@@ -1,7 +1,9 @@
 import os
+import typing
 from argparse import ArgumentParser
 
 from cauldron import cli
+from cauldron.cli import autocompletion
 from cauldron import environ
 from cauldron import runner
 
@@ -34,7 +36,8 @@ def execute(parser: ArgumentParser, path: str):
 
     recent_paths = environ.configs.fetch('recent_paths', [])
 
-    if path.startswith('::example'):
+    if path.startswith('::example:'):
+        path = path.lstrip(':').split(':', 1)[-1]
         parts = path.replace('\\', '/').strip('/').split('/')
         path = environ.paths.package('examples', *parts[1:])
     elif path.startswith('::last'):
@@ -45,6 +48,8 @@ def execute(parser: ArgumentParser, path: str):
                 """
             )
         path = recent_paths[0]
+    elif path.startswith('::recent:'):
+        path = path.lstrip(':').split(':', 1)[-1]
 
     path = environ.paths.clean(path)
     if not os.path.exists(path):
@@ -69,3 +74,38 @@ def execute(parser: ArgumentParser, path: str):
     environ.configs.put(recent_paths=recent_paths[:10], persists=True)
     environ.configs.save()
 
+
+def autocomplete(text: str, entries: typing.List[str], *args):
+    """
+
+    :param text:
+    :param entries:
+    :param args:
+    :return:
+    """
+
+    value = entries[-1]
+
+    if len(entries) == 1:
+        if entries[0].startswith('::examples'):
+            return autocompletion.matches_paths(
+                value,
+                paths=environ.paths.package('examples'),
+                include_files=False,
+                prefix='::examples:'
+            )
+
+        if entries[0].startswith('::recent'):
+            return  autocompletion.matches(
+                value,
+                *environ.configs.fetch('recent_paths', []),
+                prefix='::recent:'
+            )
+
+        if value.startswith(':'):
+            return autocompletion.matches(
+                value,
+                '::last',
+                '::examples:',
+                '::recent:'
+            )

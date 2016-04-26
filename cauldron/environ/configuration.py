@@ -20,7 +20,7 @@ class Configuration(object):
 
     @property
     def persistent(self) -> dict:
-        return self._persistent
+        return self._persistent if self._persistent != self.NO_VALUE else None
 
     def fetch_all(self):
         out = {}
@@ -37,23 +37,35 @@ class Configuration(object):
         if self.persistent is not None:
             return self
 
-        self._persistent = {}
-
         path = os.path.expanduser('~/.cauldron/v1/configs.json')
         if not os.path.exists(path):
+            self._persistent = {}
             return self
 
         try:
             with open(path, 'r+') as f:
-                self.persistent.update(**json.load(f))
+                contents = f.read()
+            if contents:
+                self._persistent = json.loads(contents)
         except json_decoder.JSONDecodeError as err:
-            log([
-                '[ERROR]: Failed to decode json file',
-                ['PATH: {}'.format(path),
-                 'INFO: {}'.format(err.msg),
-                 ['LINE: {}'.format(err.lineno),
-                  'CHAR: {}'.format(err.colno)]]
-            ])
+            if self._persistent == self.NO_VALUE:
+                return self
+
+            self._persistent = self.NO_VALUE
+            log(
+                """
+                [ERROR]: Failed to decode json file
+                  PATH: {path}
+                  INFO: {msg}
+                    LINE: {line}
+                    CHAR: {char}
+                """.format(
+                    path=path,
+                    msg=err.msg,
+                    line=err.lineno,
+                    char=err.colno
+                )
+            )
         return self
 
     def fetch(
@@ -118,13 +130,17 @@ class Configuration(object):
         :return:
         """
 
+        data = self.load().persistent
+        if data is None:
+            return self
+
         path = os.path.expanduser('~/.cauldron/v1/')
         if not os.path.exists(path):
             os.makedirs(path)
 
         path = os.path.join(path, 'configs.json')
         with open(path, 'w+') as f:
-            json.dump(self.load().persistent, f)
+            json.dump(data, f)
 
         return self
 

@@ -1,6 +1,9 @@
 import cmd
+import readline
 
 from cauldron.cli import commands
+
+readline.set_completer_delims(' \t\n')
 
 
 class CauldronShell(cmd.Cmd):
@@ -22,6 +25,9 @@ class CauldronShell(cmd.Cmd):
     def do_open(self, raw_args):
         self.execute_command('open', raw_args)
 
+    def complete_open(self, *args, **kwargs):
+        return commands.autocomplete('open', *args, **kwargs)
+
     def do_run(self, raw_args):
         self.execute_command('run', raw_args)
 
@@ -36,3 +42,4 @@ class CauldronShell(cmd.Cmd):
 
     def do_help(self, arg):
         commands.show_help()
+
