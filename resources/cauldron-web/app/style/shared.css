@@ -1,0 +1,44 @@
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+.no-select {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.left_pes_color {
+    background-color: dodgerblue;
+}
+
+.left_manus_color {
+    background-color: darkolivegreen;
+}
+
+.right_pes_color {
+    background-color: darkorange;
+}
+
+.right_manus_color {
+    background-color: darkorchid;
+}
+
+.spacer {
+    flex-grow: 1;
+}
+
+.line-break {
+    border-bottom: 1px dotted #999;
+    margin: 0.5em 0;
+}
+
+.bottom-spacer {
+    width: 100%;
+    min-height: 10.0em;
+}

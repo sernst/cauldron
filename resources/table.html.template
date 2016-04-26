@@ -1,0 +1,30 @@
+<div class="data-table">
+    <div id="{{ id }}"></div>
+</div>
+
+<script>
+  (function () {
+    var data = {{ data }};
+
+    function heightMaker() {
+      return Math.min(
+          Math.round({{ scale }} * $(window).height()),
+          26 * data.length
+      );
+    }
+
+    var table = new window.Handsontable($('#{{ id }}')[0], {
+      data: data,
+      stretchH: 'all',
+      height: heightMaker,
+      rowHeaders: true,
+      colHeaders: [{{column_headers}}],
+      manualRowResize: true,
+      manualColumnResize: true,
+      manualRowMove: true,
+      manualColumnMove: true
+    });
+
+    console.log('Created Table:', '{{ id }}', table);
+  }());
+</script>

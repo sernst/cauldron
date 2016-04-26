@@ -1,0 +1,13 @@
+{
+  "name": "cauldron-web",
+  "version": "0.0.1",
+  "dependencies": {
+    "bower": "^1.7.9",
+    "event-stream": "^3.3.2",
+    "gulp": "^3.9.1",
+    "gulp-add-src": "^0.2.0",
+    "gulp-clean-css": "^2.0.6",
+    "gulp-concat": "^2.6.0",
+    "gulp-uglify": "^1.5.3"
+  }
+}

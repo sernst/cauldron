@@ -1,0 +1,46 @@
+{
+  "name": "cauldron-web",
+  "description": "",
+  "main": "app/report.html",
+  "authors": [
+    "sernst <swernst@gmail.com>"
+  ],
+  "license": "MIT",
+  "moduleType": [],
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "d3": "~3.5.16",
+    "jquery": "^2.2.3",
+    "plotlyjs": "plotly#^1.4.1",
+    "handsontable": "^0.24.2",
+    "filesaver": "*"
+  },
+  
+  "__installs__": {
+    "js": [
+      "pikaday/pikaday.js",
+      "pikaday/plugins/pikaday.jquery.js"
+    ],
+    "js_min": [
+      "jquery/dist/jquery.min.js",
+      "d3/d3.min.js",
+      "plotlyjs/plotly.js",
+      "moment/min/moment-with-locales.min.js",
+      "zeroclipboard/dist/ZeroClipboard.min.js",
+      "handsontable/dist/handsontable.full.min.js",
+      "filesaver/FileSaver.min.js"
+    ],
+    "css": [
+      "pikaday/css/pikaday.css",
+      "handsontable/dist/handsontable.full.min.css"
+    ]
+  }
+}

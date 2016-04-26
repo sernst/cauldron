@@ -1,0 +1,25 @@
+.textbox, .plaintextbox {
+    margin:auto;
+    padding: 0.25em 1.0em;
+    max-width: 1280px;
+    font-family: 'Open Sans', Helvetica, Arial;
+    font-size: 0.9em;
+}
+
+.data-table {
+    margin: 0 1.0rem;
+}
+
+p {
+    margin: 0 0 0.5em 0;
+    line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    padding-left: 0.5em;
+    margin:0.5rem 0;
+}
+
+.box {
+    padding: 0.25em 1.0em;
+}
