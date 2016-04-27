@@ -1,3 +1,6 @@
+import re
+
+from cauldron import environ
 
 
 def confirm(question: str, default: bool = True) -> bool:
@@ -24,3 +27,54 @@ def confirm(question: str, default: bool = True) -> bool:
     return False
 
 
+def choice(title: str, prompt: str, choices: list, default_index: int = None) -> str:
+    """
+
+    :param title:
+    :param prompt:
+    :param choices:
+    :param default_index:
+    :return:
+    """
+
+    entries = []
+    for index in range(len(choices)):
+        entries.append('[{index}]: {value}'.format(
+            index=index + 1,
+            value=choices[index]
+        ))
+
+    environ.log(
+        """
+            {title}
+            {bar}
+
+            {choices}
+        """.format(
+            title=title,
+            bar='-'*len(title),
+            choices='\n'.join(entries)
+        ),
+        whitespace=1
+    )
+
+    default = ''
+    if default_index is not None:
+        default = ' [{}]'.format(1 + max(0, min(len(choices), default_index)))
+
+    while True:
+        result = input('{question}{default}:'.format(
+            question=prompt,
+            default=default
+        ))
+
+        result = re.compile('[^0-9]*').sub('', result)
+        if len(result) == 0:
+            if default_index is None:
+                continue
+
+            result = default_index
+        else:
+            result = max(0, min(int(result) - 1, len(choices)))
+
+        return choices[result]

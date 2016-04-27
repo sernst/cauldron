@@ -78,6 +78,9 @@ class Report(object):
         :return:
         """
 
+        if not isinstance(data, (list, tuple)):
+            data = [data]
+
         self.body.append(render.plotly(data, layout))
 
     def table(self, data_frame, scale: float = 0.7):

@@ -2,7 +2,9 @@ import os
 import typing
 from argparse import ArgumentParser
 
+import cauldron
 from cauldron import cli
+from cauldron.cli import query
 from cauldron.cli import autocompletion
 from cauldron import environ
 from cauldron import runner
@@ -36,37 +38,55 @@ def execute(parser: ArgumentParser, path: str):
 
     recent_paths = environ.configs.fetch('recent_paths', [])
 
-    if path.startswith('::example:'):
+    if path.startswith('@examples:'):
         path = path.lstrip(':').split(':', 1)[-1]
         parts = path.replace('\\', '/').strip('/').split('/')
-        path = environ.paths.package('examples', *parts[1:])
-    elif path.startswith('::last'):
+        path = environ.paths.package('examples', *parts)
+
+    elif path.startswith('@last'):
         if len(recent_paths) < 1:
             environ.log(
                 """
-                [ERROR]: No projects have been opened recently
+                No projects have been opened recently
                 """
             )
+            return
         path = recent_paths[0]
-    elif path.startswith('::recent:'):
-        path = path.lstrip(':').split(':', 1)[-1]
+
+    elif path.startswith('@recent'):
+        if len(recent_paths) < 1:
+            environ.log(
+                """
+                There are no recent projects available to open.
+                """
+            )
+            return
+
+        path = query.choice(
+            'Recently Opened Projects',
+            'Choose a project',
+            recent_paths,
+            0
+        )
 
     path = environ.paths.clean(path)
     if not os.path.exists(path):
         environ.log(
             """
-            [ERROR]: The specified path does not exist:
+            The specified path does not exist:
 
             "{path}"
-
-            Unable to start
             """.format(path=path)
         )
         return
 
-    environ.log('Starting: {}'.format(path))
+    try:
+        runner.initialize(path)
+    except FileNotFoundError:
+        environ.log('Error: Project not found')
+        return
 
-    runner.initialize(path)
+    environ.log('Opened: {}'.format(path))
 
     if path in recent_paths:
         recent_paths.remove(path)
@@ -74,38 +94,48 @@ def execute(parser: ArgumentParser, path: str):
     environ.configs.put(recent_paths=recent_paths[:10], persists=True)
     environ.configs.save()
 
+    url = cauldron.project.internal_project.write()
 
-def autocomplete(text: str, entries: typing.List[str], *args):
+    environ.log(
+        """
+        Project URL:
+          * {url}
+        """.format(url=url)
+    )
+
+def autocomplete(segment: str, line:str, parts: typing.List[str]):
     """
 
-    :param text:
-    :param entries:
-    :param args:
+    :param segment:
+    :param line:
+    :param parts:
     :return:
     """
 
-    value = entries[-1]
+    # print('{e}[9999D{e}[KAUTO "{prefix}" {parts}\n>>> {line}'.format(
+    #     prefix=segment,
+    #     parts=parts,
+    #     line=line,
+    #     e=chr(27)
+    # ), end='')
 
-    if len(entries) == 1:
-        if entries[0].startswith('::examples'):
-            return autocompletion.matches_paths(
-                value,
-                paths=environ.paths.package('examples'),
-                include_files=False,
-                prefix='::examples:'
+    if len(parts) == 1:
+        value = parts[0]
+
+        if value.startswith('@examples:'):
+            segment = value.split(':', 1)[-1]
+            return autocompletion.match_path(
+                segment,
+                environ.paths.package('examples', segment),
+                include_files=False
             )
 
-        if entries[0].startswith('::recent'):
-            return  autocompletion.matches(
-                value,
-                *environ.configs.fetch('recent_paths', []),
-                prefix='::recent:'
-            )
-
-        if value.startswith(':'):
+        if value.startswith('@'):
             return autocompletion.matches(
-                value,
-                '::last',
-                '::examples:',
-                '::recent:'
+                segment,
+                'last',
+                'examples:',
+                'recent'
             )
+
+        return  autocompletion.match_path(segment, value)

@@ -13,47 +13,60 @@ def matches(value: str, *args: typing.Tuple[str], prefix: str = None) -> list:
     :return:
     """
 
+    items = []
+    for a in args:
+        if isinstance(a, str):
+            items.append(a)
+        else:
+            items += list(a)
+
     if prefix:
-        args = ['{}{}'.format(prefix, x) for x in args]
+        items = ['{}{}'.format(prefix, x) for x in items]
 
     return [
-        item for item in args
+        item for item in items
         if item.startswith(value)
     ]
 
 
-def matches_paths(
+def match_path(
+        segment: str,
         value: str,
-        paths: typing.Union[str, typing.List[str]],
-        prefix: str = None,
         include_files: bool = True,
-        include_dirs: bool = True,
-        absolute: bool = False
+        include_folders: bool = True
 ) -> list:
     """
 
+    :param segment:
     :param value:
-    :param paths:
-    :param prefix:
+    :param include_files:
+    :param include_folders:
     :return:
     """
 
-    if isinstance(paths, str):
-        paths = [paths]
+    segment = segment.strip(os.sep)
+    path = environ.paths.clean(value.rstrip(os.sep))
 
-    items = []
-    for p in paths:
-        p = environ.paths.clean(p)
-        for item in list(os.listdir(p)):
-            item_path = os.path.join(p, item)
-            if not include_dirs and os.path.isdir(item_path):
-                continue
-            elif not include_files and os.path.isfile(item_path):
-                continue
-            items.append(item_path if absolute else item)
+    if not os.path.exists(path):
+        # The path doesn't exist, assume that the value is an incomplete path
+        # and grab the path to the containing directory instead
+        path = os.path.dirname(path)
 
-    return matches(
-        value,
-        *items,
-        prefix=prefix
-    )
+    if not os.path.exists(path):
+        return []
+    if not os.path.isdir(path):
+        return []
+
+    items = [x for x in os.listdir(path) if x.startswith(segment)]
+    out = []
+
+    for item in items:
+        item_path = os.path.join(path, item)
+        if include_folders and os.path.isdir(item_path):
+            out.append('{}{}'.format(item, os.sep))
+            continue
+
+        if include_files and os.path.isfile(item_path):
+            out.append(item)
+
+    return out

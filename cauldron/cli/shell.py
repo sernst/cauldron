@@ -3,7 +3,7 @@ import readline
 
 from cauldron.cli import commands
 
-readline.set_completer_delims(' \t\n')
+# readline.set_completer_delims(' \t\n')
 
 
 class CauldronShell(cmd.Cmd):
@@ -14,32 +14,30 @@ class CauldronShell(cmd.Cmd):
         super(CauldronShell, self).__init__(completekey='tab')
         self.history = []
 
-    def execute_command(self, name: str, raw_args: str):
-        args = (name, raw_args)
-        self.history.append(args)
-        return commands.execute(*args)
+    def default(self, line: str):
+        line = line.strip()
+        if len(line) < 1:
+            return
 
-    def do_clear(self, raw_args):
-        self.execute_command('clear', raw_args)
+        self.history.append(line)
+        name, raw_args = commands.split_line(line)
 
-    def do_open(self, raw_args):
-        self.execute_command('open', raw_args)
+        if name == 'help':
+            commands.show_help()
+            return
 
-    def complete_open(self, *args, **kwargs):
-        return commands.autocomplete('open', *args, **kwargs)
-
-    def do_run(self, raw_args):
-        self.execute_command('run', raw_args)
-
-    def do_configure(self, raw_args):
-        self.execute_command('configure', raw_args)
-
-    def do_export(self, raw_args):
-        self.execute_command('export', raw_args)
-
-    def do_exit(self, raw_args):
-        return self.execute_command('exit', raw_args)
+        return commands.execute(name, raw_args)
 
     def do_help(self, arg):
-        commands.show_help()
+        commands.show_help(arg)
+
+    def completenames(self, text, *ignored):
+        return [
+            x for x in commands.list_command_names()
+            if x.startswith(text)
+        ]
+
+    def completedefault(self, text, line, begin_index, end_index):
+        name, raw_args = commands.split_line(line)
+        return commands.autocomplete(name, text, line, begin_index, end_index)
 

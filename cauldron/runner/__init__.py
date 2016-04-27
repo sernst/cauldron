@@ -12,7 +12,7 @@ from cauldron.session.project import Project
 
 def step(
         project: Project,
-        step_report: Report
+        step_report: typing.Union[Report, str]
 ):
     """
 
@@ -21,20 +21,33 @@ def step(
     :return:
     """
 
-    file_path = os.path.join(project.source_path, step_report.id)
+    report = None
+    if isinstance(step_report, str):
+        for s in project.steps:
+            if s.id != step_report:
+                break
+            report = s
+            break
+    else:
+        report = step_report
+
+    if report is None:
+        return
+
+    file_path = os.path.join(project.source_path, report.id)
 
     os.chdir(os.path.dirname(file_path))
-    project.current_step = step_report
-    step_report.clear()
+    project.current_step = report
+    report.clear()
 
-    if step_report.id.endswith('.md'):
+    if report.id.endswith('.md'):
         with open(file_path, 'r+') as f:
-            step_report.markdown(f.read())
+            report.markdown(f.read())
         return True
 
-    module = types.ModuleType(step_report.id.split('.')[0])
+    module = types.ModuleType(report.id.split('.')[0])
 
-    project.shared.put(__cauldron_uid__=step_report.id.split('.')[0])
+    project.shared.put(__cauldron_uid__=report.id.split('.')[0])
 
     with open(file_path, 'r+') as f:
         contents = f.read()
