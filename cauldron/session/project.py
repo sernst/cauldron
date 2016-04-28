@@ -2,6 +2,7 @@ import os
 import typing
 import json
 import shutil
+import time
 
 from cauldron import environ
 from cauldron import templating
@@ -10,6 +11,9 @@ from cauldron.reporting.report import Report
 
 
 class ExposedProject(object):
+    """
+    A simplified form of the project for exposure to the Cauldron users.
+    """
 
     def __init__(self):
         self._project = None
@@ -20,7 +24,9 @@ class ExposedProject(object):
 
     @property
     def display(self) -> Report:
-        return self._project.current_step
+        if not self._project.current_step:
+            return None
+        return self._project.current_step.report
 
     @property
     def shared(self) -> SharedCache:
@@ -34,17 +40,64 @@ class ExposedProject(object):
         self._project = project
 
 
+class ProjectStep(object):
+    """
+    A computational step within the project, which contains data and
+    functionality related specifically to that step as well as a reference to
+    the project itself.
+    """
+
+    def __init__(
+            self,
+            project: 'Project' = None,
+            report: Report = None
+    ):
+        self.project = project
+        self.report = report
+        self.last_modified = None
+
+    @property
+    def id(self) -> str:
+        if not self.report:
+            return None
+        return self.report.id
+
+    @property
+    def index(self) -> int:
+        if not self.project:
+            return -1
+        return self.project.steps.index(self)
+
+    @property
+    def source_path(self) -> str:
+        if not self.project or not self.report:
+            return None
+        return os.path.join(self.project.source_directory, self.id)
+
+    def is_dirty(self):
+        """
+
+        :return:
+        """
+        if self.last_modified is None:
+            return True
+        p = self.source_path
+        if not p:
+            return False
+        return os.path.getmtime(p) >= self.last_modified
+
+
 class Project(object):
 
     def __init__(
             self,
-            source_path: str,
+            source_directory: str,
             results_path: str = None,
             identifier: str = None,
             shared: typing.Union[dict, SharedCache] = None
     ):
         """
-        :param source_path:
+        :param source_directory:
         :param results_path:
             [optional] The path where the results files for the project will
             be saved. If omitted, the default global results path will be
@@ -56,17 +109,15 @@ class Project(object):
             [optional] The shared data cache used to store
         """
 
-        source_path = environ.paths.clean(source_path)
-        if os.path.isfile(source_path):
-            source_path = os.path.dirname(source_path)
-        self.source_path = source_path
+        source_directory = environ.paths.clean(source_directory)
+        if os.path.isfile(source_directory):
+            source_directory = os.path.dirname(source_directory)
+        self.source_directory = source_directory
 
-        settings = load_project_settings(self.source_path)
-
-        self.id = identifier if identifier else settings.get('id', 'unknown')
         self.steps = []
         self._results_path = results_path
         self._current_step = None
+        self.last_modified = None
 
         def as_shared_cache(source):
             if source is None:
@@ -75,11 +126,16 @@ class Project(object):
                 return SharedCache().put(**source)
             return source
 
-        self.settings = as_shared_cache(settings)
         self.shared = as_shared_cache(shared)
+        self.settings = SharedCache()
+        self.refresh()
 
-        for step_name in self.settings.steps:
-            self.steps.append(Report(step_name))
+
+    @property
+    def id(self) -> str:
+        if self.settings:
+            return self.settings.fetch('id', 'unknown')
+        return 'unknown'
 
     @property
     def current_step(self) -> Report:
@@ -92,7 +148,13 @@ class Project(object):
         self._current_step = value
 
     @property
-    def results_path(self):
+    def source_path(self) -> str:
+        if not self.source_directory:
+            return None
+        return os.path.join(self.source_directory, 'cauldron.json')
+
+    @property
+    def results_path(self) -> str:
         if self._results_path:
             return self._results_path
 
@@ -105,11 +167,11 @@ class Project(object):
         )
 
     @results_path.setter
-    def results_path(self, value):
+    def results_path(self, value: str):
         self._results_path = environ.paths.clean(value)
 
     @property
-    def url(self):
+    def url(self) -> str:
         """
         Returns the URL that will open this project results file in the browser
         :return:
@@ -124,7 +186,7 @@ class Project(object):
         )
 
     @property
-    def directory(self):
+    def directory(self) -> str:
         """
         Returns the directory where the project results files will be written
         :return:
@@ -135,12 +197,36 @@ class Project(object):
 
         return os.path.join(self.results_path, 'reports', self.id)
 
-    def refresh(self):
+    def refresh(self) -> bool:
         """
+        Loads the cauldron.json configuration file for the project and populates
+        the project with the loaded data. Any existing data will be overwritten,
+        including previously stored ProjectSteps.
+
+        If the project has already loaded with the most recent version of the
+        cauldron.json file, this method will return without making any changes
+        to the project.
 
         :return:
+            Whether or not a refresh was needed and carried out
         """
-        self.settings.clear().put(**load_project_settings(self.source_path))
+
+        if self.last_modified >= os.path.getmtime(self.source_path):
+            return False
+
+        self.settings.clear().put(
+            **load_project_settings(self.source_directory)
+        )
+
+        self.steps = []
+        for step_name in self.settings.steps:
+            self.steps.append(ProjectStep(
+                report=Report(step_name),
+                project=self
+            ))
+
+        self.last_modified = time.time()
+        return True
 
     def write(self) -> str:
         """
@@ -163,9 +249,14 @@ class Project(object):
         data = {}
         files = {}
         for step in self.steps:
-            body += step.body
-            data.update(step.data.fetch(None))
-            files.update(step.files.fetch(None))
+            report = step.report
+            body.append(templating.render_template(
+                'step-body.html',
+                body=''.join(report.body),
+                title=report.id
+            ))
+            data.update(report.data.fetch(None))
+            files.update(report.files.fetch(None))
 
         report_path = os.path.join(self.directory, 'results.js')
         with open(report_path, 'w+') as f:

@@ -23,3 +23,15 @@ h1, h2, h3, h4, h5, h6 {
 .box {
     padding: 0.25em 1.0em;
 }
+
+.project-step .header {
+    padding:1.0rem;
+    margin:0;
+    background-color: #f4f4f4;
+    color: #a8a8a8;
+    border-top: 1px solid #a7a7a7;
+}
+
+.project-step .project-step-body {
+    margin: 0.5em 0;
+}

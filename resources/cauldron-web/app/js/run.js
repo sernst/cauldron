@@ -59,7 +59,11 @@
     
     return exports.loadDataFile(dataFilename)
       .then(function () {
-        $('title').html(exports.settings.title || 'Cauldron');
+        $('title').html(
+            exports.SETTINGS.title ||
+            exports.SETTINGS.id ||
+            'Cauldron'
+        );
       });
   }
   exports.run = run;

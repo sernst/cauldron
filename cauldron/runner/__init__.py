@@ -3,57 +3,58 @@ import sys
 import traceback
 import types
 import typing
+import time
 
 import cauldron
 from cauldron import environ
-from cauldron.reporting.report import Report
 from cauldron.session.project import Project
+from cauldron.session.project import ProjectStep
 
 
 def step(
         project: Project,
-        step_report: typing.Union[Report, str]
+        project_step: typing.Union[ProjectStep, str]
 ):
     """
 
     :param project:
-    :param step_report:
+    :param project_step:
     :return:
     """
 
-    report = None
-    if isinstance(step_report, str):
-        for s in project.steps:
-            if s.id != step_report:
+    if isinstance(project_step, str):
+        found = False
+        for ps in project.steps:
+            if ps.id != project_step:
                 break
-            report = s
+            project_step = ps
+            found = True
             break
-    else:
-        report = step_report
 
-    if report is None:
-        return
+        if not found:
+            return
 
-    file_path = os.path.join(project.source_path, report.id)
+    file_path = os.path.join(project.source_directory, project_step.id)
 
     os.chdir(os.path.dirname(file_path))
-    project.current_step = report
-    report.clear()
+    project.current_step = project_step
+    project_step.report.clear()
 
-    if report.id.endswith('.md'):
+    if project_step.id.endswith('.md'):
         with open(file_path, 'r+') as f:
-            report.markdown(f.read())
+            project_step.report.markdown(f.read())
         return True
 
-    module = types.ModuleType(report.id.split('.')[0])
+    module = types.ModuleType(project_step.report.id.split('.')[0])
 
-    project.shared.put(__cauldron_uid__=report.id.split('.')[0])
+    project.shared.put(__cauldron_uid__=project_step.report.id.split('.')[0])
 
     with open(file_path, 'r+') as f:
         contents = f.read()
 
     try:
         exec(contents, module.__dict__)
+        project_step.last_modified = time.time()
         return True
     except Exception as err:
         summaries = traceback.extract_tb(sys.exc_info()[-1])
@@ -61,11 +62,11 @@ def step(
             summaries.pop(0)
 
         stack = []
-        for s in summaries:
-            filename = s.filename
+        for ps in summaries:
+            filename = ps.filename
             if filename == '<string>':
                 filename = file_path
-            stack.append('FILE: {} AT LINE: {}'.format(filename, s.lineno))
+            stack.append('FILE: {} AT LINE: {}'.format(filename, ps.lineno))
 
         environ.log(
             """
@@ -73,7 +74,7 @@ def step(
                 {type}: {message}
             {stack}
             """.format(
-                filename=step_report.id,
+                filename=project_step.report.id,
                 type=err.__class__.__name__,
                 message=err,
                 stack='\n'.join(stack)
@@ -89,18 +90,24 @@ def initialize(project: typing.Union[str, Project]):
     """
 
     if isinstance(project, str):
-        project = Project(source_path=project)
+        project = Project(source_directory=project)
 
     cauldron.project.load(project)
     return project
 
 
-def complete(project: typing.Union[Project, None]) -> str:
+def complete(
+        project: typing.Union[Project, None],
+        starting: ProjectStep = None,
+        force: bool = False
+) -> str:
     """
     Runs the entire project, writes the results files, and returns the URL to
     the report file
 
     :param project:
+    :param starting:
+    :param force:
     :return:
         Local URL to the report path
     """
@@ -108,12 +115,26 @@ def complete(project: typing.Union[Project, None]) -> str:
     if project is None:
         project = cauldron.project.internal_project
 
-    for s in project.steps:
-        if not step(project, s):
+    starting_index = 0
+    if starting:
+        starting_index = project.steps.index(starting)
+    active = False
+
+    for ps in project.steps:
+        if ps.index < starting_index:
+            continue
+
+        if not force and not active and not ps.is_dirty():
+            environ.log('[{}]: Nothing to update'.format(ps.id))
+            continue
+        active = True
+
+        if not step(project, ps):
             project.write()
+            environ.log('[{}]: Failed to update'.format(ps.id))
             return None
 
+        environ.log('[{}]: Updated'.format(ps.id))
+
     return project.write()
-
-
 

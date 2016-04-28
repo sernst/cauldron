@@ -42,7 +42,14 @@ def execute(parser: ArgumentParser, target: list):
         )
         return
 
-    project.refresh()
+    was_loaded = bool(project.last_modified is not None)
+    if project.refresh() and was_loaded:
+        environ.log(
+            """
+            [WARNING]: The project was reloaded due to changes detected in the
+            cauldron.json
+            """, whitespace=1)
+
     reporting.initialize_results_path(project.results_path)
 
 

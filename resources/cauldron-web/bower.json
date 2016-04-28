@@ -21,9 +21,9 @@
     "jquery": "^2.2.3",
     "plotlyjs": "plotly#^1.4.1",
     "handsontable": "^0.24.2",
-    "filesaver": "*"
+    "filesaver": "*",
+    "normalize-css": "^4.1.1"
   },
-  
   "__installs__": {
     "js": [
       "pikaday/pikaday.js",
@@ -39,6 +39,7 @@
       "filesaver/FileSaver.min.js"
     ],
     "css": [
+      "normalize-css/normalize.css",
       "pikaday/css/pikaday.css",
       "handsontable/dist/handsontable.full.min.css"
     ]

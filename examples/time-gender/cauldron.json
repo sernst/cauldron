@@ -1,5 +1,6 @@
 {
   "steps": [
+    "introduction.md",
     "load_data.py"
   ]
 }

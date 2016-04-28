@@ -18,6 +18,9 @@ def execute(parser: ArgumentParser):
 
     for k in keys:
 
+        if k.startswith('__cauldron_'):
+            continue
+
         try:
             data_type = data[k].__class__.__name__
         except Exception:
