@@ -10,6 +10,14 @@
     margin: 0 1.0rem;
 }
 
+.padded {
+    margin: 0 1.0em;
+}
+
+pre {
+    font-family: "Lucida Console", Monaco, "Courier New", Courier, monospace;
+}
+
 p {
     margin: 0 0 0.5em 0;
     line-height: 1.5;
@@ -25,7 +33,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .project-step .header {
-    padding:1.0rem;
+    display: flex;
+    flex-direction: column;
+    padding:0.6rem;
+    min-height: 24px;
     margin:0;
     background-color: #f4f4f4;
     color: #a8a8a8;
@@ -34,4 +45,30 @@ h1, h2, h3, h4, h5, h6 {
 
 .project-step .project-step-body {
     margin: 0.5em 0;
+}
+
+.status-variable .name {
+    color: #996d90;
+    font-weight: bold;
+}
+
+.status-variable .type {
+    font-style: italic;
+    opacity: 0.6;
+    font-size: 0.9em;
+}
+
+.status-variable .value {
+    margin-left: 2.0em;
+    opacity: 0.5;
+    font-size: 0.7em;
+    line-height: 1.3;
+}
+
+.clicker {
+    cursor: pointer;
+}
+
+.clicker:hover {
+    opacity: 0.8;
 }

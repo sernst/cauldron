@@ -17,12 +17,19 @@ class SharedCache(object):
         self._shared_cache_data = dict()
         return self
 
-    def put(self, **kwargs):
+    def put(self, *args, **kwargs):
         """
 
         :param kwargs:
         :return:
         """
+
+        index = 0
+        while index < (len(args) - 1):
+            key = args[index]
+            value = args[index + 1]
+            self._shared_cache_data[key] = value
+            index += 2
 
         for key, value in kwargs.items():
             self._shared_cache_data[key] = value

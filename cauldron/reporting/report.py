@@ -7,11 +7,12 @@ class Report(object):
     A class for storing the elements of the
     """
 
-    def __init__(self, identifier: str):
+    def __init__(self, identifier: str, **kwargs):
         self.id = identifier
         self.body = []
         self.data = SharedCache()
         self.files = SharedCache()
+        self.project = kwargs.get('project')
 
     def clear(self):
         self.body = []
@@ -142,3 +143,21 @@ class Report(object):
 
         self.body.append(render.html(dom))
 
+    def workspace(self, values: bool = True, types: bool = True):
+        """
+
+        :param values:
+        :param types:
+        :return:
+        """
+
+        if not self.project:
+            return
+
+        data = {}
+        for key, value in self.project.shared.fetch(None).items():
+            if key.startswith('__cauldron_'):
+                continue
+            data[key] = value
+
+        self.body.append(render.status(data, values=values, types=types))

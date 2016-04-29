@@ -6,12 +6,20 @@
     </div>
 
     <div>
-      <div class="icon-button"></div>
+      {% if code %}
+      <div class="clicker"
+           onclick="CAULDRON.toggleVisible('#{{ "code" | id }}')">
+        Code
+      </div>
+      {%  endif %}
     </div>
-
+  </div>
+  <div class="code cds-code"
+       id="{{ "code" | id }}"
+       style="display:none">
+    {{ code }}
   </div>
   <div class="project-step-body">
     {{ body }}
   </div>
 </div>
-a

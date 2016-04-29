@@ -1,10 +1,12 @@
-import textwrap
-import random
 import json as json_internal
-import pandas as pd
+import random
+import textwrap
 from datetime import datetime
 
+import pandas as pd
+
 from cauldron import templating
+from cauldron.render import syntax_highlighting
 
 try:
     import markdown as md
@@ -17,11 +19,34 @@ except ImportError:
     plotly_lib = None
 
 
+def code(
+        source: str,
+        language: str = None,
+        filename: str = None,
+        mime_type: str = None
+) -> str:
+    """
+
+    :param source:
+    :param language:
+    :param filename:
+    :param mime_type:
+    :return:
+    """
+
+    return syntax_highlighting.as_html(
+        source=source,
+        language=language,
+        filename=filename,
+        mime_type=mime_type
+    )
+
+
 def header(level: int, contents: str) -> str:
     """
 
     :param level:
-    :param text:
+    :param contents:
     :return:
     """
 
@@ -198,3 +223,57 @@ def svg(svg_data: str) -> str:
         '<div class="svg-box">{{ svg }}</div>',
         svg=svg
     )
+
+
+def status(
+        data: dict,
+        values: bool = True,
+        types: bool = True
+) -> str:
+    """
+
+    :param data:
+    :param values:
+    :param types:
+    :return:
+    """
+
+    out = []
+    keys = list(data.keys())
+    keys.sort()
+
+    for key in keys:
+        value = data[key]
+        value_type = None
+        try:
+            value_type = value.__class__.__name__
+        except Exception:
+            pass
+
+        try:
+            if value_type is None:
+                value_type = value.__name__
+        except Exception:
+            pass
+
+        try:
+            value_type = type(value).__name__
+        except Exception:
+            pass
+
+        if hasattr(value, 'head'):
+            try:
+                value = value.head(5)
+            except Exception:
+                pass
+
+        value = '<pre>{}</pre>'.format(str(value)[:600])
+
+        out.append(templating.render_template(
+            'status-variable.template.html',
+            name=key,
+            type=value_type,
+            value=value
+        ))
+
+    return ''.join(out)

@@ -3,11 +3,13 @@ import typing
 import json
 import shutil
 import time
+import sys
 
 from cauldron import environ
 from cauldron import templating
 from cauldron.session.caching import SharedCache
 from cauldron.reporting.report import Report
+from cauldron import render
 
 
 class ExposedProject(object):
@@ -55,6 +57,7 @@ class ProjectStep(object):
         self.project = project
         self.report = report
         self.last_modified = None
+        self.code = None
 
     @property
     def id(self) -> str:
@@ -211,17 +214,38 @@ class Project(object):
             Whether or not a refresh was needed and carried out
         """
 
-        if self.last_modified >= os.path.getmtime(self.source_path):
+        lm = self.last_modified
+        if lm is not None and lm >= os.path.getmtime(self.source_path):
             return False
 
         self.settings.clear().put(
             **load_project_settings(self.source_directory)
         )
 
+        path = self.settings.fetch('results_path')
+        if path:
+            self.results_path = environ.paths.clean(
+                os.path.join(self.source_directory, path)
+            )
+
+        python_paths = self.settings.fetch('python_paths', [])
+        if isinstance(python_paths, str):
+            python_paths = [python_paths]
+        for path in python_paths:
+            path = environ.paths.clean(
+                os.path.join(self.source_directory, path)
+            )
+            if path not in sys.path:
+                sys.path.append(path)
+
         self.steps = []
+        steps_folder = self.settings.fetch('steps_folder')
         for step_name in self.settings.steps:
+            step_path = step_name
+            if steps_folder:
+                step_path = os.path.join(steps_folder, step_path)
             self.steps.append(ProjectStep(
-                report=Report(step_name),
+                report=Report(step_path, project=self),
                 project=self
             ))
 
@@ -250,8 +274,10 @@ class Project(object):
         files = {}
         for step in self.steps:
             report = step.report
+            code = render.code(step.code, filename=step.id) if step.code else ''
             body.append(templating.render_template(
                 'step-body.html',
+                code=code,
                 body=''.join(report.body),
                 title=report.id
             ))

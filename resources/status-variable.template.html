@@ -1,0 +1,15 @@
+<div id="{{ "variable" | id }}" class="status-variable padded">
+  <div class="clicker"
+       onclick="CAULDRON.toggleVisible('#{{ "value" | id }}')"
+  >
+    <span class="name">{{ name }}</span>:
+    <span class="type">{{ type }}</span>
+  </div>
+  <div id="{{ "value" | id }}"
+       class="value"
+       style="display:none"
+  >
+    {{ value }}
+  </div>
+</div>
+

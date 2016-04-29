@@ -17,6 +17,6 @@ setup(
         'six',
         'jinja2',
         'markdown',
-        'beautifulsoup4'
+        'pygments'
     ]
 )

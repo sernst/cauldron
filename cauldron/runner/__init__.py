@@ -13,12 +13,14 @@ from cauldron.session.project import ProjectStep
 
 def step(
         project: Project,
-        project_step: typing.Union[ProjectStep, str]
-):
+        project_step: typing.Union[ProjectStep, str],
+        force: bool = False
+) -> bool:
     """
 
     :param project:
     :param project_step:
+    :param force:
     :return:
     """
 
@@ -32,31 +34,46 @@ def step(
             break
 
         if not found:
-            return
+            return False
 
     file_path = os.path.join(project.source_directory, project_step.id)
+
+    if not os.path.exists(file_path):
+        environ.log('[{id}]: Not found "{path}"'.format(
+            id=project_step.id,
+            path=file_path
+        ))
+        return False
+
+    if not force and not project_step.is_dirty():
+        environ.log('[{}]: Nothing to update'.format(project_step.id))
+        return True
 
     os.chdir(os.path.dirname(file_path))
     project.current_step = project_step
     project_step.report.clear()
 
+    with open(file_path, 'r+') as f:
+        code = f.read()
+    project_step.code = code
+
     if project_step.id.endswith('.md'):
-        with open(file_path, 'r+') as f:
-            project_step.report.markdown(f.read())
+        project_step.report.markdown(code)
+        project_step.last_modified = time.time()
+        environ.log('[{}]: Updated'.format(project_step.id))
         return True
 
     module = types.ModuleType(project_step.report.id.split('.')[0])
 
     project.shared.put(__cauldron_uid__=project_step.report.id.split('.')[0])
 
-    with open(file_path, 'r+') as f:
-        contents = f.read()
-
     try:
-        exec(contents, module.__dict__)
+        exec(code, module.__dict__)
         project_step.last_modified = time.time()
+        environ.log('[{}]: Updated'.format(project_step.id))
         return True
     except Exception as err:
+        environ.log('[{}]: Failed to update'.format(project_step.id))
         summaries = traceback.extract_tb(sys.exc_info()[-1])
         while summaries[0].filename != '<string>':
             summaries.pop(0)
@@ -129,12 +146,9 @@ def complete(
             continue
         active = True
 
-        if not step(project, ps):
+        if not step(project, ps, force=True):
             project.write()
-            environ.log('[{}]: Failed to update'.format(ps.id))
             return None
-
-        environ.log('[{}]: Updated'.format(ps.id))
 
     return project.write()
 
