@@ -7,12 +7,15 @@ class Report(object):
     A class for storing the elements of the
     """
 
-    def __init__(self, identifier: str, **kwargs):
+    def __init__(self, identifier: str, project: str = None, **kwargs):
         self.id = identifier
         self.body = []
+        self.css = []
         self.data = SharedCache()
         self.files = SharedCache()
-        self.project = kwargs.get('project')
+        self.project = project
+        self.title = kwargs.get('title')
+        self.summary = kwargs.get('summary')
 
     def clear(self):
         self.body = []
@@ -43,14 +46,14 @@ class Report(object):
             result = render.text(text)
         self.body.append(result)
 
-    def markdown(self, source: str):
+    def markdown(self, source: str, **kwargs):
         """
 
         :param source:
         :return:
         """
 
-        self.body.append(render.markdown(source))
+        self.body.append(render.markdown(source, **kwargs))
 
     def json(self, window_key: str, data):
         """

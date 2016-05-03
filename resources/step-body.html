@@ -1,25 +1,47 @@
-<div class="project-step">
+<div class="cd-project-step" id="{{ "project-step" | id }}">
   <div class="header">
     <div>
-      <div class="title">{{ title }}</div>
+      <div class="title">{{ id }}</div>
       <div class="subtitle">{{ subtitle }}</div>
     </div>
 
-    <div>
+    <div class="spacer"> </div>
+
+    <div class="button-bar">
       {% if code %}
       <div class="clicker"
            onclick="CAULDRON.toggleVisible('#{{ "code" | id }}')">
-        Code
+        code
       </div>
+        {% if body %}
+        <div class="clicker collapse-close"
+
+             onclick="CAULDRON.collapse('{{ "project-step" | id }}', false)"
+        >
+          <i class="material-icons">keyboard_arrow_up</i>
+        </div>
+        <div class="clicker collapse-open"
+             style="display:none"
+             onclick="CAULDRON.collapse('{{ "project-step" | id }}', true)"
+        >
+          <i class="material-icons">keyboard_arrow_down</i>
+        </div>
+        {%  endif %}
       {%  endif %}
     </div>
   </div>
-  <div class="code cds-code"
+
+  {% if code %}
+  <div class="code"
        id="{{ "code" | id }}"
        style="display:none">
     {{ code }}
   </div>
-  <div class="project-step-body">
+  {% endif %}
+
+  {% if body %}
+  <div class="body">
     {{ body }}
   </div>
+  {%  endif %}
 </div>

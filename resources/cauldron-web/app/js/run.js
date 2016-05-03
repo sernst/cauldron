@@ -71,8 +71,12 @@
         // Add auto resizing to plotly graphs
         exports.resizeCallbacks.push(function () {
           $('.plotly-graph-div').each(function (index, e) {
-            var plot_id = $(e).attr('id');
-            console.log(plot_id);
+            if ($(e).parents('.cd-project-step').hasClass('collapsed')) {
+              console.log('skipped:', index, e);
+              // Do not resize plotly objects that are currently invisible
+              return;
+            }
+
             Plotly.Plots.resize(e);
           });
         });

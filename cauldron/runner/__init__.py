@@ -9,6 +9,7 @@ import cauldron
 from cauldron import environ
 from cauldron.session.project import Project
 from cauldron.session.project import ProjectStep
+from cauldron import templating
 
 
 def step(
@@ -58,7 +59,16 @@ def step(
     project_step.code = code
 
     if project_step.id.endswith('.md'):
-        project_step.report.markdown(code)
+        project_step.report.markdown(code, **project.shared.fetch(None))
+        project_step.last_modified = time.time()
+        environ.log('[{}]: Updated'.format(project_step.id))
+        return True
+
+    if project_step.id.endswith('.html'):
+        project_step.report.html(templating.render(
+            template=code,
+            **project.shared.fetch(None)
+        ))
         project_step.last_modified = time.time()
         environ.log('[{}]: Updated'.format(project_step.id))
         return True

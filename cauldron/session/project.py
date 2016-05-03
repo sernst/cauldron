@@ -133,7 +133,6 @@ class Project(object):
         self.settings = SharedCache()
         self.refresh()
 
-
     @property
     def id(self) -> str:
         if self.settings:
@@ -184,7 +183,7 @@ class Project(object):
             return None
 
         return 'file://{path}?id={id}'.format(
-            path=os.path.join(self.results_path, 'report.html'),
+            path=os.path.join(self.results_path, 'project.html'),
             id=self.id
         )
 
@@ -240,12 +239,25 @@ class Project(object):
 
         self.steps = []
         steps_folder = self.settings.fetch('steps_folder')
-        for step_name in self.settings.steps:
-            step_path = step_name
+        for step_data in self.settings.steps:
+            if isinstance(step_data, str):
+                step_data = dict(name=step_data)
+            step_path = step_data.get('name')
+
+            if step_path is None:
+                environ.log(
+                    """
+                    [ERROR]: No name was found for the step:
+                        {}
+                    """.format(step_data)
+                )
+                self.last_modified = 0
+                return True
+
             if steps_folder:
                 step_path = os.path.join(steps_folder, step_path)
             self.steps.append(ProjectStep(
-                report=Report(step_path, project=self),
+                report=Report(step_path, project=self, **step_data),
                 project=self
             ))
 
@@ -279,7 +291,9 @@ class Project(object):
                 'step-body.html',
                 code=code,
                 body=''.join(report.body),
-                title=report.id
+                id=report.id,
+                title=report.title,
+                summary=report.summary
             ))
             data.update(report.data.fetch(None))
             files.update(report.files.fetch(None))

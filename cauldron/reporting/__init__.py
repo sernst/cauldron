@@ -11,6 +11,23 @@ def initialize_results_path(results_path: str):
     :return:
     """
 
+    def remove(target_path):
+        if not os.path.exists(target_path):
+            return True
+
+        caller = shutil.rmtree if os.path.isdir(target_path) else os.remove
+        try:
+            caller(target_path)
+            return True
+        except Exception:
+            try:
+                caller(target_path)
+                return True
+            except Exception:
+                pass
+
+        return False
+
     dest_path = environ.paths.clean(results_path)
     if not os.path.exists(dest_path):
         os.makedirs(dest_path)
@@ -20,6 +37,9 @@ def initialize_results_path(results_path: str):
         item_path = os.path.join(web_src_path, item)
         out_path = os.path.join(dest_path, item)
 
-        if os.path.exists(out_path):
-            os.remove(out_path)
-        shutil.copy2(item_path, out_path)
+        remove(out_path)
+
+        if os.path.isdir(item_path):
+            shutil.copytree(item_path, out_path)
+        else:
+            shutil.copy2(item_path, out_path)

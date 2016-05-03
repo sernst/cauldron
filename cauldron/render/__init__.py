@@ -89,12 +89,14 @@ def preformatted_text(source: str) -> str:
     )
 
 
-def markdown(source: str) -> str:
+def markdown(source: str, **kwargs) -> str:
     """
 
     :param source:
     :return:
     """
+
+    source = templating.render(source, **kwargs)
 
     if md is None:
         raise ImportError(textwrap.dedent(
@@ -110,7 +112,7 @@ def markdown(source: str) -> str:
     )
 
 
-def json(window_key:str, data) -> str:
+def json(window_key: str, data) -> str:
     """
 
     :param window_key:

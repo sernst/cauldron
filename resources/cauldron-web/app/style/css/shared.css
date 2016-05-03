@@ -15,22 +15,6 @@ html, body {
     user-select: none;
 }
 
-.left_pes_color {
-    background-color: dodgerblue;
-}
-
-.left_manus_color {
-    background-color: darkolivegreen;
-}
-
-.right_pes_color {
-    background-color: darkorange;
-}
-
-.right_manus_color {
-    background-color: darkorchid;
-}
-
 .spacer {
     flex-grow: 1;
 }

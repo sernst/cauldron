@@ -70,7 +70,7 @@ def execute(parser: ArgumentParser, path: str, directory_name: str = None):
     report_out_path = os.path.join(out_path, 'data')
     shutil.copytree(report_path, report_out_path)
 
-    html_path = os.path.join(out_path, 'report.html')
+    html_path = os.path.join(out_path, 'project.html')
     with open(html_path, 'r+') as f:
         dom = f.read()
 

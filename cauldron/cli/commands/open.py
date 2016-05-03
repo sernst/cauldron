@@ -1,5 +1,6 @@
 import os
 import typing
+import webbrowser
 from argparse import ArgumentParser
 
 import cauldron
@@ -102,6 +103,9 @@ def execute(parser: ArgumentParser, path: str):
           * {url}
         """.format(url=url)
     )
+
+    webbrowser.open(url)
+
 
 def autocomplete(segment: str, line:str, parts: typing.List[str]):
     """

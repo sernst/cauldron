@@ -43,7 +43,9 @@ def create_layout(
         layout: dict = None,
         title: str = None,
         x_label: str = None,
-        y_label: str = None
+        y_label: str = None,
+        x_bounds: typing.List[float] = None,
+        y_bounds: typing.List[float] = None
 ) -> dict:
     """
 
@@ -51,6 +53,8 @@ def create_layout(
     :param title:
     :param x_label:
     :param y_label:
+    :param x_bounds:
+    :param y_bounds:
     :return:
     """
 
@@ -68,11 +72,15 @@ def create_layout(
     x = layout.get('xaxis', {})
     x['title'] = x_label if x_label else x['title']
     x['titlefont'] = x.get('titlefont', font)
+    if x_bounds:
+        x['range'] = x_bounds
     layout['xaxis'] = x
 
     y = layout.get('yaxis', {})
     y['title'] = y_label if y_label else y['title']
     y['titlefont'] = y.get('titlefont', font)
+    if y_bounds:
+        y['range'] = y_bounds
     layout['yaxis'] = y
 
     return layout
