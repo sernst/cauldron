@@ -8,6 +8,7 @@ from cauldron import cli
 from cauldron.cli import query
 from cauldron.cli import autocompletion
 from cauldron import environ
+from cauldron import reporting
 from cauldron import runner
 
 DESCRIPTION = """
@@ -42,7 +43,7 @@ def execute(parser: ArgumentParser, path: str):
     if path.startswith('@examples:'):
         path = path.lstrip(':').split(':', 1)[-1]
         parts = path.replace('\\', '/').strip('/').split('/')
-        path = environ.paths.package('examples', *parts)
+        path = environ.paths.package('resources', 'examples', *parts)
 
     elif path.startswith('@last'):
         if len(recent_paths) < 1:
@@ -95,7 +96,16 @@ def execute(parser: ArgumentParser, path: str):
     environ.configs.put(recent_paths=recent_paths[:10], persists=True)
     environ.configs.save()
 
-    url = cauldron.project.internal_project.write()
+    project = cauldron.project.internal_project
+
+    if project.results_path:
+        reporting.initialize_results_path(project.results_path)
+
+    path = project.output_path
+    if not path or not os.path.exists(path):
+        project.write()
+
+    url = project.url
 
     environ.log(
         """
@@ -107,7 +117,7 @@ def execute(parser: ArgumentParser, path: str):
     webbrowser.open(url)
 
 
-def autocomplete(segment: str, line:str, parts: typing.List[str]):
+def autocomplete(segment: str, line: str, parts: typing.List[str]):
     """
 
     :param segment:
@@ -130,7 +140,7 @@ def autocomplete(segment: str, line:str, parts: typing.List[str]):
             segment = value.split(':', 1)[-1]
             return autocompletion.match_path(
                 segment,
-                environ.paths.package('examples', segment),
+                environ.paths.package('resources', 'examples', segment),
                 include_files=False
             )
 
@@ -142,4 +152,4 @@ def autocomplete(segment: str, line:str, parts: typing.List[str]):
                 'recent'
             )
 
-        return  autocompletion.match_path(segment, value)
+        return autocompletion.match_path(segment, value)

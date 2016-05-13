@@ -199,6 +199,18 @@ class Project(object):
 
         return os.path.join(self.results_path, 'reports', self.id)
 
+    @property
+    def output_path(self) -> str:
+        """
+        Returns the full path to where the results.js file will be written
+        :return:
+        """
+
+        if not self.results_path:
+            return None
+
+        return os.path.join(self.directory, 'results.js')
+
     def refresh(self) -> bool:
         """
         Loads the cauldron.json configuration file for the project and populates
@@ -298,8 +310,7 @@ class Project(object):
             data.update(report.data.fetch(None))
             files.update(report.files.fetch(None))
 
-        report_path = os.path.join(self.directory, 'results.js')
-        with open(report_path, 'w+') as f:
+        with open(self.output_path, 'w+') as f:
             f.write(templating.render_template(
                 'report.js.template',
                 DATA=json.dumps({

@@ -7,7 +7,7 @@ class Report(object):
     A class for storing the elements of the
     """
 
-    def __init__(self, identifier: str, project: str = None, **kwargs):
+    def __init__(self, identifier: str, project=None, **kwargs):
         self.id = identifier
         self.body = []
         self.css = []

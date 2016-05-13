@@ -15,29 +15,35 @@
 
   /**
    *
-   * @param id
-   * @param open
+   * @param buttonId
    */
-  function collapse(id, open) {
-    var e = $('#' + id);
-    var body = e.children('.body');
-    var code = e.children('.code');
-    var opener = e.children('.header').find('.collapse-open');
-    var closer = e.children('.header').find('.collapse-close');
+  function collapse(buttonId) {
+    var btn = $('#' + buttonId);
+    var open = btn.hasClass('closed');
+    var items = btn.attr('data-' + (open ? 'opens' : 'closes'));
 
     if (open) {
-      e.removeClass('collapsed');
-      body.show();
-      opener.hide();
-      closer.show();
-      $(window).resize();
+      btn.removeClass('closed').addClass('opened');
     } else {
-      e.addClass('collapsed');
-      body.hide();
-      code.hide();
-      closer.hide();
-      opener.show();
+      btn.removeClass('opened').addClass('closed');
     }
+
+    if (!items) {
+      return;
+    }
+
+    items.split('|').forEach(function (target) {
+      target = $(target);
+      if (open) {
+        target.show();
+        btn.removeClass('closed');
+      } else {
+        target.hide();
+        target.addClass('closed');
+      }
+    });
+
+    $(window).resize();
   }
   exports.collapse = collapse;
 

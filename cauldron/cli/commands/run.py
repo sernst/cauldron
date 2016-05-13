@@ -52,7 +52,6 @@ def execute(parser: ArgumentParser, target: list):
 
     reporting.initialize_results_path(project.results_path)
 
-
     if not target or target[0] == '@all':
         runner.complete(project)
         return

@@ -4,6 +4,7 @@
   var exports = window.CAULDRON || {};
   window.CAULDRON = exports;
 
+  exports.RUNNING = false;
 
 
   /**
@@ -65,22 +66,10 @@
    */
   $(function () {
     exports.PARAMS = exports.parseUrlParameters();
-
     exports.run()
-      .then(function () {
-        // Add auto resizing to plotly graphs
-        exports.resizeCallbacks.push(function () {
-          $('.plotly-graph-div').each(function (index, e) {
-            if ($(e).parents('.cd-project-step').hasClass('collapsed')) {
-              console.log('skipped:', index, e);
-              // Do not resize plotly objects that are currently invisible
-              return;
-            }
-
-            Plotly.Plots.resize(e);
-          });
+        .then(function () {
+          exports.RUNNING = true;
         });
-      });
   });
 
 }());

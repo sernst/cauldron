@@ -10,6 +10,7 @@ setup(
     license='MIT',
     packages=['cauldron'],
     zip_safe=False,
+    scripts=['bin/cauldron'],
     install_requires=[
         'plotly',
         'pandas',

@@ -52,8 +52,8 @@ def get_environment() -> Environment:
 
     loader = env.loader
     resource_path = environ.configs.make_path(
-        'resources',
-        override_key='resources_path'
+        'resources', 'templates',
+        override_key='template_path'
     )
 
     if not loader:

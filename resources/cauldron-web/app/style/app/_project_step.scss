@@ -10,6 +10,13 @@
     color: #a8a8a8;
     border-top: 1px solid #e4e4e4;
 
+    .title-box {
+      display: flex;
+      justify-content: center;
+      align-content: center;
+      align-items: center;
+    }
+
     .button-bar {
       display: flex;
       color: #487eb1;
@@ -31,7 +38,27 @@
     }
   }
 
-  .body {
+  .project-step-body {
     margin: 0.5em 0;
+  }
+}
+
+.opened {
+  .closed-icon {
+    display: none;
+  }
+
+  .opened-icon {
+    display: inline-block;
+  }
+}
+
+.closed {
+  .opened-icon {
+    display: none;
+  }
+
+  .closed-icon {
+    display: inline-block;
   }
 }
