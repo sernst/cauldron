@@ -21,12 +21,19 @@
     var btn = $('#' + buttonId);
     var open = btn.hasClass('closed');
     var items = btn.attr('data-' + (open ? 'opens' : 'closes'));
+    var marks = btn.attr('data-marks-' + (open ? 'opened' : 'closed')) || '';
 
-    if (open) {
-      btn.removeClass('closed').addClass('opened');
-    } else {
-      btn.removeClass('opened').addClass('closed');
-    }
+    marks = marks.split('|').map(function (selector) {
+      return $(selector);
+    });
+    marks.push(btn);
+    marks.forEach(function (target) {
+      if (open) {
+        target.removeClass('closed').addClass('opened');
+      } else {
+        target.removeClass('opened').addClass('closed');
+      }
+    });
 
     if (!items) {
       return;

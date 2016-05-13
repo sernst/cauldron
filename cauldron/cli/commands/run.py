@@ -88,5 +88,8 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
                     'all'
                 )
 
-        step_names = [x.id for x in cauldron.project.internal_project.steps]
-        return autocompletion.matches(segment, *step_names)
+            project = cauldron.project.internal_project
+            step_ids = [x.id for x in project.steps]
+            return autocompletion.match_in_path_list(segment, value, *step_ids)
+
+    return []

@@ -70,3 +70,16 @@ def match_path(
             out.append(item)
 
     return out
+
+
+def match_in_path_list(segment: str, value: str, paths: typing.Iterable[str]):
+    """
+
+    :param segment:
+    :param value:
+    :param paths:
+    :return:
+    """
+
+    prefix = value[:-len(segment)]
+    return [x[:-len(prefix)] for x in paths if x.startswith(value)]

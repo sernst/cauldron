@@ -5,6 +5,7 @@
          class="title-box {{ 'clicker opened' if body else '' }}"
          data-closes="#{{ "body" | id }}|#{{ "code" | id }}"
          data-opens="#{{ "body" | id }}"
+         data-marks-closed="#{{ "code-toggler" | id }}"
          onclick="CAULDRON.collapse('{{ "title-box" | id }}')"
     >
       {% if body %}
