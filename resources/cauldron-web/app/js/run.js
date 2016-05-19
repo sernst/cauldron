@@ -47,16 +47,40 @@
    *
    */
   function run() {
-    var dataFilename = window.RESULTS_FILENAME || 
-        ('reports/' + exports.PARAMS['id'] + '/results.js');
+    var dataDirectory = window.PROJECT_DIRECTORY;
+    var id = exports.PARAMS['id'];
+    var sid = exports.PARAMS['sid'];
+
+    if (!dataDirectory) {
+      dataDirectory = 'reports/' + id;
+      if (sid) {
+        dataDirectory += '/snapshots/' + sid;
+      } else {
+        dataDirectory += '/latest';
+      }
+    }
     
-    return exports.loadDataFile(dataFilename)
+    return exports.loadDataFile(dataDirectory  +'/results.js')
       .then(function () {
-        $('title').html(
-            exports.SETTINGS.title ||
-            exports.SETTINGS.id ||
-            'Cauldron'
-        );
+        var title = exports.SETTINGS.title || exports.SETTINGS.id || id;
+        var body = $('body');
+
+        if (sid) {
+          $('<div></div>')
+              .addClass('snapshot-bar')
+              .html('Snapshot: ' + exports.PARAMS['sid'])
+              .prependTo(body);
+
+          $('<div></div>')
+              .addClass('snapshot-bar')
+              .addClass('snapshot-bar-overlay')
+              .html('Snapshot: ' + exports.PARAMS['sid'])
+              .prependTo(body);
+
+          title = '{' + sid + '} ' + title;
+        }
+
+        $('title').html(title);
       });
   }
   exports.run = run;
@@ -69,6 +93,7 @@
     exports.run()
         .then(function () {
           exports.RUNNING = true;
+          $(window).resize();
         });
   });
 

@@ -5,3 +5,28 @@
   align-content: center;
   align-items: center;
 }
+
+.clicker {
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.snapshot-bar {
+  font-size: 0.7em;
+  margin: 0;
+  padding: 0.25em;
+  background-color: #c88fbc;
+  color: #463241;
+
+  &.snapshot-bar-overlay {
+    position: fixed;
+    z-index: 100000;
+    top:0;
+    left:0;
+    width: 100%;
+    overflow: hidden;
+  }
+}

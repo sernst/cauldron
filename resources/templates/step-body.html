@@ -36,15 +36,40 @@
   </div>
 
   {% if code %}
-  <div class="code"
+  <div class="code-box"
        id="{{ "code" | id }}"
        style="display:none">
-    {{ code }}
+    <div class="code-toolbar">
+      <div class="spacer"></div>
+      <div class="tool-button"
+           onclick="CAULDRON.changeFontSize('#{{ "code" | id }} .code-wrapper', -1)"
+      >
+        -
+      </div>
+      <div class="tool-button"
+           onclick="CAULDRON.changeFontSize('#{{ "code" | id }} .code-wrapper', 0)"
+      >
+        100%
+      </div>
+      <div class="tool-button"
+           onclick="CAULDRON.changeFontSize('#{{ "code" | id }} .code-wrapper', 1)"
+      >
+        +
+      </div>
+    </div>
+    <div class="code-wrapper"
+         data-font-size="0.6"
+         data-font-size-default="0.6"
+         style="font-size: 0.6em"
+    >
+      {{ code }}
+    </div>
+
   </div>
   {% endif %}
 
   {% if body %}
-  <div id="{{ "body" | id }}" class="project-step-body">
+  <div id="{{ "body" | id }}" class="cd-project-step-body">
     {{ body }}
   </div>
   {%  endif %}

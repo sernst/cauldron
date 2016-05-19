@@ -54,5 +54,24 @@
   }
   exports.collapse = collapse;
 
+  /**
+   *
+   * @param target
+   * @param direction
+   */
+  function changeFontSize(target, direction) {
+    target = $(target);
+    var size = parseFloat(target.attr('data-font-size'));
+
+    if (!direction) {
+      size = parseFloat(target.attr('data-font-size-default'));
+    } else {
+      size = Math.max(0.1, size + direction * 0.1);
+    }
+
+    target.attr('data-font-size', size);
+    target.css('font-size', size + 'em');
+  }
+  exports.changeFontSize = changeFontSize;
 
 }());

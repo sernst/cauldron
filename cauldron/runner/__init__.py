@@ -4,12 +4,37 @@ import traceback
 import types
 import typing
 import time
+import functools
 
 import cauldron
 from cauldron import environ
 from cauldron.session.project import Project
 from cauldron.session.project import ProjectStep
 from cauldron import templating
+
+
+def step_print(
+        project_step: ProjectStep,
+        *args, sep='',
+        end='\n',
+        file=None,
+        flush=False
+):
+    """
+
+    :param project_step:
+    :param args:
+    :param sep:
+    :param end:
+    :param file:
+    :param flush:
+    :return:
+    """
+
+    text = '\t'.join([str(x) for x in args])
+    project_step.report.text(text, preformatted=True)
+
+    print(*args, sep=sep, end='\n', file=file, flush=flush)
 
 
 def step(
@@ -28,11 +53,10 @@ def step(
     if isinstance(project_step, str):
         found = False
         for ps in project.steps:
-            if ps.id != project_step:
+            if ps.id == project_step:
+                project_step = ps
+                found = True
                 break
-            project_step = ps
-            found = True
-            break
 
         if not found:
             return False
@@ -75,6 +99,13 @@ def step(
 
     module = types.ModuleType(project_step.report.id.split('.')[0])
 
+    # Add the file attribute
+    setattr(module, '__file__', file_path)
+
+    # Create a print equivalent function that also writes the output to the
+    # project page
+    setattr(module, 'print', functools.partial(step_print, project_step))
+
     project.shared.put(__cauldron_uid__=project_step.report.id.split('.')[0])
 
     try:
@@ -85,7 +116,7 @@ def step(
     except Exception as err:
         environ.log('[{}]: Failed to update'.format(project_step.id))
         summaries = traceback.extract_tb(sys.exc_info()[-1])
-        while summaries[0].filename != '<string>':
+        while summaries and summaries[0].filename != '<string>':
             summaries.pop(0)
 
         stack = []

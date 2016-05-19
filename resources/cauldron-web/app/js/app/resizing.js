@@ -27,15 +27,19 @@
    *
    */
   function resizePlotly() {
-    $('.plotly-graph-div').each(function (index, element) {
+    $('.cd-plotly-box').each(function (index, element) {
       var e = $(element);
-      var skip = e.parents('.project-step-body').hasClass('closed');
+      var skip = e.parents('.cd-project-step-body').hasClass('closed');
       if (skip) {
         // Do not resize plotly objects that are currently invisible
         return;
       }
 
-      Plotly.Plots.resize(element);
+      Plotly.relayout(e.find('.plotly-graph-div')[0], {
+        width: e.width(),
+        height: e.height()
+      });
+      //Plotly.Plots.resize(e.find('.plotly-graph-div')[0]);
     });
   }
   exports.resizePlotly = resizePlotly;

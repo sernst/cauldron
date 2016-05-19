@@ -74,18 +74,19 @@ class Report(object):
 
         self.body.append(render.html(content))
 
-    def plotly(self, data, layout):
+    def plotly(self, data, layout: dict, scale: float = 0.5):
         """
 
         :param data:
         :param layout:
+        :param scale:
         :return:
         """
 
         if not isinstance(data, (list, tuple)):
             data = [data]
 
-        self.body.append(render.plotly(data, layout))
+        self.body.append(render.plotly(data, layout, scale))
 
     def table(self, data_frame, scale: float = 0.7):
         """

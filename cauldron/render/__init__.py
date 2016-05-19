@@ -144,21 +144,26 @@ def html(content) -> str:
     )
 
 
-def plotly(data: dict, layout: dict) -> str:
+def plotly(data: dict, layout: dict, scale: float = 0.5) -> str:
     """
 
     :param data:
     :param layout:
+    :param scale:
     :return:
     """
 
     if plotly_lib is None:
         raise ImportError('Unable to import Plotly library')
 
-    return plotly_lib.offline.plot(
+    dom = plotly_lib.offline.plot(
         {'data': data, 'layout': layout},
         output_type='div',
         include_plotlyjs=False
+    )
+
+    return '<div class="cd-plotly-box" style="min-height:{}vh">{}</div>'.format(
+        round(100.0 * scale), dom
     )
 
 

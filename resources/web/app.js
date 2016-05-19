@@ -138,6 +138,25 @@
   }
   exports.collapse = collapse;
 
+  /**
+   *
+   * @param target
+   * @param direction
+   */
+  function changeFontSize(target, direction) {
+    target = $(target);
+    var size = parseFloat(target.attr('data-font-size'));
+
+    if (!direction) {
+      size = parseFloat(target.attr('data-font-size-default'));
+    } else {
+      size = Math.max(0.1, size + direction * 0.1);
+    }
+
+    target.attr('data-font-size', size);
+    target.css('font-size', size + 'em');
+  }
+  exports.changeFontSize = changeFontSize;
 
 }());
 
@@ -170,15 +189,19 @@
    *
    */
   function resizePlotly() {
-    $('.plotly-graph-div').each(function (index, element) {
+    $('.cd-plotly-box').each(function (index, element) {
       var e = $(element);
-      var skip = e.parents('.project-step-body').hasClass('closed');
+      var skip = e.parents('.cd-project-step-body').hasClass('closed');
       if (skip) {
         // Do not resize plotly objects that are currently invisible
         return;
       }
 
-      Plotly.Plots.resize(element);
+      Plotly.relayout(e.find('.plotly-graph-div')[0], {
+        width: e.width(),
+        height: e.height()
+      });
+      //Plotly.Plots.resize(e.find('.plotly-graph-div')[0]);
     });
   }
   exports.resizePlotly = resizePlotly;
@@ -233,16 +256,40 @@
    *
    */
   function run() {
-    var dataFilename = window.RESULTS_FILENAME || 
-        ('reports/' + exports.PARAMS['id'] + '/results.js');
+    var dataDirectory = window.PROJECT_DIRECTORY;
+    var id = exports.PARAMS['id'];
+    var sid = exports.PARAMS['sid'];
+
+    if (!dataDirectory) {
+      dataDirectory = 'reports/' + id;
+      if (sid) {
+        dataDirectory += '/snapshots/' + sid;
+      } else {
+        dataDirectory += '/latest';
+      }
+    }
     
-    return exports.loadDataFile(dataFilename)
+    return exports.loadDataFile(dataDirectory  +'/results.js')
       .then(function () {
-        $('title').html(
-            exports.SETTINGS.title ||
-            exports.SETTINGS.id ||
-            'Cauldron'
-        );
+        var title = exports.SETTINGS.title || exports.SETTINGS.id || id;
+        var body = $('body');
+
+        if (sid) {
+          $('<div></div>')
+              .addClass('snapshot-bar')
+              .html('Snapshot: ' + exports.PARAMS['sid'])
+              .prependTo(body);
+
+          $('<div></div>')
+              .addClass('snapshot-bar')
+              .addClass('snapshot-bar-overlay')
+              .html('Snapshot: ' + exports.PARAMS['sid'])
+              .prependTo(body);
+
+          title = '{' + sid + '} ' + title;
+        }
+
+        $('title').html(title);
       });
   }
   exports.run = run;
@@ -255,6 +302,7 @@
     exports.run()
         .then(function () {
           exports.RUNNING = true;
+          $(window).resize();
         });
   });
 

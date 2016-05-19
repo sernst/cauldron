@@ -1,2 +1,9 @@
 @import "app/general";
-@import 'app/project_step';
+@import "app/project_step";
+
+@import "app/plotly";
+@import "app/code_box";
+
+@import "app/body/body";
+@import "app/body/body_text";
+@import "app/body/body_table";

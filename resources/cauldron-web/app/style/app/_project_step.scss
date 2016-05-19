@@ -25,22 +25,6 @@
       align-items: center;
     }
   }
-
-  .code {
-    padding: 0.5em;
-    line-height: 1.5;
-    font-size: 0.7rem;
-    font-family: "Lucida Console", Monaco, "Courier New", Courier, monospace;
-
-    .linenos {
-      opacity: 0.4;
-      padding-right: 12px;
-    }
-  }
-
-  .project-step-body {
-    margin: 0.5em 0;
-  }
 }
 
 .opened {

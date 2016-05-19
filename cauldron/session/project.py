@@ -1,15 +1,14 @@
-import os
-import typing
 import json
-import shutil
-import time
+import os
 import sys
+import time
+import typing
 
 from cauldron import environ
-from cauldron import templating
-from cauldron.session.caching import SharedCache
-from cauldron.reporting.report import Report
 from cauldron import render
+from cauldron import templating
+from cauldron.reporting.report import Report
+from cauldron.session.caching import SharedCache
 
 
 class ExposedProject(object):
@@ -188,7 +187,7 @@ class Project(object):
         )
 
     @property
-    def directory(self) -> str:
+    def output_directory(self) -> str:
         """
         Returns the directory where the project results files will be written
         :return:
@@ -197,7 +196,7 @@ class Project(object):
         if not self.results_path:
             return None
 
-        return os.path.join(self.results_path, 'reports', self.id)
+        return os.path.join(self.results_path, 'reports', self.id, 'latest')
 
     @property
     def output_path(self) -> str:
@@ -209,7 +208,28 @@ class Project(object):
         if not self.results_path:
             return None
 
-        return os.path.join(self.directory, 'results.js')
+        return os.path.join(self.output_directory, 'results.js')
+
+    def snapshot_path(self, *args: typing.Tuple[str]) -> str:
+        """
+
+        :param args:
+        :return:
+        """
+
+        if not self.results_path:
+            return None
+
+        return os.path.join(self.output_directory, '..', 'snapshots', *args)
+
+    def snapshot_url(self, snapshot_name: str) -> str:
+        """
+
+        :param snapshot_name:
+        :return:
+        """
+
+        return '{}&sid={}'.format(self.url, snapshot_name)
 
     def refresh(self) -> bool:
         """
@@ -282,16 +302,8 @@ class Project(object):
         :return:
         """
 
-        if os.path.exists(self.directory):
-            try:
-                shutil.rmtree(self.directory)
-            except Exception:
-                try:
-                    shutil.rmtree(self.directory)
-                except Exception:
-                    return None
-
-        os.makedirs(self.directory)
+        environ.systems.remove(self.output_directory)
+        os.makedirs(self.output_directory)
 
         body = []
         data = {}
@@ -321,7 +333,7 @@ class Project(object):
             ))
 
         for filename, contents in files.items():
-            file_path = os.path.join(self.directory, filename)
+            file_path = os.path.join(self.output_directory, filename)
             with open(file_path, 'w+') as f:
                 f.write(contents)
 

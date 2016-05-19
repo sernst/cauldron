@@ -18,6 +18,7 @@ setup(
         'six',
         'jinja2',
         'markdown',
-        'pygments'
+        'pygments',
+        'pyquery'
     ]
 )

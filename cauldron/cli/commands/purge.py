@@ -40,17 +40,11 @@ def execute(parser: ArgumentParser):
         environ.log('[ABORTED]: No files were deleted')
         return
 
-    if os.path.exists(path):
-        try:
-            shutil.rmtree(path)
-        except Exception:
-            try:
-                shutil.rmtree(path)
-            except Exception:
-                pass
+    if environ.systems.remove(path):
+        msg = '[SUCCESS]: All results have been removed'
+    else:
+        msg = '[ERROR]: Failed to remove results directory'
 
-    environ.log("""
-        [SUCCESS]: All results have been removed
-        """, whitespace_top=1)
+    environ.log(msg, whitespace_top=1)
 
 
