@@ -4,7 +4,12 @@ import typing
 
 from cauldron import environ
 
-def matches(value: str, *args: typing.Tuple[str], prefix: str = None) -> list:
+
+def matches(
+        value: str,
+        *args: typing.Tuple[str],
+        prefix: str = None
+) -> list:
     """
 
     :param value:
@@ -45,7 +50,9 @@ def match_path(
     """
 
     segment = segment.strip(os.sep)
-    path = environ.paths.clean(value.rstrip(os.sep))
+    path = environ.paths.clean(
+        value.rstrip(os.sep) if len(value) > 1 else value
+    )
 
     if not os.path.exists(path):
         # The path doesn't exist, assume that the value is an incomplete path
@@ -81,5 +88,41 @@ def match_in_path_list(segment: str, value: str, paths: typing.Iterable[str]):
     :return:
     """
 
-    prefix = value[:-len(segment)]
-    return [x[:-len(prefix)] for x in paths if x.startswith(value)]
+    pieces = value.replace('\\', '/').split('/')
+
+    out = []
+    for c in [x for x in paths if x.startswith(value)]:
+        c_pieces = c.replace('\\', '/').split('/')
+        index = len(pieces) - 1
+        entry = c_pieces[index]
+
+        if len(pieces) < len(c_pieces):
+            entry += os.sep
+
+        if entry not in out:
+            out.append(entry)
+
+    return [x for x in out if x.startswith(segment)]
+
+
+def match_flags(
+        segment: str,
+        value: str,
+        shorts: typing.List[str],
+        longs: typing.List[str]
+) -> list:
+    """
+
+    :param segment:
+    :param value:
+    :param shorts:
+    :param longs:
+    :return:
+    """
+
+    if value.startswith('--'):
+        return [x for x in longs if x.startswith(segment)]
+
+    out = [x for x in shorts if x.startswith(segment)]
+    out.append('-')
+    return out

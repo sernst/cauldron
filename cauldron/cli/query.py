@@ -1,4 +1,5 @@
 import re
+import typing
 
 from cauldron import environ
 
@@ -27,7 +28,12 @@ def confirm(question: str, default: bool = True) -> bool:
     return False
 
 
-def choice(title: str, prompt: str, choices: list, default_index: int = None) -> str:
+def choice(
+        title: str,
+        prompt: str,
+        choices: list,
+        default_index: int = None
+) -> typing.Tuple[int, str]:
     """
 
     :param title:
@@ -44,19 +50,12 @@ def choice(title: str, prompt: str, choices: list, default_index: int = None) ->
             value=choices[index]
         ))
 
-    environ.log(
-        """
-            {title}
-            {bar}
-
-            {choices}
-        """.format(
-            title=title,
-            bar='-'*len(title),
-            choices='\n'.join(entries)
-        ),
-        whitespace=1
+    entries.insert(0, '')
+    entries.insert(
+        0,
+        '{bar}\n{title}\n{bar}'.format(title=title, bar='-' * len(title))
     )
+    environ.log(entries, whitespace=1)
 
     default = ''
     if default_index is not None:
@@ -77,4 +76,4 @@ def choice(title: str, prompt: str, choices: list, default_index: int = None) ->
         else:
             result = max(0, min(int(result) - 1, len(choices)))
 
-        return choices[result]
+        return result, choices[result]

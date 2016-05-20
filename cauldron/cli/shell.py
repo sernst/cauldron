@@ -1,6 +1,7 @@
 import cmd
-import readline
+# import readline
 
+import cauldron
 from cauldron.cli import commands
 
 # readline.set_completer_delims(' \t\n')
@@ -8,7 +9,7 @@ from cauldron.cli import commands
 
 class CauldronShell(cmd.Cmd):
     intro = 'Cauldron Started\nType help or ? to list commands.\n'
-    prompt = '>>> '
+    prompt = '<>: '
 
     def __init__(self):
         super(CauldronShell, self).__init__(completekey='tab')
@@ -26,7 +27,16 @@ class CauldronShell(cmd.Cmd):
             commands.show_help()
             return
 
-        return commands.execute(name, raw_args)
+        result = commands.execute(name, raw_args)
+
+        p = cauldron.project
+        if not p or not p.internal_project or not p.internal_project.title:
+            name = ''
+        else:
+            name = cauldron.project.internal_project.title[:20]
+
+        self.prompt = '<{}>: '.format(name)
+        return result
 
     def do_help(self, arg):
         commands.show_help(arg)

@@ -14,6 +14,7 @@ from cauldron.cli.commands import run
 from cauldron.cli.commands import status
 from cauldron.cli.commands import reload
 from cauldron.cli.commands import snapshot
+from cauldron.cli.commands import show
 
 ME = sys.modules[__name__]
 
@@ -110,13 +111,10 @@ def execute(name: str, raw_args: str):
     if not hasattr(ME, name):
         environ.log(
             """
-            [ERROR]: "{name}" is not a recognized command.
-            For a list of available commands run:
-
-                >>> cauldron help
+            [ERROR]: "{name}" is not a recognized command. For a list of
+                available commands enter help or ?.
             """)
         return None
-
 
     try:
         module = getattr(ME, name)
@@ -193,16 +191,18 @@ def show_help(command_name:str = None):
             parser.print_help()
             return
 
-    environ.log('The following commands are available:')
+    environ.log_header('Available Commands')
     print_module_help()
 
-    msg = """
+    environ.log(
+        """
         For more information on the various commands, enter help on the
         specific command:
 
-            >>> [COMMAND] help
-        """
-    environ.log(msg, whitespace_top=1)
+            [COMMAND] help
+        """,
+        whitespace_bottom=1
+    )
 
 
 def autocomplete(

@@ -74,6 +74,11 @@ def step(
         environ.log('[{}]: Nothing to update'.format(project_step.id))
         return True
 
+    # Set the top-level display and cache values to the current project values
+    # before running the step for availability within the step scripts
+    cauldron.display = cauldron.project.display
+    cauldron.cache = cauldron.project.shared
+
     os.chdir(os.path.dirname(file_path))
     project.current_step = project_step
     project_step.report.clear()

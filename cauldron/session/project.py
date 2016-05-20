@@ -25,12 +25,14 @@ class ExposedProject(object):
 
     @property
     def display(self) -> Report:
-        if not self._project.current_step:
+        if not self._project or not self._project.current_step:
             return None
         return self._project.current_step.report
 
     @property
     def shared(self) -> SharedCache:
+        if not self._project:
+            return None
         return self._project.shared
 
     @property
@@ -131,6 +133,19 @@ class Project(object):
         self.shared = as_shared_cache(shared)
         self.settings = SharedCache()
         self.refresh()
+
+    @property
+    def title(self) -> str:
+        if self.settings:
+            out = self.settings.fetch('title')
+            if out:
+                return out
+            out = self.settings.fetch('name')
+            if out:
+                return out
+            return self.id
+
+        return 'unknown-project'
 
     @property
     def id(self) -> str:
