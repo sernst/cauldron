@@ -1,3 +1,4 @@
+import os
 import typing
 from argparse import ArgumentParser
 
@@ -64,6 +65,18 @@ def execute(
 
     if path:
         path = environ.paths.clean(path)
+        if not os.path.isdir(path):
+            path = os.path.dirname(path)
+            environ.log(
+                """
+                [WARNING]: The specified path was not a directory. Aliases must
+                    be directories, so the directory containing the specified
+                    file will be used instead:
+
+                    {}
+                """.format(path),
+                whitespace=1
+            )
 
     environ.configs.load()
     aliases = environ.configs.fetch('folder_aliases', {})

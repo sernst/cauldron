@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 import typing
+import re
 
 import cauldron
 from cauldron import cli
@@ -120,6 +121,16 @@ def execute(
 
     reporting.initialize_results_path(project.results_path)
 
+    try:
+        # Special cases that apply limits
+        if re.match(r'[0-9]+$', step[-1]):
+            limit = int(step[-1])
+        elif re.match(r'[\.]+', step[-1]):
+            limit = len(step[-1])
+        step.pop()
+    except Exception:
+        pass
+
     project_steps = []
     for s in project.steps:
         if s.id in step:
@@ -134,28 +145,36 @@ def execute(
         environ.log(message, whitespace=1)
         return
 
+    environ.log(
+        'RUNNING\n-------',
+        whitespace_top=1
+    )
+
     if single_step:
         ps = project_steps[0] if len(project_steps) > 0 else None
         runner.section(project, ps, 1)
     elif continue_after:
         runner.complete(project, project_steps[0], force=force, limit=limit)
+        environ.log_blanks()
         return
     elif len(project_steps) == 0:
         runner.complete(project, force=force, limit=limit)
+        environ.log_blanks()
         return
     elif limit > 0:
-        step_cache = []
         for ps in project_steps:
             index = project.steps.index(ps)
-            step_cache += project.steps[index:(index + limit)]
-        step_cache = set(step_cache)
-        for ps in sorted(step_cache, key=lambda x: x.index):
-            runner.step(project, ps, force=force)
+            for i in range(index, len(project.steps)):
+                start = project.steps[index]
+                if start.is_dirty():
+                    runner.section(project, start, limit)
+                    break
     else:
         for ps in project_steps:
             runner.step(project, ps, force=force)
 
     project.write()
+    environ.log_blanks()
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):

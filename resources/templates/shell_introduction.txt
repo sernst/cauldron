@@ -1,0 +1,9 @@
+
+=================================
+CAULDRON Data Science Environment
+=================================
+
+--- HELP ---
+For help, type "help" or "?" in the command prompt
+to get information on the available commands and
+how to get started.

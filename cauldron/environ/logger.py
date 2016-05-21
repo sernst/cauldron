@@ -56,7 +56,7 @@ def blanks(
 
     return log(
         '',
-        whitespace_bottom=line_count,
+        whitespace_bottom=max(0, line_count - 1),
         trace=trace,
         file_path=file_path,
         append_to_file=append_to_file

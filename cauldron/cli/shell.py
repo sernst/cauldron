@@ -2,13 +2,16 @@ import cmd
 # import readline
 
 import cauldron
+from cauldron import templating
 from cauldron.cli import commands
 
 # readline.set_completer_delims(' \t\n')
 
 
 class CauldronShell(cmd.Cmd):
-    intro = 'Cauldron Started\nType help or ? to list commands.\n'
+    intro = '\n{}\n'.format(
+        templating.render_template('shell_introduction.txt')
+    )
     prompt = '<>: '
 
     def __init__(self):

@@ -238,11 +238,12 @@ def complete(
         if ps.index < starting_index:
             continue
 
-        count += 1
-
         if not force and not ps.is_dirty():
-            environ.log('[{}]: Nothing to update'.format(ps.id))
+            if limit < 1:
+                environ.log('[{}]: Nothing to update'.format(ps.id))
             continue
+
+        count += 1
 
         if not step(project, ps, force=True):
             project.write()
