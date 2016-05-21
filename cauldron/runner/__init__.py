@@ -85,7 +85,7 @@ def step(
     # Set the top-level display and cache values to the current project values
     # before running the step for availability within the step scripts
     cauldron.display = cauldron.project.display
-    cauldron.cache = cauldron.project.shared
+    cauldron.shared = cauldron.project.shared
 
     # Mark the downstream steps as dirty because this one has run
     [x.mark_dirty(True) for x in project.steps[(project_step.index + 1):]]

@@ -7,6 +7,7 @@ import pandas as pd
 
 from cauldron import templating
 from cauldron.render import syntax_highlighting
+from cauldron.render import utils as render_utils
 
 try:
     import markdown as md
@@ -42,7 +43,7 @@ def code(
     )
 
 
-def header(level: int, contents: str) -> str:
+def header(contents: str, level: int = 1) -> str:
     """
 
     :param level:
@@ -273,8 +274,17 @@ def status(
                 value = value.head(5)
             except Exception:
                 pass
+        elif isinstance(value, dict):
+            temp_value = []
+            for k, v in value.items():
+                temp_value.append('{}: {}'.format(k, v))
+            value = '\n'.join(temp_value)
+        elif isinstance(value, (list, tuple)):
+            value = '\n'.join(['{}'.format(v) for v in value])
 
-        value = '<pre>{}</pre>'.format(str(value)[:600])
+        value = '<pre>{}</pre>'.format(
+            render_utils.html_escape('{}'.format(value))[:600]
+        )
 
         out.append(templating.render_template(
             'status-variable.template.html',

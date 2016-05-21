@@ -22,15 +22,15 @@ class Report(object):
         self.data = SharedCache()
         self.files = SharedCache()
 
-    def header(self, level: int, text: str):
+    def header(self, text: str, level: int = 1):
         """
 
-        :param level:
         :param text:
+        :param level:
         :return:
         """
 
-        self.body.append(render.header(level, text))
+        self.body.append(render.header(text, level=level))
 
     def text(self, text: str, preformatted: bool = False):
         """
