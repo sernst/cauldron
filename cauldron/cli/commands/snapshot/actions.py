@@ -50,21 +50,14 @@ def list_snapshots(project: Project):
 
     if not snapshots:
         environ.log('No snapshots found')
-        return
+        return None
 
     entries = []
     for item in snapshots:
-        entries.append(' * {id}\n   {url}\n'.format(
-            id=item['name'],
-            url=item['url']
-        ))
+        entries.append('   * {}'.format(item['name']))
 
-    environ.log([
-        'Existing Snapshots:',
-        '-------------------'
-    ] + entries,
-        whitespace=1
-    )
+    environ.log_header('EXISTING SNAPSHOTS')
+    environ.log(entries, whitespace_bottom=1)
 
 
 def create_snapshot(project: Project, *args: typing.List[str]):
@@ -112,22 +105,47 @@ def remove_snapshot(project: Project, *args: typing.List[str]):
     :return:
     """
 
-    if len(args) < 1 or not args[0]:
-        snapshot_name = get_snapshot_listing(project)[-1]['name']
-    else:
-        snapshot_name = args[0]
+    if len(args) < 1 or not args[0].strip():
+        environ.log(
+            """
+            Are you sure you want to remove all snapshots in this project?
+            """)
+
+        if not query.confirm('Confirm Delete All', False):
+            environ.log(
+                '[ABORTED]: No snapshots were deleted',
+                whitespace=1
+            )
+            return
+
+        if not environ.systems.remove(project.snapshot_path()):
+            environ.log(
+                '[ERROR]: Failed to delete snapshots',
+                whitespace=1
+            )
+            return
+
+        environ.log(
+            '[SUCCESS]: All snapshots have been removed',
+            whitespace=1
+        )
+        return
+
+    snapshot_name = args[0]
 
     environ.log(
         """
         Are you sure you want to remove the snapshot "{}"?
-        """.format(snapshot_name)
+        """.format(snapshot_name),
+        whitespace=1
     )
 
     if not query.confirm('Confirm Deletion', False):
         environ.log(
             """
             [ABORTED]: "{}" was not removed
-            """.format(snapshot_name)
+            """.format(snapshot_name),
+            whitespace=1
         )
         return
 
@@ -135,13 +153,41 @@ def remove_snapshot(project: Project, *args: typing.List[str]):
         environ.log(
             """
             [ERROR]: Unable to delete snapshot "{}" at this time
-            """.format(snapshot_name)
+            """.format(snapshot_name),
+            whitespace=1
         )
         return
 
     environ.log(
         """
         [SUCCESS]: Snapshot "{}" was removed
-        """.format(snapshot_name)
+        """.format(snapshot_name),
+        whitespace=1
     )
     return
+
+
+def open_snapshot(project: Project, name: str) -> dict:
+    """
+
+    :param project:
+    :param name:
+    :return:
+    """
+
+    snapshots_directory = project.snapshot_path()
+    if not os.path.exists(snapshots_directory):
+        return None
+
+    item_path = os.path.join(snapshots_directory, name)
+    results_path = os.path.join(item_path, 'results.js')
+
+    if not os.path.exists(results_path):
+        return None
+
+    return dict(
+        name=name,
+        url=project.snapshot_url(name),
+        directory=item_path,
+        last_modified=os.path.getmtime(results_path)
+    )

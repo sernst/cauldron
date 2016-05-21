@@ -53,12 +53,36 @@ def populate(parser: ArgumentParser):
             """)
     )
 
+    parser.add_argument(
+        '-s', '--step',
+        dest='single_step',
+        default=False,
+        action='store_true',
+        help=cli.reformat("""
+            When this option is included, only the first step that needs to be
+            updated will be run.
+            """)
+    )
+
+    parser.add_argument(
+        '-l', '--limit',
+        dest='limit',
+        default=-1,
+        type=int,
+        help=cli.reformat("""
+            The maximum number of steps to run including any specified first
+            step. Useful is you want to run only a section of the project.
+            """)
+    )
+
 
 def execute(
         parser: ArgumentParser,
         step: list,
         force: bool = False,
-        continue_after = False
+        continue_after: bool = False,
+        single_step: bool = False,
+        limit: int = -1
 ):
     """
 
@@ -66,6 +90,8 @@ def execute(
     :param step:
     :param force:
     :param continue_after:
+    :param single_step:
+    :param limit:
     :return:
     """
 
@@ -94,10 +120,6 @@ def execute(
 
     reporting.initialize_results_path(project.results_path)
 
-    if len(step) < 1:
-        runner.complete(project, force=force)
-        return
-
     project_steps = []
     for s in project.steps:
         if s.id in step:
@@ -112,8 +134,23 @@ def execute(
         environ.log(message, whitespace=1)
         return
 
-    if continue_after:
-        runner.complete(project, project_steps[0], force=force)
+    if single_step:
+        ps = project_steps[0] if len(project_steps) > 0 else None
+        runner.section(project, ps, 1)
+    elif continue_after:
+        runner.complete(project, project_steps[0], force=force, limit=limit)
+        return
+    elif len(project_steps) == 0:
+        runner.complete(project, force=force, limit=limit)
+        return
+    elif limit > 0:
+        step_cache = []
+        for ps in project_steps:
+            index = project.steps.index(ps)
+            step_cache += project.steps[index:(index + limit)]
+        step_cache = set(step_cache)
+        for ps in sorted(step_cache, key=lambda x: x.index):
+            runner.step(project, ps, force=force)
     else:
         for ps in project_steps:
             runner.step(project, ps, force=force)
@@ -134,8 +171,8 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
         return autocompletion.match_flags(
             segment=segment,
             value=parts[-1],
-            shorts=['f', 'c'],
-            longs=['force', 'continue']
+            shorts=['f', 'c', 's', 'l'],
+            longs=['force', 'continue', 'step', 'limit']
         )
 
     if len(parts) < 1:

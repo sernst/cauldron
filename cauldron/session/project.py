@@ -59,6 +59,7 @@ class ProjectStep(object):
         self.report = report
         self.last_modified = None
         self.code = None
+        self._is_dirty = True
 
     @property
     def id(self) -> str:
@@ -83,12 +84,18 @@ class ProjectStep(object):
 
         :return:
         """
+        if self._is_dirty:
+            return self._is_dirty
+
         if self.last_modified is None:
             return True
         p = self.source_path
         if not p:
             return False
         return os.path.getmtime(p) >= self.last_modified
+
+    def mark_dirty(self, value):
+        self._is_dirty = bool(value)
 
 
 class Project(object):

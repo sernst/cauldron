@@ -1,4 +1,6 @@
 import typing
+import webbrowser
+from datetime import datetime
 from argparse import ArgumentParser
 
 import cauldron
@@ -66,11 +68,37 @@ def execute(parser: ArgumentParser, action: str, arguments: list):
         )
         return
 
+    if action == 'remove':
+        return actions.remove_snapshot(project, *arguments)
+
     if action == 'add':
         return actions.create_snapshot(project, *arguments)
 
     if action == 'list':
         return actions.list_snapshots(project)
+
+    if action == 'open':
+        name = arguments[0]
+        result = actions.open_snapshot(project, name)
+        if result is None:
+            environ.log('[ERROR]: No snapshot found named "{}"'.format(name))
+            return
+
+        environ.log_header('SNAPSHOT: {}'.format(name))
+        environ.log(
+            """
+            URL: {url}
+            LAST MODIFIED: {modified}
+            """.format(
+                url=result['url'],
+                modified=datetime.fromtimestamp(
+                    result['last_modified']
+                ).strftime('%H:%M %b %d, %Y')
+            ),
+            whitespace=1
+        )
+
+        webbrowser.open(result['url'])
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):
@@ -89,11 +117,18 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
     #     e=chr(27)
     # ), end='')
 
-    if len(parts) == 1:
+    if len(parts) < 2:
         return autocompletion.matches(
             segment,
-            'add',
-            'remove',
-            'list',
-            'show'
+            parts[0] if len(parts) else '',
+            ['add', 'remove', 'list', 'show', 'open']
         )
+
+    project = cauldron.project.internal_project
+
+    if parts[0] in ['open', 'remove', 'show'] and len(parts) < 3:
+        names = [x['name'] for x in actions.get_snapshot_listing(project)]
+        out = autocompletion.matches(segment, parts[-1], names)
+        return out
+
+    return []

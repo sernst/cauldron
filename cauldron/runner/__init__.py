@@ -74,11 +74,6 @@ def step(
         environ.log('[{}]: Nothing to update'.format(project_step.id))
         return True
 
-    # Set the top-level display and cache values to the current project values
-    # before running the step for availability within the step scripts
-    cauldron.display = cauldron.project.display
-    cauldron.cache = cauldron.project.shared
-
     os.chdir(os.path.dirname(file_path))
     project.current_step = project_step
     project_step.report.clear()
@@ -87,10 +82,19 @@ def step(
         code = f.read()
     project_step.code = code
 
+    # Set the top-level display and cache values to the current project values
+    # before running the step for availability within the step scripts
+    cauldron.display = cauldron.project.display
+    cauldron.cache = cauldron.project.shared
+
+    # Mark the downstream steps as dirty because this one has run
+    [x.mark_dirty(True) for x in project.steps[(project_step.index + 1):]]
+
     if project_step.id.endswith('.md'):
         project_step.report.markdown(code, **project.shared.fetch(None))
         project_step.last_modified = time.time()
         environ.log('[{}]: Updated'.format(project_step.id))
+        project_step.mark_dirty(False)
         return True
 
     if project_step.id.endswith('.html'):
@@ -100,6 +104,7 @@ def step(
         ))
         project_step.last_modified = time.time()
         environ.log('[{}]: Updated'.format(project_step.id))
+        project_step.mark_dirty(False)
         return True
 
     module = types.ModuleType(project_step.report.id.split('.')[0])
@@ -117,6 +122,7 @@ def step(
         exec(code, module.__dict__)
         project_step.last_modified = time.time()
         environ.log('[{}]: Updated'.format(project_step.id))
+        project_step.mark_dirty(False)
         return True
     except Exception as err:
         environ.log('[{}]: Failed to update'.format(project_step.id))
@@ -159,10 +165,51 @@ def initialize(project: typing.Union[str, Project]):
     return project
 
 
+def section(
+        project: typing.Union[Project, None],
+        starting: ProjectStep = None,
+        limit: int = 1
+) -> str:
+    """
+
+    :param project:
+    :param starting:
+    :param limit:
+    :return:
+    """
+
+    if project is None:
+        project = cauldron.project.internal_project
+
+    starting_index = 0
+    if starting:
+        starting_index = project.steps.index(starting)
+    count = 0
+
+    for ps in project.steps:
+        if count >= limit:
+            break
+
+        if ps.index < starting_index:
+            continue
+
+        if count == 0 and not ps.is_dirty():
+            continue
+
+        if not step(project, ps):
+            project.write()
+            return None
+
+        count += 1
+
+    return project.write()
+
+
 def complete(
         project: typing.Union[Project, None],
         starting: ProjectStep = None,
-        force: bool = False
+        force: bool = False,
+        limit: int = -1
 ) -> str:
     """
     Runs the entire project, writes the results files, and returns the URL to
@@ -171,6 +218,7 @@ def complete(
     :param project:
     :param starting:
     :param force:
+    :param limit:
     :return:
         Local URL to the report path
     """
@@ -181,16 +229,20 @@ def complete(
     starting_index = 0
     if starting:
         starting_index = project.steps.index(starting)
-    active = False
+    count = 0
 
     for ps in project.steps:
+        if 0 < limit <= count:
+            break
+
         if ps.index < starting_index:
             continue
 
-        if not force and not active and not ps.is_dirty():
+        count += 1
+
+        if not force and not ps.is_dirty():
             environ.log('[{}]: Nothing to update'.format(ps.id))
             continue
-        active = True
 
         if not step(project, ps, force=True):
             project.write()

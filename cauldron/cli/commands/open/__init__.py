@@ -140,11 +140,10 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
             )
 
         if value.startswith('@'):
-            return autocompletion.matches(
-                segment,
+            return autocompletion.matches(segment, value, [
                 'examples:',
                 'home:'
-            )
+            ])
 
         return autocompletion.match_path(segment, value)
 

@@ -110,9 +110,9 @@ def log(
     post_whitespace = int(max(whitespace, whitespace_bottom))
 
     if pre_whitespace:
-        m.insert(0, pre_whitespace * '\n')
+        m.insert(0, max(0, pre_whitespace - 1) * '\n')
     if post_whitespace:
-        m.append(post_whitespace * '\n')
+        m.append(max(0, post_whitespace - 1) * '\n')
 
     message = '\n'.join(m)
     if trace:
@@ -120,7 +120,7 @@ def log(
     if file_path:
         file_path = paths.clean(file_path)
         with open(file_path, 'a+' if append_to_file else 'w+') as f:
-            f.write(message)
+            f.write('{}\n'.format(message))
     return message
 
 

@@ -6,12 +6,14 @@ from cauldron import environ
 
 
 def matches(
+        segment: str,
         value: str,
-        *args: typing.Tuple[str],
+        *args: typing.Tuple[typing.Union[str, list, tuple]],
         prefix: str = None
 ) -> list:
     """
 
+    :param segment:
     :param value:
     :param args:
     :param prefix:
@@ -28,10 +30,13 @@ def matches(
     if prefix:
         items = ['{}{}'.format(prefix, x) for x in items]
 
-    return [
-        item for item in items
-        if item.startswith(value)
+    start_index = len(value) - len(segment)
+    possible_matches = [
+        x[start_index:] for x in items
+        if x.startswith(value)
     ]
+
+    return [x for x in possible_matches if x.startswith(segment)]
 
 
 def match_path(
