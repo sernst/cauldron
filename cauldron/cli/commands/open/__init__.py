@@ -67,7 +67,7 @@ def populate(parser: ArgumentParser):
 
 def execute(
         parser: ArgumentParser,
-        path: list,
+        path: str = None,
         last_opened_project: bool = False,
         a_recent_project: bool = False,
         show_in_browser: bool = False
@@ -87,7 +87,7 @@ def execute(
         if not path:
             return
         actions.open_project(path)
-    elif len(path) == 0:
+    elif not path or not path.strip():
         parser.print_help()
         environ.log("""
             [ABORTED]: There was not enough information in that command to
@@ -96,7 +96,7 @@ def execute(
             """)
         return
     else:
-        p = actions.fetch_location(path[0])
+        p = actions.fetch_location(path)
         actions.open_project(p if p else path)
 
     if show_in_browser:
@@ -139,11 +139,26 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
                 include_files=False
             )
 
+        environ.configs.load()
+        aliases = environ.configs.fetch('folder_aliases', {})
+        matches = ['@{}:'.format(x) for x in aliases.keys()]
+
+        for m in matches:
+            if value.startswith(m):
+                return autocompletion.match_path(
+                    segment,
+                    environ.paths.clean(os.path.join(
+                        aliases[m[1:-1]]['path'],
+                        value[-1].split(':', 1)[-1]
+                    )),
+                    include_files=False
+                )
+
+        matches.append('@examples:')
+        matches.append('@home:')
+
         if value.startswith('@'):
-            return autocompletion.matches(segment, value, [
-                'examples:',
-                'home:'
-            ])
+            return autocompletion.matches(segment, value, matches)
 
         return autocompletion.match_path(segment, value)
 

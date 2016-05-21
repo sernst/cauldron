@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 
 from cauldron import cli
 from cauldron import environ
+from cauldron.cli.commands import alias
 from cauldron.cli.commands import clear
 from cauldron.cli.commands import configure
 from cauldron.cli.commands import exit

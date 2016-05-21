@@ -51,6 +51,15 @@ def fetch_location(path: str) -> str:
     if parts[0] == '@home':
         return environ.paths.clean(os.path.join('~', 'cauldron', *segments))
 
+    environ.configs.load()
+    aliases = environ.configs.fetch('folder_aliases', {})
+    key = parts[0][1:]
+    if key in aliases:
+        return environ.paths.clean(os.path.join(
+            aliases[key]['path'],
+            *segments
+        ))
+
     return None
 
 
