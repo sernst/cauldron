@@ -122,6 +122,32 @@
   var exports = window.CAULDRON || {};
   window.CAULDRON = exports;
 
+  var headerDom = [
+    '<div class="cd-body-header">',
+    '<div class="menu-icon"></div>',
+    '<div class="project-title"></div>',
+    '<div class="spacer"></div>',
+    '<div class="buttons"></div>',
+    '</div>'
+  ];
+
+  /**
+   *
+   */
+  function createHeader() {
+    var header = $(headerDom.join(''))
+        .prependTo($('.body-wrapper'));
+    var buttons = header.find('.buttons');
+  }
+  exports.createHeader = createHeader;
+  
+}());
+(function () {
+  'use strict';
+
+  var exports = window.CAULDRON || {};
+  window.CAULDRON = exports;
+
   /**
    *
    * @param selector
@@ -154,6 +180,7 @@
     });
 
     if (!items) {
+      $(window).resize();
       return;
     }
 
@@ -311,19 +338,26 @@
           if (sid) {
             $('<div></div>')
                 .addClass('snapshot-bar')
-                .html('Snapshot: ' + exports.PARAMS['sid'])
+                .text('Snapshot: ' + exports.PARAMS['sid'])
                 .prependTo(body);
   
             $('<div></div>')
                 .addClass('snapshot-bar')
                 .addClass('snapshot-bar-overlay')
-                .html('Snapshot: ' + exports.PARAMS['sid'])
+                .text('Snapshot: ' + exports.PARAMS['sid'])
                 .prependTo(body);
   
             title = '{' + sid + '} ' + title;
           }
   
-          $('title').html(title);
+          $('title').text(title);
+
+          if (exports.SETTINGS.headerless) {
+            return;
+          }
+
+          exports.createHeader();
+          $('.cd-body-header').find('.project-title').text(title);
         });
   }
   exports.run = run;
@@ -336,7 +370,10 @@
     exports.run()
         .then(function () {
           exports.RUNNING = true;
+
+          // Resolve the ready promise
           exports.__on__.ready();
+
           $(window).resize();
         });
   });

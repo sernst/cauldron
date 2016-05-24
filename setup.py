@@ -1,6 +1,7 @@
 import os
 import json
 from setuptools import setup
+from setuptools import find_packages
 
 MY_DIRECTORY = os.path.dirname(__file__)
 with open(os.path.join(MY_DIRECTORY, 'package_data.json'), 'r+') as f:
@@ -14,9 +15,18 @@ setup(
     author='Scott Ernst',
     author_email='swernst@gmail.com',
     license='MIT',
-    packages=['cauldron'],
+    packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     zip_safe=False,
     scripts=['bin/cauldron'],
+    classifiers=[
+        'Development Status :: 3 - Alpha',
+        'License :: OSI Approved :: MIT License',
+
+        'Programming Language :: Python :: 3.5',
+
+        'Topic :: Scientific/Engineering',
+        'Topic :: Scientific/Engineering :: Mathematics',
+    ],
     install_requires=[
         'plotly',
         'pandas',

@@ -145,10 +145,7 @@ def execute(
         environ.log(message, whitespace=1)
         return
 
-    environ.log(
-        'RUNNING\n-------',
-        whitespace_top=1
-    )
+    environ.log_header('RUNNING', 5)
 
     if single_step:
         ps = project_steps[0] if len(project_steps) > 0 else None

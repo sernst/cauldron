@@ -68,19 +68,26 @@
           if (sid) {
             $('<div></div>')
                 .addClass('snapshot-bar')
-                .html('Snapshot: ' + exports.PARAMS['sid'])
+                .text('Snapshot: ' + exports.PARAMS['sid'])
                 .prependTo(body);
   
             $('<div></div>')
                 .addClass('snapshot-bar')
                 .addClass('snapshot-bar-overlay')
-                .html('Snapshot: ' + exports.PARAMS['sid'])
+                .text('Snapshot: ' + exports.PARAMS['sid'])
                 .prependTo(body);
   
             title = '{' + sid + '} ' + title;
           }
   
-          $('title').html(title);
+          $('title').text(title);
+
+          if (exports.SETTINGS.headerless) {
+            return;
+          }
+
+          exports.createHeader();
+          $('.cd-body-header').find('.project-title').text(title);
         });
   }
   exports.run = run;

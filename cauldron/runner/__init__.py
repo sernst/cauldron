@@ -61,8 +61,7 @@ def step(
         if not found:
             return False
 
-    file_path = os.path.join(project.source_directory, project_step.id)
-
+    file_path = project_step.source_path
     if not os.path.exists(file_path):
         environ.log('[{id}]: Not found "{path}"'.format(
             id=project_step.id,
@@ -80,7 +79,6 @@ def step(
 
     with open(file_path, 'r+') as f:
         code = f.read()
-    project_step.code = code
 
     # Set the top-level display and cache values to the current project values
     # before running the step for availability within the step scripts
@@ -90,14 +88,14 @@ def step(
     # Mark the downstream steps as dirty because this one has run
     [x.mark_dirty(True) for x in project.steps[(project_step.index + 1):]]
 
-    if project_step.id.endswith('.md'):
+    if file_path.endswith('.md'):
         project_step.report.markdown(code, **project.shared.fetch(None))
         project_step.last_modified = time.time()
         environ.log('[{}]: Updated'.format(project_step.id))
         project_step.mark_dirty(False)
         return True
 
-    if project_step.id.endswith('.html'):
+    if file_path.endswith('.html'):
         project_step.report.html(templating.render(
             template=code,
             **project.shared.fetch(None)

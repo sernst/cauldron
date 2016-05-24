@@ -7,7 +7,7 @@ from cauldron.environ import paths
 
 def header(
         text: str,
-        bar_char: str = '=',
+        level: int = 1,
         whitespace: int = 0,
         whitespace_top: int = 1,
         whitespace_bottom: int = 0,
@@ -18,7 +18,7 @@ def header(
     """
 
     :param text:
-    :param bar_char:
+    :param level:
     :param whitespace:
     :param whitespace_top:
     :param whitespace_bottom:
@@ -28,8 +28,28 @@ def header(
     :return:
     """
 
+    if level == 0:
+        message = text
+    elif level < 3:
+        message = '{bar}\n{text}\n{bar}'.format(
+            bar=('=' if level == 1 else '-') * len(text),
+            text=text
+        )
+    elif level < 5:
+        message = '{text}\n{bar}'.format(
+            bar=('=' if level == 3 else '-') * 5,
+            text=text
+        )
+    elif level < 7:
+        message = '{bar} {text} {bar}'.format(
+            bar=('=' if level == 5 else '-') * 3,
+            text=text
+        )
+    else:
+        message = text
+
     return log(
-        '{bar}\n{text}\n{bar}'.format(bar=bar_char * len(text), text=text),
+        message,
         whitespace=whitespace,
         whitespace_top=whitespace_top,
         whitespace_bottom=whitespace_bottom,
@@ -68,6 +88,7 @@ def log(
         whitespace: int = 0,
         whitespace_top: int = 0,
         whitespace_bottom: int = 0,
+        indent_by: int = 0,
         trace: bool = True,
         file_path: str = None,
         append_to_file: bool = True,
@@ -92,6 +113,8 @@ def log(
         message when printed to the console. If whitespace_bottom and
         whitespace are both specified, the larger of hte two values will be
         used.
+    :param indent_by:
+        The number of spaces that each line of text should be indented
     :param trace:
         Whether or not to trace the output to the console
     :param file_path:
@@ -114,7 +137,7 @@ def log(
     if post_whitespace:
         m.append(max(0, post_whitespace - 1) * '\n')
 
-    message = '\n'.join(m)
+    message = indent('\n'.join(m), ' ' * indent_by)
     if trace:
         print(message)
     if file_path:

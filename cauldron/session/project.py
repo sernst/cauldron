@@ -39,7 +39,21 @@ class ExposedProject(object):
 
     @property
     def settings(self) -> SharedCache:
+        if not self._project:
+            return None
         return self._project.settings
+
+    @property
+    def title(self) -> str:
+        if not self._project:
+            return None
+        return self._project.title
+
+    @title.setter
+    def title(self, value: str):
+        if not self._project:
+            raise RuntimeError('Failed to assign title to an unloaded project')
+        self._project.title = value
 
     def load(self, project: typing.Union['Project', None]):
         self._project = project
@@ -55,8 +69,10 @@ class ProjectStep(object):
     def __init__(
             self,
             project: 'Project' = None,
+            definition: dict = None,
             report: Report = None
     ):
+        self.definition = {} if definition is None else definition
         self.project = project
         self.report = report
         self.last_modified = None
@@ -70,6 +86,26 @@ class ProjectStep(object):
         return self.report.id
 
     @property
+    def filename(self) -> str:
+        return os.path.join(
+            self.definition.get('folder', ''),
+            self.definition.get('file', '')
+        )
+
+    @property
+    def web_includes(self) -> list:
+        if not self.project:
+            return []
+
+        out = []
+        for fn in self.definition.get('web_includes', []):
+            out.append(os.path.join(
+                self.definition.get('folder', ''),
+                fn.replace('/', os.sep)
+            ))
+        return out
+
+    @property
     def index(self) -> int:
         if not self.project:
             return -1
@@ -79,7 +115,7 @@ class ProjectStep(object):
     def source_path(self) -> str:
         if not self.project or not self.report:
             return None
-        return os.path.join(self.project.source_directory, self.id)
+        return os.path.join(self.project.source_directory, self.filename)
 
     def is_dirty(self):
         """
@@ -97,7 +133,61 @@ class ProjectStep(object):
         return os.path.getmtime(p) >= self.last_modified
 
     def mark_dirty(self, value):
+        """
+
+        :param value:
+        :return:
+        """
+
         self._is_dirty = bool(value)
+
+    def dumps(self):
+        """
+
+        :return:
+        """
+
+        code_file_path = os.path.join(
+            self.project.source_directory,
+            self.filename
+        )
+        codes = [dict(
+            filename=self.filename,
+            path=code_file_path,
+            code=render.code_file(code_file_path)
+        )]
+
+        for fn in self.definition.get('web_includes', []):
+            fn_path = os.path.join(
+                self.project.source_directory,
+                self.definition.get('folder', ''),
+                fn.replace('/', os.sep)
+            )
+
+            codes.append(dict(
+                filename=fn,
+                path=fn_path,
+                code=render.code_file(fn_path)
+            ))
+
+        body = ''.join(self.report.body)
+        has_body = len(body) > 0 and (
+            body.find('<div ') != -1 or
+            body.find('<span ') != -1 or
+            body.find('<p ') != -1 or
+            body.find('<pre ') != -1
+        )
+
+        return templating.render_template(
+            'step-body.html',
+            codes=codes,
+            body=body,
+            has_body=has_body,
+            id=self.report.id,
+            title=self.report.title,
+            subtitle=self.report.subtitle,
+            summary=self.report.summary
+        )
 
 
 class Project(object):
@@ -145,16 +235,17 @@ class Project(object):
 
     @property
     def title(self) -> str:
-        if self.settings:
-            out = self.settings.fetch('title')
-            if out:
-                return out
-            out = self.settings.fetch('name')
-            if out:
-                return out
-            return self.id
+        out = self.settings.fetch('title')
+        if out:
+            return out
+        out = self.settings.fetch('name')
+        if out:
+            return out
+        return self.id
 
-        return 'unknown-project'
+    @title.setter
+    def title(self, value: str):
+        self.settings.title = value
 
     @property
     def id(self) -> str:
@@ -294,26 +385,34 @@ class Project(object):
                 sys.path.append(path)
 
         self.steps = []
-        steps_folder = self.settings.fetch('steps_folder')
+        steps_folder = self.settings.fetch('steps_folder', '')
         for step_data in self.settings.steps:
             if isinstance(step_data, str):
-                step_data = dict(name=step_data)
-            step_path = step_data.get('name')
+                step_data = dict(
+                    name=step_data,
+                    file=step_data
+                )
 
-            if step_path is None:
+            step_data['file'] = step_data.get('file', step_data.get('name', ''))
+            step_data['folder'] = steps_folder
+
+            if not step_data['name']:
                 environ.log(
                     """
                     [ERROR]: No name was found for the step:
                         {}
-                    """.format(step_data)
+                    """.format(step_data['name']),
+                    whitespace=1
                 )
                 self.last_modified = 0
                 return True
 
-            if steps_folder:
-                step_path = os.path.join(steps_folder, step_path)
             self.steps.append(ProjectStep(
-                report=Report(step_path, project=self, **step_data),
+                report=Report(
+                    definition=step_data,
+                    project=self
+                ),
+                definition=step_data,
                 project=self
             ))
 
@@ -330,29 +429,15 @@ class Project(object):
         os.makedirs(self.output_directory)
 
         body = []
+        web_include_paths = self.settings.fetch('web_includes', []) + []
         data = {}
         files = {}
         for step in self.steps:
             report = step.report
-            code = render.code(step.code, filename=step.id) if step.code else ''
-            step_body = ''.join(report.body)
-            has_body = len(step_body) > 0 and (
-                step_body.find('<div ') != -1 or
-                step_body.find('<span ') != -1 or
-                step_body.find('<p ') != -1 or
-                step_body.find('<pre ') != -1
-            )
-            body.append(templating.render_template(
-                'step-body.html',
-                code=code,
-                body=step_body,
-                has_body=has_body,
-                id=report.id,
-                title=report.title,
-                summary=report.summary
-            ))
+            body.append(step.dumps())
             data.update(report.data.fetch(None))
             files.update(report.files.fetch(None))
+            web_include_paths += step.web_includes
 
         for filename, contents in files.items():
             file_path = os.path.join(self.output_directory, filename)
@@ -364,7 +449,7 @@ class Project(object):
                 f.write(contents)
 
         web_includes = []
-        for item in self.settings.fetch('web_includes', []):
+        for item in web_include_paths:
             # Copy "included" files and folders that were specified in the
             # project file to the output directory
 

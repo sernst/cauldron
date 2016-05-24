@@ -7,15 +7,17 @@ class Report(object):
     A class for storing the elements of the
     """
 
-    def __init__(self, identifier: str, project=None, **kwargs):
-        self.id = identifier
+    def __init__(self, project=None, definition: dict = None):
+        self.definition = {} if definition is None else definition
+        self.id = self.definition.get('name', 'unknown-step')
         self.body = []
         self.css = []
         self.data = SharedCache()
         self.files = SharedCache()
         self.project = project
-        self.title = kwargs.get('title')
-        self.summary = kwargs.get('summary')
+        self.title = self.definition.get('title')
+        self.subtitle = self.definition.get('subtitle')
+        self.summary = self.definition.get('summary')
 
     def clear(self):
         self.body = []

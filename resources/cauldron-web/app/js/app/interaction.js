@@ -36,6 +36,7 @@
     });
 
     if (!items) {
+      $(window).resize();
       return;
     }
 

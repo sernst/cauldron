@@ -36,17 +36,24 @@ def execute(parser: ArgumentParser):
             The specified path does not exist:
 
             "{path}"
-            """.format(path=path)
+            """.format(path=path),
+            whitespace=1
         )
         return
 
     try:
         runner.initialize(path)
     except FileNotFoundError:
-        environ.log('Error: Project not found')
+        environ.log(
+            '[Error]: Project not found',
+            whitespace=1
+        )
         return
 
-    environ.log('Reloaded: {}'.format(path))
+    environ.log(
+        '[RELOADED]: {}'.format(path),
+        whitespace=1
+    )
 
     project = cauldron.project.internal_project
 
@@ -57,11 +64,3 @@ def execute(parser: ArgumentParser):
     if not path or not os.path.exists(path):
         project.write()
 
-    url = project.url
-
-    environ.log(
-        """
-        Project URL:
-          * {url}
-        """.format(url=url)
-    )

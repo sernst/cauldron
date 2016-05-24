@@ -122,19 +122,16 @@ def open_project(path: str) -> bool:
 
     url = project.url
 
-    header = 'OPENED: {}'.format(project.title)
+    environ.log_header('OPENED', 5)
     environ.log(
         """
-        {bars}
-        {header}
-        {bars}
+        PROJECT: {title}
 
-          PATH: {path}
+           PATH: {path}
 
-           URL: {url}
+            URL: {url}
         """.format(
-            bars='=' * len(header),
-            header=header,
+            title=project.title,
             path=path,
             url=url
         ),

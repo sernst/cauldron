@@ -1,3 +1,4 @@
+import os
 import json as json_internal
 import random
 import textwrap
@@ -5,6 +6,7 @@ from datetime import datetime
 
 import pandas as pd
 
+from cauldron import environ
 from cauldron import templating
 from cauldron.render import syntax_highlighting
 from cauldron.render import utils as render_utils
@@ -18,6 +20,35 @@ try:
     import plotly as plotly_lib
 except ImportError:
     plotly_lib = None
+
+
+def code_file(
+        path: str,
+        language: str = None,
+        mime_type: str = None
+) -> str:
+    """
+
+    :param path:
+    :param language:
+    :param mime_type:
+    :return:
+    """
+
+    path = environ.paths.clean(path)
+
+    if not os.path.exists(path):
+        return 'File does not exist: {}'.format(path)
+
+    with open(path, 'r+') as f:
+        source = f.read()
+
+    return code(
+        source=source,
+        language=language,
+        filename=path,
+        mime_type=mime_type
+    )
 
 
 def code(
@@ -34,6 +65,9 @@ def code(
     :param mime_type:
     :return:
     """
+
+    if not source:
+        return ''
 
     return syntax_highlighting.as_html(
         source=source,

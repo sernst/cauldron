@@ -418,7 +418,7 @@ textarea {
   font: inherit; /* 2 */
 }
 
-.centered, .cd-project-step .code-box .code-toolbar {
+.centered, .cd-body-header, .cd-project-step .code-box .code-toolbar {
   display: flex;
   justify-content: center;
   align-content: center;
@@ -442,6 +442,11 @@ textarea {
     left: 0;
     width: 100%;
     overflow: hidden; }
+
+.cd-body-header {
+  background-color: #333333;
+  color: #FFF;
+  padding: 0.5rem; }
 
 .cd-project-step .header {
   display: flex;
@@ -490,6 +495,8 @@ textarea {
     .cd-project-step .code-box .code-wrapper .linenos {
       opacity: 0.4;
       padding-right: 12px; }
+  .cd-project-step .code-box .code-toolbar {
+    margin: 0.5em 0; }
   .cd-project-step .code-box .tool-button {
     background-color: #333;
     color: #FFF;
@@ -500,6 +507,13 @@ textarea {
     .cd-project-step .code-box .tool-button:hover {
       background-color: #AAA;
       color: black; }
+  .cd-project-step .code-box .code-file-header {
+    padding: 0.5em;
+    background-color: #666666;
+    color: #FFF; }
+  .cd-project-step .code-box .code-file-box {
+    width: 100%;
+    overflow-x: auto; }
 
 .cd-project-step-body {
   margin: 0.5em 0 1.0em 0; }

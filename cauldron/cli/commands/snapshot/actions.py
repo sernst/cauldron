@@ -54,10 +54,10 @@ def list_snapshots(project: Project):
 
     entries = []
     for item in snapshots:
-        entries.append('   * {}'.format(item['name']))
+        entries.append('* {}'.format(item['name']))
 
     environ.log_header('EXISTING SNAPSHOTS')
-    environ.log(entries, whitespace_bottom=1)
+    environ.log(entries, whitespace_bottom=1, indent_by=3)
 
 
 def create_snapshot(project: Project, *args: typing.List[str]):
@@ -84,14 +84,10 @@ def create_snapshot(project: Project, *args: typing.List[str]):
 
     url = project.snapshot_url(snapshot_name)
 
-    environ.log(
-        """
-        Snapshot URL:
-        -------------
-
-          * {}
-        """.format(url),
-        whitespace=1
+    environ.log_header('Snapshot URL', 5)
+    environ.log('* {}'.format(url),
+        whitespace_bottom=1,
+        indent_by=2
     )
 
     webbrowser.open(url)

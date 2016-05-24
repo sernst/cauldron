@@ -8,20 +8,22 @@
          data-marks-closed="#{{ "code-toggler" | id }}"
          onclick="CAULDRON.collapse('{{ "title-box" | id }}')"
     >
-      {% if body %}
+      {% if has_body %}
       <i class="material-icons closed-icon">keyboard_arrow_down</i>
       <i class="material-icons opened-icon">keyboard_arrow_up</i>
       {% endif %}
       <div>
-        <div class="title">{{ id }}</div>
+        <div class="title">{{ title if title else id }}</div>
+        {% if subtitle %}
         <div class="subtitle">{{ subtitle }}</div>
+        {% endif %}
       </div>
     </div>
 
     <div class="spacer"> </div>
 
     <div class="button-bar">
-      {% if code %}
+      {% if codes %}
       <div id="{{ "code-toggler" | id }}"
            class="clicker closed centered"
            data-closes="#{{ "code" | id }}"
@@ -35,7 +37,7 @@
     </div>
   </div>
 
-  {% if code %}
+  {% if codes %}
   <div class="code-box"
        id="{{ "code" | id }}"
        style="display:none">
@@ -62,14 +64,24 @@
          data-font-size-default="0.6"
          style="font-size: 0.6em"
     >
-      {{ code }}
+      {% for entry in codes %}
+      <div class="code-file-header">{{ entry.filename }}</div>
+      <div class="code-file-box">
+        {{ entry.code }}
+      </div>
+      {% endfor %}
     </div>
 
   </div>
   {% endif %}
 
   {% if body %}
-  <div id="{{ "body" | id }}" class="cd-project-step-body">
+  <div id="{{ "body" | id }}"
+       class="cd-project-step-body"
+       {% if not has_body %}
+         style="display:none;"
+       {% endif %}
+  >
     {{ body }}
   </div>
   {%  endif %}
