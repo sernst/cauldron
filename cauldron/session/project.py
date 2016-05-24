@@ -3,6 +3,8 @@ import os
 import sys
 import time
 import typing
+import shutil
+import glob
 
 from cauldron import environ
 from cauldron import render
@@ -333,10 +335,18 @@ class Project(object):
         for step in self.steps:
             report = step.report
             code = render.code(step.code, filename=step.id) if step.code else ''
+            step_body = ''.join(report.body)
+            has_body = len(step_body) > 0 and (
+                step_body.find('<div ') != -1 or
+                step_body.find('<span ') != -1 or
+                step_body.find('<p ') != -1 or
+                step_body.find('<pre ') != -1
+            )
             body.append(templating.render_template(
                 'step-body.html',
                 code=code,
-                body=''.join(report.body),
+                body=step_body,
+                has_body=has_body,
                 id=report.id,
                 title=report.title,
                 summary=report.summary
@@ -344,20 +354,55 @@ class Project(object):
             data.update(report.data.fetch(None))
             files.update(report.files.fetch(None))
 
+        for filename, contents in files.items():
+            file_path = os.path.join(self.output_directory, filename)
+            output_directory = os.path.dirname(file_path)
+            if not os.path.exists(output_directory):
+                os.makedirs(output_directory)
+
+            with open(file_path, 'w+') as f:
+                f.write(contents)
+
+        web_includes = []
+        for item in self.settings.fetch('web_includes', []):
+            # Copy "included" files and folders that were specified in the
+            # project file to the output directory
+
+            source_path = environ.paths.clean(
+                os.path.join(self.source_directory, item)
+            )
+            if not os.path.exists(source_path):
+                continue
+
+            item_path = os.path.join(self.output_directory, item)
+            output_directory = os.path.dirname(item_path)
+            if not os.path.exists(output_directory):
+                os.makedirs(output_directory)
+
+            if os.path.isdir(source_path):
+                shutil.copytree(source_path, item_path)
+                glob_path = os.path.join(item_path, '**', '*')
+                for entry in glob.iglob(glob_path, recursive=True):
+                    web_includes.append(
+                        '{}'.format(
+                            entry[len(self.output_directory):]
+                                .replace('\\', '/'))
+                    )
+            else:
+                shutil.copy2(source_path, item_path)
+                web_includes.append('/{}'.format(item.replace('\\', '/')))
+
         with open(self.output_path, 'w+') as f:
+            # Write the results file
             f.write(templating.render_template(
                 'report.js.template',
                 DATA=json.dumps({
                     'data': data,
+                    'includes': web_includes,
                     'settings': self.settings.fetch(None),
                     'body': '\n'.join(body)
                 })
             ))
-
-        for filename, contents in files.items():
-            file_path = os.path.join(self.output_directory, filename)
-            with open(file_path, 'w+') as f:
-                f.write(contents)
 
         return self.url
 

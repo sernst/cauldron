@@ -1,16 +1,21 @@
 import cmd
-# import readline
+import json
 
 import cauldron
+from cauldron import environ
 from cauldron import templating
 from cauldron.cli import commands
 
-# readline.set_completer_delims(' \t\n')
+with open(environ.paths.package('package_data.json'), 'r+') as f:
+    package_data = json.load(f)
 
 
 class CauldronShell(cmd.Cmd):
     intro = '\n{}\n'.format(
-        templating.render_template('shell_introduction.txt')
+        templating.render_template(
+            'shell_introduction.txt',
+            version=package_data['version']
+        )
     )
     prompt = '<>: '
 

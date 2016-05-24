@@ -51,32 +51,66 @@
   exports.toDisplayNumber = toDisplayNumber;
 
   /**
+   *
    * @param filename
    */
-  function loadDataFile(filename) {
-
-    function loadComplete(resolve) {
-      exports.DATA = window.RESULTS.data;
-      exports.SETTINGS = window.RESULTS.settings;
-      $('.body-wrapper').html(window.RESULTS.body);
-      resolve(exports.DATA);
-      $(window).trigger('resize');
+  function loadSourceFile(filename) {
+    if (/.*\.css$/.test(filename)) {
+      // Load Style sheet files
+      return new Promise(function (resolve) {
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.onload = resolve;
+        link.href = filename;
+        document.head.appendChild(link);
+      });
     }
+
+    if (/.*\.js$/.test(filename)) {
+      // Load Javascript files
+      return new Promise(function (resolve) {
+        var script = document.createElement('script');
+        script.onload = resolve;
+        script.src = filename;
+        document.head.appendChild(script);
+      });
+    }
+
+    return Promise.reject();
+  }
+
+  /**
+   * @param rootPath
+   * @param filename
+   */
+  function loadDataFile(rootPath, filename) {
+    var prom;
 
     if (window.RESULTS) {
       // If the results were included in the page directly, don't load them
       // again
-      return new Promise(function (resolve) {
-        loadComplete(resolve);
-      });
+      prom = Promise.resolve();
+    } else {
+      prom = loadSourceFile(rootPath + filename);
     }
 
-    return new Promise(function (resolve) {
-      var script = document.createElement('script');
-      script.onload = loadComplete.bind(null, resolve);
-      script.src = filename;
-      document.head.appendChild(script);
-    });
+    return prom
+        .then(function () {
+          exports.DATA = window.RESULTS.data;
+          exports.SETTINGS = window.RESULTS.settings;
+
+          var proms = [];
+          window.RESULTS.includes.forEach(function (includedFilename) {
+            proms.push(loadSourceFile(rootPath + includedFilename));
+          });
+
+          return Promise.all(proms);
+        })
+        .then(function () {
+          $('.body-wrapper').html(window.RESULTS.body);
+          $(window).trigger('resize');
+          return exports.DATA;
+        });
   }
   exports.loadDataFile = loadDataFile;
 
@@ -269,28 +303,28 @@
       }
     }
     
-    return exports.loadDataFile(dataDirectory  +'/results.js')
-      .then(function () {
-        var title = exports.SETTINGS.title || exports.SETTINGS.id || id;
-        var body = $('body');
-
-        if (sid) {
-          $('<div></div>')
-              .addClass('snapshot-bar')
-              .html('Snapshot: ' + exports.PARAMS['sid'])
-              .prependTo(body);
-
-          $('<div></div>')
-              .addClass('snapshot-bar')
-              .addClass('snapshot-bar-overlay')
-              .html('Snapshot: ' + exports.PARAMS['sid'])
-              .prependTo(body);
-
-          title = '{' + sid + '} ' + title;
-        }
-
-        $('title').html(title);
-      });
+    return exports.loadDataFile(dataDirectory, '/results.js')
+        .then(function () {
+          var title = exports.SETTINGS.title || exports.SETTINGS.id || id;
+          var body = $('body');
+  
+          if (sid) {
+            $('<div></div>')
+                .addClass('snapshot-bar')
+                .html('Snapshot: ' + exports.PARAMS['sid'])
+                .prependTo(body);
+  
+            $('<div></div>')
+                .addClass('snapshot-bar')
+                .addClass('snapshot-bar-overlay')
+                .html('Snapshot: ' + exports.PARAMS['sid'])
+                .prependTo(body);
+  
+            title = '{' + sid + '} ' + title;
+          }
+  
+          $('title').html(title);
+        });
   }
   exports.run = run;
 
@@ -302,6 +336,7 @@
     exports.run()
         .then(function () {
           exports.RUNNING = true;
+          exports.__on__.ready();
           $(window).resize();
         });
   });

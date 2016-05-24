@@ -7,6 +7,21 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
 
   <title>Cauldron Project</title>
+
+  <script type="application/javascript">
+    (function () {
+      var c = window.CAULDRON || {};
+      window.CAULDRON = c;
+
+      c.on = {};
+      c.__on__ = {};
+      c.on.ready = new Promise(function (resolve) {
+        c.__on__.ready = resolve;
+      });
+
+    }());
+  </script>
+
   <link rel="stylesheet" href="project.css" />
   <!-- CAULDRON:EXPORT -->
   <script src="bower.js"></script>

@@ -1,8 +1,14 @@
+import os
+import json
 from setuptools import setup
+
+MY_DIRECTORY = os.path.dirname(__file__)
+with open(os.path.join(MY_DIRECTORY, 'package_data.json'), 'r+') as f:
+    package_data = json.load(f)
 
 setup(
     name='cauldron',
-    version='0.1',
+    version=package_data['version'],
     description='Un-Notebook Data Science',
     url='https://github.com/sernst/cauldron',
     author='Scott Ernst',

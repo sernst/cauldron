@@ -13,6 +13,7 @@ from cauldron.cli.commands import open
 from cauldron.cli.commands import purge
 from cauldron.cli.commands import run
 from cauldron.cli.commands import status
+from cauldron.cli.commands import refresh
 from cauldron.cli.commands import reload
 from cauldron.cli.commands import snapshot
 from cauldron.cli.commands import show

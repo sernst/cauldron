@@ -1,7 +1,13 @@
+       ___            _     _
+      / __\__ _ _   _| | __| |_ __ ___  _ __
+     / /  / _` | | | | |/ _` | '__/ _ \| '_ \
+    / /__| (_| | |_| | | (_| | | | (_) | | | |
+    \____/\__,_|\__,_|_|\__,_|_|  \___/|_| |_|
 
-=================================
-CAULDRON Data Science Environment
-=================================
+            "The Un-Notebook Notebook"
+          Scientific Analysis Environment
+
+Version: {{ version }}
 
 --- HELP ---
 For help, type "help" or "?" in the command prompt
