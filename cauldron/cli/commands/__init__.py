@@ -7,6 +7,7 @@ from cauldron import environ
 from cauldron.cli.commands import alias
 from cauldron.cli.commands import clear
 from cauldron.cli.commands import configure
+from cauldron.cli.commands import create
 from cauldron.cli.commands import exit
 from cauldron.cli.commands import export
 from cauldron.cli.commands import open

@@ -9,7 +9,7 @@ DESCRIPTION = """
     """
 
 
-def prepare(parser: ArgumentParser):
+def populate(parser: ArgumentParser):
     pass
 
 
