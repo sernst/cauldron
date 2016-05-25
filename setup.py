@@ -36,6 +36,8 @@ setup(
         'markdown',
         'pygments',
         'pyquery',
-        'matplotlib'
+        'matplotlib',
+        'bokeh',
+        'seaborn'
     ]
 )

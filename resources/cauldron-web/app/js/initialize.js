@@ -107,6 +107,7 @@
           return Promise.all(proms);
         })
         .then(function () {
+          $('head').append(window.RESULTS.head);
           $('.body-wrapper').html(window.RESULTS.body);
           $(window).trigger('resize');
           return exports.DATA;

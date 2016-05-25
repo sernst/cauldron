@@ -1,5 +1,6 @@
 import typing
 
+import pandas as pd
 from matplotlib.pyplot import Figure
 
 from cauldron import render
@@ -9,7 +10,9 @@ from cauldron.session.caching import SharedCache
 
 class Report(object):
     """
-    A class for storing the elements of the
+    The display management class for each step in a project. These class
+    instances are exposed to Cauldron users, which provide the functionality
+    for adding various element types to the display.
     """
 
     def __init__(self, project=None, definition: dict = None):
@@ -23,16 +26,28 @@ class Report(object):
         self.title = self.definition.get('title')
         self.subtitle = self.definition.get('subtitle')
         self.summary = self.definition.get('summary')
+        self.library_includes = []
 
     def clear(self):
+        """
+        Clear all user-data stored in this instance and reset it to its
+        originally loaded state
+
+        :return:
+            The instance that was called for method chaining
+        """
         self.body = []
         self.data = SharedCache()
         self.files = SharedCache()
+        return self
 
     def inspect(self, source: dict):
         """
+        Inspects the data and structure of the source dictionary object and
+        adds the results to the display for viewing
 
         :param source:
+            A dictionary object to be inspected
         :return:
         """
 
@@ -40,9 +55,13 @@ class Report(object):
 
     def header(self, text: str, level: int = 1):
         """
+        Adds a text header to the display with the specified level.
 
         :param text:
+            The text to display in the header
         :param level:
+            The level of the header, which corresponds to the html header
+            levels, such as <h1>, <h2>, ...
         :return:
         """
 
@@ -50,9 +69,14 @@ class Report(object):
 
     def text(self, text: str, preformatted: bool = False):
         """
+        Adds text to the display. If the text is not preformatted, it will be
+        displayed in paragraph format. Preformatted text will be displayed
+        inside a pre tag with a monospace font.
 
         :param text:
+            The text to display
         :param preformatted:
+            Whether or not to preserve the whitespace display the text
         :return:
         """
 
@@ -64,8 +88,11 @@ class Report(object):
 
     def markdown(self, source: str, **kwargs):
         """
+        Renders the source string using markdown and adds the resulting html
+        to the display
 
         :param source:
+            A markdown formatted string
         :return:
         """
 
@@ -73,29 +100,46 @@ class Report(object):
 
     def json(self, window_key: str, data):
         """
+        Adds the specified data to the the output display window with the
+        specified key. This allows the user to make available arbitrary
+        JSON-compatible data to the display for runtime use.
 
         :param window_key:
+            The key on the global window object to which this data will be
+            assigned.
         :param data:
+            The data to be assigned to the window object. This data must be
+            serializable as JSON data.
         :return:
         """
 
         self.body.append(render.json(window_key, data))
 
-    def add_html(self, content):
+    def add_html(self, dom: str):
         """
+        Add the specified html string to the display
 
         :param content:
+            A string containing html to be added to the display
         :return:
         """
 
-        self.body.append(render.html(content))
+        self.body.append(render.html(dom))
 
     def plotly(self, data, layout: dict, scale: float = 0.5):
         """
+        Creates a plotly plot in the display with the specified data and layout
 
         :param data:
+            The plotly trace data to be plotted
         :param layout:
+            The layout data used for the plot
         :param scale:
+            The display scale with units of fractional screen height. A value
+            of 0.5 constrains the output to a maximum height equal to half the
+            height of browser window when viewed. Values below 1.0 are usually
+            recommended so the entire output can be viewed without scrolling.
+
         :return:
         """
 
@@ -104,11 +148,18 @@ class Report(object):
 
         self.body.append(render.plotly(data, layout, scale))
 
-    def table(self, data_frame, scale: float = 0.7):
+    def table(self, data_frame: pd.DataFrame, scale: float = 0.7):
         """
+        Adds the specified data frame to the display in a nicely formatted
+        scrolling table
 
         :param data_frame:
+            The pandas data frame to be rendered to a table
         :param scale:
+            The display scale with units of fractional screen height. A value
+            of 0.5 constrains the output to a maximum height equal to half the
+            height of browser window when viewed. Values below 1.0 are usually
+            recommended so the entire output can be viewed without scrolling.
         :return:
         """
 
@@ -119,9 +170,15 @@ class Report(object):
 
     def svg(self, svg: str, filename: str = None):
         """
+        Adds the specified SVG string to the display. If a filename is
+        included, the SVG data will also be saved to that filename within the
+        project results folder.
 
         :param svg:
+            The SVG string data to add to the display
         :param filename:
+            An optional filename where the SVG data should be saved within
+            the project results folder.
         :return:
         """
 
@@ -137,7 +194,7 @@ class Report(object):
 
     def jinja(self, path, **kwargs):
         """
-
+        Renders the specified jinja template
         :param path:
         :param kwargs:
         :return:
@@ -215,3 +272,15 @@ class Report(object):
         """
 
         self.body.append(render_plots.pyplot(figure, scale=scale))
+
+    def bokeh(self, model):
+        """
+
+        :param model:
+        :return:
+        """
+
+        if 'bokeh' not in self.library_includes:
+            self.library_includes.append('bokeh')
+
+        self.body.append(render_plots.bokeh_plot(model))

@@ -6,6 +6,9 @@ import typing
 import shutil
 import glob
 
+from pyquery import PyQuery as pq
+from bokeh.resources import Resources as BokehResources
+
 from cauldron import environ
 from cauldron import render
 from cauldron import templating
@@ -428,25 +431,19 @@ class Project(object):
         environ.systems.remove(self.output_directory)
         os.makedirs(self.output_directory)
 
+        head = []
         body = []
         web_include_paths = self.settings.fetch('web_includes', []) + []
         data = {}
         files = {}
+        library_includes = []
         for step in self.steps:
             report = step.report
             body.append(step.dumps())
             data.update(report.data.fetch(None))
             files.update(report.files.fetch(None))
             web_include_paths += step.web_includes
-
-        for filename, contents in files.items():
-            file_path = os.path.join(self.output_directory, filename)
-            output_directory = os.path.dirname(file_path)
-            if not os.path.exists(output_directory):
-                os.makedirs(output_directory)
-
-            with open(file_path, 'w+') as f:
-                f.write(contents)
+            library_includes += step.report.library_includes
 
         web_includes = []
         for item in web_include_paths:
@@ -477,6 +474,28 @@ class Project(object):
                 shutil.copy2(source_path, item_path)
                 web_includes.append('/{}'.format(item.replace('\\', '/')))
 
+        if 'bokeh' in library_includes:
+            js_path = os.path.join('bokeh', 'bokeh.js')
+            css_path = os.path.join('bokeh', 'bokeh.css')
+
+            br = BokehResources(mode='inline')
+            dom = pq(br.render_js())
+            files[js_path] = dom('script').html()
+            dom = pq(br.render_css())
+            files[css_path] = dom('style').html()
+
+            web_includes.append('/bokeh/bokeh.js')
+            web_includes.append('/bokeh/bokeh.css')
+
+        for filename, contents in files.items():
+            file_path = os.path.join(self.output_directory, filename)
+            output_directory = os.path.dirname(file_path)
+            if not os.path.exists(output_directory):
+                os.makedirs(output_directory)
+
+            with open(file_path, 'w+') as f:
+                f.write(contents)
+
         with open(self.output_path, 'w+') as f:
             # Write the results file
             f.write(templating.render_template(
@@ -485,7 +504,8 @@ class Project(object):
                     'data': data,
                     'includes': web_includes,
                     'settings': self.settings.fetch(None),
-                    'body': '\n'.join(body)
+                    'body': '\n'.join(body),
+                    'head': '\n'.join(head)
                 })
             ))
 

@@ -5,6 +5,9 @@ from pyquery import PyQuery as pq
 from matplotlib import pyplot as mpl_pyplot
 from matplotlib.pyplot import Figure
 
+from bokeh import embed
+from bokeh.model import Model
+
 
 def pyplot(
         figure: Figure = None,
@@ -34,7 +37,6 @@ def pyplot(
     figure.savefig(
         buffer,
         format='svg',
-        transparent=transparent,
         dpi=300
     )
     buffer.seek(0)
@@ -51,3 +53,13 @@ def pyplot(
     svg.attr('height', '100%')
 
     return dom.html()
+
+
+def bokeh_plot(model: Model) -> str:
+    """
+
+    :param model:
+    :return:
+    """
+
+    return embed.notebook_div(model)

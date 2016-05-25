@@ -1,16 +1,16 @@
+import functools
 import os
 import sys
+import time
 import traceback
 import types
 import typing
-import time
-import functools
 
 import cauldron
 from cauldron import environ
+from cauldron import templating
 from cauldron.session.project import Project
 from cauldron.session.project import ProjectStep
-from cauldron import templating
 
 
 def step_print(
@@ -32,6 +32,7 @@ def step_print(
     """
 
     text = '\t'.join([str(x) for x in args])
+
     project_step.report.text(text, preformatted=True)
 
     print(*args, sep=sep, end='\n', file=file, flush=flush)

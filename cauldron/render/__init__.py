@@ -109,6 +109,7 @@ def text(value: str) -> str:
     :return:
     """
 
+    value = render_utils.html_escape(value)
     lines = str(value).strip().split('\n')
 
     for index in range(len(lines)):
@@ -126,6 +127,8 @@ def preformatted_text(source: str) -> str:
     :param source:
     :return:
     """
+
+    source = render_utils.html_escape(source)
 
     return '<pre class="preformatted-textbox">{text}</pre>'.format(
         text=str(textwrap.dedent(source))

@@ -1,10 +1,10 @@
-html_escapes = {
-    "&": "&amp;",
-    '"': "&quot;",
-    "'": "&apos;",
-    ">": "&gt;",
-    "<": "&lt;",
-}
+html_escapes = [
+    ("&", "&amp;"),
+    ('"', "&quot;"),
+    ("'", "&apos;"),
+    (">", "&gt;"),
+    ("<", "&lt;"),
+]
 
 
 def html_escape(text: str) -> str:
@@ -14,7 +14,7 @@ def html_escape(text: str) -> str:
     :return:
     """
 
-    for k, v in html_escapes.items():
+    for k, v in html_escapes:
         text = text.replace(k, v)
 
     return text
