@@ -1,4 +1,9 @@
+import typing
+
+from matplotlib.pyplot import Figure
+
 from cauldron import render
+from cauldron.render import plots as render_plots
 from cauldron.session.caching import SharedCache
 
 
@@ -23,6 +28,15 @@ class Report(object):
         self.body = []
         self.data = SharedCache()
         self.files = SharedCache()
+
+    def inspect(self, source: dict):
+        """
+
+        :param source:
+        :return:
+        """
+
+        self.body.append(render.inspect(source))
 
     def header(self, text: str, level: int = 1):
         """
@@ -167,3 +181,37 @@ class Report(object):
             data[key] = value
 
         self.body.append(render.status(data, values=values, types=types))
+
+    def pyplot(
+            self,
+            figure: Figure = None,
+            scale: float = 0.8,
+            clear: bool = True,
+            aspect_ratio: typing.Union[list, tuple] = None
+    ):
+        """
+
+        :param figure:
+            The matplotlib figure to plot. If omitted, the currently active
+            figure will be used.
+        :param scale:
+            The display scale with units of fractional screen height. A value
+            of 0.5 constrains the output to a maximum height equal to half the
+            height of browser window when viewed. Values below 1.0 are usually
+            recommended so the entire output can be viewed without scrolling.
+        :param clear:
+            Clears the figure after it has been rendered. This is useful to
+            prevent persisting old plot data between repeated runs of the
+            project files. This can be disabled if the plot is going to be
+            used later in the project files.
+        :param aspect_ratio:
+            The aspect ratio for the displayed plot as a two-element list or
+            tuple. The first element is the width and the second element the
+            height. The units are "inches," which is an important consideration
+            for the display of text within the figure. If no aspect ratio is
+            specified, the currently assigned values to the plot will be used
+            instead.
+        :return:
+        """
+
+        self.body.append(render_plots.pyplot(figure, scale=scale))

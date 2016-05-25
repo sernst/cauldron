@@ -524,6 +524,15 @@ textarea {
 .cd-project-step-body .data-table {
   margin: 1.0em 2.0em 1.0em 2.0em; }
 
+.cd-pylab-plot {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center; }
+  .cd-pylab-plot .cd-pylab-svg {
+    width: 100%;
+    max-height: 80vh; }
+
 @charset "UTF-8";
 
 /*!

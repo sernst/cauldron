@@ -172,10 +172,10 @@ class ProjectStep(object):
 
         body = ''.join(self.report.body)
         has_body = len(body) > 0 and (
-            body.find('<div ') != -1 or
-            body.find('<span ') != -1 or
-            body.find('<p ') != -1 or
-            body.find('<pre ') != -1
+            body.find('<div') != -1 or
+            body.find('<span') != -1 or
+            body.find('<p') != -1 or
+            body.find('<pre') != -1
         )
 
         return templating.render_template(

@@ -9,6 +9,7 @@ import pandas as pd
 from cauldron import environ
 from cauldron import templating
 from cauldron.render import syntax_highlighting
+from cauldron.render import inspection
 from cauldron.render import utils as render_utils
 
 try:
@@ -20,6 +21,13 @@ try:
     import plotly as plotly_lib
 except ImportError:
     plotly_lib = None
+
+
+def inspect(source: dict) -> str:
+    out = inspection.inspect_data(source=source)
+    return '<div><pre>{}</pre></div>'.format(
+        '\n'.join(inspection.echo_inspection_data(out, 0))
+    )
 
 
 def code_file(

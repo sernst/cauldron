@@ -35,6 +35,7 @@ setup(
         'jinja2',
         'markdown',
         'pygments',
-        'pyquery'
+        'pyquery',
+        'matplotlib'
     ]
 )
