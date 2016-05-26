@@ -1,4 +1,3 @@
-
 Cauldron
 ========
 
@@ -18,7 +17,7 @@ About Cauldron
   executions to avoid having to run every step from the beginning each time.
 - **Accessible HTML Output**: Output is written to notebook-style formatted
   HTML for efficient display, consumption and sharing.
-- **Segmented code execution**: Code is run in distinct steps (just like
+- **Segmented Code Execution**: Code is run in distinct steps (just like
   notebook cells), and you control when and which steps are run.
 
 with the best elements of traditional software development:
@@ -130,13 +129,12 @@ For more details about the create command, use the Cauldron shell command:
 
 The create command takes two arguments:
 
-1. The name of your new project (``hello_cauldron`` in the example above)
-2. The absolute path to the directory where the project will be saved. In the
-example above, the ``@home:`` argument is a shortcut to Cauldron's default home
-directory, which is ~/cauldron/.
+#. The name of your new project (``hello_cauldron`` in the example above)
+#. The absolute path to the directory where the project will be saved. In the
+   example above, the ``@home:`` argument is a shortcut to Cauldron's default home
+   directory, which is ~/cauldron/.
 
 When the example create command above is executed, a *hello_cauldron* project
 will be created in the directory *~/cauldron/hello_cauldron/*, with the
 scaffolding for the project already written. The create command also
-immediately opens the new project, which is ready to run.
-
+immediately opens the new project and is ready to run.
