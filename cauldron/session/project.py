@@ -388,39 +388,65 @@ class Project(object):
                 sys.path.append(path)
 
         self.steps = []
-        steps_folder = self.settings.fetch('steps_folder', '')
         for step_data in self.settings.steps:
-            if isinstance(step_data, str):
-                step_data = dict(
-                    name=step_data,
-                    file=step_data
-                )
-
-            step_data['file'] = step_data.get('file', step_data.get('name', ''))
-            step_data['folder'] = steps_folder
-
-            if not step_data['name']:
-                environ.log(
-                    """
-                    [ERROR]: No name was found for the step:
-                        {}
-                    """.format(step_data['name']),
-                    whitespace=1
-                )
-                self.last_modified = 0
-                return True
-
-            self.steps.append(ProjectStep(
-                report=Report(
-                    definition=step_data,
-                    project=self
-                ),
-                definition=step_data,
-                project=self
-            ))
+            self.add_step(step_data)
 
         self.last_modified = time.time()
         return True
+
+    def add_step(
+            self, step_data: typing.Union[str, dict],
+            index: int = None
+    ) -> ProjectStep:
+        """
+
+        :param step_data:
+        :param index:
+        :return:
+        """
+
+        steps_folder = self.settings.fetch('steps_folder', '')
+
+        if isinstance(step_data, str):
+            step_data = dict(
+                name=step_data,
+                file=step_data
+            )
+
+        step_data['file'] = step_data.get('file', step_data.get('name', ''))
+        step_data['folder'] = steps_folder
+
+        if not step_data['name']:
+            environ.log(
+                """
+                [ERROR]: No name was found for the step:
+                    {}
+                """.format(step_data['name']),
+                whitespace=1
+            )
+            self.last_modified = 0
+            return True
+
+        ps = ProjectStep(
+            report=Report(
+                definition=step_data,
+                project=self
+            ),
+            definition=step_data,
+            project=self
+        )
+
+        if index is None:
+            self.steps.append(ps)
+        else:
+            if index < 0:
+                index %= len(self.steps)
+            self.steps.insert(index, ps)
+            for i in range(self.steps.index(ps) + 1, len(self.steps)):
+                self.steps[i].mark_dirty(True)
+
+        self.last_modified = time.time()
+        return ps
 
     def write(self) -> str:
         """

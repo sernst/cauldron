@@ -17,6 +17,7 @@ from cauldron.cli.commands import status
 from cauldron.cli.commands import refresh
 from cauldron.cli.commands import reload
 from cauldron.cli.commands import snapshot
+from cauldron.cli.commands import steps
 from cauldron.cli.commands import show
 
 ME = sys.modules[__name__]

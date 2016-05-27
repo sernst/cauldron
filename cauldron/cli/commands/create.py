@@ -62,7 +62,9 @@ def execute(parser: ArgumentParser, project_name: str, directory: str):
                 """
                 [ABORTED]: Directory already exists and contains a cauldron
                     project file.
-                """,
+
+                    {}
+                """.format(directory),
                 whitespace=1
             )
             return

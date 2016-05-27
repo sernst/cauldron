@@ -59,7 +59,7 @@ def match_path(
         value.rstrip(os.sep) if len(value) > 1 else value
     )
 
-    if not os.path.exists(path):
+    if len(segment) > 0 or not os.path.exists(path):
         # The path doesn't exist, assume that the value is an incomplete path
         # and grab the path to the containing directory instead
         path = os.path.dirname(path)
@@ -76,9 +76,7 @@ def match_path(
         item_path = os.path.join(path, item)
         if include_folders and os.path.isdir(item_path):
             out.append('{}{}'.format(item, os.sep))
-            continue
-
-        if include_files and os.path.isfile(item_path):
+        elif include_files and os.path.isfile(item_path):
             out.append(item)
 
     return out

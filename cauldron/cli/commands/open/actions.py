@@ -35,7 +35,7 @@ def echo_known_projects() -> dict:
         glob_path = os.path.join(root_path, '**', 'cauldron.json')
         return [
             os.path.dirname(x)[(len(root_path) + 1):]
-            for x in glob.iglob(glob_path)
+            for x in glob.iglob(glob_path, recursive=True)
         ]
 
     environ.log_header('Existing Projects')

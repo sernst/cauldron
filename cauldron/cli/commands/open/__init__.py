@@ -134,18 +134,20 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
         value = parts[0]
 
         if value.startswith('@examples:'):
-            segment = value.split(':', 1)[-1]
+            path_segment = value.split(':', 1)[-1]
             return autocompletion.match_path(
                 segment,
-                environ.paths.package('resources', 'examples', segment),
+                environ.paths.package('resources', 'examples', path_segment),
                 include_files=False
             )
 
         if value.startswith('@home:'):
-            segment = value.split(':', 1)[-1]
+            path_segment = value.split(':', 1)[-1]
             return autocompletion.match_path(
                 segment,
-                environ.paths.clean(os.path.join('~', 'cauldron', segment)),
+                environ.paths.clean(
+                    os.path.join('~', 'cauldron', path_segment)
+                ),
                 include_files=False
             )
 
