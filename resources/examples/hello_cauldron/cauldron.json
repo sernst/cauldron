@@ -1,0 +1,12 @@
+{
+  "steps":[
+    {
+      "name": "create_data.py",
+      "file": "create_data.py"
+    },
+    {
+      "name": "plot_data.py",
+      "file": "plot_data.py"
+    }
+  ]
+}

@@ -8,7 +8,7 @@ Cauldron combines the great elements of notebook-style editing:
 - `Installation`_
 - `Getting Started`_
 - `Example Projects`_
-- `First Project`_
+- `Tutorial: First Project`_
 
 About Cauldron
 --------------
@@ -122,8 +122,11 @@ show command::
 
 which opens the current project display file in your default browser.
 
-First Project
--------------
+Tutorial: First Project
+-----------------------
+
+This tutorial walks through creating your first project. It mirrors the
+**@example:hello_cauldron** project that comes installed with Cauldron.
 
 Create New Project
 ~~~~~~~~~~~~~~~~~~
@@ -154,8 +157,89 @@ Add First Code Step
 Now that the project has been created, you need to add some code to it. To
 do that, use the ``step add`` command::
 
-    <hello_cauldron>: step add my_first_step.py
+    <hello_cauldron>: step add create_data.py
 
-This will create a new step called *my_first_step.py* in your project
+This will create a new step called *create_data.py* in your project
 directory and add modify the Cauldron project file to recognize the new step.
-The step file is ready to be modified.
+The step file is ready to be modified. Open the *create_data.py* step file in
+your choice of Python code editor. You'll find the file in the project
+directory, which is *~/cauldron/hello_cauldron/*. Add the following code to
+the *create_data.py* file:
+
+.. code-block:: python3
+
+    import numpy as np
+    import pandas as pd
+    import cauldron as cd
+
+    df = pd.DataFrame(
+        np.random.randn(10, 5),
+        columns=['a', 'b', 'c', 'd', 'e']
+    )
+
+    cd.display.header('Random Data Frame:')
+    cd.display.table(df)
+
+    cd.shared.df = df
+
+Once you've saved that code to the *create_data.py* file, you can run this
+code with the ``run`` command::
+
+    <hello_cauldron>: run
+
+Then use the ``show`` command to see the results::
+
+    <hello_cauldron>: show
+
+The project display file will open in your default browser.
+
+Add Another Step
+~~~~~~~~~~~~~~~~
+
+Now we'll add another code step to plot each column in our DataFrame. Once
+again use the steps command::
+
+    <hello_cauldron>: steps add plot_data.py
+
+Open the *plot_data.py* step file and add the following code:
+
+.. code-block:: python3
+
+    import matplotlib.pyplot as plt
+    import cauldron as cd
+
+    df = cd.shared.df
+
+    for column_name in df.columns:
+        plt.plot(df[column_name])
+
+    plt.title('Random Plot')
+    plt.xlabel('Indexes')
+    plt.ylabel('Values')
+
+    cd.display.pyplot()
+
+We used matplotlib for this tutorial, but Cauldron also supports Seaborn,
+Bokeh, Plotly or any other Python plotting library that can produce an HTML
+output. There is a Cauldron example project showing how to plot using each of
+these libraries.
+
+Now run the project again::
+
+    <hello_cauldron>: run
+
+You'll notice that the shell output looks like::
+
+    === RUNNING ===
+    [create_data.py]: Nothing to update
+    [plot_data.py]: Updated
+
+The *create_data.py* step was not run because it hasn't been modified since your
+previous run. Just like other notebooks, the results of running a step (cell)
+persist until you close the project.
+
+Now you can view the updated project display simply by refreshing your browser.
+However, if you already closed the project display browser window, you can show
+it again at any time with the ``show`` command.
+
+And that's that. You've successfully created your first Cauldron project.
