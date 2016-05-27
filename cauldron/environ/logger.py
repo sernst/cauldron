@@ -13,7 +13,8 @@ def header(
         whitespace_bottom: int = 0,
         trace: bool = True,
         file_path: str = None,
-        append_to_file: bool = True
+        append_to_file: bool = True,
+        indent_by: int = 0
 ) -> str:
     """
 
@@ -25,19 +26,22 @@ def header(
     :param trace:
     :param file_path:
     :param append_to_file:
+    :param indent_by:
     :return:
     """
 
     if level == 0:
         message = text
     elif level < 3:
-        message = '{bar}\n{text}\n{bar}'.format(
-            bar=('=' if level == 1 else '-') * len(text),
+        char = ('=' if level == 1 else '-')
+        message = '{bar}\n{indent}  {text}  {indent}\n{bar}'.format(
+            bar=char * (len(text) + 8),
+            indent='::',
             text=text
         )
     elif level < 5:
         message = '{text}\n{bar}'.format(
-            bar=('=' if level == 3 else '-') * 5,
+            bar=('=' if level == 3 else '-') * len(text),
             text=text
         )
     elif level < 7:
@@ -55,7 +59,8 @@ def header(
         whitespace_bottom=whitespace_bottom,
         trace=trace,
         file_path=file_path,
-        append_to_file=append_to_file
+        append_to_file=append_to_file,
+        indent_by=indent_by
     )
 
 

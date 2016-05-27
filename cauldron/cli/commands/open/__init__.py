@@ -64,18 +64,33 @@ def populate(parser: ArgumentParser):
             """)
     )
 
+    parser.add_argument(
+        '-a', '--available',
+        dest='list_available',
+        default=False,
+        action='store_true',
+        help=cli.reformat("""
+            When set, the open command will display all known projects.
+            """)
+    )
+
 
 def execute(
         parser: ArgumentParser,
         path: str = None,
         last_opened_project: bool = False,
         a_recent_project: bool = False,
-        show_in_browser: bool = False
+        show_in_browser: bool = False,
+        list_available: bool = False
 ):
     """
 
     :return:
     """
+
+    if list_available:
+        actions.echo_known_projects()
+        return
 
     if last_opened_project:
         path = actions.fetch_last()
@@ -88,12 +103,7 @@ def execute(
             return
         actions.open_project(path)
     elif not path or not path.strip():
-        parser.print_help()
-        environ.log("""
-            [ABORTED]: There was not enough information in that command to
-                open a project. See information above for how to use this
-                command.
-            """)
+        actions.echo_known_projects()
         return
     else:
         p = actions.fetch_location(path)
@@ -116,8 +126,8 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
         return autocompletion.match_flags(
             segment=segment,
             value=parts[-1],
-            shorts=['s', 'l'],
-            longs=['show', 'last', 'recent']
+            shorts=['s', 'l', 'r', 'a'],
+            longs=['show', 'last', 'recent', 'available']
         )
 
     if len(parts) == 1:
