@@ -193,6 +193,87 @@ class ProjectStep(object):
         )
 
 
+class ProjectDependency(object):
+    """
+
+    """
+
+    def __init__(
+            self,
+            project: 'Project' = None,
+            definition: dict = None
+    ):
+        self.definition = {} if definition is None else definition
+        self.project = project
+        self.last_modified = None
+        self._is_dirty = True
+
+    @property
+    def id(self) -> str:
+        if not self.definition:
+            return None
+        return self.definition.get('name', 'unknown')
+
+    @property
+    def filename(self) -> str:
+        return os.path.join(
+            self.definition.get('folder', ''),
+            self.definition.get('file', '')
+        )
+
+    @property
+    def source_path(self) -> str:
+        if not self.project:
+            return None
+        return os.path.join(self.project.source_directory, self.filename)
+
+    def is_dirty(self):
+        """
+
+        :return:
+        """
+        if self._is_dirty:
+            return self._is_dirty
+
+        if self.last_modified is None:
+            return True
+        p = self.source_path
+        if not p:
+            return False
+        return os.path.getmtime(p) >= self.last_modified
+
+    def mark_dirty(self, value):
+        """
+
+        :param value:
+        :return:
+        """
+
+        self._is_dirty = bool(value)
+
+    def dumps(self):
+        """
+
+        :return:
+        """
+
+        code_file_path = os.path.join(
+            self.project.source_directory,
+            self.filename
+        )
+
+        return templating.render_template(
+            'step-body.html',
+            code=render.code_file(code_file_path),
+            path=code_file_path,
+            filename=self.filename,
+            id=self.id,
+            title=self.definition.get('title', self.definition.get('name')),
+            subtitle=self.definition.get('subtitle'),
+            summary=self.definition.get('summary')
+        )
+
+
 class Project(object):
 
     def __init__(
@@ -221,6 +302,7 @@ class Project(object):
         self.source_directory = source_directory
 
         self.steps = []
+        self.dependencies = []
         self._results_path = results_path
         self._current_step = None
         self.last_modified = None
@@ -388,14 +470,52 @@ class Project(object):
                 sys.path.append(path)
 
         self.steps = []
-        for step_data in self.settings.steps:
+        for step_data in self.settings.fetch('steps', []):
             self.add_step(step_data)
+
+        self.dependencies = []
+        for dep_data in self.settings.fetch('dependencies', []):
+            self.add_dependency(dep_data)
 
         self.last_modified = time.time()
         return True
 
+    def add_dependency(
+            self,
+            dependency_data: typing.Union[str, dict],
+    ) -> ProjectDependency:
+        """
+
+        :param dependency_data:
+        :return:
+        """
+
+        dep_folder = self.settings.fetch('dependencies_folder', '')
+
+        if isinstance(dependency_data, str):
+            dependency_data = dict(
+                name=dependency_data,
+                file=dependency_data
+            )
+
+        dependency_data['file'] = dependency_data.get(
+            'file',
+            dependency_data.get('name', '')
+        )
+        dependency_data['folder'] = dep_folder
+
+        dep = ProjectDependency(
+            project=self,
+            definition=dependency_data
+        )
+        self.dependencies.append(dep)
+
+        self.last_modified = time.time()
+        return dep
+
     def add_step(
-            self, step_data: typing.Union[str, dict],
+            self,
+            step_data: typing.Union[str, dict],
             index: int = None
     ) -> ProjectStep:
         """
@@ -470,6 +590,11 @@ class Project(object):
             files.update(report.files.fetch(None))
             web_include_paths += step.web_includes
             library_includes += step.report.library_includes
+
+        dependency_bodies = []
+        for dep in self.dependencies:
+            dependency_bodies.append(dep.dumps())
+        body.insert(0, ''.join(dependency_bodies))
 
         web_includes = []
         for item in web_include_paths:

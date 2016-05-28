@@ -234,9 +234,12 @@ You'll notice that the shell output looks like::
     [create_data.py]: Nothing to update
     [plot_data.py]: Updated
 
-The *create_data.py* step was not run because it hasn't been modified since your
-previous run. Just like other notebooks, the results of running a step (cell)
-persist until you close the project.
+The *create_data.py* step was not run because it hasn't been modified since the
+last time you executed the ``run`` command. Just like other notebooks, the
+results of running a step (cell) persist until you close the project and do not
+need to be updated each time. Cauldron watches for changes to your files and
+only updates steps if the files have been modified, or an early step was
+modified that may affect their output.
 
 Now you can view the updated project display simply by refreshing your browser.
 However, if you already closed the project display browser window, you can show

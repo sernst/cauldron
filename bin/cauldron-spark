@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+
+MY_DIRECTORY = os.path.abspath(os.path.dirname(__file__))
+sys.path.append(
+    os.path.abspath(os.path.join(MY_DIRECTORY, '..'))
+)
+
+from cauldron import environ
+
+spark_home_path = os.environ.get('SPARK_HOME')
+if not spark_home_path:
+    environ.log(
+        """
+        [ERROR]: Cannot find Spark installation. Missing SPARK_HOME
+            environmental variable.
+
+            For OSX and Linux, you need to add
+
+            exports SPARK_HOME="/path/to/spark"
+
+            to your .bash_profile.
+        """,
+        whitespace=1
+    )
+    sys.exit(1)
+
+os.chdir(spark_home_path)
+
+command = 'export PYSPARK_PYTHON=python3; cd "{}"; ./bin/pyspark "{}"'.format(
+    spark_home_path,
+    os.path.join(MY_DIRECTORY, 'cauldron')
+)
+print(command)
+os.system(command)

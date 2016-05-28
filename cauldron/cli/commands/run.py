@@ -8,6 +8,7 @@ from cauldron.cli import autocompletion
 from cauldron import environ
 from cauldron import reporting
 from cauldron import runner
+from cauldron.runner import source as runner_source
 
 DESCRIPTION = cli.reformat("""
     Runs one or more steps within the currently opened project
@@ -167,8 +168,9 @@ def execute(
                     runner.section(project, start, limit)
                     break
     else:
-        for ps in project_steps:
-            runner.step(project, ps, force=force)
+        if runner.dependencies(project):
+            for ps in project_steps:
+                runner_source.run_step(project, ps, force=force)
 
     project.write()
     environ.log_blanks()
