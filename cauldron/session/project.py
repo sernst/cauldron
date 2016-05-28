@@ -81,6 +81,7 @@ class ProjectStep(object):
         self.last_modified = None
         self.code = None
         self._is_dirty = True
+        self.error = None
 
     @property
     def id(self) -> str:
@@ -189,7 +190,8 @@ class ProjectStep(object):
             id=self.report.id,
             title=self.report.title,
             subtitle=self.report.subtitle,
-            summary=self.report.summary
+            summary=self.report.summary,
+            error=self.error
         )
 
 
@@ -207,6 +209,7 @@ class ProjectDependency(object):
         self.project = project
         self.last_modified = None
         self._is_dirty = True
+        self.error = None
 
     @property
     def id(self) -> str:
@@ -263,7 +266,7 @@ class ProjectDependency(object):
         )
 
         return templating.render_template(
-            'step-body.html',
+            'project-dependency.html',
             code=render.code_file(code_file_path),
             path=code_file_path,
             filename=self.filename,
@@ -577,6 +580,7 @@ class Project(object):
         environ.systems.remove(self.output_directory)
         os.makedirs(self.output_directory)
 
+        has_error = False
         head = []
         body = []
         web_include_paths = self.settings.fetch('web_includes', []) + []
@@ -584,6 +588,7 @@ class Project(object):
         files = {}
         library_includes = []
         for step in self.steps:
+            has_error = has_error or step.error
             report = step.report
             body.append(step.dumps())
             data.update(report.data.fetch(None))
@@ -592,9 +597,21 @@ class Project(object):
             library_includes += step.report.library_includes
 
         dependency_bodies = []
+        dependency_errors = []
         for dep in self.dependencies:
             dependency_bodies.append(dep.dumps())
-        body.insert(0, ''.join(dependency_bodies))
+            if dep.error:
+                has_error = True
+                dependency_errors.append(dep.error)
+
+        if dependency_bodies:
+            body.insert(0, templating.render_template(
+                'dependencies.html',
+                body=''.join(dependency_bodies)
+            ))
+
+        if dependency_errors:
+            body.insert(0, ''.join(dependency_errors))
 
         web_includes = []
         for item in web_include_paths:
@@ -656,7 +673,8 @@ class Project(object):
                     'includes': web_includes,
                     'settings': self.settings.fetch(None),
                     'body': '\n'.join(body),
-                    'head': '\n'.join(head)
+                    'head': '\n'.join(head),
+                    'has_error': has_error
                 })
             ))
 

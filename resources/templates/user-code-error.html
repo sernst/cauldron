@@ -1,0 +1,28 @@
+<div class="cd-user-code-error">
+  <div class="heading">
+    <div class="type">{{ type | e }}</div>
+    <div class="message">{{ message | e }}</div>
+  </div>
+
+  <div class="stack-box">
+  {% for s in stack %}
+    <div class="stack-entry">
+      <div class="filename">{{ s.filename | e }}</div>
+      {% if s.location %}
+        <div class="item indented">
+          in: <span class="value">{{ s.location | e }}</span>
+        </div>
+      {% endif %}
+      <div class="item indented">
+        line: <span class="value">{{ s.line_number | e }}</span>
+      </div>
+      <div class="code-line">{{ s.line | e }}</div>
+    </div>
+  {% endfor %}
+  </div>
+
+</div>
+
+
+
+

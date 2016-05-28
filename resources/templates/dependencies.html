@@ -1,0 +1,41 @@
+<div class="cd-project-step cd-dependencies" id="{{ "project-step" | id }}">
+  <div class="header dependencies">
+    <div id="{{ "title-box" | id }}"
+         class="title-box clicker closed"
+         data-closes="#{{ "body" | id }}"
+         data-opens="#{{ "body" | id }}"
+         onclick="CAULDRON.collapse('{{ "title-box" | id }}')"
+    >
+      <i class="material-icons closed-icon">keyboard_arrow_down</i>
+      <i class="material-icons opened-icon">keyboard_arrow_up</i>
+      <div class="title">Project Definitions</div>
+    </div>
+
+    <div class="spacer"></div>
+  </div>
+
+  <div id="{{ "body" | id }}"
+       class="cd-dependencies-body closed"
+       style="display: none;"
+  >
+    <div class="code-toolbar">
+      <div class="spacer"></div>
+      <div class="tool-button"
+           onclick="CAULDRON.changeFontSize('#{{ "body" | id }} .code-wrapper', -1)"
+      >
+        -
+      </div>
+      <div class="tool-button"
+           onclick="CAULDRON.changeFontSize('#{{ "body" | id }} .code-wrapper', 0)"
+      >
+        100%
+      </div>
+      <div class="tool-button"
+           onclick="CAULDRON.changeFontSize('#{{ "body" | id }} .code-wrapper', 1)"
+      >
+        +
+      </div>
+    </div>
+    {{ body }}
+  </div>
+</div>

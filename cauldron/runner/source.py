@@ -71,6 +71,7 @@ def source_dependency(
         ))
         return False
 
+    dependency.error = None
     if status['code'] == 'SKIP':
         return True
 
@@ -83,11 +84,13 @@ def source_dependency(
     cauldron.shared = cauldron.project.shared
 
     result = run_python_file(project, dependency)
-    if 'error' not in result:
+    if result['success']:
         environ.log('[{}]: Updated'.format(dependency.id))
         return True
 
-    environ.log(result['message'], whitespace=1)
+    environ.log_raw(result['message'])
+    dependency.error = result['html_message']
+
     return False
 
 
@@ -123,6 +126,7 @@ def run_step(
         ))
         return False
 
+    step.error = None
     if status['code'] == 'SKIP':
         environ.log('[{}]: Nothing to update'.format(step.id))
         return True
@@ -163,11 +167,13 @@ def run_step(
         return True
 
     result = run_python_file(project, step)
-    if 'error' not in result:
+    if result['success']:
         environ.log('[{}]: Updated'.format(step.id))
         return True
 
-    environ.log(result['message'], whitespace=1)
+    environ.log_raw(result['message'])
+    step.error = result['html_message']
+
     return False
 
 
@@ -231,15 +237,8 @@ def run_python_file(
         exec(code, module.__dict__)
         target.last_modified = time.time()
         target.mark_dirty(False)
-        return dict()
+        return {'success': True}
     except Exception as err:
-        result = {'error': err}
-        message = ['[ERROR]: Execution failed in "{}"\n\t{}: {}'.format(
-            target.filename,
-            err.__class__.__name__,
-            err
-        )]
-
         frames = traceback.extract_tb(sys.exc_info()[-1])
         cauldron_path = environ.paths.package('cauldron')
         while frames and frames[0].filename.startswith(cauldron_path):
@@ -251,18 +250,32 @@ def run_python_file(
             if filename.startswith(project.source_directory):
                 filename = filename[len(project.source_directory) + 1:]
 
-            name = frame.name
-            if name == '<module>':
-                name = None
+            location = frame.name
+            if location == '<module>':
+                location = None
 
-            message.append(
-                '\n## FILE: "{}"{}\n## LINE: {}\n##  {}'.format(
-                    filename,
-                    '\n##  IN: {}'.format(name) if name else '',
-                    frame.lineno,
-                    frame.line
-                )
+            stack.append(dict(
+                filename=filename,
+                location=location,
+                line_number=frame.lineno,
+                line=frame.line
+            ))
+
+        render_data = dict(
+            type=err.__class__.__name__,
+            message='{}'.format(err),
+            stack=stack
+        )
+
+        return dict(
+            success=False,
+            error=err,
+            message=templating.render_template(
+                'user-code-error.txt',
+                **render_data
+            ),
+            html_message=templating.render_template(
+                'user-code-error.html',
+                **render_data
             )
-
-        result['message'] = '\n'.join(message)
-        return result
+        )

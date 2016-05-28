@@ -1,29 +1,46 @@
-.cd-project-step {
+.cd-project-step .header {
+  display: flex;
+  font-size: 0.8rem;
+  flex-direction: row;
+  padding: 0.4rem;
+  margin: 0;
+  background-color: #f6f6f6;
+  color: #a8a8a8;
+  border-top: 1px solid #e4e4e4;
 
-  .header {
+  .title-box {
     display: flex;
-    font-size: 0.8rem;
-    flex-direction: row;
-    padding: 0.4rem;
-    margin: 0;
-    background-color: #f6f6f6;
-    color: #a8a8a8;
-    border-top: 1px solid #e4e4e4;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+  }
 
-    .title-box {
-      display: flex;
-      justify-content: center;
-      align-content: center;
-      align-items: center;
-    }
+  .button-bar {
+    display: flex;
+    color: #487eb1;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+  }
+}
 
-    .button-bar {
-      display: flex;
-      color: #487eb1;
-      justify-content: center;
-      align-content: center;
-      align-items: center;
-    }
+.cd-project-step .header.standard {
+  background-color: #f6f6f6;
+  color: #a8a8a8;
+  border-top: 1px solid #e4e4e4;
+
+  .button-bar {
+    color: #487eb1;
+  }
+}
+
+.cd-project-step .header.dependencies {
+  background-color: #585858;
+  color: #d2d2d2;
+  border-top: 1px solid #1f1f1f;
+
+  .button-bar {
+    color: #a0d2ed;
   }
 }
 

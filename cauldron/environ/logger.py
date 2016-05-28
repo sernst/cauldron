@@ -143,13 +143,36 @@ def log(
         m.append(max(0, post_whitespace - 1) * '\n')
 
     message = indent('\n'.join(m), ' ' * indent_by)
+    raw(
+        message=message,
+        trace=trace,
+        file_path=file_path,
+        append_to_file=append_to_file
+    )
+    return message
+
+
+def raw(
+        message: str,
+        trace: bool = True,
+        file_path: str = None,
+        append_to_file: bool = True
+):
+    """
+
+    :param message:
+    :param trace:
+    :param file_path:
+    :param append_to_file:
+    :return:
+    """
+
     if trace:
         print(message)
     if file_path:
         file_path = paths.clean(file_path)
         with open(file_path, 'a+' if append_to_file else 'w+') as f:
             f.write('{}\n'.format(message))
-    return message
 
 
 def add_to_message(data, indent_level=0) -> list:

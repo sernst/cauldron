@@ -96,6 +96,7 @@
 
     return prom
         .then(function () {
+          exports.RESULTS = window.RESULTS;
           exports.DATA = window.RESULTS.data;
           exports.SETTINGS = window.RESULTS.settings;
 

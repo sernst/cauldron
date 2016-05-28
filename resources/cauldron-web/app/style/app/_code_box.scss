@@ -1,5 +1,21 @@
 .cd-project-step .code-box {
   padding: 0.5em;
+
+  .code-toolbar {
+    @extend .centered;
+    margin: 0.5em 0;
+  }
+}
+
+.cd-project-step .cd-dependencies-body {
+  .code-toolbar {
+    @extend .centered;
+    margin: 0 0 0.5em 0;
+    padding-top: 0.5em;
+  }
+}
+
+.cd-project-step .code-box, .cd-project-step .cd-dependencies-body {
   background-color: #f4f4f4;
 
   .code-wrapper {
@@ -10,11 +26,6 @@
       opacity: 0.4;
       padding-right: 12px;
     }
-  }
-
-  .code-toolbar {
-    @extend .centered;
-    margin: 0.5em 0;
   }
 
   .tool-button {

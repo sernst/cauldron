@@ -1,0 +1,56 @@
+.cd-user-code-error {
+  background-color: rgba(136, 0, 0, 0.1);
+
+  .heading {
+    background-color: #880000;
+    padding: 0.5rem;
+
+    .type {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 600;
+    }
+
+    .message {
+      color: rgba(255, 255, 255, 0.6);
+    }
+  }
+
+  .stack-box {
+    padding:1.0rem;
+  }
+
+  .stack-entry {
+    margin-bottom: 1.0rem;
+    border-left: 5px solid #880000;
+    padding-left: 0.5rem;
+
+    .filename {
+      font-size: 1.2rem;
+      font-style: italic;
+      color: #880000;
+      margin-bottom: 0.5rem;
+    }
+
+    .item {
+      color: rgba(0, 0, 0, 0.3);
+
+      &.indented {
+        padding-left: 1.0rem;
+      }
+
+      .value {
+        font-style: italic;
+        color: rgba(0, 0, 0, 0.6);
+      }
+    }
+
+    .code-line {
+      font-family: "Lucida Console", Monaco, "Courier New", Courier, monospace;
+      color: rgba(136, 0, 0, 0.8);
+      /* color: rgb(175, 96, 112); */
+      padding: 0.75rem 0;
+    }
+  }
+
+}

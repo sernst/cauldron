@@ -418,15 +418,15 @@ textarea {
   font: inherit; /* 2 */
 }
 
-.centered, .cd-body-header, .cd-project-step .code-box .code-toolbar {
+.centered, .cd-body-header, .cd-project-step .code-box .code-toolbar, .cd-project-step .cd-dependencies-body .code-toolbar {
   display: flex;
   justify-content: center;
   align-content: center;
   align-items: center; }
 
-.clicker, .cd-project-step .code-box .tool-button {
+.clicker, .cd-project-step .code-box .tool-button, .cd-project-step .cd-dependencies-body .tool-button {
   cursor: pointer; }
-  .clicker:hover, .cd-project-step .code-box .tool-button:hover {
+  .clicker:hover, .cd-project-step .code-box .tool-button:hover, .cd-project-step .cd-dependencies-body .tool-button:hover {
     opacity: 0.8; }
 
 .snapshot-bar {
@@ -443,10 +443,51 @@ textarea {
     width: 100%;
     overflow: hidden; }
 
+.body-wrapper {
+  margin-bottom: 150px; }
+
+.cd-user-code-error {
+  background-color: rgba(136, 0, 0, 0.1); }
+  .cd-user-code-error .heading {
+    background-color: #880000;
+    padding: 0.5rem; }
+    .cd-user-code-error .heading .type {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 600; }
+    .cd-user-code-error .heading .message {
+      color: rgba(255, 255, 255, 0.6); }
+  .cd-user-code-error .stack-box {
+    padding: 1.0rem; }
+  .cd-user-code-error .stack-entry {
+    margin-bottom: 1.0rem;
+    border-left: 5px solid #880000;
+    padding-left: 0.5rem; }
+    .cd-user-code-error .stack-entry .filename {
+      font-size: 1.2rem;
+      font-style: italic;
+      color: #880000;
+      margin-bottom: 0.5rem; }
+    .cd-user-code-error .stack-entry .item {
+      color: rgba(0, 0, 0, 0.3); }
+      .cd-user-code-error .stack-entry .item.indented {
+        padding-left: 1.0rem; }
+      .cd-user-code-error .stack-entry .item .value {
+        font-style: italic;
+        color: rgba(0, 0, 0, 0.6); }
+    .cd-user-code-error .stack-entry .code-line {
+      font-family: "Lucida Console", Monaco, "Courier New", Courier, monospace;
+      color: rgba(136, 0, 0, 0.8);
+      /* color: rgb(175, 96, 112); */
+      padding: 0.75rem 0; }
+
 .cd-body-header {
   background-color: #333333;
   color: #FFF;
   padding: 0.5rem; }
+
+.cd-body-header.project-error {
+  background-color: #880000; }
 
 .cd-project-step .header {
   display: flex;
@@ -469,6 +510,20 @@ textarea {
     align-content: center;
     align-items: center; }
 
+.cd-project-step .header.standard {
+  background-color: #f6f6f6;
+  color: #a8a8a8;
+  border-top: 1px solid #e4e4e4; }
+  .cd-project-step .header.standard .button-bar {
+    color: #487eb1; }
+
+.cd-project-step .header.dependencies {
+  background-color: #585858;
+  color: #d2d2d2;
+  border-top: 1px solid #1f1f1f; }
+  .cd-project-step .header.dependencies .button-bar {
+    color: #a0d2ed; }
+
 .opened .closed-icon {
   display: none; }
 
@@ -487,31 +542,37 @@ textarea {
   min-height: 250px; }
 
 .cd-project-step .code-box {
-  padding: 0.5em;
-  background-color: #f4f4f4; }
-  .cd-project-step .code-box .code-wrapper {
-    line-height: 1.5;
-    font-family: "Lucida Console", Monaco, "Courier New", Courier, monospace; }
-    .cd-project-step .code-box .code-wrapper .linenos {
-      opacity: 0.4;
-      padding-right: 12px; }
+  padding: 0.5em; }
   .cd-project-step .code-box .code-toolbar {
     margin: 0.5em 0; }
-  .cd-project-step .code-box .tool-button {
+
+.cd-project-step .cd-dependencies-body .code-toolbar {
+  margin: 0 0 0.5em 0;
+  padding-top: 0.5em; }
+
+.cd-project-step .code-box, .cd-project-step .cd-dependencies-body {
+  background-color: #f4f4f4; }
+  .cd-project-step .code-box .code-wrapper, .cd-project-step .cd-dependencies-body .code-wrapper {
+    line-height: 1.5;
+    font-family: "Lucida Console", Monaco, "Courier New", Courier, monospace; }
+    .cd-project-step .code-box .code-wrapper .linenos, .cd-project-step .cd-dependencies-body .code-wrapper .linenos {
+      opacity: 0.4;
+      padding-right: 12px; }
+  .cd-project-step .code-box .tool-button, .cd-project-step .cd-dependencies-body .tool-button {
     background-color: #333;
     color: #FFF;
     font-size: 0.7em;
     border-radius: 0.5em;
     padding: 0.4em 1.2em 0.5em 1.2em;
     margin: 0 0.4em; }
-    .cd-project-step .code-box .tool-button:hover {
+    .cd-project-step .code-box .tool-button:hover, .cd-project-step .cd-dependencies-body .tool-button:hover {
       background-color: #AAA;
       color: black; }
-  .cd-project-step .code-box .code-file-header {
+  .cd-project-step .code-box .code-file-header, .cd-project-step .cd-dependencies-body .code-file-header {
     padding: 0.5em;
     background-color: #666666;
     color: #FFF; }
-  .cd-project-step .code-box .code-file-box {
+  .cd-project-step .code-box .code-file-box, .cd-project-step .cd-dependencies-body .code-file-box {
     width: 100%;
     overflow-x: auto; }
 

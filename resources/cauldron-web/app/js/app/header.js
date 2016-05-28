@@ -19,6 +19,9 @@
   function createHeader() {
     var header = $(headerDom.join(''))
         .prependTo($('.body-wrapper'));
+    if (exports.RESULTS.has_error) {
+      header.addClass('project-error');
+    }
     var buttons = header.find('.buttons');
   }
   exports.createHeader = createHeader;

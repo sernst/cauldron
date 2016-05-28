@@ -1,5 +1,5 @@
 <div class="cd-project-step" id="{{ "project-step" | id }}">
-  <div class="header">
+  <div class="header standard">
 
     <div id="{{ "title-box" | id }}"
          class="title-box {{ 'clicker opened' if body else '' }}"
@@ -85,4 +85,8 @@
     {{ body }}
   </div>
   {%  endif %}
+
+  {% if error %}
+    {{ error }}
+  {% endif %}
 </div>

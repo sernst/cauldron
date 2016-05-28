@@ -96,6 +96,7 @@
 
     return prom
         .then(function () {
+          exports.RESULTS = window.RESULTS;
           exports.DATA = window.RESULTS.data;
           exports.SETTINGS = window.RESULTS.settings;
 
@@ -107,6 +108,7 @@
           return Promise.all(proms);
         })
         .then(function () {
+          $('head').append(window.RESULTS.head);
           $('.body-wrapper').html(window.RESULTS.body);
           $(window).trigger('resize');
           return exports.DATA;
@@ -137,6 +139,9 @@
   function createHeader() {
     var header = $(headerDom.join(''))
         .prependTo($('.body-wrapper'));
+    if (exports.RESULTS.has_error) {
+      header.addClass('project-error');
+    }
     var buttons = header.find('.buttons');
   }
   exports.createHeader = createHeader;

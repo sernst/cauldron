@@ -1,0 +1,17 @@
+
+     ___ _ __ _ __ ___  _ __
+    / _ \ '__| '__/ _ \| '__|
+   |  __/ |  | | | (_) | |
+    \___|_|  |_|  \___/|_|
+
+[{{ type }}]: {{ message }}
+{% for s in stack %}
+## "{{ s.filename }}"
+{% if s.location -%}
+##    * IN: {{ s.location }}
+{% endif -%}
+##    * LINE: {{ s.line_number }}
+##
+##  {{ s.line }}
+##
+{% endfor %}
