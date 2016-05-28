@@ -24,10 +24,14 @@ except ImportError:
 
 
 def inspect(source: dict) -> str:
+    """
+
+    :param source:
+    :return:
+    """
+
     out = inspection.inspect_data(source=source)
-    return '<div><pre>{}</pre></div>'.format(
-        '\n'.join(inspection.echo_inspection_data(out, 0))
-    )
+    return inspection.render_tree(out)
 
 
 def code_file(

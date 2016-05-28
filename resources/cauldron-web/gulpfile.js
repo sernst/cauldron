@@ -23,7 +23,7 @@ gulp.task('build-js', function () {
   ])
       .pipe(gulpif(taskName === 'build', uglify()))
       .pipe(concat('app.js'))
-      .pipe(gulp.dest(destRoot));
+      .pipe(gulp.dest(destRoot + '/js'));
 });
 
 /**
@@ -45,7 +45,7 @@ gulp.task('build-bower-js', function () {
 
   return es.merge(jsMinStream, bowerStream, extStream)
       .pipe(concat('bower.js'))
-      .pipe(gulp.dest(destRoot));
+      .pipe(gulp.dest(destRoot + '/js'));
 });
 
 
@@ -65,9 +65,20 @@ gulp.task('build-css', function () {
   return es.merge(sassStream, gulp.src(files))
       .pipe(gulpif(taskName === 'build', cleanCss()))
       .pipe(concat('project.css'))
-      .pipe(gulp.dest(destRoot));
+      .pipe(gulp.dest(destRoot + '/css'));
 });
 
+/**
+ *
+ */
+gulp.task('copy-css-resources', function () {
+
+  var files = bowerData.__installs__.css_resources.map(function (item) {
+    return 'bower_components/' + item;
+  });
+
+  return gulp.src(files).pipe(gulp.dest(destRoot + '/css'));
+});
 
 /**
  *
@@ -83,7 +94,7 @@ gulp.task('build-html', function () {
  */
 gulp.task('copy-icons', function () {
   return gulp.src('app/style/icons/*.*')
-      .pipe(gulp.dest(destRoot + '/icons'));
+      .pipe(gulp.dest(destRoot + '/css/icons'));
 });
 
 
@@ -92,7 +103,8 @@ var pre = [
   'build-bower-js',
   'build-js',
   'build-css',
-  'build-html'
+  'build-html',
+  'copy-css-resources'
 ];
 
 gulp.task('develop', pre);

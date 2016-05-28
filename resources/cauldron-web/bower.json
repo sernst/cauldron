@@ -22,7 +22,8 @@
     "handsontable": "latest",
     "filesaver": "*",
     "normalize-css": "latest",
-    "plotlyjs": "plotly#^1.4.1"
+    "plotlyjs": "plotly#^1.4.1",
+    "jstree": "^3.3.1"
   },
   "__installs__": {
     "js": [
@@ -32,6 +33,7 @@
     "js_min": [
       "jquery/dist/jquery.min.js",
       "d3/d3.min.js",
+      "jstree/dist/jstree.min.js",
       "moment/min/moment-with-locales.min.js",
       "zeroclipboard/dist/ZeroClipboard.min.js",
       "handsontable/dist/handsontable.full.min.js",
@@ -40,7 +42,13 @@
     "css": [
       "normalize-css/normalize.css",
       "pikaday/css/pikaday.css",
-      "handsontable/dist/handsontable.full.min.css"
+      "handsontable/dist/handsontable.full.min.css",
+      "jstree/dist/themes/default/style.min.css"
+    ],
+    "css_resources": [
+      "jstree/dist/themes/default/32px.png",
+      "jstree/dist/themes/default/40px.png",
+      "jstree/dist/themes/default/throbber.gif"
     ]
   }
 }

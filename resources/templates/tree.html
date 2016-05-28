@@ -1,0 +1,15 @@
+<div class="cd-tree-view">
+  <div id="{{ "tree" | id }}"></div>
+  <script type="application/javascript">
+    (function () {
+      $('#{{ "tree" | id }}').jstree({
+        'core': {
+          'themes': {
+            'variant': 'large'
+          },
+          'data': {{ data }}
+        }
+      });
+    })();
+  </script>
+</div>

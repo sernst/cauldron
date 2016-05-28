@@ -1,4 +1,29 @@
 import json
+from cauldron import templating
+
+
+def render_tree(inspected_data: dict):
+    """
+
+    :param inspected_data:
+    :return:
+    """
+
+    def to_jstree_node(d: dict) -> dict:
+        children = d.get('structure', [])
+        if isinstance(children, (list, tuple)):
+            children = [to_jstree_node(x) for x in children]
+        else:
+            children = []
+
+        return dict(
+            text='{} ({})'.format(d['key'], d['type']),
+            children=children
+        )
+
+    data = [to_jstree_node(v) for v in inspected_data['structure']]
+
+    return templating.render_template('tree.html', data=data)
 
 
 def inspect_data(source_key: str = None, source=None) -> dict:
