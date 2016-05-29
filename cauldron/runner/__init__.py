@@ -42,15 +42,19 @@ def initialize(project: typing.Union[str, Project]):
 def section(
         project: typing.Union[Project, None],
         starting: ProjectStep = None,
-        limit: int = 1
-) -> str:
+        limit: int = 1,
+        force: bool = False
+) -> list:
     """
 
     :param project:
     :param starting:
     :param limit:
+    :param force:
     :return:
     """
+
+    limit = max(1, limit)
 
     if project is None:
         project = cauldron.project.internal_project
@@ -63,6 +67,8 @@ def section(
         starting_index = project.steps.index(starting)
     count = 0
 
+    steps_run = []
+
     for ps in project.steps:
         if count >= limit:
             break
@@ -70,16 +76,18 @@ def section(
         if ps.index < starting_index:
             continue
 
-        if count == 0 and not ps.is_dirty():
+        if not force and count == 0 and not ps.is_dirty():
             continue
 
-        if not source.run_step(project, ps):
+        steps_run.append(ps)
+        if not source.run_step(project, ps, force=force):
             project.write()
             return None
 
         count += 1
 
-    return project.write()
+    project.write()
+    return steps_run
 
 
 def complete(

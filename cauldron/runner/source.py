@@ -135,9 +135,6 @@ def run_step(
     project.current_step = step
     step.report.clear()
 
-    # Mark the downstream steps as dirty because this one has run
-    [x.mark_dirty(True) for x in project.steps[(step.index + 1):]]
-
     # Set the top-level display and cache values to the current project values
     # before running the step for availability within the step scripts
     cauldron.display = cauldron.project.display
@@ -165,6 +162,9 @@ def run_step(
         environ.log('[{}]: Updated'.format(step.id))
         step.mark_dirty(False)
         return True
+
+    # Mark the downstream steps as dirty because this one has run
+    [x.mark_dirty(True) for x in project.steps[(step.index + 1):]]
 
     result = run_python_file(project, step)
     if result['success']:

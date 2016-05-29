@@ -1,4 +1,7 @@
 import typing
+import random
+
+import numpy as np
 
 PLOT_COLOR_PALETTE = (
     (31, 119, 180),
@@ -87,12 +90,14 @@ def create_layout(
 
 
 def make_line_data(
-        x: list,
-        y: list,
-        y_unc: list,
+        x: typing.Union[list, tuple, np.ndarray],
+        y: typing.Union[list, tuple, np.ndarray],
+        y_unc: typing.Union[list, tuple, np.ndarray],
         name: str = None,
         color: str = None,
-        fill_color: str = None
+        fill_color: str = None,
+        line_properties: typing.Union[dict, int] = 0,
+        marker_properties: typing.Union[dict, int] = 6
 ):
     """
 
@@ -102,6 +107,8 @@ def make_line_data(
     :param name:
     :param color:
     :param fill_color:
+    :param line_properties:
+    :param marker_properties:
     :return:
     """
 
@@ -110,6 +117,9 @@ def make_line_data(
 
     if not name:
         name = 'Measurement'
+        legend_group = '{}_{}'.format(name, random.randint(0, 1e6))
+    else:
+        legend_group = name
 
     if not fill_color:
         fill_color = 'rgba(68, 68, 68, 0.1)'
@@ -129,20 +139,45 @@ def make_line_data(
         name='- {}'.format(name),
         type='scatter',
         showlegend=False,
-        legendgroup=name
+        legendgroup=legend_group
     )
+
+    mode = ''
+
+    if isinstance(line_properties, dict):
+        mode += 'lines'
+    elif isinstance(line_properties, int) and line_properties > 0:
+        mode += 'lines'
+        line_properties = {'width': line_properties}
+    else:
+        line_properties = {'width': 0}
+
+    if 'color' not in line_properties:
+        line_properties['color'] = color
+
+    if isinstance(marker_properties, dict):
+        mode += '+markers' if len(mode) > 0 else 'markers'
+    elif isinstance(marker_properties, int) and marker_properties > 0:
+        mode += '+markers' if len(mode) > 0 else 'markers'
+        marker_properties = {'size': marker_properties}
+    else:
+        marker_properties = {'size': 0}
+
+    if 'color' not in marker_properties:
+        marker_properties['color'] = color
 
     middle_trace = dict(
         x=x,
         y=y,
         fill='tonexty',
         fillcolor=fill_color,
-        mode='markers',
-        marker={'color': color},
+        mode=mode,
+        marker=marker_properties,
+        line=line_properties,
         name=name,
         type='scatter',
         showlegend=bool(name is not None),
-        legendgroup=name
+        legendgroup=legend_group
     )
 
     upper_trace = dict(
@@ -155,7 +190,7 @@ def make_line_data(
         name='+ {}'.format(name),
         type='scatter',
         showlegend=False,
-        legendgroup=name
+        legendgroup=legend_group
     )
 
     return {

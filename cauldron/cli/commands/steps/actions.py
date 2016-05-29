@@ -56,12 +56,16 @@ def create_step(filename: str) -> str:
     steps = []
 
     for ps in project.steps:
-        steps.append(ps.definition)
+        d = ps.definition
+        if not d.get('folder') and d.get('name') == d.get('file'):
+            steps.append(d['name'])
+        else:
+            steps.append(ps.definition)
 
     project_data['steps'] = steps
 
     with open(project.source_path, 'w+') as f:
-        json.dump(project_data, f)
+        json.dump(project_data, f, indent=2, sort_keys=True)
 
     project.last_modified = time.time()
 

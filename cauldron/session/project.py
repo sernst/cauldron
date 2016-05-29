@@ -179,7 +179,11 @@ class ProjectStep(object):
             body.find('<div') != -1 or
             body.find('<span') != -1 or
             body.find('<p') != -1 or
-            body.find('<pre') != -1
+            body.find('<pre') != -1 or
+            body.find('<h') != -1 or
+            body.find('<ol') != -1 or
+            body.find('<ul') != -1 or
+            body.find('<li') != -1
         )
 
         return templating.render_template(
@@ -505,7 +509,7 @@ class Project(object):
             'file',
             dependency_data.get('name', '')
         )
-        dependency_data['folder'] = dep_folder
+        dependency_data['folder'] = dependency_data.get('folder', dep_folder)
 
         dep = ProjectDependency(
             project=self,

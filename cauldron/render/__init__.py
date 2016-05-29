@@ -23,6 +23,21 @@ except ImportError:
     plotly_lib = None
 
 
+def listing(source: list, ordered: bool = False) -> str:
+    """
+
+    :param source:
+    :param ordered:
+    :return:
+    """
+
+    return templating.render_template(
+        'listing.html',
+        type='ol' if ordered else 'ul',
+        items=['{}'.format(x) for x in source]
+    )
+
+
 def inspect(source: dict) -> str:
     """
 

@@ -284,3 +284,13 @@ class Report(object):
             self.library_includes.append('bokeh')
 
         self.body.append(render_plots.bokeh_plot(model))
+
+    def listing(self, source: list, ordered: bool = False):
+        """
+
+        :param source:
+        :param ordered:
+        :return:
+        """
+
+        self.body.append(render.listing(source, ordered))
