@@ -146,6 +146,9 @@ class Report(object):
         if not isinstance(data, (list, tuple)):
             data = [data]
 
+        if 'plotly' not in self.library_includes:
+            self.library_includes.append('plotly')
+
         self.body.append(render.plotly(data, layout, scale))
 
     def table(self, data_frame: pd.DataFrame, scale: float = 0.7):

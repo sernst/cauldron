@@ -16,7 +16,7 @@ data = go.Scatter(
 )
 
 project.display.plotly(
-    data=[data],
+    data=data,
     layout=plotting.create_layout(
         title='Female Time Covers',
         y_label='Percentage each Year (%)',

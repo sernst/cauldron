@@ -28,16 +28,17 @@ setup(
         'Topic :: Scientific/Engineering :: Mathematics',
     ],
     install_requires=[
-        'plotly',
         'pandas',
         'numpy',
-        'six',
         'jinja2',
         'markdown',
         'pygments',
-        'pyquery',
-        'matplotlib',
-        'bokeh',
-        'seaborn'
-    ]
+        'pyquery'
+    ],
+    extras_require={
+        'plotly': ['plotly'],
+        'matplotlib': ['matplotlib'],
+        'bokeh': ['bokeh'],
+        'seaborn': ['seaborn']
+    }
 )

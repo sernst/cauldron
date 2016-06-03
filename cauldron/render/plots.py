@@ -2,11 +2,19 @@ import typing
 import io
 from pyquery import PyQuery as pq
 
-from matplotlib import pyplot as mpl_pyplot
-from matplotlib.pyplot import Figure
+try:
+    from matplotlib import pyplot as mpl_pyplot
+    from matplotlib.pyplot import Figure
+except Exception:
+    mpl_pyplot = None
+    Figure = None
 
-from bokeh import embed
-from bokeh.model import Model
+try:
+    from bokeh import embed
+    from bokeh.model import Model
+except Exception:
+    embed = None
+    Model = None
 
 
 def pyplot(

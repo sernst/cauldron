@@ -6,8 +6,15 @@ import typing
 import shutil
 import glob
 
-from pyquery import PyQuery as pq
-from bokeh.resources import Resources as BokehResources
+try:
+    from bokeh.resources import Resources as BokehResources
+except Exception:
+    BokehResources = None
+
+try:
+    from plotly.offline import offline as plotly_offline
+except Exception:
+    plotly_offline = None
 
 from cauldron import environ
 from cauldron import render
@@ -647,14 +654,46 @@ class Project(object):
                 web_includes.append('/{}'.format(item.replace('\\', '/')))
 
         if 'bokeh' in library_includes:
-            br = BokehResources(mode='absolute')
+            if BokehResources is None:
+                environ.log(
+                    """
+                    [WARNING]: Bokeh library is not installed. Unable to
+                        include library dependencies, which may result in
+                        HTML rendering errors. To resolve this make sure
+                        you have installed the Bokeh library.
+                    """
+                )
+            else:
+                br = BokehResources(mode='absolute')
 
-            for p in (br.js_files + br.css_files):
-                with open(p, 'r+') as fp:
-                    contents = fp.read()
-                file_path = os.path.join('bokeh', os.path.basename(p))
-                files[file_path] = contents
-                web_includes.append('/{}'.format(file_path))
+                for p in (br.js_files + br.css_files):
+                    with open(p, 'r+') as fp:
+                        contents = fp.read()
+                    file_path = os.path.join('bokeh', os.path.basename(p))
+                    files[file_path] = contents
+                    web_includes.append('/{}'.format(file_path))
+
+        if 'plotly' in library_includes:
+            if plotly_offline is None:
+                environ.log(
+                    """
+                    [WARNING]: Plotly library is not installed. Unable to
+                        include library dependencies, which may result in
+                        HTML rendering errors. To resolve this make sure
+                        you have installed the Plotly library.
+                    """
+                )
+
+            p = os.path.join(
+                environ.paths.clean(os.path.dirname(plotly_offline.__file__)),
+                'plotly.min.js'
+            )
+            with open(p, 'r+') as f:
+                contents = f.read()
+
+            save_path = 'plotly/plotly.min.js'
+            files[save_path] = contents
+            web_includes.append('/{}'.format(save_path))
 
         for filename, contents in files.items():
             file_path = os.path.join(self.output_directory, filename)
