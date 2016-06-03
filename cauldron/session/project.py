@@ -349,7 +349,7 @@ class Project(object):
     def current_step(self) -> Report:
         if self._current_step:
             return self._current_step
-        return self.steps[0]
+        return self.steps[0] if self.steps else None
 
     @current_step.setter
     def current_step(self, value: typing.Union[Report, None]):
@@ -647,17 +647,14 @@ class Project(object):
                 web_includes.append('/{}'.format(item.replace('\\', '/')))
 
         if 'bokeh' in library_includes:
-            js_path = os.path.join('bokeh', 'bokeh.js')
-            css_path = os.path.join('bokeh', 'bokeh.css')
+            br = BokehResources(mode='absolute')
 
-            br = BokehResources(mode='inline')
-            dom = pq(br.render_js())
-            files[js_path] = dom('script').html()
-            dom = pq(br.render_css())
-            files[css_path] = dom('style').html()
-
-            web_includes.append('/bokeh/bokeh.js')
-            web_includes.append('/bokeh/bokeh.css')
+            for p in (br.js_files + br.css_files):
+                with open(p, 'r+') as fp:
+                    contents = fp.read()
+                file_path = os.path.join('bokeh', os.path.basename(p))
+                files[file_path] = contents
+                web_includes.append('/{}'.format(file_path))
 
         for filename, contents in files.items():
             file_path = os.path.join(self.output_directory, filename)

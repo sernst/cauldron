@@ -62,4 +62,13 @@ def bokeh_plot(model: Model) -> str:
     :return:
     """
 
-    return embed.notebook_div(model)
+    results = embed.components(model, wrap_plot_info=False)
+
+    return """
+        {script}
+        <div id="{id}" class="plotDiv cd-bokeh-plot"></div>
+        """.format(
+        script=results[0],
+        id=results[1]['elementid']
+    )
+

@@ -52,7 +52,7 @@ def execute(parser: ArgumentParser, project_name: str, directory: str):
     if location:
         directory = location
 
-    directory = directory.rstrip(os.sep)
+    directory = environ.paths.clean(directory).rstrip(os.sep)
     if not directory.endswith(project_name):
         directory = os.path.join(directory, project_name)
 
