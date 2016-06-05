@@ -2,7 +2,6 @@ Cauldron
 ========
 
 The un-notebook notebook: an interactive scientific analysis environment.
-Cauldron combines the great elements of notebook-style editing:
 
 - `About Cauldron`_
 - `Installation`_
@@ -12,6 +11,8 @@ Cauldron combines the great elements of notebook-style editing:
 
 About Cauldron
 --------------
+
+Cauldron blends the key functionality of notebook-style editing:
 
 - **Data Persistence**: Shared variables are stored in memory between
   executions to avoid having to run every step from the beginning each time.
@@ -23,13 +24,20 @@ About Cauldron
 with the best elements of traditional software development:
 
 - **Free From Browser Coding**: Face it, coding in browsers is less than ideal.
-- **Your Choice of IDE**: Modern modern IDEs have fantastic productivity
-  features such as extensive customization, real-time error checking,
-  intelligent code completion and efficient project navigation. Why settle
-  for anything less?
-- **Code Lives as Files**: Ever take a look at the diff for a notebook? Or
-  tried to merge notebook conflicts? Code is embedded in data structures that
-  obstruct useful version control functionality.
+- **Your Choice of IDE**: Modern modern IDEs have excellent productivity
+  features like extensive customization, real-time error checking,
+  intelligent code completion and efficient project navigation. Use whichever
+  one works best for you.
+- **Straight to Production**: Cauldron projects can be run in non-interactive
+  mode as well as run from inside other python applications, which makes it
+  easy to *productionize* and deploy an analysis when it's ready.
+- **Cleaner Version Control**: Common version control actions like diff-ing and
+  merging are obstructed when the code is embedded in notebook files. In
+  Cauldron, where code is stored in independent code files, you can take full
+  advantage of version control functionality.
+- **Easier Code Review**: Embedded notebook code also makes reviews cumbersome
+  to say the least. Cauldron's independent code files provide all of the
+  flexibility available to traditional code review.
 
 With Cauldron you write code in your choice of interactive development
 environment (IDE) or text editor, and run it using the Cauldron shell like a
