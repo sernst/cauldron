@@ -41,7 +41,7 @@ class CauldronShell(cmd.Cmd):
         if not p or not p.internal_project or not p.internal_project.title:
             name = ''
         else:
-            name = cauldron.project.internal_project.title[:20]
+            name = cauldron.project.internal_project.id[:20]
 
         self.prompt = '<{}>: '.format(name)
         return result

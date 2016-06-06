@@ -666,12 +666,21 @@ class Project(object):
             else:
                 br = BokehResources(mode='absolute')
 
-                for p in (br.js_files + br.css_files):
+                contents = []
+                for p in br.css_files:
                     with open(p, 'r+') as fp:
-                        contents = fp.read()
-                    file_path = os.path.join('bokeh', os.path.basename(p))
-                    files[file_path] = contents
-                    web_includes.append('/{}'.format(file_path))
+                        contents.append(fp.read())
+                file_path = os.path.join('bokeh', 'bokeh.css')
+                files[file_path] = '\n'.join(contents)
+                web_includes.append('/bokeh/bokeh.css')
+
+                contents = []
+                for p in br.js_files:
+                    with open(p, 'r+') as fp:
+                        contents.append(fp.read())
+                file_path = os.path.join('bokeh', 'bokeh.js')
+                files[file_path] = '\n'.join(contents)
+                web_includes.append('/bokeh/bokeh.js')
 
         if 'plotly' in library_includes:
             if plotly_offline is None:

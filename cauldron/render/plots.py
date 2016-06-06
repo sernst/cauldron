@@ -2,6 +2,8 @@ import typing
 import io
 from pyquery import PyQuery as pq
 
+from cauldron import templating
+
 try:
     from matplotlib import pyplot as mpl_pyplot
     from matplotlib.pyplot import Figure
@@ -72,11 +74,9 @@ def bokeh_plot(model: Model) -> str:
 
     results = embed.components(model, wrap_plot_info=False)
 
-    return """
-        {script}
-        <div id="{id}" class="plotDiv cd-bokeh-plot"></div>
-        """.format(
+    return templating.render_template(
+        'bokeh_component.html',
         script=results[0],
-        id=results[1]['elementid']
+        id=results[1]['elementid'],
+        model_id=results[1]['modelid']
     )
-
