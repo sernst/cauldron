@@ -65,12 +65,23 @@ def pyplot(
     return dom.html()
 
 
-def bokeh_plot(model: Model) -> str:
+def bokeh_plot(
+        model: Model,
+        scale: float = 0.7,
+        responsive: bool = True
+) -> str:
     """
 
     :param model:
+    :param scale:
+    :param responsive:
     :return:
     """
+
+    if responsive:
+        model.responsive = True
+        model.plot_width = 800
+        model.plot_height = round((scale * 9 / 16) * 800)
 
     results = embed.components(model, wrap_plot_info=False)
 
@@ -78,5 +89,6 @@ def bokeh_plot(model: Model) -> str:
         'bokeh_component.html',
         script=results[0],
         id=results[1]['elementid'],
-        model_id=results[1]['modelid']
+        model_id=results[1]['modelid'],
+        scale=round(100 * scale) if scale is not None else 1000
     )

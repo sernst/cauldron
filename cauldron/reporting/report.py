@@ -276,17 +276,23 @@ class Report(object):
 
         self.body.append(render_plots.pyplot(figure, scale=scale))
 
-    def bokeh(self, model):
+    def bokeh(self, model, scale: float = 0.7, responsive: bool = True):
         """
 
         :param model:
+        :param scale:
+        :param responsive:
         :return:
         """
 
         if 'bokeh' not in self.library_includes:
             self.library_includes.append('bokeh')
 
-        self.body.append(render_plots.bokeh_plot(model))
+        self.body.append(render_plots.bokeh_plot(
+            model=model,
+            scale=scale,
+            responsive=responsive
+        ))
 
     def listing(self, source: list, ordered: bool = False):
         """
