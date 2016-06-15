@@ -21,7 +21,11 @@ def execute(parser: ArgumentParser):
 
     project = cauldron.project
     if not project or not project.internal_project.url:
-        environ.log(
+        environ.output.fail().notify(
+            kind='ABORTED',
+            code='NO_OPEN_PROJECT',
+            message='No project is currently open.'
+        ).console(
             """
             [ABORTED]: No project is currently open. Please use the open
                 command to load a project.

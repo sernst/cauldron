@@ -1,15 +1,13 @@
-from argparse import ArgumentParser
-import typing
 import re
+import typing
+from argparse import ArgumentParser
 
 import cauldron
 from cauldron import cli
+from cauldron import environ
+from cauldron import runner
 from cauldron.cli import autocompletion
 from cauldron.cli.commands.run import actions as run_actions
-from cauldron import environ
-from cauldron import reporting
-from cauldron import runner
-from cauldron.runner import source as runner_source
 
 DESCRIPTION = cli.reformat("""
     Runs one or more steps within the currently opened project
@@ -129,7 +127,16 @@ def execute(
     if len(step) > 0:
         message = ['  * "{}"'.format(x) for x in step]
         message.insert(0, '[ABORTED]: Unable to locate the following step(s):')
-        environ.log(message, whitespace=1)
+        environ.output.fail().notify(
+            kind='ABORTED',
+            code='MISSING_STEP',
+            message='Unable to locate steps'
+        ).kernel(
+            steps=[x for x in step]
+        ).console(
+            message,
+            whitespace=1
+        )
         return
 
     has_dirty_dependency = False

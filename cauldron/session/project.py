@@ -315,7 +315,7 @@ class Project(object):
             source_directory = os.path.dirname(source_directory)
         self.source_directory = source_directory
 
-        self.steps = []
+        self.steps = []  # type: typing.List[ProjectStep]
         self.dependencies = []
         self._results_path = results_path
         self._current_step = None

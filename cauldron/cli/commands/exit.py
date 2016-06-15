@@ -19,4 +19,4 @@ def execute(parser: ArgumentParser):
     """
 
     environ.configs.save()
-    return True
+    environ.output.end()

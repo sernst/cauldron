@@ -17,7 +17,7 @@ setup(
     license='MIT',
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     zip_safe=False,
-    scripts=['bin/cauldron'],
+    scripts=['bin/cauldron', 'bin/cauldron-server'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
@@ -33,7 +33,8 @@ setup(
         'jinja2',
         'markdown',
         'pygments',
-        'pyquery'
+        'pyquery',
+        'flask'
     ],
     extras_require={
         'plotly': ['plotly'],

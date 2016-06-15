@@ -79,10 +79,12 @@ def fetch_recent() -> str:
     recent_paths = environ.configs.fetch('recent_paths', [])
 
     if len(recent_paths) < 1:
-        environ.log(
-            '[ABORTED]: There are no recent projects available'
-        )
-        return
+        environ.output.fail().notify(
+            kind='ABORTED',
+            code='NO_RECENT_PROJECTS',
+            message='There are no recent projects available'
+        ).console()
+        return None
 
     index, path = query.choice(
         'Recently Opened Projects',
@@ -135,7 +137,11 @@ def fetch_last() -> str:
     recent_paths = environ.configs.fetch('recent_paths', [])
 
     if len(recent_paths) < 1:
-        environ.log('[ABORTED]: No projects have been opened recently')
+        environ.output.fail().notify(
+            kind='ABORTED',
+            code='NO_RECENT_PROJECTS',
+            message='No projects have been opened recently'
+        ).console()
         return None
 
     return recent_paths[0]
@@ -151,7 +157,13 @@ def open_project(path: str) -> bool:
     path = environ.paths.clean(path)
 
     if not os.path.exists(path):
-        environ.log(
+        environ.output.fail().notify(
+            kind='ERROR',
+            code='PROJECT_NOT_FOUND',
+            message='The project path does not exist'
+        ).kernel(
+            path=path
+        ).console(
             """
             [ERROR]: The specified path does not exist
 
@@ -165,7 +177,11 @@ def open_project(path: str) -> bool:
     try:
         runner.initialize(path)
     except FileNotFoundError:
-        environ.log('Error: Project not found')
+        environ.output.fail().notify(
+            kind='ERROR',
+            code='PROJECT_NOT_FOUND',
+            message='Project not found'
+        ).console()
         return
 
     if path in recent_paths:
@@ -190,7 +206,24 @@ def open_project(path: str) -> bool:
 
     url = project.url
 
-    environ.log_header(project.title, 2)
+    steps = []
+    for s in project.steps:
+        steps.append(dict(
+            id=s.id,
+            index=s.index,
+            path=s.source_path,
+            dirty=s.is_dirty()
+        ))
+
+    environ.output.update(
+        path=path,
+        url=url,
+        title=project.title,
+        id=project.id,
+        steps=steps
+    )
+
+    environ.log_header(project.title, level=2)
     environ.log(
         """
         PATH: {path}

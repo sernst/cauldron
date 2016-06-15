@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 
 from cauldron import cli
 from cauldron import environ
+from cauldron.environ.response import Response
 from cauldron.cli.commands import alias
 from cauldron.cli.commands import clear
 from cauldron.cli.commands import configure
@@ -106,19 +107,32 @@ def get_parser(name: str) -> ArgumentParser:
     return parser
 
 
-def execute(name: str, raw_args: str):
+def execute(
+        name: str,
+        raw_args: str,
+        output: Response = None
+) -> Response:
     """
 
     :return:
     """
 
+    if not output:
+        output = Response()
+    environ.output = output
+
     if not hasattr(ME, name):
-        environ.log(
+        return environ.output.fail().notify(
+            kind='ERROR',
+            code='NO_SUCH_COMMAND'
+        ).kernel(
+            name=name
+        ).console(
             """
-            [ERROR]: "{name}" is not a recognized command. For a list of
-                available commands enter help or ?.
-            """)
-        return None
+            "{name}" is not a recognized command. For a list of available
+            commands enter help or ?.
+            """
+        )
 
     try:
         module = getattr(ME, name)
@@ -126,7 +140,7 @@ def execute(name: str, raw_args: str):
     except Exception as err:
         return None
     if parser is None:
-        return
+        return None
 
     raw_args = explode_line(raw_args)
 
@@ -148,7 +162,9 @@ def execute(name: str, raw_args: str):
     if 'show_help' in command_args:
         del command_args['show_help']
 
-    return getattr(module, 'execute')(parser=parser, **command_args)
+    getattr(module, 'execute')(parser=parser, **command_args)
+    environ.output = None
+    return output
 
 
 def list_command_names():
@@ -172,18 +188,27 @@ def print_module_help():
     :return:
     """
 
-    print(' ')
+    environ.log_blanks()
+    entries = dict()
+
     for key in dir(ME):
         item = getattr(ME, key)
         if hasattr(item, 'DESCRIPTION'):
+            entries[key] = cli.reformat(getattr(item, 'DESCRIPTION'))
+
             msg = '[{key}]:\n   {description}'.format(
                 key=key,
-                description=cli.reformat(
-                    getattr(item, 'DESCRIPTION')
-                ).replace('\n', '\n   ')
+                description=entries[key].replace('\n', '\n   ')
             )
 
             environ.log(msg)
+
+    environ.output.notify(
+        kind='INFO',
+        code='MODULE_DESCRIPTIONS'
+    ).kernel(
+        commands=entries
+    )
 
 
 def show_help(command_name:str = None):
