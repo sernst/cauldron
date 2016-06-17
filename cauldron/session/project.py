@@ -482,8 +482,8 @@ class Project(object):
 
         return dict(
             last_modified=self.last_modified,
-            directory=self.source_directory,
-            path=self.source_path,
+            source_directory=self.source_directory,
+            source_path=self.source_path,
             output_directory=self.output_directory,
             output_path=self.output_path,
             url=self.url,

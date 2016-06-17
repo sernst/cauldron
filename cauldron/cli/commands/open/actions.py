@@ -204,7 +204,9 @@ def open_project(path: str) -> bool:
     if not path or not os.path.exists(path):
         project.write()
 
-    environ.output.update(**project.kernel_serialize())
+    environ.output.update(
+        project=project.kernel_serialize()
+    )
 
     environ.log_header(project.title, level=2)
     environ.log(

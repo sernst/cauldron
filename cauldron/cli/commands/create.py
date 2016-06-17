@@ -41,12 +41,52 @@ def populate(parser: ArgumentParser):
             """)
     )
 
+    parser.add_argument(
+        '-t', '--title',
+        dest='title',
+        type=str,
+        default='',
+        help=cli.reformat('The title for the new project')
+    )
 
-def execute(parser: ArgumentParser, project_name: str, directory: str):
+    parser.add_argument(
+        '-s', '--summary',
+        dest='summary',
+        type=str,
+        default='',
+        help=cli.reformat('A short summary description of the new project')
+    )
+
+    parser.add_argument(
+        '-a', '--author',
+        dest='author',
+        type=str,
+        default='',
+        help=cli.reformat('Names of the author or authors of the project')
+    )
+
+
+def execute(
+        parser: ArgumentParser,
+        project_name: str,
+        directory: str,
+        title: str = '',
+        summary: str = '',
+        author: str = ''
+):
     """
 
     :return:
     """
+
+    project_name = project_name.strip('" \t')
+    directory = directory.strip('" \t')
+    summary = summary.strip('" \t')
+    title = title.strip('" \t')
+    author = author.strip('" \t')
+
+    if not title:
+        title = project_name.replace('_', ' ').replace('-', ' ').capitalize()
 
     location = open_actions.fetch_location(directory)
     if location:
@@ -58,7 +98,13 @@ def execute(parser: ArgumentParser, project_name: str, directory: str):
 
     if os.path.exists(directory):
         if os.path.exists(os.path.join(directory, 'cauldron.json')):
-            environ.log(
+            environ.output.fail().notify(
+                kind='ABORTED',
+                code='ALREADY_EXISTS',
+                message='Cauldron project exists in the specified directory'
+            ).kernel(
+                directory=directory
+            ).console(
                 """
                 [ABORTED]: Directory already exists and contains a cauldron
                     project file.
@@ -73,8 +119,9 @@ def execute(parser: ArgumentParser, project_name: str, directory: str):
 
     project_data = dict(
         name=project_name,
-        title=project_name.replace('_', ' ').replace('-', ' ').capitalize(),
-        summary='',
+        title=title,
+        summary=summary,
+        author=author,
         steps=[]
     )
 

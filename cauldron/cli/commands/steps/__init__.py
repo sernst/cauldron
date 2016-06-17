@@ -37,6 +37,7 @@ def populate(parser: ArgumentParser):
 
     parser.add_argument(
         '-p', '--position',
+        dest='position',
         type=str,
         default=None,
         help=cli.reformat(
