@@ -204,31 +204,14 @@ def open_project(path: str) -> bool:
     if not path or not os.path.exists(path):
         project.write()
 
-    url = project.url
-
-    steps = []
-    for s in project.steps:
-        steps.append(dict(
-            id=s.id,
-            index=s.index,
-            path=s.source_path,
-            dirty=s.is_dirty()
-        ))
-
-    environ.output.update(
-        path=path,
-        url=url,
-        title=project.title,
-        id=project.id,
-        steps=steps
-    )
+    environ.output.update(**project.kernel_serialize())
 
     environ.log_header(project.title, level=2)
     environ.log(
         """
         PATH: {path}
          URL: {url}
-        """.format(path=path, url=url),
+        """.format(path=path, url=project.url),
         whitespace=1
     )
 

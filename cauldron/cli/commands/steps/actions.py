@@ -1,6 +1,7 @@
 import os
 import time
 import json
+import typing
 
 import cauldron
 from cauldron import environ
@@ -35,16 +36,34 @@ def echo_steps():
     environ.log('\n'.join(message), indent_by=2, whitespace_bottom=1)
 
 
-def create_step(filename: str) -> str:
+def create_step(filename: str, position: typing.Union[str, int]) -> str:
     """
 
     :param filename:
+    :param position:
     :return:
     """
 
+    filename = filename.strip('"')
+
     project = cauldron.project.internal_project
 
-    result = project.add_step(filename)
+    if position is not None:
+        if isinstance(position, str):
+            position = position.strip('"')
+        try:
+            position = int(position)
+            if position < 0:
+                position = None
+        except Exception:
+            for index, s in enumerate(project.steps):
+                if s.id == position:
+                    position = index + 1
+                    break
+            if not isinstance(position, int):
+                position = None
+
+    result = project.add_step(filename, index=position)
 
     if not os.path.exists(result.source_path):
         with open(result.source_path, 'w+') as f:
@@ -68,5 +87,10 @@ def create_step(filename: str) -> str:
         json.dump(project_data, f, indent=2, sort_keys=True)
 
     project.last_modified = time.time()
+
+    environ.output.update(
+        project=project.kernel_serialize(),
+        step_id=result.id
+    )
 
     return result.id

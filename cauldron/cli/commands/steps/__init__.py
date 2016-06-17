@@ -35,10 +35,24 @@ def populate(parser: ArgumentParser):
             """)
     )
 
+    parser.add_argument(
+        '-p', '--position',
+        type=str,
+        default=None,
+        help=cli.reformat(
+            """
+            Only valid for the add action, this specifies the index where the
+            step will be inserted, or the name of the step after which this new
+            step will be inserted.
+            """
+        )
+    )
+
 
 def execute(
         parser: ArgumentParser,
         action: list,
+        position: str = None
 ):
     """
 
@@ -70,7 +84,7 @@ def execute(
             )
             return
 
-        step_id = actions.create_step(action[1])
+        step_id = actions.create_step(action[1], position=position)
 
         environ.log(
             """

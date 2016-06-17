@@ -128,6 +128,21 @@ class ProjectStep(object):
             return None
         return os.path.join(self.project.source_directory, self.filename)
 
+    def kernel_serialize(self):
+        """
+
+        :return:
+        """
+
+        return dict(
+            id=self.id,
+            filename=self.filename,
+            index=self.index,
+            source_path=self.source_path,
+            last_modified=self.last_modified,
+            is_dirty=self.is_dirty()
+        )
+
     def is_dirty(self):
         """
 
@@ -241,6 +256,20 @@ class ProjectDependency(object):
             return None
         return os.path.join(self.project.source_directory, self.filename)
 
+    def kernel_serialize(self):
+        """
+
+        :return:
+        """
+
+        return dict(
+            id=self.id,
+            filename=self.filename,
+            source_path=self.source_path,
+            last_modified=self.last_modified,
+            is_dirty=self.is_dirty()
+        )
+
     def is_dirty(self):
         """
 
@@ -316,9 +345,9 @@ class Project(object):
         self.source_directory = source_directory
 
         self.steps = []  # type: typing.List[ProjectStep]
-        self.dependencies = []
-        self._results_path = results_path
-        self._current_step = None
+        self.dependencies = []  # type: typing.List[ProjectDependency]
+        self._results_path = results_path  # type: str
+        self._current_step = None  # type: ProjectStep
         self.last_modified = None
 
         def as_shared_cache(source):
@@ -444,6 +473,25 @@ class Project(object):
         """
 
         return '{}&sid={}'.format(self.url, snapshot_name)
+
+    def kernel_serialize(self):
+        """
+
+        :return:
+        """
+
+        return dict(
+            last_modified=self.last_modified,
+            directory=self.source_directory,
+            path=self.source_path,
+            output_directory=self.output_directory,
+            output_path=self.output_path,
+            url=self.url,
+            title=self.title,
+            id=self.id,
+            steps=[s.kernel_serialize() for s in self.steps],
+            dependencies=[d.kernel_serialize() for d in self.dependencies]
+        )
 
     def refresh(self) -> bool:
         """
