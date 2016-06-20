@@ -1,4 +1,6 @@
+import sys
 import typing
+import traceback
 from textwrap import dedent
 from textwrap import indent
 
@@ -193,3 +195,24 @@ def add_to_message(data, indent_level=0) -> list:
         else:
             m += add_to_message(line, indent_level + 1)
     return m
+
+
+def get_error_stack() -> typing.List[dict]:
+    frames = traceback.extract_tb(sys.exc_info()[-1])
+
+    stack = []
+    for frame in frames:
+        filename = frame.filename
+        location = frame.name
+
+        if location == '<module>':
+            location = None
+
+        stack.append(dict(
+            filename=filename,
+            location=location,
+            line_number=frame.lineno,
+            line=frame.line
+        ))
+
+    return stack

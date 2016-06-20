@@ -16,6 +16,26 @@ PLOT_COLOR_PALETTE = (
     (23, 190, 207)
 )
 
+def get_gray_color(
+        level: int = 128,
+        opacity: float = None,
+        as_string: bool = True
+) -> typing.Union[tuple, str]:
+    """
+
+    :param level:
+    :param opacity:
+    :param as_string:
+    :return:
+    """
+
+    level = max(0, min(255, level))
+    out = (level, level, level, opacity)
+
+    if as_string:
+        return 'rgba({}, {}, {}, {})'.format(*out)
+    return out
+
 
 def get_color(
         index: int,

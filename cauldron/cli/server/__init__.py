@@ -12,6 +12,7 @@ sys.path.append(
 
 from cauldron.cli import commands
 from cauldron.environ.response import Response
+from cauldron.environ import logger
 
 APPLICATION = Flask('Cauldron')
 
@@ -65,14 +66,15 @@ def execute():
     except Exception as err:
         r.fail().notify(
             kind='ERROR',
-            code='EXECUTION_FAILURE',
+            code='KERNEL_EXECUTION_FAILURE',
             message='Unable to execute command'
         ).kernel(
             cmd=cmd,
             parts=parts,
             name=name,
             args=args,
-            error=str(err)
+            error=str(err),
+            stack=logger.get_error_stack()
         )
 
     return flask.jsonify(r.serialize())

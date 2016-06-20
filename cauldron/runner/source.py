@@ -1,19 +1,18 @@
+import functools
 import os
 import sys
+import time
 import traceback
 import types
 import typing
-import time
-import functools
 from importlib.abc import InspectLoader
 
 import cauldron
-from cauldron import cli
-from cauldron import templating
 from cauldron import environ
+from cauldron import templating
 from cauldron.session.project import Project
-from cauldron.session.project import ProjectStep
 from cauldron.session.project import ProjectDependency
+from cauldron.session.project import ProjectStep
 
 
 def step_print(
