@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 
 import cauldron
 from cauldron import environ
-from cauldron import reporting
+from cauldron import session
 
 DESCRIPTION = """
     Rewrites the current state of the project to the results directory for
@@ -32,7 +32,7 @@ def execute(parser: ArgumentParser):
         )
         return
 
-    reporting.initialize_results_path(project.results_path)
+    session.initialize_results_path(project.results_path)
     project.write()
 
     environ.log(

@@ -17,6 +17,18 @@ from cauldron.environ import logger
 APPLICATION = Flask('Cauldron')
 
 
+@APPLICATION.route('/ping', methods=['GET', 'POST'])
+def ping():
+    """
+
+    :return:
+    """
+
+    return flask.jsonify(dict(
+        success=True
+    ))
+
+
 @APPLICATION.route('/', methods=['GET', 'POST'])
 def execute():
     """
@@ -80,12 +92,12 @@ def execute():
     return flask.jsonify(r.serialize())
 
 
-def run(port: int = 5010):
+def run(port: int = 5010, debug: bool = False):
     """
 
     :param port:
+    :param debug:
     :return:
     """
 
-    APPLICATION.debug = True
-    APPLICATION.run(port=port)
+    APPLICATION.run(port=port, debug=debug)

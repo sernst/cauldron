@@ -5,7 +5,7 @@ import cauldron
 from cauldron import environ
 from cauldron.cli import query
 from cauldron import runner
-from cauldron import reporting
+from cauldron import session
 
 
 def echo_known_projects() -> dict:
@@ -198,7 +198,7 @@ def open_project(path: str) -> bool:
     cauldron.shared = cauldron.project.shared
 
     if project.results_path:
-        reporting.initialize_results_path(project.results_path)
+        session.initialize_results_path(project.results_path)
 
     path = project.output_path
     if not path or not os.path.exists(path):

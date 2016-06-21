@@ -15,18 +15,28 @@ class Report(object):
     for adding various element types to the display.
     """
 
-    def __init__(self, project=None, definition: dict = None):
-        self.definition = {} if definition is None else definition
-        self.id = self.definition.get('name', 'unknown-step')
+    def __init__(self, step=None):
+        self.step = step
         self.body = []
         self.css = []
         self.data = SharedCache()
         self.files = SharedCache()
-        self.project = project
         self.title = self.definition.get('title')
         self.subtitle = self.definition.get('subtitle')
         self.summary = self.definition.get('summary')
         self.library_includes = []
+
+    @property
+    def project(self):
+        return self.step.project if self.step else None
+
+    @property
+    def id(self):
+        return self.step.definition.name if self.step else None
+
+    @property
+    def definition(self):
+        return self.step.definition if self.step else None
 
     def clear(self):
         """

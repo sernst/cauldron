@@ -120,11 +120,11 @@ def execute(
 
     project_steps = []
     for s in project.steps:
-        if s.id in step:
+        if s.definition.name in step:
             project_steps.append(s)
 
     for ps in project_steps:
-        step.remove(ps.id)
+        step.remove(ps.definition.name)
 
     if len(step) > 0:
         message = ['  * "{}"'.format(x) for x in step]
@@ -210,8 +210,8 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
 
     value = parts[-1]
     project = cauldron.project.internal_project
-    step_ids = [x.id for x in project.steps]
-    return autocompletion.match_in_path_list(segment, value, step_ids)
+    step_names = [x.definition.name for x in project.steps]
+    return autocompletion.match_in_path_list(segment, value, step_names)
 
 
 

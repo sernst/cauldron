@@ -1,4 +1,4 @@
-from cauldron.session.project import ExposedProject
+from cauldron.session import ExposedProject
 
 project = ExposedProject()
 

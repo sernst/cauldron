@@ -32,7 +32,7 @@ def echo_steps():
     environ.log_header('Project Steps', level=3)
     message = []
     for ps in project.steps:
-        message.append('* {}'.format(ps.id))
+        message.append('* {}'.format(ps.definition.name))
     environ.log('\n'.join(message), indent_by=2, whitespace_bottom=1)
 
 
@@ -57,7 +57,7 @@ def create_step(filename: str, position: typing.Union[str, int]) -> str:
                 position = None
         except Exception:
             for index, s in enumerate(project.steps):
-                if s.id == position:
+                if s.definition.name == position:
                     position = index + 1
                     break
             if not isinstance(position, int):
@@ -72,15 +72,7 @@ def create_step(filename: str, position: typing.Union[str, int]) -> str:
     with open(project.source_path, 'r+') as f:
         project_data = json.load(f)
 
-    steps = []
-
-    for ps in project.steps:
-        d = ps.definition
-        if not d.get('folder') and d.get('name') == d.get('file'):
-            steps.append(d['name'])
-        else:
-            steps.append(ps.definition)
-
+    steps = [ps.definition.serialize() for ps in project.steps]
     project_data['steps'] = steps
 
     with open(project.source_path, 'w+') as f:
@@ -90,7 +82,27 @@ def create_step(filename: str, position: typing.Union[str, int]) -> str:
 
     environ.output.update(
         project=project.kernel_serialize(),
-        step_id=result.id
+        step_name=result.definition.name
     )
 
-    return result.id
+    return result.definition.name
+
+
+def rename_step(old_filename: str, new_filename: str, new_title: str = None):
+    """
+
+    :param old_filename:
+    :param new_filename:
+    :param new_title:
+    :return:
+    """
+
+    old_name = old_filename.strip('"')
+    new_name = new_filename.strip('"')
+
+    new_title = new_title.strip('"') if new_title is not None else None
+    project = cauldron.project.internal_project
+
+    for step in project.steps:
+        if step.name == old_name:
+            step.name = new_name

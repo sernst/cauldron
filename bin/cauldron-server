@@ -2,6 +2,7 @@
 
 import os
 import sys
+from argparse import ArgumentParser
 
 MY_DIRECTORY = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(
@@ -10,5 +11,25 @@ sys.path.append(
 
 from cauldron.cli import server
 
-server.run()
+parser = ArgumentParser(
+    description='Cauldron server'
+)
+
+parser.add_argument(
+    '-p', '--port',
+    dest='port',
+    type=int,
+    default=5010
+)
+
+parser.add_argument(
+    '-d', '--debug',
+    dest='debug',
+    default=False,
+    action='store_true'
+)
+
+args = parser.parse_args()
+
+server.run(port=args.port, debug=args.debug)
 

@@ -5,7 +5,7 @@ import typing
 from datetime import datetime
 
 from cauldron import environ
-from cauldron.session.project import Project
+from cauldron.session.projects import Project
 from cauldron.cli import query
 
 

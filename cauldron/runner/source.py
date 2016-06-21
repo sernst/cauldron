@@ -10,9 +10,9 @@ from importlib.abc import InspectLoader
 import cauldron
 from cauldron import environ
 from cauldron import templating
-from cauldron.session.project import Project
-from cauldron.session.project import ProjectDependency
-from cauldron.session.project import ProjectStep
+from cauldron.session.projects import Project
+from cauldron.session.projects import ProjectDependency
+from cauldron.session.projects import ProjectStep
 
 
 def step_print(
@@ -54,7 +54,7 @@ def source_dependency(
     if isinstance(dependency, str):
         found = False
         for pd in project.dependencies:
-            if pd.id == dependency:
+            if pd.definition.name == dependency:
                 dependency = pd
                 found = True
                 break
@@ -64,8 +64,8 @@ def source_dependency(
 
     status = check_status(project, dependency)
     if status['code'] == 'NOT-FOUND':
-        environ.log('[{id}]: Dependency Not found "{path}"'.format(
-            id=dependency.id,
+        environ.log('[{name}]: Dependency Not found "{path}"'.format(
+            name=dependency.definition.name,
             path=status['path']
         ))
         return False
@@ -84,7 +84,7 @@ def source_dependency(
 
     result = run_python_file(project, dependency)
     if result['success']:
-        environ.log('[{}]: Updated'.format(dependency.id))
+        environ.log('[{}]: Updated'.format(dependency.definition.name))
         return True
 
     environ.log_raw(result['message'])
@@ -109,7 +109,7 @@ def run_step(
     if isinstance(step, str):
         found = False
         for ps in project.steps:
-            if ps.id == step:
+            if ps.definition.name == step:
                 step = ps
                 found = True
                 break
@@ -120,14 +120,14 @@ def run_step(
     status = check_status(project, step, force)
     if status['code'] == 'NOT-FOUND':
         environ.log('[{id}]: Not found "{path}"'.format(
-            id=step.id,
+            id=step.definition.name,
             path=status['path']
         ))
         return False
 
     step.error = None
     if status['code'] == 'SKIP':
-        environ.log('[{}]: Nothing to update'.format(step.id))
+        environ.log('[{}]: Nothing to update'.format(step.definition.name))
         return True
 
     os.chdir(os.path.dirname(status['path']))
@@ -145,7 +145,7 @@ def run_step(
 
         step.report.markdown(code, **project.shared.fetch(None))
         step.last_modified = time.time()
-        environ.log('[{}]: Updated'.format(step.id))
+        environ.log('[{}]: Updated'.format(step.definition.name))
         step.mark_dirty(False)
         return True
 
@@ -158,7 +158,7 @@ def run_step(
             **project.shared.fetch(None)
         ))
         step.last_modified = time.time()
-        environ.log('[{}]: Updated'.format(step.id))
+        environ.log('[{}]: Updated'.format(step.definition.name))
         step.mark_dirty(False)
         return True
 
@@ -167,7 +167,7 @@ def run_step(
 
     result = run_python_file(project, step)
     if result['success']:
-        environ.log('[{}]: Updated'.format(step.id))
+        environ.log('[{}]: Updated'.format(step.definition.name))
         return True
 
     environ.log_raw(result['message'])
@@ -208,9 +208,9 @@ def check_status(
 def run_python_file(
         project: Project,
         target,
-):
+) -> dict:
 
-    module_name = target.id.rsplit('.', 1)[0]
+    module_name = target.definition.name.rsplit('.', 1)[0]
     module = types.ModuleType(module_name)
 
     with open(target.source_path, 'r+') as f:

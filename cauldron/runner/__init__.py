@@ -3,8 +3,8 @@ import typing
 import cauldron
 from cauldron import environ
 from cauldron.runner import source
-from cauldron.session.project import Project
-from cauldron.session.project import ProjectStep
+from cauldron.session.projects import Project
+from cauldron.session.projects import ProjectStep
 
 
 def dependencies(
@@ -128,7 +128,9 @@ def complete(
 
         if not force and not ps.is_dirty():
             if limit < 1:
-                environ.log('[{}]: Nothing to update'.format(ps.id))
+                environ.log(
+                    '[{}]: Nothing to update'.format(ps.definition.name)
+                )
             continue
 
         count += 1

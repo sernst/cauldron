@@ -1,7 +1,7 @@
 import cauldron
 from cauldron import environ
-from cauldron.session.project import Project
-from cauldron import reporting
+from cauldron import session
+from cauldron.session.projects import Project
 
 
 def get_project():
@@ -50,4 +50,4 @@ def preload_project(project: Project):
             whitespace=1
         )
 
-    reporting.initialize_results_path(project.results_path)
+    session.initialize_results_path(project.results_path)

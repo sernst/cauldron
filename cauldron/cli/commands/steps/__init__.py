@@ -85,12 +85,12 @@ def execute(
             )
             return
 
-        step_id = actions.create_step(action[1], position=position)
+        step_name = actions.create_step(action[1], position=position)
 
         environ.log(
             """
             [CREATED]: "{}" step has been created.
-            """.format(step_id),
+            """.format(step_name),
             whitespace=1
         )
         return

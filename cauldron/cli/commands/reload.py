@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 import cauldron
 from cauldron import environ
 from cauldron import runner
-from cauldron import reporting
+from cauldron import session
 
 DESCRIPTION = """
     Discards all shared data and reloads the currently open project to its
@@ -58,7 +58,7 @@ def execute(parser: ArgumentParser):
     project = cauldron.project.internal_project
 
     if project.results_path:
-        reporting.initialize_results_path(project.results_path)
+        session.initialize_results_path(project.results_path)
 
     path = project.output_path
     if not path or not os.path.exists(path):
