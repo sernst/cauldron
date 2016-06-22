@@ -26,11 +26,10 @@ def index_from_location(project: Project, location: str = None) -> int:
 
         try:
             location = int(location)
-            if location < 0:
-                return None
+            return None if location < 0 else location
         except Exception:
             index = project.index_of_step(location)
-            if isinstance(location, int):
+            if index is not None:
                 return index + 1
             else:
                 return None
@@ -148,7 +147,12 @@ def remove_step(name: str, keep_file: bool = False):
 
     project.save()
 
-    environ.output.notify(
+    if not keep_file:
+        os.remove(step.source_path)
+
+    environ.output.update(
+        project=project.kernel_serialize()
+    ).notify(
         kind='SUCCESS',
         code='STEP_REMOVED',
         message='Removed "{}" step from project'.format(name)
@@ -176,7 +180,7 @@ def modify_step(
     project = cauldron.project.internal_project
 
     name = name.strip('"')
-    new_name = new_name.strip('"')
+    new_name = new_name.strip('"') if new_name else name
     step_data = {'name': new_name}
 
     title = title.strip('"') if title else None
@@ -202,13 +206,16 @@ def modify_step(
 
     if not os.path.exists(new_step.source_path):
         if os.path.exists(old_step.source_path):
-            shutil.copy2(old_step.source_path, new_step.source_path)
+            shutil.move(old_step.source_path, new_step.source_path)
         else:
             with open(new_step.source_path, 'w+') as f:
                 f.write('')
 
+    project.save()
+
     environ.output.update(
-        project=project.kernel_serialize()
+        project=project.kernel_serialize(),
+        step_name=new_step.definition.name
     ).notify(
         kind='SUCCESS',
         code='STEP_MODIFIED',
