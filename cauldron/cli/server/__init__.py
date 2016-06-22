@@ -48,14 +48,7 @@ def status():
             project=project.kernel_serialize()
         )
     except Exception:
-        return flask.jsonify(r.serialize())
-
-    try:
-        r.update(
-            steps_status=[s.status for s in project.steps]
-        )
-    except Exception:
-        pass
+        r.fail()
 
     return flask.jsonify(r.serialize())
 

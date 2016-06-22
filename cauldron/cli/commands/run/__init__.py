@@ -76,6 +76,19 @@ def populate(parser: ArgumentParser):
             """)
     )
 
+    parser.add_argument(
+        '-ps', '--print-status',
+        dest='print_status',
+        default=False,
+        action='store_true',
+        help=cli.reformat(
+            """
+            Whether or not to print detailed status after the run command
+            completes
+            """
+        )
+    )
+
 
 def execute(
         parser: ArgumentParser,
@@ -83,7 +96,8 @@ def execute(
         force: bool = False,
         continue_after: bool = False,
         single_step: bool = False,
-        limit: int = -1
+        limit: int = -1,
+        print_status: bool = False
 ):
     """
 
@@ -93,6 +107,7 @@ def execute(
     :param continue_after:
     :param single_step:
     :param limit:
+    :param print_status:
     :return:
     """
 
@@ -186,6 +201,11 @@ def execute(
 
     project.write()
     environ.log_blanks()
+
+    if print_status:
+        environ.output.update(
+            project=project.kernel_serialize()
+        )
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):
