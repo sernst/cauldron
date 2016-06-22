@@ -1,10 +1,41 @@
 import os
-import time
-import json
 import typing
+import shutil
 
 import cauldron
 from cauldron import environ
+from cauldron.session.projects import Project
+
+
+def index_from_location(project: Project, location: str = None) -> int:
+    """
+
+    :param project:
+    :param location:
+    :return:
+    """
+
+    if location is None:
+        return None
+
+    if isinstance(location, (int, float)):
+        return int(location)
+
+    if isinstance(location, str):
+        location = location.strip('"')
+
+        try:
+            location = int(location)
+            if location < 0:
+                return None
+        except Exception:
+            index = project.index_of_step(location)
+            if isinstance(location, int):
+                return index + 1
+            else:
+                return None
+
+    return None
 
 
 def echo_steps():
@@ -16,7 +47,13 @@ def echo_steps():
     project = cauldron.project.internal_project
 
     if len(project.steps) < 1:
-        environ.log(
+        environ.output.update(
+            steps=[]
+        ).notify(
+            kind='SUCCESS',
+            code='ECHO_STEPS',
+            message='No steps in project'
+        ).console(
             """
             [NONE]: This project does not have any steps yet. To add a new
                 step use the command:
@@ -29,80 +66,156 @@ def echo_steps():
         )
         return
 
-    environ.log_header('Project Steps', level=3)
-    message = []
-    for ps in project.steps:
-        message.append('* {}'.format(ps.definition.name))
-    environ.log('\n'.join(message), indent_by=2, whitespace_bottom=1)
+    environ.output.update(
+        steps=[ps.kernel_serialize() for ps in project]
+    ).notify(
+        kind='SUCCESS',
+        code='ECHO_STEPS'
+    ).console_header(
+        'Project Steps',
+        level=3
+    ).console(
+        '\n'.join(['* {}'.format(ps.definition.name) for ps in project.steps]),
+        indent_by=2,
+        whitespace_bottom=1
+    )
 
 
-def create_step(filename: str, position: typing.Union[str, int]) -> str:
+def create_step(
+        name: str,
+        position: typing.Union[str, int],
+        title: str = None
+) -> str:
     """
 
-    :param filename:
+    :param name:
     :param position:
+    :param title:
     :return:
     """
 
-    filename = filename.strip('"')
+    name = name.strip('"')
+    title = title.strip('"') if title else title
 
     project = cauldron.project.internal_project
+    position = index_from_location(project, position)
 
-    if position is not None:
-        if isinstance(position, str):
-            position = position.strip('"')
-        try:
-            position = int(position)
-            if position < 0:
-                position = None
-        except Exception:
-            for index, s in enumerate(project.steps):
-                if s.definition.name == position:
-                    position = index + 1
-                    break
-            if not isinstance(position, int):
-                position = None
+    step_data = {'name': name}
+    if title:
+        step_data['title'] = title
 
-    result = project.add_step(filename, index=position)
+    result = project.add_step(step_data, index=position)
 
     if not os.path.exists(result.source_path):
         with open(result.source_path, 'w+') as f:
             f.write('')
 
-    with open(project.source_path, 'r+') as f:
-        project_data = json.load(f)
-
-    steps = [ps.definition.serialize() for ps in project.steps]
-    project_data['steps'] = steps
-
-    with open(project.source_path, 'w+') as f:
-        json.dump(project_data, f, indent=2, sort_keys=True)
-
-    project.last_modified = time.time()
+    project.save()
 
     environ.output.update(
         project=project.kernel_serialize(),
         step_name=result.definition.name
+    ).notify(
+        kind='CREATED',
+        code='STEP_CREATED',
+        message='"{}" step has been created'.format(result.definition.name)
+    ).console(
+        whitespace=1
     )
 
-    return result.definition.name
 
-
-def rename_step(old_filename: str, new_filename: str, new_title: str = None):
+def remove_step(name: str, keep_file: bool = False):
     """
 
-    :param old_filename:
-    :param new_filename:
-    :param new_title:
+    :param name:
+    :param keep_file:
     :return:
     """
 
-    old_name = old_filename.strip('"')
-    new_name = new_filename.strip('"')
+    project = cauldron.project.internal_project
+    step = project.remove_step(name)
+    if not step:
+        environ.output.fail().notify(
+            kind='ABORTED',
+            code='NO_SUCH_STEP',
+            message='Step "{}" not found. Unable to remove.'.format(name)
+        ).kernel(
+            name=name
+        ).console(
+            whitespace=1
+        )
+        return False
 
-    new_title = new_title.strip('"') if new_title is not None else None
+    project.save()
+
+    environ.output.notify(
+        kind='SUCCESS',
+        code='STEP_REMOVED',
+        message='Removed "{}" step from project'.format(name)
+    ).console(
+        whitespace=1
+    )
+    return True
+
+
+def modify_step(
+        name: str,
+        new_name: str = None,
+        title: str = None,
+        position: typing.Union[str, int] = None
+):
+    """
+
+    :param name:
+    :param new_name:
+    :param title:
+    :param position:
+    :return:
+    """
+
     project = cauldron.project.internal_project
 
-    for step in project.steps:
-        if step.name == old_name:
-            step.name = new_name
+    name = name.strip('"')
+    new_name = new_name.strip('"')
+    step_data = {'name': new_name}
+
+    title = title.strip('"') if title else None
+    if title:
+        step_data['title'] = title
+
+    position = position.strip('"') if isinstance(position, str) else position
+
+    old_step = project.remove_step(name)
+    if not old_step:
+        environ.output.fail().notify(
+            kind='ABORTED',
+            code='NO_SUCH_STEP',
+            message='Unable to modify unknown step "{}"'.format(name)
+        ).console(
+            whitespace=1
+        )
+        return False
+
+    index = index_from_location(project, position)
+
+    new_step = project.add_step(step_data, index=index)
+
+    if not os.path.exists(new_step.source_path):
+        if os.path.exists(old_step.source_path):
+            shutil.copy2(old_step.source_path, new_step.source_path)
+        else:
+            with open(new_step.source_path, 'w+') as f:
+                f.write('')
+
+    environ.output.update(
+        project=project.kernel_serialize()
+    ).notify(
+        kind='SUCCESS',
+        code='STEP_MODIFIED',
+        message='Step modifications complete'
+    ).console(
+        whitespace=1
+    )
+
+    return True
+

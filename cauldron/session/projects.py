@@ -75,7 +75,21 @@ class ProjectStep(object):
             index=self.index,
             source_path=self.source_path,
             last_modified=self.last_modified,
-            is_dirty=self.is_dirty()
+            is_dirty=self.is_dirty(),
+            status=self.status()
+        )
+
+    def status(self):
+        """
+
+        :return:
+        """
+
+        return dict(
+            name=self.definition.name,
+            dirty=self.is_dirty(),
+            run=self.last_modified is not None,
+            error=self.error is not None
         )
 
     def is_dirty(self):
@@ -271,7 +285,8 @@ class Project(object):
             [optional] The project unique identifier. If omitted, the
             identifier will be loaded from the settings file, or assigned
         :param shared:
-            [optional] The shared data cache used to store
+            [optional] The shared data cache used to store project data when
+            run
         """
 
         source_directory = environ.paths.clean(source_directory)
@@ -505,6 +520,21 @@ class Project(object):
         self.last_modified = time.time()
         return dep
 
+    def index_of_step(self, name) -> int:
+        """
+
+        :param name:
+        :return:
+        """
+
+        name = name.strip('"')
+
+        for index, s in enumerate(self.steps):
+            if s.definition.name == name:
+                return int(index)
+
+        return None
+
     def add_step(
             self,
             step_data: typing.Union[str, dict],
@@ -538,11 +568,59 @@ class Project(object):
             if index < 0:
                 index %= len(self.steps)
             self.steps.insert(index, ps)
-            for i in range(self.steps.index(ps) + 1, len(self.steps)):
-                self.steps[i].mark_dirty(True)
+
+            if fd.name.endswith('.py'):
+                for i in range(self.steps.index(ps) + 1, len(self.steps)):
+                    self.steps[i].mark_dirty(True)
 
         self.last_modified = time.time()
         return ps
+
+    def remove_step(self, name) -> 'ProjectStep':
+        """
+
+        :param name:
+        :return:
+        """
+
+        step = None
+
+        for ps in self.steps:
+            if ps.definition.name == name:
+                step = ps
+                break
+
+        if step is None:
+            return None
+
+        if step.definition.name.endswith('.py'):
+            for i in range(self.steps.index(step) + 1, len(self.steps)):
+                self.steps[i].mark_dirty(True)
+
+        self.steps.remove(step)
+
+        return step
+
+    def save(self, path: str = None):
+        """
+
+        :param path:
+        :return:
+        """
+
+        if not path:
+            path = self.source_path
+
+        self.settings.put(
+            steps=[ps.definition.serialize() for ps in self.steps],
+            dependencies=[pd.definition.serialize() for pd in self.dependencies]
+        )
+
+        data = self.settings.fetch(None)
+        with open(path, 'w+') as f:
+            json.dump(data, f, indent=2, sort_keys=True)
+
+        self.last_modified = time.time()
 
     def write(self) -> str:
         """

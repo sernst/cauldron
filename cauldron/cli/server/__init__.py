@@ -10,6 +10,7 @@ sys.path.append(
     os.path.abspath(os.path.join(MY_DIRECTORY, '..'))
 )
 
+import cauldron
 from cauldron.cli import commands
 from cauldron.environ.response import Response
 from cauldron.environ import logger
@@ -24,9 +25,39 @@ def ping():
     :return:
     """
 
-    return flask.jsonify(dict(
+    r = Response()
+    r.update(
         success=True
-    ))
+    )
+
+    return flask.jsonify(r.serialize())
+
+
+@APPLICATION.route('/status', methods=['GET', 'POST'])
+def status():
+    """
+
+    :return:
+    """
+
+    r = Response()
+
+    try:
+        project = cauldron.project.internal_project
+        r.update(
+            project=project.kernel_serialize()
+        )
+    except Exception:
+        return flask.jsonify(r.serialize())
+
+    try:
+        r.update(
+            steps_status=[s.status for s in project.steps]
+        )
+    except Exception:
+        pass
+
+    return flask.jsonify(r.serialize())
 
 
 @APPLICATION.route('/', methods=['GET', 'POST'])
