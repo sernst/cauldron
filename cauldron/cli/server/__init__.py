@@ -45,6 +45,26 @@ def status():
     try:
         project = cauldron.project.internal_project
         r.update(
+            project=project.status()
+        )
+    except Exception:
+        r.fail()
+
+    return flask.jsonify(r.serialize())
+
+
+@APPLICATION.route('/project', methods=['GET', 'POST'])
+def project():
+    """
+
+    :return:
+    """
+
+    r = Response()
+
+    try:
+        project = cauldron.project.internal_project
+        r.update(
             project=project.kernel_serialize()
         )
     except Exception:

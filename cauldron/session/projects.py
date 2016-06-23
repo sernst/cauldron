@@ -87,6 +87,7 @@ class ProjectStep(object):
 
         return dict(
             name=self.definition.name,
+            last_modified=self.last_modified,
             dirty=self.is_dirty(),
             run=self.last_modified is not None,
             error=self.error is not None
@@ -312,6 +313,21 @@ class Project(object):
         self.refresh()
 
     @property
+    def has_error(self):
+        """
+
+        :return:
+        """
+
+        for s in self.steps:
+            if s.error:
+                return True
+        for d in self.dependencies:
+            if d.error:
+                return True
+        return False
+
+    @property
     def title(self) -> str:
         out = self.settings.fetch('title')
         if out:
@@ -431,6 +447,7 @@ class Project(object):
         """
 
         return dict(
+            serial_time=time.time(),
             last_modified=self.last_modified,
             source_directory=self.source_directory,
             source_path=self.source_path,
@@ -630,6 +647,14 @@ class Project(object):
 
         writing.write_project(self)
         return self.url
+
+    def status(self) -> dict:
+
+        return dict(
+            id=self.id,
+            steps=[s.status() for s in self.steps],
+            last_modified=self.last_modified
+        )
 
 
 def load_project_settings(path: str) -> dict:

@@ -65,6 +65,30 @@ class ResponseMessage(object):
         )
         return self
 
+    def console_raw(
+            self,
+            message: str,
+            trace: bool = True,
+            file_path: str = None,
+            append_to_file: bool = True
+    ):
+        """
+
+        :param message:
+        :param trace:
+        :param file_path:
+        :param append_to_file:
+        :return:
+        """
+
+        logger.raw(
+            message=message,
+            trace=trace,
+            file_path=file_path,
+            append_to_file=append_to_file
+        )
+        return self
+
     def console(
             self,
             message: typing.Union[str, typing.List[str]] = None,
@@ -168,8 +192,10 @@ class Response(object):
             success=not self.failed
         )
 
-    def fail(self) -> 'Response':
+    def fail(self, **kwargs) -> 'Response':
         self.failed = True
+        if kwargs:
+            self.update(**kwargs)
         return self
 
     def end(self) -> 'Response':

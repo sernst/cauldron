@@ -25,6 +25,5 @@
       manualColumnMove: true
     });
 
-    console.log('Created Table:', '{{ id }}', table);
   }());
 </script>

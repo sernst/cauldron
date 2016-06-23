@@ -119,7 +119,15 @@ def run_step(
 
     status = check_status(project, step, force)
     if status['code'] == 'NOT-FOUND':
-        environ.log('[{id}]: Not found "{path}"'.format(
+        environ.output.fail().notify(
+            kind='ERROR',
+            code='MISSING_SOURCE_FILE',
+            message='Source file not found "{}"'.format(status['path'])
+        ).kernel(
+            id=step.definition.name,
+            path=status['path']
+        ).console(
+            '[{id}]: Not found "{path}"'.format(
             id=step.definition.name,
             path=status['path']
         ))
@@ -170,8 +178,16 @@ def run_step(
         environ.log('[{}]: Updated'.format(step.definition.name))
         return True
 
-    environ.log_raw(result['message'])
     step.error = result['html_message']
+    environ.output.fail().notify(
+        kind='ERROR',
+        message='Step execution error',
+        code='EXECUTION_ERROR'
+    ).kernel(
+        step_name=step.definition.name
+    ).console_raw(
+        result['message']
+    )
 
     return False
 

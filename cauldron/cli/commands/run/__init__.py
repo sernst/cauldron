@@ -202,7 +202,7 @@ def execute(
     project.write()
     environ.log_blanks()
 
-    if print_status:
+    if print_status or environ.output.failed:
         environ.output.update(
             project=project.kernel_serialize()
         )
