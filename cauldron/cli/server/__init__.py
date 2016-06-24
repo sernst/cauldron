@@ -1,5 +1,6 @@
 import os
 import sys
+import logging
 
 import flask
 from flask import Flask
@@ -143,5 +144,9 @@ def run(port: int = 5010, debug: bool = False):
     :param debug:
     :return:
     """
+
+    if not debug:
+        log = logging.getLogger('werkzeug')
+        log.setLevel(logging.ERROR)
 
     APPLICATION.run(port=port, debug=debug)

@@ -153,6 +153,18 @@
   var exports = window.CAULDRON || {};
   window.CAULDRON = exports;
 
+
+  /**
+   *
+   * @param name
+   */
+  function scrollToAnchor(name){
+    var aTag = $("a[name='"+ name +"']");
+    $('html,body').animate({scrollTop: aTag.offset().top}, 'slow');
+  }
+  exports.scrollToAnchor = scrollToAnchor;
+
+
   /**
    *
    * @param selector

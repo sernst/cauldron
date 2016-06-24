@@ -179,7 +179,9 @@ def run_step(
         return True
 
     step.error = result['html_message']
-    environ.output.fail().notify(
+    environ.output.fail(
+        project=project.kernel_serialize()
+    ).notify(
         kind='ERROR',
         message='Step execution error',
         code='EXECUTION_ERROR'
