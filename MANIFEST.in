@@ -1,5 +1,5 @@
 include LICENSE
+include package_data.json
 recursive-include bin *
 recursive-include resources/web *
 recursive-include resources/templates *
-

@@ -11,12 +11,14 @@ class ResponseMessage(object):
             kind: str = None,
             code: str = None,
             message: str = None,
+            response: 'Response' = None,
             **kwargs
     ):
         self.kind = kind
         self.code = code
         self.message = message
         self.data = kwargs
+        self.response = response
 
     def serialize(self) -> dict:
         """
@@ -174,7 +176,8 @@ class Response(object):
         rm = ResponseMessage(
             kind=kind if kind else 'INFO',
             message=message,
-            code=code
+            code=code,
+            response=self
         )
         self.messages.append(rm)
         return rm

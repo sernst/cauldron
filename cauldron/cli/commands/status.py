@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 import cauldron
 from cauldron import environ
 
+NAME = 'status'
 DESCRIPTION = """
     Displays the status of project and the shared workspace variables
     """

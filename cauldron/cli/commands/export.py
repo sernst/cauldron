@@ -1,20 +1,28 @@
 from argparse import ArgumentParser
 import os
 import shutil
+import typing
 
 import cauldron
 from cauldron import environ
 from cauldron import cli
 
+NAME = 'export'
 DESCRIPTION = """
     Export the current project's results html file
     """
 
 
-def populate(parser: ArgumentParser):
+def populate(
+        parser: ArgumentParser,
+        raw_args: typing.List[str],
+        assigned_args: dict
+):
     """
 
     :param parser:
+    :param raw_args:
+    :param assigned_args:
     :return:
     """
 

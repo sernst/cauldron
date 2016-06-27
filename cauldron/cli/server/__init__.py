@@ -12,7 +12,7 @@ sys.path.append(
 )
 
 import cauldron
-from cauldron.cli import commands
+from cauldron.cli import commander
 from cauldron.environ.response import Response
 from cauldron.environ import logger
 
@@ -119,7 +119,7 @@ def execute():
         return flask.jsonify(r.serialize())
 
     try:
-        commands.execute(name, args, r)
+        commander.execute(name, args, r)
     except Exception as err:
         r.fail().notify(
             kind='ERROR',

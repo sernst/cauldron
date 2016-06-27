@@ -1,9 +1,10 @@
 .textbox, .plaintextbox {
     margin:auto;
+    opacity: 0.9;
     padding: 0.25em 1.0em;
     max-width: 1280px;
-    font-family: 'Open Sans', Helvetica, Arial;
-    font-size: 0.9em;
+    font-family: 'Open Sans', Helvetica, Arial, "Helvetica Neue", sans-serif;
+    font-size: 1.1em;
 }
 
 .data-table {
@@ -19,8 +20,8 @@ pre {
 }
 
 p {
-    margin: 0 0 0.5em 0;
-    line-height: 1.5;
+    margin: 0 0 0.75em 0;
+    line-height: 1.6;
 }
 
 h1, h2, h3, h4, h5, h6 {

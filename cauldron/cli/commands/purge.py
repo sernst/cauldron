@@ -1,16 +1,27 @@
-import os
-import shutil
+import typing
 from argparse import ArgumentParser
 
 from cauldron import environ
-from cauldron.cli import query
+from cauldron.cli.interaction import query
 
+NAME = 'purge'
 DESCRIPTION = """
     Removes all existing group and trial results from cached results folders
     """
 
 
-def populate(parser: ArgumentParser):
+def populate(
+        parser: ArgumentParser,
+        raw_args: typing.List[str],
+        assigned_args: dict
+):
+    """
+
+    :param parser:
+    :param raw_args:
+    :param assigned_args:
+    :return:
+    """
     pass
 
 

@@ -4,7 +4,8 @@ import json
 import cauldron
 from cauldron import environ
 from cauldron import templating
-from cauldron.cli import commands
+from cauldron.cli import commander
+from cauldron.cli import parse
 
 with open(environ.paths.package('package_data.json'), 'r+') as f:
     package_data = json.load(f)
@@ -43,13 +44,13 @@ class CauldronShell(cmd.Cmd):
             return
 
         self.history.append(line)
-        name, raw_args = commands.split_line(line)
+        name, raw_args = parse.split_line(line)
 
         if name == 'help':
-            commands.show_help()
+            commander.show_help()
             return
 
-        result = commands.execute(name, raw_args)
+        result = commander.execute(name, raw_args)
 
         p = cauldron.project
         if not p or not p.internal_project or not p.internal_project.id:
@@ -58,7 +59,12 @@ class CauldronShell(cmd.Cmd):
             name = cauldron.project.internal_project.id[:20]
 
         self.prompt = '<{}>: '.format(name)
-        return result.ended
+        if hasattr(result, 'ended'):
+            return result.ended
+        elif hasattr(result, 'response'):
+            return result.response.ended
+        else:
+            return result
 
     def do_help(self, arg):
         """
@@ -67,7 +73,7 @@ class CauldronShell(cmd.Cmd):
         :return:
         """
 
-        commands.show_help(arg)
+        commander.show_help(arg)
 
     def completenames(self, text, *ignored):
         """
@@ -78,8 +84,7 @@ class CauldronShell(cmd.Cmd):
         """
 
         return [
-            x for x in commands.list_command_names()
-            if x.startswith(text)
+            x.NAME for x in commander.fetch() if x.NAME.startswith(text)
         ]
 
     def completedefault(self, text, line, begin_index, end_index):
@@ -92,6 +97,6 @@ class CauldronShell(cmd.Cmd):
         :return:
         """
 
-        name, raw_args = commands.split_line(line)
-        return commands.autocomplete(name, text, line, begin_index, end_index)
+        name, raw_args = parse.split_line(line)
+        return commander.autocomplete(name, text, line, begin_index, end_index)
 

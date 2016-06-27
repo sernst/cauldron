@@ -4,17 +4,24 @@ from argparse import ArgumentParser
 
 from cauldron import cli
 from cauldron import environ
-from cauldron.cli import autocompletion
+from cauldron.cli.interaction import autocompletion
 
+NAME = 'alias'
 DESCRIPTION = """
     Add or remove a path alias to make opening projects easier
     """
 
 
-def populate(parser: ArgumentParser):
+def populate(
+        parser: ArgumentParser,
+        raw_args: typing.List[str],
+        assigned_args: dict
+):
     """
 
     :param parser:
+    :param raw_args:
+    :param assigned_args:
     :return:
     """
 

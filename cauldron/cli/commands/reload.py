@@ -1,4 +1,5 @@
 import os
+import typing
 from argparse import ArgumentParser
 
 import cauldron
@@ -6,16 +7,23 @@ from cauldron import environ
 from cauldron import runner
 from cauldron import session
 
+NAME = 'reload'
 DESCRIPTION = """
     Discards all shared data and reloads the currently open project to its
     initial state
     """
 
 
-def populate(parser: ArgumentParser):
+def populate(
+        parser: ArgumentParser,
+        raw_args: typing.List[str],
+        assigned_args: dict
+):
     """
 
     :param parser:
+    :param raw_args:
+    :param assigned_args:
     :return:
     """
     pass

@@ -6,18 +6,23 @@ from argparse import ArgumentParser
 import cauldron
 from cauldron import cli
 from cauldron import environ
-from cauldron.cli import autocompletion
 from cauldron.cli.commands.open import actions
+from cauldron.cli.interaction import autocompletion
 
-DESCRIPTION = """
-    Opens a cauldron project.
-    """
+NAME = 'open'
+DESCRIPTION = 'Opens a cauldron project'
 
 
-def populate(parser: ArgumentParser):
+def populate(
+        parser: ArgumentParser,
+        raw_args: typing.List[str],
+        assigned_args: dict
+):
     """
 
     :param parser:
+    :param raw_args:
+    :param assigned_args:
     :return:
     """
 
@@ -25,10 +30,12 @@ def populate(parser: ArgumentParser):
         'path',
         nargs='?',
         default=None,
-        help=cli.reformat("""
+        help=cli.reformat(
+            """
             A path to the directory containing a cauldron project. Special
             location paths can also be used.
-            """)
+            """
+        )
     )
 
     parser.add_argument(
@@ -36,10 +43,12 @@ def populate(parser: ArgumentParser):
         dest='show_in_browser',
         default=False,
         action='store_true',
-        help=cli.reformat("""
-            When set the previously stored state of the project will open in
-            the browser for display.
-            """)
+        help=cli.reformat(
+            """
+            The previously stored state of the project will open in the browser
+            for display if this flag is included.
+            """
+        )
     )
 
     parser.add_argument(
@@ -48,8 +57,8 @@ def populate(parser: ArgumentParser):
         default=False,
         action='store_true',
         help=cli.reformat("""
-            When set, the open command will open the most recently opened
-            project.
+            The open command will open the most recently opened project if this
+            flag is included.
             """)
     )
 
@@ -58,10 +67,11 @@ def populate(parser: ArgumentParser):
         dest='a_recent_project',
         default=False,
         action='store_true',
-        help=cli.reformat("""
-            When set, the open command will display a list of recently opened
-            projects for you to select from.
-            """)
+        help=cli.reformat(
+            """
+            Displays a list of recently opened projects for you to select from.
+            """
+        )
     )
 
     parser.add_argument(
@@ -69,9 +79,11 @@ def populate(parser: ArgumentParser):
         dest='list_available',
         default=False,
         action='store_true',
-        help=cli.reformat("""
-            When set, the open command will display all known projects.
-            """)
+        help=cli.reformat(
+            """
+            List all known projects.
+            """
+        )
     )
 
 

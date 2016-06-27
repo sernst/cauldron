@@ -1,12 +1,12 @@
 import os
 import shutil
-import webbrowser
 import typing
+import webbrowser
 from datetime import datetime
 
 from cauldron import environ
 from cauldron.session.projects import Project
-from cauldron.cli import query
+from cauldron.cli.interaction import query
 
 
 def get_snapshot_listing(project: Project):

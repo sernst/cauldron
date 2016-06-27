@@ -1,6 +1,6 @@
 import unittest
 
-from cauldron.cli import commands
+from cauldron.cli import parse
 
 
 class TestCliCommands(unittest.TestCase):
@@ -10,7 +10,7 @@ class TestCliCommands(unittest.TestCase):
         """
 
         src = 'run "my name" --force --help --test 1'
-        parts = commands.explode_line(src)
+        parts = parse.explode_line(src)
 
         print(src)
         print(parts)

@@ -66,7 +66,7 @@ def echo_steps():
         return
 
     environ.output.update(
-        steps=[ps.kernel_serialize() for ps in project]
+        steps=[ps.kernel_serialize() for ps in project.steps]
     ).notify(
         kind='SUCCESS',
         code='ECHO_STEPS'

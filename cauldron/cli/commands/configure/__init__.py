@@ -5,15 +5,22 @@ from cauldron import cli
 from cauldron import environ
 from cauldron.cli.commands.configure import actions
 
+NAME = 'configure'
 DESCRIPTION = """
     View or modify the Cauldron's configuration settings
     """
 
 
-def populate(parser: ArgumentParser):
+def populate(
+        parser: ArgumentParser,
+        raw_args: typing.List[str],
+        assigned_args: dict
+):
     """
 
     :param parser:
+    :param raw_args:
+    :param assigned_args:
     :return:
     """
 

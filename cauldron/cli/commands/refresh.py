@@ -1,9 +1,11 @@
 from argparse import ArgumentParser
+import typing
 
 import cauldron
 from cauldron import environ
 from cauldron import session
 
+NAME = 'refresh'
 DESCRIPTION = """
     Rewrites the current state of the project to the results directory for
     viewing. Useful when you want to update included and dependency files
@@ -11,7 +13,18 @@ DESCRIPTION = """
     """
 
 
-def populate(parser: ArgumentParser):
+def populate(
+        parser: ArgumentParser,
+        raw_args: typing.List[str],
+        assigned_args: dict
+):
+    """
+
+    :param parser:
+    :param raw_args:
+    :param assigned_args:
+    :return:
+    """
     pass
 
 

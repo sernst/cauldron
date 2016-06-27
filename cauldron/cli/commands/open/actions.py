@@ -1,11 +1,11 @@
-import os
 import glob
+import os
 
 import cauldron
 from cauldron import environ
-from cauldron.cli import query
 from cauldron import runner
 from cauldron import session
+from cauldron.cli.interaction import query
 
 
 def echo_known_projects() -> dict:

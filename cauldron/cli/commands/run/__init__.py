@@ -6,18 +6,25 @@ import cauldron
 from cauldron import cli
 from cauldron import environ
 from cauldron import runner
-from cauldron.cli import autocompletion
 from cauldron.cli.commands.run import actions as run_actions
+from cauldron.cli.interaction import autocompletion
 
+NAME = 'run'
 DESCRIPTION = cli.reformat("""
     Runs one or more steps within the currently opened project
     """)
 
 
-def populate(parser: ArgumentParser):
+def populate(
+        parser: ArgumentParser,
+        raw_args: typing.List[str],
+        assigned_args: dict
+):
     """
 
     :param parser:
+    :param raw_args:
+    :param assigned_args:
     :return:
     """
 

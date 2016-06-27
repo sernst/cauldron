@@ -1,15 +1,28 @@
 import webbrowser
 from argparse import ArgumentParser
+import typing
 
 import cauldron
 from cauldron import environ
 
+NAME = 'show'
 DESCRIPTION = """
     Opens the current project display in the default browser
     """
 
 
-def populate(parser: ArgumentParser):
+def populate(
+        parser: ArgumentParser,
+        raw_args: typing.List[str],
+        assigned_args: dict
+):
+    """
+
+    :param parser:
+    :param raw_args:
+    :param assigned_args:
+    :return:
+    """
     pass
 
 

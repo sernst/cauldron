@@ -1,22 +1,29 @@
-import os
 import json
+import os
 import typing
 from argparse import ArgumentParser
 
 from cauldron import cli
-from cauldron.cli import autocompletion
 from cauldron import environ
 from cauldron.cli.commands.open import actions as open_actions
+from cauldron.cli.interaction import autocompletion
 
+NAME = 'create'
 DESCRIPTION = """
     Create a new Cauldron project
     """
 
 
-def populate(parser: ArgumentParser):
+def populate(
+        parser: ArgumentParser,
+        raw_args: typing.List[str],
+        assigned_args: dict
+):
     """
 
     :param parser:
+    :param raw_args:
+    :param assigned_args:
     :return:
     """
 

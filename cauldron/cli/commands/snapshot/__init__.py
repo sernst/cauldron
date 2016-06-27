@@ -1,23 +1,30 @@
 import typing
 import webbrowser
-from datetime import datetime
 from argparse import ArgumentParser
+from datetime import datetime
 
 import cauldron
 from cauldron import environ
-from cauldron.cli import autocompletion
 from cauldron.cli.commands.snapshot import actions
+from cauldron.cli.interaction import autocompletion
 
+NAME = 'snapshot'
 DESCRIPTION = """
     Stores the current results as a snapshot with the specified snapshot
     name for reference
     """
 
 
-def populate(parser: ArgumentParser):
+def populate(
+        parser: ArgumentParser,
+        raw_args: typing.List[str],
+        assigned_args: dict
+):
     """
 
     :param parser:
+    :param raw_args:
+    :param assigned_args:
     :return:
     """
 
