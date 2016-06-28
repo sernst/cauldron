@@ -8,6 +8,7 @@ var cleanCss = require('gulp-clean-css');
 var sass = require('gulp-sass');
 var gulpif = require('gulp-if');
 var minimist = require('minimist');
+var rename = require('gulp-rename');
 
 var taskName = process.argv[1];
 var destRoot = '../web';
@@ -25,6 +26,36 @@ gulp.task('build-js', function () {
       .pipe(concat('app.js'))
       .pipe(gulp.dest(destRoot + '/js'));
 });
+
+
+/**
+ *
+ */
+gulp.task('copy-bower-components', function () {
+  var copies = bowerData.__copies__;
+  var streams = [];
+
+  copies.forEach(function (copy) {
+    var outputDirectory = destRoot + '/components/' + copy.name;
+    Object.keys(copy.files).forEach(function (name) {
+      streams.push(
+          gulp.src('bower_components/' + copy.files[name])
+              .pipe(rename(name))
+              .pipe(gulp.dest(outputDirectory))
+      );
+    });
+
+    Object.keys(copy.directories).forEach(function (name) {
+      streams.push(
+          gulp.src('bower_components/' + copy.directories[name] + '/**/*')
+            .pipe(gulp.dest(outputDirectory + '/' + name))
+      );
+    });
+  });
+
+  return es.merge.apply(null, streams);
+});
+
 
 /**
  *
@@ -104,7 +135,8 @@ var pre = [
   'build-js',
   'build-css',
   'build-html',
-  'copy-css-resources'
+  'copy-css-resources',
+  'copy-bower-components'
 ];
 
 gulp.task('develop', pre);

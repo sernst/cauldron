@@ -22,7 +22,8 @@
     "handsontable": "latest",
     "filesaver": "*",
     "normalize-css": "latest",
-    "jstree": "^3.3.1"
+    "jstree": "^3.3.1",
+    "KaTeX": "katex#^0.6.0"
   },
   "__installs__": {
     "js": [
@@ -49,5 +50,17 @@
       "jstree/dist/themes/default/40px.png",
       "jstree/dist/themes/default/throbber.gif"
     ]
-  }
+  },
+  "__copies__": [
+    {
+      "name": "katex",
+      "files": {
+        "katex.min.js": "KaTeX/dist/katex.min.js",
+        "katex.min.css": "KaTeX/dist/katex.min.css"
+      },
+      "directories": {
+        "fonts": "KaTeX/dist/fonts"
+      }
+    }
+  ]
 }

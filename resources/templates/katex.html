@@ -1,0 +1,13 @@
+<div id="{{ 'equation' | id }}" class="cd-katex-equation"></div>
+<script>
+  window.CAULDRON.on.ready.then(function () {
+    katex.render(
+        '{{ source }}',
+        window.document.getElementById('{{ 'equation' | id }}'),
+        {
+          displayMode: true,
+          throwOnError: false
+        }
+    );
+  });
+</script>

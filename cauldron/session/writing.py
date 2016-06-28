@@ -31,8 +31,9 @@ def write_project(project: 'projects.Project'):
     has_error = False
     head = []
     body = []
-    data = {}
-    files = {}
+    data = dict()
+    files = dict()
+    file_copies = dict()
     library_includes = []
     web_include_paths = project.settings.fetch('web_includes', []) + []
 
@@ -91,8 +92,15 @@ def write_project(project: 'projects.Project'):
             shutil.copy2(source_path, item_path)
             web_includes.append('/{}'.format(item.replace('\\', '/')))
 
-    add_bokeh(library_includes, files, web_includes)
-    add_plotly(library_includes, files, web_includes)
+    add_components(library_includes, file_copies, files, web_includes)
+
+    for filename, source_path in file_copies.items():
+        file_path = os.path.join(project.output_directory, filename)
+        output_directory = os.path.dirname(file_path)
+        if not os.path.exists(output_directory):
+            os.makedirs(output_directory)
+
+        shutil.copy2(source_path, file_path)
 
     for filename, contents in files.items():
         file_path = os.path.join(project.output_directory, filename)
@@ -118,17 +126,63 @@ def write_project(project: 'projects.Project'):
         ))
 
 
-def add_bokeh(library_includes, files, web_includes):
+def add_components(library_includes, file_copies, file_writes, web_includes):
     """
 
     :param library_includes:
-    :param files:
+    :param file_copies:
+    :param file_writes:
     :param web_includes:
     :return:
     """
 
-    if 'bokeh' not in library_includes:
+    for lib_name in set(library_includes):
+        if lib_name == 'bokeh':
+            add_bokeh(file_writes, web_includes)
+        elif lib_name == 'plotly':
+            add_plotly(file_copies, web_includes)
+        else:
+            add_component(lib_name, file_copies, web_includes)
+
+
+def add_component(name, file_copies, web_includes):
+    """
+
+    :param name:
+    :param file_copies:
+    :param web_includes:
+    :return:
+    """
+
+    component_directory = environ.paths.resources(
+        'web', 'components', name
+    )
+
+    if not os.path.exists(component_directory):
         return False
+
+    glob_path = '{}/**/*'.format(component_directory)
+    for path in glob.iglob(glob_path, recursive=True):
+        if not os.path.isfile(path):
+            continue
+
+        slug = path[len(component_directory):]
+        save_path = 'components/{}'.format(slug)
+        file_copies[save_path] = path
+
+        if path.endswith('.js') or path.endswith('.css'):
+            web_includes.append('/{}'.format(save_path))
+
+    return True
+
+
+def add_bokeh(file_writes, web_includes):
+    """
+
+    :param file_writes:
+    :param web_includes:
+    :return:
+    """
 
     if BokehResources is None:
         environ.log(
@@ -148,7 +202,7 @@ def add_bokeh(library_includes, files, web_includes):
         with open(p, 'r+') as fp:
             contents.append(fp.read())
     file_path = os.path.join('bokeh', 'bokeh.css')
-    files[file_path] = '\n'.join(contents)
+    file_writes[file_path] = '\n'.join(contents)
     web_includes.append('/bokeh/bokeh.css')
 
     contents = []
@@ -156,15 +210,19 @@ def add_bokeh(library_includes, files, web_includes):
         with open(p, 'r+') as fp:
             contents.append(fp.read())
     file_path = os.path.join('bokeh', 'bokeh.js')
-    files[file_path] = '\n'.join(contents)
+    file_writes[file_path] = '\n'.join(contents)
     web_includes.append('/bokeh/bokeh.js')
 
     return True
 
 
-def add_plotly(library_includes, files, web_includes):
-    if 'plotly' not in library_includes:
-        return False
+def add_plotly(file_copies, web_includes):
+    """
+
+    :param file_copies:
+    :param web_includes:
+    :return:
+    """
 
     if plotly_offline is None:
         environ.log(
@@ -181,11 +239,9 @@ def add_plotly(library_includes, files, web_includes):
         environ.paths.clean(os.path.dirname(plotly_offline.__file__)),
         'plotly.min.js'
     )
-    with open(p, 'r+') as f:
-        contents = f.read()
 
-    save_path = 'plotly/plotly.min.js'
-    files[save_path] = contents
+    save_path = 'components/plotly/plotly.min.js'
+    file_copies[save_path] = p
     web_includes.append('/{}'.format(save_path))
 
     return True

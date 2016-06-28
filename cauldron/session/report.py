@@ -313,3 +313,15 @@ class Report(object):
         """
 
         self.body.append(render.listing(source, ordered))
+
+    def equation(self, latex: str):
+        """
+
+        :param latex:
+        :return:
+        """
+
+        if 'katex' not in self.library_includes:
+            self.library_includes.append('katex')
+
+        self.body.append(render.latex(latex))

@@ -23,6 +23,19 @@ except ImportError:
     plotly_lib = None
 
 
+def latex(source: str) -> str:
+    """
+
+    :param source:
+    :return:
+    """
+
+    return templating.render_template(
+        'katex.html',
+        source=source
+    )
+
+
 def listing(source: list, ordered: bool = False) -> str:
     """
 
