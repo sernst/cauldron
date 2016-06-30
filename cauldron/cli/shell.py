@@ -47,8 +47,7 @@ class CauldronShell(cmd.Cmd):
         name, raw_args = parse.split_line(line)
 
         if name == 'help':
-            commander.show_help()
-            return
+            return commander.show_help().ended
 
         result = commander.execute(name, raw_args)
 
@@ -73,7 +72,7 @@ class CauldronShell(cmd.Cmd):
         :return:
         """
 
-        commander.show_help(arg)
+        return commander.show_help(arg).ended
 
     def completenames(self, text, *ignored):
         """
@@ -84,7 +83,7 @@ class CauldronShell(cmd.Cmd):
         """
 
         return [
-            x.NAME for x in commander.fetch() if x.NAME.startswith(text)
+            n for n in commander.fetch().keys() if n.startswith(text)
         ]
 
     def completedefault(self, text, line, begin_index, end_index):

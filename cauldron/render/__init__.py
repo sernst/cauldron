@@ -1,39 +1,21 @@
-import os
 import json as json_internal
+import os
 import random
-import textwrap
 from datetime import datetime
 
 import pandas as pd
 
 from cauldron import environ
 from cauldron import templating
-from cauldron.render import syntax_highlighting
 from cauldron.render import inspection
+from cauldron.render import syntax_highlighting
 from cauldron.render import utils as render_utils
-
-try:
-    import markdown as md
-except Exception:
-    md = None
 
 try:
     import plotly as plotly_lib
 except ImportError:
     plotly_lib = None
 
-
-def latex(source: str) -> str:
-    """
-
-    :param source:
-    :return:
-    """
-
-    return templating.render_template(
-        'katex.html',
-        source=source
-    )
 
 
 def listing(source: list, ordered: bool = False) -> str:
@@ -131,62 +113,6 @@ def header(contents: str, level: int = 1) -> str:
         """,
         level=level,
         contents=contents
-    )
-
-
-def text(value: str) -> str:
-    """
-
-    :param value:
-    :return:
-    """
-
-    value = render_utils.html_escape(value)
-    lines = str(value).strip().split('\n')
-
-    for index in range(len(lines)):
-        l = lines[index].strip()
-        if len(l) < 1:
-            l = '</p><p class="plaintextbox">'
-        lines[index] = l
-
-    return '<p class="plaintextbox">{text}</p>'.format(text=' '.join(lines))
-
-
-def preformatted_text(source: str) -> str:
-    """
-
-    :param source:
-    :return:
-    """
-
-    source = render_utils.html_escape(source)
-
-    return '<pre class="preformatted-textbox">{text}</pre>'.format(
-        text=str(textwrap.dedent(source))
-    )
-
-
-def markdown(source: str, **kwargs) -> str:
-    """
-
-    :param source:
-    :return:
-    """
-
-    source = templating.render(source, **kwargs)
-
-    if md is None:
-        raise ImportError(textwrap.dedent(
-            """
-            Unable to import the markdown package. Please check
-            """).strip())
-
-    return templating.render(
-        """
-        <div class="textbox markdown">{{ text }}</div>
-        """,
-        text=md.markdown(textwrap.dedent(source))
     )
 
 

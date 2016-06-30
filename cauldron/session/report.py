@@ -5,6 +5,7 @@ from matplotlib.pyplot import Figure
 
 from cauldron import render
 from cauldron.render import plots as render_plots
+from cauldron.render import texts as render_texts
 from cauldron.session.caching import SharedCache
 
 
@@ -91,9 +92,9 @@ class Report(object):
         """
 
         if preformatted:
-            result = render.preformatted_text(text)
+            result = render_texts.preformatted_text(text)
         else:
-            result = render.text(text)
+            result = render_texts.text(text)
         self.body.append(result)
 
     def markdown(self, source: str, **kwargs):
@@ -106,7 +107,10 @@ class Report(object):
         :return:
         """
 
-        self.body.append(render.markdown(source, **kwargs))
+        result = render_texts.markdown(source, **kwargs)
+        self.library_includes += result['library_includes']
+
+        self.body.append(result['body'])
 
     def json(self, window_key: str, data):
         """
@@ -124,17 +128,6 @@ class Report(object):
         """
 
         self.body.append(render.json(window_key, data))
-
-    def add_html(self, dom: str):
-        """
-        Add the specified html string to the display
-
-        :param content:
-            A string containing html to be added to the display
-        :return:
-        """
-
-        self.body.append(render.html(dom))
 
     def plotly(self, data, layout: dict, scale: float = 0.5):
         """
@@ -314,14 +307,14 @@ class Report(object):
 
         self.body.append(render.listing(source, ordered))
 
-    def equation(self, latex: str):
+    def latex(self, source: str):
         """
 
-        :param latex:
+        :param source:
         :return:
         """
 
         if 'katex' not in self.library_includes:
             self.library_includes.append('katex')
 
-        self.body.append(render.latex(latex))
+        self.body.append(render_texts.latex(source))

@@ -104,8 +104,11 @@ def print_module_help():
     )
 
 
-def show_help(command_name: str = None, raw_args: str = ''):
+def show_help(command_name: str = None, raw_args: str = '') -> Response:
     """ Prints the basic command help to the console """
+
+    if not environ.output:
+        environ.output = Response()
 
     cmds = fetch()
     if command_name and command_name in cmds:
@@ -130,6 +133,8 @@ def show_help(command_name: str = None, raw_args: str = ''):
         """,
         whitespace_bottom=1
     )
+
+    return environ.output
 
 
 def autocomplete(

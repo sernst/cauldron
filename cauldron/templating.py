@@ -11,10 +11,10 @@ from jinja2 import contextfilter
 from jinja2.runtime import Context
 
 from cauldron import environ
+from cauldron.render import utils
 
 BASE_TIME = time.time()
 JINJA_ENVIRONMENT = Environment()
-
 
 @contextfilter
 def get_id(context: Context, prefix: str) -> str:
@@ -25,7 +25,25 @@ def get_id(context: Context, prefix: str) -> str:
     :return:
     """
 
-    return 'cdi-{}-{}'.format(prefix, context['cauldron_template_uid'])
+    return 'cdi-{}-{}'.format(
+        prefix,
+        context['cauldron_template_uid']
+    )
+
+
+@contextfilter
+def get_latex(content:Context, prefix: str) -> str:
+    """
+
+    :param content:
+    :param prefix:
+    :return:
+    """
+
+    return '\n\n{}\n\n'.format(render_template(
+        'katex.html',
+        source=utils.format_latex(prefix)
+    ))
 
 
 def make_template_uid() -> str:
@@ -58,6 +76,7 @@ def get_environment() -> Environment:
 
     if not loader:
         env.filters['id'] = get_id
+        env.filters['latex'] = get_latex
 
     if not loader or resource_path not in loader.searchpath:
         env.loader = FileSystemLoader(resource_path)

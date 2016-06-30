@@ -125,6 +125,24 @@ def write_project(project: 'projects.Project'):
             })
         ))
 
+    copy_assets(project)
+
+
+def copy_assets(project: 'projects.Project'):
+    """
+
+    :param project:
+    :return:
+    """
+
+    directory = os.path.join(project.source_directory, 'assets')
+    if not os.path.exists(directory):
+        return False
+
+    output_directory = os.path.join(project.output_directory, 'assets')
+    shutil.copytree(directory, output_directory)
+    return True
+
 
 def add_components(library_includes, file_copies, file_writes, web_includes):
     """
@@ -142,7 +160,40 @@ def add_components(library_includes, file_copies, file_writes, web_includes):
         elif lib_name == 'plotly':
             add_plotly(file_copies, web_includes)
         else:
-            add_component(lib_name, file_copies, web_includes)
+            add_global_component(lib_name, web_includes)
+
+
+def add_global_component(name, web_includes):
+    """
+
+    :param name:
+    :param web_includes:
+    :return:
+    """
+
+    component_directory = environ.paths.resources(
+        'web', 'components', name
+    )
+
+    if not os.path.exists(component_directory):
+        return False
+
+    glob_path = '{}/**/*'.format(component_directory)
+    for path in glob.iglob(glob_path, recursive=True):
+        if not os.path.isfile(path):
+            continue
+
+        if not path.endswith('.css') and not path.endswith('.js'):
+            continue
+
+        slug = path[len(component_directory):]
+
+        # web includes that start with a : are relative to the root
+        # results folder, not the project itself. They are for shared
+        # resource files
+        web_includes.append(':components/{}{}'.format(name, slug))
+
+    return True
 
 
 def add_component(name, file_copies, web_includes):

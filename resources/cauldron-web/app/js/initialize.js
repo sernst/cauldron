@@ -7,6 +7,21 @@
   exports.resizeCallbacks = [];
 
   /**
+   *
+   */
+  function getNoCacheString() {
+    var d = new Date();
+    return d.getUTCMilliseconds() + '-' +
+        d.getUTCSeconds() + '-' +
+        d.getUTCMinutes() + '-' +
+        d.getUTCHours() + '-' +
+        d.getUTCDay() + '-' +
+        d.getUTCMonth() + '-' +
+        d.getUTCFullYear();
+  }
+  exports.getNoCacheString = getNoCacheString;
+
+  /**
    * A fake require function that is needed for the inclusion of some
    * elements within the DOM (e.g. plotly offline)
    *
@@ -55,13 +70,15 @@
    * @param filename
    */
   function loadSourceFile(filename) {
+    var noCache = '?nocache=' + exports.getNoCacheString();
+
     if (/.*\.css$/.test(filename)) {
       // Load Style sheet files
       return new Promise(function (resolve) {
         var link = document.createElement('link');
         link.rel = 'stylesheet';
         link.onload = resolve;
-        link.href = filename;
+        link.href = filename + noCache;
         document.head.appendChild(link);
       });
     }
@@ -71,7 +88,7 @@
       return new Promise(function (resolve) {
         var script = document.createElement('script');
         script.onload = resolve;
-        script.src = filename;
+        script.src = filename + noCache;
         document.head.appendChild(script);
       });
     }
@@ -102,14 +119,34 @@
 
           var proms = [];
           window.RESULTS.includes.forEach(function (includedFilename) {
-            proms.push(loadSourceFile(rootPath + includedFilename));
+            if (includedFilename.startsWith(':')) {
+              includedFilename = includedFilename.slice(1);
+            } else {
+              includedFilename = rootPath + includedFilename;
+            }
+            proms.push(loadSourceFile(includedFilename));
           });
 
           return Promise.all(proms);
         })
         .then(function () {
           $('head').append(window.RESULTS.head);
-          $('.body-wrapper').html(window.RESULTS.body);
+          
+          var body = $(window.RESULTS.body);
+          body.find('[data-src]').each(function (index, e) {
+            var element = $(e);
+            var src = element.attr('data-src');
+            if (src.startsWith('/')) {
+              src = src.slice(1);
+            }
+            element.attr(
+                'src',
+                rootPath + '/' + src + '?nocache=' + exports.getNoCacheString()
+            );
+            element.attr('data-src', null);
+          });
+          
+          $('.body-wrapper').html(body);
           $(window).trigger('resize');
           return exports.DATA;
         });
