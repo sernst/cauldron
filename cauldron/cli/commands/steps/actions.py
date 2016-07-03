@@ -187,7 +187,10 @@ def modify_step(
     if title:
         step_data['title'] = title
 
+    old_position = project.index_of_step(name)
     position = position.strip('"') if isinstance(position, str) else position
+    if position is None:
+        position = old_position
 
     old_step = project.remove_step(name)
     if not old_step:
@@ -226,3 +229,42 @@ def modify_step(
 
     return True
 
+
+def toggle_muting(
+        step_name: str,
+        value: bool = None
+):
+    """
+
+    :param step_name:
+    :param value:
+    :return:
+    """
+
+    project = cauldron.project.internal_project
+
+    index = project.index_of_step(step_name)
+    if index is None:
+        return environ.output.fail().notify(
+            kind='ERROR',
+            code='NO_SUCH_STEP',
+            message='No step found with name: "{}"'.format(step_name)
+        ).kernel(
+            name=step_name
+        ).console()
+
+    step = project.steps[index]
+    if value is None:
+        value = not bool(step.is_muted)
+
+    step.is_muted = value
+
+    return environ.output.notify(
+        kind='SUCCESS',
+        code='STEP_MUTE_ENABLED' if step.is_muted else 'STEP_MUTE_DISABLED',
+        message='Muting has been {}'.format(
+            'enabled' if step.is_muted else 'disabled'
+        )
+    ).kernel(
+        project=project.kernel_serialize()
+    ).console()

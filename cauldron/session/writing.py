@@ -38,6 +38,9 @@ def write_project(project: 'projects.Project'):
     web_include_paths = project.settings.fetch('web_includes', []) + []
 
     for step in project.steps:
+        if step.is_muted:
+            continue
+
         has_error = has_error or step.error
         report = step.report
         body.append(step.dumps())

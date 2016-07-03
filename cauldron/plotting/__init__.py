@@ -215,7 +215,7 @@ def make_line_data(
 
     return {
         'data': [lower_trace, middle_trace, upper_trace],
-        'layout': {}
+        'layout': {'hovermode': 'closest'}
     }
 
 

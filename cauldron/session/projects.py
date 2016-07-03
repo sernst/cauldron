@@ -33,6 +33,7 @@ class ProjectStep(object):
         self.code = None
         self._is_dirty = True
         self.error = None
+        self.is_muted = False
 
     @property
     def filename(self) -> str:
@@ -87,6 +88,7 @@ class ProjectStep(object):
 
         return dict(
             name=self.definition.name,
+            muted=self.is_muted,
             last_modified=self.last_modified,
             dirty=self.is_dirty(),
             run=self.last_modified is not None,
@@ -186,6 +188,7 @@ class ProjectDependency(object):
         self.last_modified = None
         self._is_dirty = True
         self.error = None
+        self.is_muted = False
 
     @property
     def id(self) -> str:

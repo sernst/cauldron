@@ -15,6 +15,8 @@ DESCRIPTION = """
         * [list]: Lists the steps within the currently opened project
         * [modify]: Modifies an existing step
         * [remove]: Removes an existing step from the project
+        * [unmute]: Enables a step within the active project
+        * [mute]: Disables a step within the active project
     """
 
 
@@ -48,6 +50,9 @@ def populate(
                 """
             )
         )
+
+    if action in ['mute', 'unmute']:
+        return
 
     if action in ['add', 'modify']:
         parser.add_argument(
@@ -164,6 +169,18 @@ def execute(
             keep_file=keep
         )
 
+    if action == 'unmute':
+        actions.toggle_muting(
+            step_name=step_name,
+            value=False
+        )
+
+    if action == 'mute':
+        actions.toggle_muting(
+            step_name=step_name,
+            value=True
+        )
+
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):
     """
@@ -178,7 +195,7 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
         return autocompletion.matches(
             segment,
             parts[0],
-            ['add', 'list', 'remove', 'modify']
+            ['add', 'list', 'remove', 'modify', 'unmute', 'mute']
         )
 
     action = parts[0]
@@ -187,7 +204,7 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
 
     project = cauldron.project.internal_project
 
-    if len(parts) < 3:
+    if len(parts) < 3 or parts[-1].startswith(('--position=', '-p ')):
         step_names = [x.definition.name for x in project.steps]
         return autocompletion.match_in_path_list(
             segment,
@@ -207,11 +224,11 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
             longs.append('keep')
         else:
             shorts += ['p', 't']
-            longs += ['position', 'title']
+            longs += ['position=', 'title=']
 
         if action == 'modify':
             shorts.append('n')
-            longs.append('name')
+            longs.append('name=')
 
         return autocompletion.match_flags(
             segment=segment,

@@ -16,7 +16,7 @@ from cauldron.session.projects import ProjectStep
 
 
 def step_print(
-        project_step: ProjectStep,
+        project: Project,
         *args, sep='',
         end='\n',
         file=None,
@@ -24,7 +24,7 @@ def step_print(
 ):
     """
 
-    :param project_step:
+    :param project:
     :param args:
     :param sep:
     :param end:
@@ -32,6 +32,8 @@ def step_print(
     :param flush:
     :return:
     """
+
+    project_step = project.current_step
 
     if hasattr(project_step, 'report'):
         text = '\t'.join([str(x) for x in args])
@@ -134,6 +136,11 @@ def run_step(
         return False
 
     step.error = None
+
+    if status['code'] == 'MUTED':
+        environ.log('[{}]: Muted (skipped)'.format(step.definition.name))
+        return True
+
     if status['code'] == 'SKIP':
         environ.log('[{}]: Nothing to update'.format(step.definition.name))
         return True
@@ -211,6 +218,10 @@ def check_status(
         path=target.source_path
     )
 
+    if target.is_muted:
+        result['code'] = 'MUTED'
+        return result
+
     if not os.path.exists(result['path']):
         result.update(error=True, code='NOT-FOUND')
         return result
@@ -248,7 +259,7 @@ def run_python_file(
 
     # Create a print equivalent function that also writes the output to the
     # project page
-    setattr(module, 'print', functools.partial(step_print, target))
+    setattr(module, 'print', functools.partial(step_print, project))
 
     try:
         exec(code, module.__dict__)
