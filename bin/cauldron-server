@@ -10,6 +10,7 @@ sys.path.append(
 )
 
 from cauldron.cli import server
+from cauldron.cli.commands import version
 
 parser = ArgumentParser(
     description='Cauldron server'
@@ -29,7 +30,19 @@ parser.add_argument(
     action='store_true'
 )
 
+parser.add_argument(
+    '-v', '--version',
+    dest='version',
+    default=False,
+    action='store_true'
+)
+
 args = parser.parse_args()
+
+if args.version:
+    data = version.get_package_data()
+    print('VERSION: {}'.format(data['version']))
+    sys.exit(0)
 
 server.run(port=args.port, debug=args.debug)
 

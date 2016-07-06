@@ -163,6 +163,8 @@ def execute(
         )
         return
 
+    runner.reload_libraries()
+
     has_dirty_dependency = False
     for dep in project.dependencies:
         if dep.is_dirty():

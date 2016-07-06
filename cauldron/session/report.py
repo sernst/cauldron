@@ -317,4 +317,4 @@ class Report(object):
         if 'katex' not in self.library_includes:
             self.library_includes.append('katex')
 
-        self.body.append(render_texts.latex(source))
+        self.body.append(render_texts.latex(source.replace('@', '\\')))

@@ -9,6 +9,7 @@ from cauldron.cli.commands import snapshot
 from cauldron.cli.commands import steps
 from cauldron.cli.commands import alias
 from cauldron.cli.commands import clear
+from cauldron.cli.commands import close
 from cauldron.cli.commands import create
 from cauldron.cli.commands import exit
 from cauldron.cli.commands import export
@@ -17,3 +18,4 @@ from cauldron.cli.commands import refresh
 from cauldron.cli.commands import reload
 from cauldron.cli.commands import show
 from cauldron.cli.commands import status
+from cauldron.cli.commands import version

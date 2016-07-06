@@ -1,3 +1,7 @@
+import sys
+import os
+import glob
+import importlib
 import typing
 
 import cauldron
@@ -35,8 +39,38 @@ def initialize(project: typing.Union[str, Project]):
     if isinstance(project, str):
         project = Project(source_directory=project)
 
+    sys.path.append(project.library_directory)
+
     cauldron.project.load(project)
     return project
+
+
+def close():
+    """
+
+    :return:
+    """
+
+    project = cauldron.project.internal_project
+    if not project:
+        return False
+
+    sys.path.remove(project.library_directory)
+    cauldron.project.unload()
+    return True
+
+
+def reload_libraries():
+    project = cauldron.project.internal_project
+
+    directory = project.library_directory
+    glob_path = os.path.join(directory, '**', '*.py')
+    for path in glob.glob(glob_path, recursive=True):
+        package = path[len(directory) + 1:-3].replace(os.sep, '.')
+        module = sys.modules.get(package)
+        if module is not None:
+            print('RELOADED:', package)
+            importlib.reload(module)
 
 
 def section(

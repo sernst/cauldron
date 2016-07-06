@@ -153,6 +153,11 @@ def open_project(path: str) -> bool:
     :return:
     """
 
+    try:
+        runner.close()
+    except Exception:
+        pass
+
     recent_paths = environ.configs.fetch('recent_paths', [])
     path = environ.paths.clean(path)
 

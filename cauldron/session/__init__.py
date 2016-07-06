@@ -93,6 +93,14 @@ class ExposedProject(object):
 
         self._project = project
 
+    def unload(self):
+        """
+
+        :return:
+        """
+
+        self._project = None
+
 
 def initialize_results_path(results_path: str):
     """

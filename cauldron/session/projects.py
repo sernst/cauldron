@@ -316,6 +316,15 @@ class Project(object):
         self.refresh()
 
     @property
+    def library_directory(self):
+        """
+
+        :return:
+        """
+
+        return os.path.join(self.source_directory, 'libs')
+
+    @property
     def has_error(self):
         """
 

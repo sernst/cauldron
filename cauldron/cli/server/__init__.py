@@ -1,6 +1,6 @@
+import logging
 import os
 import sys
-import logging
 
 import flask
 from flask import Flask
@@ -15,12 +15,33 @@ import cauldron
 from cauldron.cli import commander
 from cauldron.environ.response import Response
 from cauldron.environ import logger
+from cauldron import environ
 
 APPLICATION = Flask('Cauldron')
+SERVER_VERSION = [0, 0, 1, 1]
+
+server_data = dict(
+    version=SERVER_VERSION
+)
+
+
+def get_server_data() -> dict:
+    """
+
+    :return:
+    """
+
+    out = dict(
+        test=1,
+        pid=os.getpid(),
+        uptime=environ.run_time().total_seconds()
+    )
+    out.update(server_data)
+    return out
 
 
 @APPLICATION.route('/ping', methods=['GET', 'POST'])
-def ping():
+def server_status():
     """
 
     :return:
@@ -28,14 +49,15 @@ def ping():
 
     r = Response()
     r.update(
-        success=True
+        success=True,
+        __server__=get_server_data()
     )
 
     return flask.jsonify(r.serialize())
 
 
 @APPLICATION.route('/status', methods=['GET', 'POST'])
-def status():
+def project_status():
     """
 
     :return:
@@ -51,11 +73,12 @@ def status():
     except Exception:
         r.fail()
 
+    r.update(__server__=get_server_data())
     return flask.jsonify(r.serialize())
 
 
 @APPLICATION.route('/project', methods=['GET', 'POST'])
-def project():
+def project_data():
     """
 
     :return:
@@ -71,6 +94,7 @@ def project():
     except Exception:
         r.fail()
 
+    r.update(__server__=get_server_data())
     return flask.jsonify(r.serialize())
 
 
@@ -82,6 +106,7 @@ def execute():
     """
 
     r = Response()
+    r.update(__server__=get_server_data())
 
     cmd = None
     parts = None
@@ -144,6 +169,10 @@ def run(port: int = 5010, debug: bool = False):
     :param debug:
     :return:
     """
+
+    server_data['port'] = port
+    server_data['debug'] = debug
+    server_data['id'] = environ.start_time.isoformat()
 
     if not debug:
         log = logging.getLogger('werkzeug')
