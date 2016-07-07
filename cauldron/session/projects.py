@@ -360,7 +360,7 @@ class Project(object):
         return 'unknown'
 
     @property
-    def current_step(self) -> Report:
+    def current_step(self) -> ProjectStep:
         if self._current_step:
             return self._current_step
         return self.steps[0] if self.steps else None

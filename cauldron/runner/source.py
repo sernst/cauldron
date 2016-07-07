@@ -13,6 +13,7 @@ from cauldron import templating
 from cauldron.session.projects import Project
 from cauldron.session.projects import ProjectDependency
 from cauldron.session.projects import ProjectStep
+from cauldron.runner import printing
 
 
 def step_print(
@@ -81,7 +82,6 @@ def source_dependency(
 
     # Set the top-level display and cache values to the current project values
     # before running the step for availability within the step scripts
-    cauldron.display = None
     cauldron.shared = cauldron.project.shared
 
     result = run_python_file(project, dependency)
@@ -151,14 +151,13 @@ def run_step(
 
     # Set the top-level display and cache values to the current project values
     # before running the step for availability within the step scripts
-    cauldron.display = cauldron.project.display
     cauldron.shared = cauldron.project.shared
 
     if status['path'].endswith('.md'):
         with open(status['path'], 'r+') as f:
             code = f.read()
 
-        step.report.markdown(code, **project.shared.fetch(None))
+        cauldron.display.markdown(code, **project.shared.fetch(None))
         step.last_modified = time.time()
         environ.log('[{}]: Updated'.format(step.definition.name))
         step.mark_dirty(False)
@@ -239,6 +238,7 @@ def run_python_file(
         target,
 ) -> dict:
 
+    step = project.current_step
     module_name = target.definition.name.rsplit('.', 1)[0]
     module = types.ModuleType(module_name)
 
@@ -259,13 +259,15 @@ def run_python_file(
 
     # Create a print equivalent function that also writes the output to the
     # project page
-    setattr(module, 'print', functools.partial(step_print, project))
+    print_redirect = printing.BufferedStringIO()
+    sys.stdout = print_redirect
+    step.report.print_buffer = print_redirect
 
     try:
         exec(code, module.__dict__)
         target.last_modified = time.time()
         target.mark_dirty(False)
-        return {'success': True}
+        out = {'success': True}
     except Exception as err:
         frames = traceback.extract_tb(sys.exc_info()[-1])
         cauldron_path = environ.paths.package('cauldron')
@@ -295,7 +297,7 @@ def run_python_file(
             stack=stack
         )
 
-        return dict(
+        out = dict(
             success=False,
             error=err,
             message=templating.render_template(
@@ -307,3 +309,11 @@ def run_python_file(
                 **render_data
             )
         )
+
+    # Restore the print buffer
+    sys.stdout = sys.__stdout__
+    step.report.flush_prints()
+    print_redirect.close()
+    step.report.print_buffer = None
+
+    return out

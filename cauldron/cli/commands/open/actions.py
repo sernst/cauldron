@@ -199,7 +199,6 @@ def open_project(path: str) -> bool:
 
     # Set the top-level display and cache values to the current project values
     # before running the step for availability within the step scripts
-    cauldron.display = cauldron.project.display
     cauldron.shared = cauldron.project.shared
 
     if project.results_path:

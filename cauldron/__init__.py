@@ -1,7 +1,6 @@
-from cauldron.session import ExposedProject
+from cauldron import session
+from cauldron.session import display
 
-project = ExposedProject()
+project = session.project
 
-display = project.display
-
-shared = project.shared
+shared = session.project.shared

@@ -100,6 +100,8 @@ def execute(
     :return:
     """
 
+    path = path.strip('"') if path else None
+
     if list_available:
         actions.echo_known_projects()
         return
