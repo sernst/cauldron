@@ -21,6 +21,7 @@
   }
   exports.getNoCacheString = getNoCacheString;
 
+
   /**
    * A fake require function that is needed for the inclusion of some
    * elements within the DOM (e.g. plotly offline)
@@ -39,6 +40,7 @@
   }
   window.require = fakeRequire;
 
+
   /**
    *
    * @param lower
@@ -51,6 +53,7 @@
       });
   }
   exports.capitalize = capitalize;
+
 
   /**
    *
@@ -65,12 +68,24 @@
   }
   exports.toDisplayNumber = toDisplayNumber;
 
+
   /**
-   *
-   * @param filename
+   * @param include
    */
-  function loadSourceFile(filename) {
+  function loadSourceFile(include) {
+    var filename;
     var noCache = '?nocache=' + exports.getNoCacheString();
+
+    if (include.src.startsWith(':')) {
+      filename = include.src.slice(1);
+    } else {
+      filename = exports.DATA_DIRECTORY + include.src;
+    }
+
+    if ($('#' + include.name).length > 0) {
+      // If the source file is already loaded, don't load it again
+      return Promise.resolve();
+    }
 
     if (/.*\.css$/.test(filename)) {
       // Load Style sheet files
@@ -79,6 +94,7 @@
         link.rel = 'stylesheet';
         link.onload = resolve;
         link.href = filename + noCache;
+        link.id = include.name;
         document.head.appendChild(link);
       });
     }
@@ -89,6 +105,7 @@
         var script = document.createElement('script');
         script.onload = resolve;
         script.src = filename + noCache;
+        script.id = include.name;
         document.head.appendChild(script);
       });
     }
@@ -96,11 +113,31 @@
     return Promise.reject();
   }
 
+
   /**
-   * @param rootPath
-   * @param filename
+   *
+   * @param includes
+   * @returns {*}
    */
-  function loadDataFile(rootPath, filename) {
+  function loadSourceFiles(includes) {
+    if (!includes) {
+      return Promise.resolve();
+    }
+
+    var proms = [];
+    includes.forEach(function (include) {
+      proms.push(loadSourceFile(include));
+    });
+
+    return Promise.all(proms);
+  }
+  exports.loadSourceFiles = loadSourceFiles;
+
+
+  /**
+   *
+   */
+  function loadDataFile() {
     var prom;
 
     if (window.RESULTS) {
@@ -108,7 +145,10 @@
       // again
       prom = Promise.resolve();
     } else {
-      prom = loadSourceFile(rootPath + filename);
+      prom = loadSourceFile({
+        name: 'cauldron-project',
+        src: '/results.js'
+      });
     }
 
     return prom
@@ -116,37 +156,51 @@
           exports.RESULTS = window.RESULTS;
           exports.DATA = window.RESULTS.data;
           exports.SETTINGS = window.RESULTS.settings;
+          return exports.loadSourceFiles(window.RESULTS.includes);
+        })
+        .then(function () {
+          // Load the include files for each step
 
           var proms = [];
-          window.RESULTS.includes.forEach(function (includedFilename) {
-            if (includedFilename.startsWith(':')) {
-              includedFilename = includedFilename.slice(1);
-            } else {
-              includedFilename = rootPath + includedFilename;
-            }
-            proms.push(loadSourceFile(includedFilename));
+          exports.RESULTS.steps.forEach(function (step) {
+            proms.push(exports.loadSourceFiles(step.includes))
           });
 
           return Promise.all(proms);
         })
         .then(function () {
-          $('head').append(window.RESULTS.head);
-          
-          var body = $(window.RESULTS.body);
-          body.find('[data-src]').each(function (index, e) {
-            var element = $(e);
-            var src = element.attr('data-src');
-            if (src.startsWith('/')) {
-              src = src.slice(1);
+          var head = $('head');
+          var body = $('.body-wrapper');
+
+          window.RESULTS.steps.forEach(function (step) {
+            if (step.head) {
+              head.append(step.head);
             }
-            element.attr(
-                'src',
-                rootPath + '/' + src + '?nocache=' + exports.getNoCacheString()
-            );
-            element.attr('data-src', null);
+
+            if (!step.body) {
+              return;
+            }
+
+            var stepBody = $(step.body);
+            stepBody.find('[data-src]').each(function (index, e) {
+              var element = $(e);
+              var src = element.attr('data-src');
+
+              if (src.startsWith('/')) {
+                src = src.slice(1);
+              }
+
+              element.attr(
+                  'src',
+                  exports.DATA_DIRECTORY + '/' + src +
+                    '?nocache=' + exports.getNoCacheString()
+              );
+              element.attr('data-src', null);
+            });
+
+            body.append(stepBody);
           });
-          
-          $('.body-wrapper').html(body);
+
           $(window).trigger('resize');
           return exports.DATA;
         });

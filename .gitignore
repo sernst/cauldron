@@ -172,3 +172,5 @@ jspm_packages
 .idea/
 
 /results/
+/build
+/dist

@@ -59,8 +59,10 @@
         dataDirectory += '/latest';
       }
     }
+
+    exports.DATA_DIRECTORY = dataDirectory;
     
-    return exports.loadDataFile(dataDirectory, '/results.js')
+    return exports.loadDataFile()
         .then(function () {
           var title = exports.SETTINGS.title || exports.SETTINGS.id || id;
           var body = $('body');

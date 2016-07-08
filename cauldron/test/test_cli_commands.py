@@ -12,8 +12,6 @@ class TestCliCommands(unittest.TestCase):
         src = 'run "my name" --force --help --test 1'
         parts = parse.explode_line(src)
 
-        print(src)
-        print(parts)
         self.assertEqual(len(parts), 6)
 
 ################################################################################

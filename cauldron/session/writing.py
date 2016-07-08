@@ -2,6 +2,7 @@ import os
 import shutil
 import glob
 import json
+import typing
 
 from cauldron import environ
 from cauldron.session import projects
@@ -18,6 +19,45 @@ except Exception:
     plotly_offline = None
 
 
+def write_step(
+        step: 'projects.ProjectStep',
+        project: 'projects.Project'
+) -> dict:
+    """
+
+    :param step:
+    :param project:
+    :return:
+    """
+
+    out = dict(
+        name=step.definition.name,
+        status=step.status(),
+        has_error=False,
+        head=None,
+        body=None,
+        data=dict(),
+        includes=[]
+    )
+
+    if step.is_muted:
+        return out
+
+    out['has_error'] = step.error
+    out['body'] = step.dumps()
+
+    report = step.report
+    out['data'].update(report.data.fetch(None))
+    out['includes'] += (
+        add_web_includes(step.web_includes, project) +
+        add_components(step)
+    )
+
+    write_files(report.files.fetch(None), project)
+
+    return out
+
+
 def write_project(project: 'projects.Project'):
     """
 
@@ -28,46 +68,61 @@ def write_project(project: 'projects.Project'):
     environ.systems.remove(project.output_directory)
     os.makedirs(project.output_directory)
 
-    has_error = False
-    head = []
-    body = []
-    data = dict()
-    files = dict()
-    file_copies = dict()
-    library_includes = []
-    web_include_paths = project.settings.fetch('web_includes', []) + []
+    web_includes = add_web_includes(
+        project.settings.fetch('web_includes', []),
+        project
+    )
 
+    steps = []
     for step in project.steps:
-        if step.is_muted:
-            continue
+        steps.append(write_step(step, project))
 
-        has_error = has_error or step.error
-        report = step.report
-        body.append(step.dumps())
-        data.update(report.data.fetch(None))
-        files.update(report.files.fetch(None))
-        web_include_paths += step.web_includes
-        library_includes += step.report.library_includes
-
-    dependency_bodies = []
-    dependency_errors = []
-    for dep in project.dependencies:
-        dependency_bodies.append(dep.dumps())
-        if dep.error:
-            has_error = True
-            dependency_errors.append(dep.error)
-
-    if dependency_bodies:
-        body.insert(0, templating.render_template(
-            'dependencies.html',
-            body=''.join(dependency_bodies)
+    with open(project.output_path, 'w+') as f:
+        # Write the results file
+        f.write(templating.render_template(
+            'report.js.template',
+            DATA=json.dumps({
+                'steps': steps,
+                'includes': web_includes,
+                'settings': project.settings.fetch(None)
+            })
         ))
 
-    if dependency_errors:
-        body.insert(0, ''.join(dependency_errors))
+    copy_assets(project)
+
+
+def copy_files(file_copies: dict, project: 'projects.Project'):
+    if not file_copies:
+        return
+
+    for filename, source_path in file_copies.items():
+        file_path = os.path.join(project.output_directory, filename)
+        output_directory = os.path.dirname(file_path)
+        if not os.path.exists(output_directory):
+            os.makedirs(output_directory)
+
+        shutil.copy2(source_path, file_path)
+
+
+def write_files(file_writes: dict, project: 'projects.Project'):
+    if not file_writes:
+        return
+
+    for filename, contents in file_writes.items():
+        file_path = os.path.join(project.output_directory, filename)
+        output_directory = os.path.dirname(file_path)
+        if not os.path.exists(output_directory):
+            os.makedirs(output_directory)
+
+        with open(file_path, 'w+') as f:
+            f.write(contents)
+
+
+def add_web_includes(include_paths: list, project: 'projects.Project') -> list:
 
     web_includes = []
-    for item in web_include_paths:
+
+    for item in include_paths:
         # Copy "included" files and folders that were specified in the
         # project file to the output directory
 
@@ -95,40 +150,7 @@ def write_project(project: 'projects.Project'):
             shutil.copy2(source_path, item_path)
             web_includes.append('/{}'.format(item.replace('\\', '/')))
 
-    add_components(library_includes, file_copies, files, web_includes)
-
-    for filename, source_path in file_copies.items():
-        file_path = os.path.join(project.output_directory, filename)
-        output_directory = os.path.dirname(file_path)
-        if not os.path.exists(output_directory):
-            os.makedirs(output_directory)
-
-        shutil.copy2(source_path, file_path)
-
-    for filename, contents in files.items():
-        file_path = os.path.join(project.output_directory, filename)
-        output_directory = os.path.dirname(file_path)
-        if not os.path.exists(output_directory):
-            os.makedirs(output_directory)
-
-        with open(file_path, 'w+') as f:
-            f.write(contents)
-
-    with open(project.output_path, 'w+') as f:
-        # Write the results file
-        f.write(templating.render_template(
-            'report.js.template',
-            DATA=json.dumps({
-                'data': data,
-                'includes': web_includes,
-                'settings': project.settings.fetch(None),
-                'body': '\n'.join(body),
-                'head': '\n'.join(head),
-                'has_error': has_error
-            })
-        ))
-
-    copy_assets(project)
+    return web_includes
 
 
 def copy_assets(project: 'projects.Project'):
@@ -147,30 +169,31 @@ def copy_assets(project: 'projects.Project'):
     return True
 
 
-def add_components(library_includes, file_copies, file_writes, web_includes):
+def add_components(step: 'projects.ProjectStep') -> typing.List[dict]:
     """
 
-    :param library_includes:
-    :param file_copies:
-    :param file_writes:
-    :param web_includes:
+    :param step:
     :return:
     """
 
-    for lib_name in set(library_includes):
+    web_includes = []
+
+    for lib_name in set(step.report.library_includes):
         if lib_name == 'bokeh':
-            add_bokeh(file_writes, web_includes)
+            web_includes += add_bokeh(step)
         elif lib_name == 'plotly':
-            add_plotly(file_copies, web_includes)
+            web_includes += add_plotly(step)
         else:
-            add_global_component(lib_name, web_includes)
+            web_includes += add_global_component(lib_name, step)
+
+    return web_includes
 
 
-def add_global_component(name, web_includes):
+def add_global_component(name, step):
     """
 
     :param name:
-    :param web_includes:
+    :param step:
     :return:
     """
 
@@ -178,10 +201,11 @@ def add_global_component(name, web_includes):
         'web', 'components', name
     )
 
+    out = []
     if not os.path.exists(component_directory):
-        return False
+        return out
 
-    glob_path = '{}/**/*'.format(component_directory)
+    glob_path = os.path.join(component_directory, '**', '*')
     for path in glob.iglob(glob_path, recursive=True):
         if not os.path.isfile(path):
             continue
@@ -194,9 +218,12 @@ def add_global_component(name, web_includes):
         # web includes that start with a : are relative to the root
         # results folder, not the project itself. They are for shared
         # resource files
-        web_includes.append(':components/{}{}'.format(name, slug))
+        out.append({
+            'name': 'components-{}-{}'.format(name, slug.replace('/', '_')),
+            'src': ':components/{}{}'.format(name, slug)
+        })
 
-    return True
+    return out
 
 
 def add_component(name, file_copies, web_includes):
@@ -230,13 +257,12 @@ def add_component(name, file_copies, web_includes):
     return True
 
 
-def add_bokeh(file_writes, web_includes):
+def add_bokeh(step: 'projects.ProjectStep') -> typing.List[dict]:
     """
-
-    :param file_writes:
-    :param web_includes:
     :return:
     """
+
+    out = []
 
     if BokehResources is None:
         environ.log(
@@ -247,17 +273,22 @@ def add_bokeh(file_writes, web_includes):
                 you have installed the Bokeh library.
             """
         )
-        return False
+        return out
 
     br = BokehResources(mode='absolute')
 
+    file_writes = dict()
     contents = []
     for p in br.css_files:
         with open(p, 'r+') as fp:
             contents.append(fp.read())
     file_path = os.path.join('bokeh', 'bokeh.css')
     file_writes[file_path] = '\n'.join(contents)
-    web_includes.append('/bokeh/bokeh.css')
+
+    out.append({
+        'name': 'bokeh-css',
+        'src': '/bokeh/bokeh.css'
+    })
 
     contents = []
     for p in br.js_files:
@@ -265,18 +296,23 @@ def add_bokeh(file_writes, web_includes):
             contents.append(fp.read())
     file_path = os.path.join('bokeh', 'bokeh.js')
     file_writes[file_path] = '\n'.join(contents)
-    web_includes.append('/bokeh/bokeh.js')
 
-    return True
+    out.append({
+        'name': 'bokeh-js',
+        'src': '/bokeh/bokeh.js'
+    })
+
+    write_files(file_writes, step.project)
+    return out
 
 
-def add_plotly(file_copies, web_includes):
+def add_plotly(step: 'projects.ProjectStep') -> typing.List[dict]:
     """
-
-    :param file_copies:
-    :param web_includes:
+    :param step:
     :return:
     """
+
+    out = []
 
     if plotly_offline is None:
         environ.log(
@@ -287,7 +323,7 @@ def add_plotly(file_copies, web_includes):
                 you have installed the Plotly library.
             """
         )
-        return False
+        return out
 
     p = os.path.join(
         environ.paths.clean(os.path.dirname(plotly_offline.__file__)),
@@ -295,7 +331,11 @@ def add_plotly(file_copies, web_includes):
     )
 
     save_path = 'components/plotly/plotly.min.js'
-    file_copies[save_path] = p
-    web_includes.append('/{}'.format(save_path))
+    copy_files({save_path: p}, step.project)
 
-    return True
+    out.append({
+        'name': 'plotly',
+        'src': '/{}'.format(save_path)
+    })
+
+    return out

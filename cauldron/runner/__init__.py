@@ -11,24 +11,6 @@ from cauldron.session.projects import Project
 from cauldron.session.projects import ProjectStep
 
 
-def dependencies(
-    project: Project,
-    force: bool = False
-) -> bool:
-    """
-
-    :param project:
-    :param force:
-    :return:
-    """
-
-    for pd in project.dependencies:
-        if not source.source_dependency(project, pd):
-            return False
-
-    return True
-
-
 def initialize(project: typing.Union[str, Project]):
     """
 
@@ -93,9 +75,6 @@ def section(
     if project is None:
         project = cauldron.project.internal_project
 
-    if not dependencies(project):
-        return None
-
     starting_index = 0
     if starting:
         starting_index = project.steps.index(starting)
@@ -144,9 +123,6 @@ def complete(
 
     if project is None:
         project = cauldron.project.internal_project
-
-    if not dependencies(project):
-        return None
 
     starting_index = 0
     if starting:

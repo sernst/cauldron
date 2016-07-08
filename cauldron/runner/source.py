@@ -1,4 +1,4 @@
-import functools
+import io
 import os
 import sys
 import time
@@ -11,88 +11,7 @@ import cauldron
 from cauldron import environ
 from cauldron import templating
 from cauldron.session.projects import Project
-from cauldron.session.projects import ProjectDependency
 from cauldron.session.projects import ProjectStep
-from cauldron.runner import printing
-
-
-def step_print(
-        project: Project,
-        *args, sep='',
-        end='\n',
-        file=None,
-        flush=False
-):
-    """
-
-    :param project:
-    :param args:
-    :param sep:
-    :param end:
-    :param file:
-    :param flush:
-    :return:
-    """
-
-    project_step = project.current_step
-
-    if hasattr(project_step, 'report'):
-        text = '\t'.join([str(x) for x in args])
-        project_step.report.text(text, preformatted=True)
-
-    print(*args, sep=sep, end='\n', file=file, flush=flush)
-
-
-def source_dependency(
-        project: Project,
-        dependency: ProjectDependency
-) -> bool:
-    """
-
-    :param project:
-    :param dependency:
-    :return:
-    """
-
-    if isinstance(dependency, str):
-        found = False
-        for pd in project.dependencies:
-            if pd.definition.name == dependency:
-                dependency = pd
-                found = True
-                break
-
-        if not found:
-            return False
-
-    status = check_status(project, dependency)
-    if status['code'] == 'NOT-FOUND':
-        environ.log('[{name}]: Dependency Not found "{path}"'.format(
-            name=dependency.definition.name,
-            path=status['path']
-        ))
-        return False
-
-    dependency.error = None
-    if status['code'] == 'SKIP':
-        return True
-
-    os.chdir(os.path.dirname(status['path']))
-    project.current_step = None
-
-    # Set the top-level display and cache values to the current project values
-    # before running the step for availability within the step scripts
-    cauldron.shared = cauldron.project.shared
-
-    result = run_python_file(project, dependency)
-    if result['success']:
-        environ.log('[{}]: Updated'.format(dependency.definition.name))
-        return True
-
-    environ.log_raw(result['message'])
-    dependency.error = result['html_message']
-
-    return False
 
 
 def run_step(
@@ -130,9 +49,10 @@ def run_step(
             path=status['path']
         ).console(
             '[{id}]: Not found "{path}"'.format(
-            id=step.definition.name,
-            path=status['path']
-        ))
+                id=step.definition.name,
+                path=status['path']
+            )
+        )
         return False
 
     step.error = None
@@ -237,6 +157,12 @@ def run_python_file(
         project: Project,
         target,
 ) -> dict:
+    """
+
+    :param project:
+    :param target:
+    :return:
+    """
 
     step = project.current_step
     module_name = target.definition.name.rsplit('.', 1)[0]
@@ -259,7 +185,9 @@ def run_python_file(
 
     # Create a print equivalent function that also writes the output to the
     # project page
-    print_redirect = printing.BufferedStringIO()
+    # print_redirect = printing.BufferedStringIO()
+    # noinspection PyTypeChecker
+    print_redirect = io.TextIOWrapper(io.BytesIO(), sys.stdout.encoding)
     sys.stdout = print_redirect
     step.report.print_buffer = print_redirect
 

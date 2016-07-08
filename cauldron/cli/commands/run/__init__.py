@@ -165,17 +165,6 @@ def execute(
 
     runner.reload_libraries()
 
-    has_dirty_dependency = False
-    for dep in project.dependencies:
-        if dep.is_dirty():
-            has_dirty_dependency = True
-            break
-
-    if has_dirty_dependency:
-        environ.log_header('SOURCING', 5)
-        if not runner.dependencies(project):
-            return
-
     environ.log_header('RUNNING', 5)
 
     if single_step:

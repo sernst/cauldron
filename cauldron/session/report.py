@@ -21,7 +21,7 @@ class Report(object):
         self.subtitle = self.definition.get('subtitle')
         self.summary = self.definition.get('summary')
         self.library_includes = []
-        self.print_buffer = None  # type: io.StringIO
+        self.print_buffer = None  # type: io.TextIOWrapper
 
     @property
     def project(self):
@@ -67,7 +67,12 @@ class Report(object):
         if not self.print_buffer:
             return
 
-        contents = self.print_buffer.getvalue()
-        self.print_buffer.truncate(0)
-        self.print_buffer.seek(0)
-        self.body.append(render_texts.preformatted_text(contents))
+        pb = self.print_buffer
+
+        pb.seek(0)
+        contents = pb.read()
+        pb.truncate(0)
+        pb.seek(0)
+
+        if len(contents) > 0:
+            self.body.append(render_texts.preformatted_text(contents))

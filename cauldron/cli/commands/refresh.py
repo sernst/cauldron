@@ -8,8 +8,7 @@ from cauldron import session
 NAME = 'refresh'
 DESCRIPTION = """
     Rewrites the current state of the project to the results directory for
-    viewing. Useful when you want to update included and dependency files
-    without re-running the analysis steps.
+    viewing. Useful when you want to update support files.
     """
 
 

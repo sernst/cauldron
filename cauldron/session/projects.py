@@ -173,103 +173,6 @@ class ProjectStep(object):
         )
 
 
-class ProjectDependency(object):
-    """
-
-    """
-
-    def __init__(
-            self,
-            project: 'Project' = None,
-            definition: definitions.FileDefinition = None
-    ):
-        self.definition = definition
-        self.project = project
-        self.last_modified = None
-        self._is_dirty = True
-        self.error = None
-        self.is_muted = False
-
-    @property
-    def id(self) -> str:
-        if not self.definition:
-            return None
-        return self.definition.get('name', 'unknown')
-
-    @property
-    def filename(self) -> str:
-        return os.path.join(
-            self.definition.get('folder', ''),
-            self.definition.get('file', '')
-        )
-
-    @property
-    def source_path(self) -> str:
-        if not self.project:
-            return None
-        return os.path.join(self.project.source_directory, self.filename)
-
-    def kernel_serialize(self):
-        """
-
-        :return:
-        """
-
-        return dict(
-            name=self.definition.name,
-            slug=self.definition.slug,
-            source_path=self.source_path,
-            last_modified=self.last_modified,
-            is_dirty=self.is_dirty()
-        )
-
-    def is_dirty(self):
-        """
-
-        :return:
-        """
-        if self._is_dirty:
-            return self._is_dirty
-
-        if self.last_modified is None:
-            return True
-        p = self.source_path
-        if not p:
-            return False
-        return os.path.getmtime(p) >= self.last_modified
-
-    def mark_dirty(self, value):
-        """
-
-        :param value:
-        :return:
-        """
-
-        self._is_dirty = bool(value)
-
-    def dumps(self):
-        """
-
-        :return:
-        """
-
-        code_file_path = os.path.join(
-            self.project.source_directory,
-            self.filename
-        )
-
-        return templating.render_template(
-            'project-dependency.html',
-            code=render.code_file(code_file_path),
-            path=code_file_path,
-            filename=self.filename,
-            id=self.definition.name,
-            title=self.definition.get('title', self.definition.get('name')),
-            subtitle=self.definition.get('subtitle'),
-            summary=self.definition.get('summary')
-        )
-
-
 class Project(object):
 
     def __init__(
@@ -299,7 +202,6 @@ class Project(object):
         self.source_directory = source_directory
 
         self.steps = []  # type: typing.List[ProjectStep]
-        self.dependencies = []  # type: typing.List[ProjectDependency]
         self._results_path = results_path  # type: str
         self._current_step = None  # type: ProjectStep
         self.last_modified = None
@@ -333,9 +235,6 @@ class Project(object):
 
         for s in self.steps:
             if s.error:
-                return True
-        for d in self.dependencies:
-            if d.error:
                 return True
         return False
 
@@ -468,8 +367,7 @@ class Project(object):
             url=self.url,
             title=self.title,
             id=self.id,
-            steps=[s.kernel_serialize() for s in self.steps],
-            dependencies=[d.kernel_serialize() for d in self.dependencies]
+            steps=[s.kernel_serialize() for s in self.steps]
         )
 
     def refresh(self) -> bool:
@@ -514,40 +412,8 @@ class Project(object):
         for step_data in self.settings.fetch('steps', []):
             self.add_step(step_data)
 
-        self.dependencies = []
-        for dep_data in self.settings.fetch('dependencies', []):
-            self.add_dependency(dep_data)
-
         self.last_modified = time.time()
         return True
-
-    def add_dependency(
-            self,
-            dependency_data: typing.Union[str, dict],
-    ) -> ProjectDependency:
-        """
-
-        :param dependency_data:
-        :return:
-        """
-
-        fd = definitions.FileDefinition(
-            data=dependency_data,
-            project=self,
-            project_folder=functools.partial(
-                self.settings.fetch,
-                'dependencies_folder'
-            )
-        )
-
-        if not fd.name:
-            self.last_modified = 0
-            return None
-
-        dep = ProjectDependency(self, fd)
-        self.dependencies.append(dep)
-        self.last_modified = time.time()
-        return dep
 
     def index_of_step(self, name) -> int:
         """
@@ -641,8 +507,7 @@ class Project(object):
             path = self.source_path
 
         self.settings.put(
-            steps=[ps.definition.serialize() for ps in self.steps],
-            dependencies=[pd.definition.serialize() for pd in self.dependencies]
+            steps=[ps.definition.serialize() for ps in self.steps]
         )
 
         data = self.settings.fetch(None)

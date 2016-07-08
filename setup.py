@@ -3,21 +3,29 @@ import json
 from setuptools import setup
 from setuptools import find_packages
 
+# python3 setup.py register -r pypitest
+
+# python3 setup.py sdist bdist_wheel
+# twine upload dist/cauldron_notebook-0.0.1*
+
 MY_DIRECTORY = os.path.dirname(__file__)
 with open(os.path.join(MY_DIRECTORY, 'package_data.json'), 'r+') as f:
     package_data = json.load(f)
 
 setup(
-    name='cauldron',
+    name='cauldron-notebook',
     version=package_data['version'],
-    description='Un-Notebook Data Science',
+    description='The Un-Notebook Notebook: Scientific Analysis Environment',
     url='https://github.com/sernst/cauldron',
     author='Scott Ernst',
     author_email='swernst@gmail.com',
     license='MIT',
     packages=find_packages(exclude=['contrib', 'docs', 'tests*']),
     zip_safe=False,
-    scripts=['bin/cauldron', 'bin/cauldron-server'],
+    scripts=[
+        'bin/cauldron',
+        'bin/cauldron-server'
+    ],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
@@ -41,5 +49,7 @@ setup(
         'matplotlib': ['matplotlib'],
         'bokeh': ['bokeh'],
         'seaborn': ['seaborn']
-    }
+    },
+    test_suite='nose.collector',
+    tests_require=['nose', 'nose-cover3']
 )
