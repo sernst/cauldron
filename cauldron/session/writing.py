@@ -92,6 +92,13 @@ def write_project(project: 'projects.Project'):
 
 
 def copy_files(file_copies: dict, project: 'projects.Project'):
+    """
+
+    :param file_copies:
+    :param project:
+    :return:
+    """
+
     if not file_copies:
         return
 
@@ -105,6 +112,13 @@ def copy_files(file_copies: dict, project: 'projects.Project'):
 
 
 def write_files(file_writes: dict, project: 'projects.Project'):
+    """
+
+    :param file_writes:
+    :param project:
+    :return:
+    """
+
     if not file_writes:
         return
 
@@ -119,6 +133,12 @@ def write_files(file_writes: dict, project: 'projects.Project'):
 
 
 def add_web_includes(include_paths: list, project: 'projects.Project') -> list:
+    """
+
+    :param include_paths:
+    :param project:
+    :return:
+    """
 
     web_includes = []
 
@@ -219,7 +239,10 @@ def add_global_component(name, step):
         # results folder, not the project itself. They are for shared
         # resource files
         out.append({
-            'name': 'components-{}-{}'.format(name, slug.replace('/', '_')),
+            'name': 'components-{}-{}'.format(
+                name,
+                slug.strip('/').replace('/', '_').replace('.', '_')
+            ),
             'src': ':components/{}{}'.format(name, slug)
         })
 

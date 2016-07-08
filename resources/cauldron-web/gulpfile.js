@@ -10,8 +10,22 @@ var gulpif = require('gulp-if');
 var minimist = require('minimist');
 var rename = require('gulp-rename');
 
-var taskName = process.argv[1];
 var destRoot = '../web';
+var taskName = null;
+process.argv.some(function (arg) {
+  switch (arg) {
+    case 'develop':
+      taskName = 'develop';
+      return true;
+
+    case 'build':
+      taskName = 'build';
+      return true;
+  }
+
+  return false;
+});
+
 
 /**
  *

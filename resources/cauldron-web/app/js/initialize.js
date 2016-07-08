@@ -82,7 +82,9 @@
       filename = exports.DATA_DIRECTORY + include.src;
     }
 
-    if ($('#' + include.name).length > 0) {
+
+    var existing = window.document.getElementById(include.name);
+    if (existing) {
       // If the source file is already loaded, don't load it again
       return Promise.resolve();
     }
