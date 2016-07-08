@@ -1,4 +1,7 @@
-<div class="cd-project-step" id="{{ "project-step" | id }}">
+<div class="cd-project-step"
+     id="{{ "project-step" | id }}"
+     data-step-name="{{ id }}"
+>
   <a name="{{ id }}"></a>
   <div class="header standard">
 
@@ -14,7 +17,7 @@
       <i class="material-icons opened-icon">keyboard_arrow_up</i>
       {% endif %}
       <div>
-        <div class="title">{{ title if title else id }}</div>
+        <div class="title cd-step-title">{{ title if title else id }}</div>
         {% if subtitle %}
         <div class="subtitle">{{ subtitle }}</div>
         {% endif %}

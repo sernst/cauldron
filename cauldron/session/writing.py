@@ -19,14 +19,10 @@ except Exception:
     plotly_offline = None
 
 
-def write_step(
-        step: 'projects.ProjectStep',
-        project: 'projects.Project'
-) -> dict:
+def write_step(step: 'projects.ProjectStep') -> dict:
     """
 
     :param step:
-    :param project:
     :return:
     """
 
@@ -34,7 +30,6 @@ def write_step(
         name=step.definition.name,
         status=step.status(),
         has_error=False,
-        head=None,
         body=None,
         data=dict(),
         includes=[]
@@ -44,16 +39,19 @@ def write_step(
         return out
 
     out['has_error'] = step.error
-    out['body'] = step.dumps()
+
+    if step.dom is None:
+        step.dumps()
+    out['body'] = step.dom
 
     report = step.report
     out['data'].update(report.data.fetch(None))
     out['includes'] += (
-        add_web_includes(step.web_includes, project) +
+        add_web_includes(step.web_includes, step.project) +
         add_components(step)
     )
 
-    write_files(report.files.fetch(None), project)
+    write_files(report.files.fetch(None), step.project)
 
     return out
 
@@ -75,7 +73,7 @@ def write_project(project: 'projects.Project'):
 
     steps = []
     for step in project.steps:
-        steps.append(write_step(step, project))
+        steps.append(write_step(step))
 
     with open(project.output_path, 'w+') as f:
         # Write the results file

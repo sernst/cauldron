@@ -5,6 +5,7 @@ import shutil
 import cauldron
 from cauldron import environ
 from cauldron.session.projects import Project
+from cauldron.session import writing
 
 
 def index_from_location(project: Project, location: str = None) -> int:
@@ -111,9 +112,19 @@ def create_step(
 
     project.save()
 
+    index = project.steps.index(result)
+
+    step_changes = [dict(
+        name=result.definition.name,
+        action='added',
+        step=writing.write_step(result),
+        after=None if index < 1 else project.steps[index - 1].definition.name
+    )]
+
     environ.output.update(
         project=project.kernel_serialize(),
-        step_name=result.definition.name
+        step_name=result.definition.name,
+        step_changes=step_changes
     ).notify(
         kind='CREATED',
         code='STEP_CREATED',
@@ -150,8 +161,14 @@ def remove_step(name: str, keep_file: bool = False):
     if not keep_file:
         os.remove(step.source_path)
 
+    step_changes = [dict(
+        name=name,
+        action='removed'
+    )]
+
     environ.output.update(
-        project=project.kernel_serialize()
+        project=project.kernel_serialize(),
+        step_changes=step_changes
     ).notify(
         kind='SUCCESS',
         code='STEP_REMOVED',
@@ -216,9 +233,19 @@ def modify_step(
 
     project.save()
 
+    index = project.steps.index(new_step)
+
+    step_changes = [dict(
+        name=old_step.definition.name,
+        action='modified',
+        new_name=new_step.definition.name,
+        after=None if index < 1 else project.steps[index - 1].definition.name
+    )]
+
     environ.output.update(
         project=project.kernel_serialize(),
-        step_name=new_step.definition.name
+        step_name=new_step.definition.name,
+        step_changes=step_changes
     ).notify(
         kind='SUCCESS',
         code='STEP_MODIFIED',

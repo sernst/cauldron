@@ -32,6 +32,7 @@ process.argv.some(function (arg) {
  */
 gulp.task('build-js', function () {
   return gulp.src([
+    'app/js/utils.js',
     'app/js/initialize.js',
     'app/js/app/**/*.js',
     'app/js/run.js'

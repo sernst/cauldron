@@ -68,6 +68,7 @@ def run_step(
     os.chdir(os.path.dirname(status['path']))
     project.current_step = step
     step.report.clear()
+    step.dom = None
 
     # Set the top-level display and cache values to the current project values
     # before running the step for availability within the step scripts
@@ -81,6 +82,7 @@ def run_step(
         step.last_modified = time.time()
         environ.log('[{}]: Updated'.format(step.definition.name))
         step.mark_dirty(False)
+        step.dumps()
         return True
 
     if status['path'].endswith('.html'):
@@ -94,6 +96,7 @@ def run_step(
         step.last_modified = time.time()
         environ.log('[{}]: Updated'.format(step.definition.name))
         step.mark_dirty(False)
+        step.dumps()
         return True
 
     # Mark the downstream steps as dirty because this one has run
@@ -102,6 +105,7 @@ def run_step(
     result = run_python_file(project, step)
     if result['success']:
         environ.log('[{}]: Updated'.format(step.definition.name))
+        step.dumps()
         return True
 
     step.error = result['html_message']
@@ -116,6 +120,8 @@ def run_step(
     ).console_raw(
         result['message']
     )
+
+    step.dumps()
 
     return False
 

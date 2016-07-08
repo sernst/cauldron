@@ -4,6 +4,7 @@
   var exports = window.CAULDRON || {};
   window.CAULDRON = exports;
 
+  var previousWidth = -100;
 
   /**
    * Function called when
@@ -14,6 +15,13 @@
       // race conditions during the load process of external libraries
       return;
     }
+
+    var width = $(window).width();
+    if (Math.abs(width - previousWidth) < 10) {
+      return;
+    }
+
+    previousWidth = width;
 
     exports.resizeCallbacks.forEach(function (func) {
       func();

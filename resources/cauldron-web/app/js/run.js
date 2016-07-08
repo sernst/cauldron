@@ -47,27 +47,12 @@
    *
    */
   function run() {
-    var dataDirectory = window.PROJECT_DIRECTORY;
-    var id = exports.PARAMS['id'];
-    var sid = exports.PARAMS['sid'];
-
-    if (!dataDirectory) {
-      dataDirectory = 'reports/' + id;
-      if (sid) {
-        dataDirectory += '/snapshots/' + sid;
-      } else {
-        dataDirectory += '/latest';
-      }
-    }
-
-    exports.DATA_DIRECTORY = dataDirectory;
-    
-    return exports.loadDataFile()
+    return exports.initialize()
         .then(function () {
           var title = exports.SETTINGS.title || exports.SETTINGS.id || id;
           var body = $('body');
   
-          if (sid) {
+          if (exports.PARAMS['sid']) {
             $('<div></div>')
                 .addClass('snapshot-bar')
                 .text('Snapshot: ' + exports.PARAMS['sid'])

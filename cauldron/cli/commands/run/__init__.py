@@ -8,6 +8,7 @@ from cauldron import environ
 from cauldron import runner
 from cauldron.cli.commands.run import actions as run_actions
 from cauldron.cli.interaction import autocompletion
+from cauldron.session import writing
 
 NAME = 'run'
 DESCRIPTION = cli.reformat("""
@@ -167,13 +168,15 @@ def execute(
 
     environ.log_header('RUNNING', 5)
 
+    steps_run = []
+
     if single_step:
         # If the user specifies the single step flag, only run one step. Force
         # the step to be run if they specified it explicitly
 
         ps = project_steps[0] if len(project_steps) > 0 else None
         force = force or (single_step and bool(ps is not None))
-        runner.section(project, ps, limit=1, force=force)
+        steps_run = runner.section(project, ps, limit=1, force=force)
 
     elif continue_after or len(project_steps) == 0:
         # If the continue after flag is set, start with the specified step
@@ -181,17 +184,14 @@ def execute(
         # specified, run the entire project with the specified flags.
 
         ps = project_steps[0] if len(project_steps) > 0 else None
-        runner.complete(project, ps, force=force, limit=limit)
-        environ.log_blanks()
-        return
+        steps_run = runner.complete(project, ps, force=force, limit=limit)
 
     else:
-        has_run = []
         for ps in project_steps:
-            if ps in has_run:
+            if ps in steps_run:
                 continue
 
-            has_run += runner.section(
+            steps_run += runner.section(
                 project, ps,
                 limit=max(1, limit),
                 force=force or (limit < 1 and len(project_steps) < 2)
@@ -199,6 +199,18 @@ def execute(
 
     project.write()
     environ.log_blanks()
+
+    step_changes = []
+    for ps in steps_run:
+        step_changes.append(dict(
+            name=ps.definition.name,
+            action='updated',
+            step=writing.write_step(ps)
+        ))
+
+    environ.output.update(
+        step_changes=step_changes
+    )
 
     if print_status or environ.output.failed:
         environ.output.update(

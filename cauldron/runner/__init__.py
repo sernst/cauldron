@@ -94,12 +94,10 @@ def section(
 
         steps_run.append(ps)
         if not source.run_step(project, ps, force=force):
-            project.write()
-            return None
+            return steps_run
 
         count += 1
 
-    project.write()
     return steps_run
 
 
@@ -108,7 +106,7 @@ def complete(
         starting: ProjectStep = None,
         force: bool = False,
         limit: int = -1
-) -> str:
+) -> list:
     """
     Runs the entire project, writes the results files, and returns the URL to
     the report file
@@ -129,6 +127,8 @@ def complete(
         starting_index = project.steps.index(starting)
     count = 0
 
+    steps_run = []
+
     for ps in project.steps:
         if 0 < limit <= count:
             break
@@ -145,9 +145,9 @@ def complete(
 
         count += 1
 
+        steps_run.append(ps)
         if not source.run_step(project, ps, force=True):
-            project.write()
-            return None
+            return steps_run
 
-    return project.write()
+    return steps_run
 

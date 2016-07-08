@@ -34,6 +34,7 @@ class ProjectStep(object):
         self._is_dirty = True
         self.error = None
         self.is_muted = False
+        self.dom = None
 
     @property
     def filename(self) -> str:
@@ -160,7 +161,7 @@ class ProjectStep(object):
             body.find('<li') != -1
         )
 
-        return templating.render_template(
+        self.dom = templating.render_template(
             'step-body.html',
             codes=codes,
             body=body,
@@ -169,8 +170,10 @@ class ProjectStep(object):
             title=self.report.title,
             subtitle=self.report.subtitle,
             summary=self.report.summary,
-            error=self.error
+            error=self.error,
+            index=self.index
         )
+        return self.dom
 
 
 class Project(object):
@@ -179,7 +182,6 @@ class Project(object):
             self,
             source_directory: str,
             results_path: str = None,
-            identifier: str = None,
             shared: typing.Union[dict, SharedCache] = None
     ):
         """
@@ -188,9 +190,6 @@ class Project(object):
             [optional] The path where the results files for the project will
             be saved. If omitted, the default global results path will be
             used.
-        :param identifier:
-            [optional] The project unique identifier. If omitted, the
-            identifier will be loaded from the settings file, or assigned
         :param shared:
             [optional] The shared data cache used to store project data when
             run
