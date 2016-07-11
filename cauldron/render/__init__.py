@@ -17,7 +17,6 @@ except ImportError:
     plotly_lib = None
 
 
-
 def listing(source: list, ordered: bool = False) -> str:
     """
 

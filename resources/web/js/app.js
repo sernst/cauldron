@@ -279,7 +279,7 @@
    */
   function loadSourceFiles(includes) {
     if (!includes) {
-      return Promise.resolve();
+      return Promise.resolve([]);
     }
 
     var proms = [];
@@ -296,6 +296,10 @@
    *
    */
   function loadStepIncludes(steps) {
+    if (!steps) {
+      return Promise.resolve([]);
+    }
+
     var proms = [];
     steps.forEach(function (step) {
       if (!step) {

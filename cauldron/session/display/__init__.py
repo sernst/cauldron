@@ -323,3 +323,25 @@ def latex(source: str):
         r.library_includes.append('katex')
 
     r.append_body(render_texts.latex(source.replace('@', '\\')))
+
+
+def head(source, count: int = 5):
+    """
+
+    :param source:
+    :param count:
+    :return:
+    """
+
+    _get_report().append_body(render_texts.head(source, count=count))
+
+
+def tail(source, count: int = 5):
+    """
+
+    :param source:
+    :param count:
+    :return:
+    """
+
+    _get_report().append_body(render_texts.tail(source, count=count))

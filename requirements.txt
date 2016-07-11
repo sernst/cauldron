@@ -5,7 +5,7 @@ numpy
 jinja2
 markdown
 pygments
-pyquery
+beautifulsoup4
 flask
 plotly
 matplotlib

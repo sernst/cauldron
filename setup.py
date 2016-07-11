@@ -41,7 +41,7 @@ setup(
         'jinja2',
         'markdown',
         'pygments',
-        'pyquery',
+        'beautifulsoup4',
         'flask'
     ],
     extras_require={

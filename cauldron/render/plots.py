@@ -1,6 +1,6 @@
 import typing
 import io
-from pyquery import PyQuery as pq
+from bs4 import BeautifulSoup
 
 from cauldron import templating
 
@@ -50,19 +50,29 @@ def pyplot(
         dpi=300
     )
     buffer.seek(0)
-    svg_dta = buffer.read()
+    svg_data = buffer.read()
 
     if clear:
         figure.clear()
 
-    dom = pq('<div class="cd-pylab-plot">{}</div>'.format(svg_dta))
-    svg = dom('svg')
-    svg.add_class('cd-pylab-svg')
-    svg.css('max-height', '{}vh'.format(int(100.0 * scale)))
-    svg.attr('width', '100%')
-    svg.attr('height', '100%')
+    soup = BeautifulSoup(svg_data, 'html.parser')
 
-    return dom.html()
+    svg_tag = soup.find_all('svg')[0]
+    svg_tag['width'] = '100%'
+    svg_tag['height'] = '100%'
+
+    classes = svg_tag.get('class', '').strip().split(' ')
+    classes.append('cd-pylab-svg')
+    svg_tag['class'] = '\n'.join(classes)
+
+    styles = [
+        s for s in svg_tag.get('style', '').split(';')
+        if len(s.strip()) > 1
+    ]
+    styles.append('max-height:{}vh;'.format(int(100.0 * scale)))
+    svg_tag['style'] = ';'.join(styles)
+
+    return '<div class="cd-pylab-plot">{}</div>'.format(soup.prettify())
 
 
 def bokeh_plot(

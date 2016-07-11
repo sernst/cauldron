@@ -25,6 +25,104 @@ def latex(source: str, inline: bool = False) -> str:
     )
 
 
+def head(value, count: int = 5) -> str:
+    """
+
+    :param value:
+    :param count:
+    :return:
+    """
+
+    if count < 1:
+        return ''
+
+    try:
+        if hasattr(value, 'head'):
+            return preformatted_text(
+                '\n'.join(['{}'.format(v) for v in value.head(count)])
+            )
+    except Exception:
+        pass
+
+    if isinstance(value, str):
+        return preformatted_text(
+            '\n'.join(value.split('\n')[:count])
+        )
+
+    if isinstance(value, (list, tuple)):
+        out = ['{}'.format(v) for v in value[:count]]
+        return preformatted_text('\n'.join(out))
+
+    if isinstance(value, dict):
+        out = []
+        for k, v in value.items():
+            if len(out) >= count:
+                break
+            out.append('{}: {}'.format(k, v))
+        return preformatted_text('\n'.join(out))
+
+    try:
+        out = []
+        for v in value:
+            if len(out) >= count:
+                break
+            out.append('{}'.format(v))
+            return preformatted_text('\n'.join(out))
+    except Exception:
+        pass
+
+    out = '{}'.format(value)
+    out = out.split('\n')
+    return '\n'.join(out[:count])
+
+
+def tail(value, count: int = 5) -> str:
+    """
+
+    :param value:
+    :param count:
+    :return:
+    """
+
+    if count < 1:
+        return ''
+
+    try:
+        if hasattr(value, 'tail'):
+            return preformatted_text(
+                '\n'.join(['{}'.format(v) for v in value.tail(count)])
+            )
+    except Exception:
+        pass
+
+    if isinstance(value, str):
+        return preformatted_text(
+            '\n'.join(value.split('\n')[-count:])
+        )
+
+    if isinstance(value, (list, tuple)):
+        out = ['{}'.format(v) for v in value[-count:]]
+        return preformatted_text('\n'.join(out))
+
+    if isinstance(value, dict):
+        out = []
+        for k, v in reversed(value.items()):
+            if len(out) >= count:
+                break
+            out.append('{}: {}'.format(k, v))
+            return preformatted_text('\n'.join(out))
+
+    try:
+        value = list(value)
+        out = ['{}'.format(v) for v in value[-count:]]
+        return preformatted_text('\n'.join(out))
+    except Exception:
+        return ''
+
+    out = '{}'.format(value).split('\n')
+    return '\n'.join(out[-count:])
+
+
 def text(value: str) -> str:
     """
 
