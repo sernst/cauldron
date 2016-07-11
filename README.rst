@@ -1,8 +1,17 @@
 Cauldron
 ========
 
+.. image:: https://badge.fury.io/py/cauldron-notebook.svg
+   :target: https://badge.fury.io/py/cauldron-notebook
+
 .. image:: https://travis-ci.org/sernst/cauldron.svg?branch=master
    :target: https://travis-ci.org/sernst/cauldron
+
+.. image:: https://codecov.io/gh/sernst/cauldron/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/sernst/cauldron
+
+.. image:: https://img.shields.io/badge/license-MIT-blue.svg
+   :target: https://raw.githubusercontent.com/sernst/cauldron/master/LICENSE
 
 The un-notebook notebook: an interactive scientific analysis environment.
 

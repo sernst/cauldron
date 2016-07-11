@@ -1,0 +1,42 @@
+package:
+    name: cauldron
+    version: {{ GIT_DESCRIBE_TAG|replace("v","") }}
+
+build:
+    number: {{ GIT_DESCRIBE_NUMBER|int }}
+    {% if GIT_DESCRIBE_NUMBER|int == 0 %}string: np{{ CONDA_NPY }}py{{ CONDA_PY }}_0
+    {% else %}string: np{{ CONDA_NPY }}py{{ CONDA_PY }}_{{ GIT_BUILD_STR }}{% endif %}
+    noarch_python: True
+
+source:
+    git_url: ../
+
+requirements:
+  build:
+    - python
+    - pandas
+    - numpy
+    - jinja2
+    - markdown
+    - pygments
+    - pyquery
+    - flask
+
+  run:
+    - python
+    - numpy
+    - pandas
+    - jinja2
+    - markdown
+    - pygments
+    - pyquery
+    - flask
+
+test:
+  imports:
+    - cauldron
+
+about:
+  home: https://github.com/sernst/cauldron
+  license: MIT
+  license_file: LICENSE
