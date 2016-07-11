@@ -1,13 +1,13 @@
 package:
     name: cauldron
-    version: "0.0.3"
+    version: "0.0.4"
 
 build:
     number: 1
     noarch_python: True
 
 source:
-    git_rev: "v0.0.3"
+    git_rev: "v0.0.4"
     git_url: https://github.com/sernst/cauldron.git
 
 requirements:
