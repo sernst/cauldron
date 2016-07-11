@@ -100,7 +100,7 @@ def populate(
 
 def execute(
         parser: ArgumentParser,
-        step: list,
+        step: list = None,
         force: bool = False,
         continue_after: bool = False,
         single_step: bool = False,
