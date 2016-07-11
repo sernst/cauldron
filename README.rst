@@ -1,7 +1,8 @@
 Cauldron
 ========
 
-[![Build Status](https://travis-ci.org/sernst/Cadence.svg?branch=master)](https://travis-ci.org/sernst/Cadence)
+.. image:: https://travis-ci.org/sernst/cauldron.svg?branch=master
+   :target: https://travis-ci.org/sernst/cauldron
 
 The un-notebook notebook: an interactive scientific analysis environment.
 
