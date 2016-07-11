@@ -1,6 +1,8 @@
 Cauldron
 ========
 
+[![Build Status](https://travis-ci.org/sernst/Cadence.svg?branch=master)](https://travis-ci.org/sernst/Cadence)
+
 The un-notebook notebook: an interactive scientific analysis environment.
 
 - `About Cauldron`_
@@ -47,9 +49,13 @@ traditional drawbacks of notebooks.
 Installation
 ------------
 
-Cauldron is in the early development stages, and so is not yet available on
-PyPi. Instead you will need to install pip install directly from the Github
-page::
+Install Cauldron from PyPi for the latest stable release:
+
+    $ pip install cauldron-notebook
+
+Cauldron is in the early development stages and changes fast. To keep up with
+the latest developments, install directly from the Github page instead of from
+PyPi::
 
     $ pip install git+https://github.com/sernst/cauldron.git
 
