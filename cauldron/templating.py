@@ -16,13 +16,29 @@ from cauldron.render import utils
 BASE_TIME = time.time()
 JINJA_ENVIRONMENT = Environment()
 
+
 @contextfilter
 def get_id(context: Context, prefix: str) -> str:
     """
+    A jinja2 context filter for creating reusable unique identifiers within a
+    cauldron display. The uid is designed to be unique within each step within
+    a project, as well as unique each time that step is rendered. A UID is
+    made up of three pieces::
+
+        cdi-[PREFIX]-[RENDER_HASH]
+
+    The "cdi" is a universal prefix that prevents any possible collision with
+    non-cauldron IDs in the page. The [PREFIX] is supplied by the prefix
+    argument to separate different IDs inside the same render step. The
+    [RENDER_HASH] is a unique character string that is created uniquely each
+    time a render step completes.
 
     :param context:
+        Jinja2 context in which this filter is being applied
     :param prefix:
+        Prefix string that indicates which uid is being created within a step
     :return:
+        A uniquely identifying string
     """
 
     return 'cdi-{}-{}'.format(
@@ -86,10 +102,15 @@ def get_environment() -> Environment:
 
 def render(template: typing.Union[str, Template], **kwargs):
     """
+    Renders a template string using Jinja2 and the Cauldron templating
+    environment.
 
     :param template:
+        The string containing the template to be rendered
     :param kwargs:
+        Any named arguments to pass to Jinja2 for use in rendering
     :return:
+        The rendered template string
     """
 
     if not hasattr(template, 'render'):
@@ -103,10 +124,16 @@ def render(template: typing.Union[str, Template], **kwargs):
 
 def render_file(path: str, **kwargs):
     """
+    Renders a file at the specified absolute path. The file can reside
+    anywhere on the local disk as Cauldron's template environment path
+    searching is ignored.
 
     :param path:
+        Absolute path to a template file to render
     :param kwargs:
+        Named arguments that should be passed to Jinja2 for rendering
     :return:
+        The rendered template string
     """
 
     with open(path, 'r+') as f:
@@ -120,10 +147,16 @@ def render_file(path: str, **kwargs):
 
 def render_template(template_name: str, **kwargs):
     """
+    Renders the template file with the given filename from within Cauldron's
+    template environment folder.
 
     :param template_name:
+        The filename of the template to render. Any path elements should be
+        relative to Cauldron's root template folder.
     :param kwargs:
+        Any elements passed to Jinja2 for rendering the template
     :return:
+        The rendered string
     """
 
     return get_environment().get_template(template_name).render(

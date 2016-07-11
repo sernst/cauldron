@@ -1,6 +1,8 @@
 Cauldron
 ========
 
+The un-notebook notebook: an interactive scientific analysis environment.
+
 .. image:: https://badge.fury.io/py/cauldron-notebook.svg
    :target: https://badge.fury.io/py/cauldron-notebook
 
@@ -13,8 +15,6 @@ Cauldron
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg
    :target: https://raw.githubusercontent.com/sernst/cauldron/master/LICENSE
 
-The un-notebook notebook: an interactive scientific analysis environment.
-
 - `About Cauldron`_
 - `Installation`_
 - `Getting Started`_
@@ -24,7 +24,7 @@ The un-notebook notebook: an interactive scientific analysis environment.
 About Cauldron
 --------------
 
-Cauldron blends the key functionality of notebook-style editing:
+Cauldron combines the crucial workflow of notebook-style editing:
 
 - **Data Persistence**: Shared variables are stored in memory between
   executions to avoid having to run every step from the beginning each time.
@@ -33,9 +33,8 @@ Cauldron blends the key functionality of notebook-style editing:
 - **Segmented Code Execution**: Code is run in distinct steps (just like
   notebook cells), and you control when and which steps are run.
 
-with the best elements of traditional software development:
+with the best elements of traditional software development workflow:
 
-- **Free From Browser Coding**: Face it, coding in browsers is less than ideal.
 - **Your Choice of IDE**: Modern modern IDEs have excellent productivity
   features like extensive customization, real-time error checking,
   intelligent code completion and efficient project navigation. Use whichever
@@ -53,19 +52,24 @@ with the best elements of traditional software development:
 
 With Cauldron you write code in your choice of interactive development
 environment (IDE) or text editor, and run it using the Cauldron shell like a
-notebook. The result is an notebook-style HTML output page, without the
+notebook. The result is a notebook-style HTML output page, without the
 traditional drawbacks of notebooks.
 
 Installation
 ------------
 
-Install Cauldron from PyPi for the latest stable release::
+The latest release of Cauldron is available from both PyPi::
 
     $ pip install cauldron-notebook
 
-Cauldron is in the early development stages and changes fast. To keep up with
-the latest developments, install directly from the Github page instead of from
-PyPi::
+and Anaconda::
+
+   $ conda install -c sernst cauldron
+
+Because Cauldron is still in the early stages of development and rapidly
+evolving, the latest releases can lag behind the development version. If you
+want keep up with the latest developments, install directly from the Github
+page instead of from PyPi::
 
     $ pip install git+https://github.com/sernst/cauldron.git
 
@@ -80,15 +84,15 @@ Getting Started
 ---------------
 
 Once the installation is complete, you'll have access to the Cauldron shell
-from a terminal. Simply run the command::
+from a terminal. Cauldron is a shell-based program you start from a terminal
+with the ``cauldron`` command::
 
     $ cauldron
 
-to start the shell. Cauldron is a shell-based program you start from a terminal
-with the ``cauldron`` command. Once started, the Cauldron shell provides all
-of the functionality you need to manage your analysis projects through a
-collection of commands. To see a list of available commands and their basic
-descriptions use the ``?`` or ``help`` command on the Cauldron prompt::
+Once started, the Cauldron shell provides all of the functionality you need to
+manage your analysis projects through a collection of commands. To see a list
+of available commands and their basic descriptions use the ``?`` or ``help``
+command on the Cauldron prompt::
 
     <>: ?
 
