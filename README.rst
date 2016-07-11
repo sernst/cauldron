@@ -59,7 +59,7 @@ traditional drawbacks of notebooks.
 Installation
 ------------
 
-Install Cauldron from PyPi for the latest stable release:
+Install Cauldron from PyPi for the latest stable release::
 
     $ pip install cauldron-notebook
 
