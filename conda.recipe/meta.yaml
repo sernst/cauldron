@@ -1,13 +1,13 @@
 package:
     name: cauldron
-    version: "0.0.2"
+    version: "0.0.3"
 
 build:
     number: 1
     noarch_python: True
 
 source:
-    git_rev: "v0.0.2"
+    git_rev: "v0.0.3"
     git_url: https://github.com/sernst/cauldron.git
 
 requirements:
@@ -18,7 +18,7 @@ requirements:
     - jinja2
     - markdown
     - pygments
-    - pyquery
+    - beautifulsoup4
     - flask
 
   run:
