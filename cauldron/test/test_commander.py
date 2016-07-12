@@ -1,8 +1,10 @@
-import unittest
-
 import os
-from cauldron.cli import commander
+import unittest
+from unittest import mock
+
 from cauldron import environ
+from cauldron.cli import commander
+from cauldron.environ import Response
 
 
 class TestCommander(unittest.TestCase):
@@ -26,7 +28,26 @@ class TestCommander(unittest.TestCase):
         )
 
         commands_again = commander.fetch()
-        self.assertEqual(commands, commands_again)
+        self.assertEqual(
+            commands, commands_again,
+            'Command dictionaries should be the same'
+        )
+
+    def test_print_module_help(self):
+        """
+
+        :return:
+        """
+
+        target = 'cauldron.environ.response.ResponseMessage.console'
+        with mock.patch(target) as console_func:
+            r = Response()
+            environ.output = r
+            commander.print_module_help()
+            self.assertEqual(1, console_func.call_count)
+
+
+
 
 
 ################################################################################

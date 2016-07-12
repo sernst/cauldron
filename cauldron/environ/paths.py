@@ -46,3 +46,17 @@ def resources(*args: typing.List[str]) -> str:
     """
 
     return package('resources', *args)
+
+
+def user(*args: typing.List[str]) -> str:
+    """
+    Creates an absolute path from the specified relative components within the
+    user's Cauldron app data folder.
+
+    :param args:
+        Relative components of the path relative to the root package
+    :return:
+        The absolute path
+    """
+
+    return clean(os.path.join('~', '.cauldron', *args))

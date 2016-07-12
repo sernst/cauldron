@@ -33,7 +33,7 @@ def fetch(reload: bool = False) -> dict:
         if e and hasattr(e, 'NAME') and hasattr(e, 'DESCRIPTION'):
             COMMANDS[e.NAME] = e
 
-    return COMMANDS
+    return dict(COMMANDS.items())
 
 
 def execute(
@@ -93,23 +93,25 @@ def print_module_help():
     environ.log_blanks()
     entries = dict()
 
+    msg = []
     for key, item in fetch().items():
         if hasattr(item, 'DESCRIPTION'):
             entries[key] = cli.reformat(getattr(item, 'DESCRIPTION'))
 
-            msg = '[{key}]:\n   {description}'.format(
+            msg.append('[{key}]:\n   {description}'.format(
                 key=key,
                 description=entries[key].replace('\n', '\n   ')
-            )
+            ))
 
-            environ.log(msg)
-
-    environ.output.notify(
+    return environ.output.notify(
         kind='INFO',
         code='MODULE_DESCRIPTIONS'
     ).kernel(
         commands=entries
-    )
+    ).console(
+        '\n'.join(msg),
+        whitespace=1
+    ).get_response()
 
 
 def show_help(command_name: str = None, raw_args: str = '') -> Response:
@@ -120,19 +122,32 @@ def show_help(command_name: str = None, raw_args: str = '') -> Response:
 
     cmds = fetch()
     if command_name and command_name in cmds:
-        parser = parse.get_parser(
+        parser, result = parse.get_parser(
             command_name,
-            parse.explode_line(raw_args)
+            parse.explode_line(raw_args),
+            dict()
         )
 
         if parser is not None:
-            parser.print_help()
-            return
+            out = parser.format_help()
+            return environ.output.notify(
+                kind='INFO',
+                code='COMMAND_DESSCRIPTION'
+            ).kernel(
+                commands=out
+            ).console(
+                out,
+                whitespace=1
+            ).get_response()
 
     environ.log_header('Available Commands')
     print_module_help()
 
-    environ.log(
+    return environ.output.fail().notify(
+        kind='ERROR',
+        code='NO_SUCH_COMMAND',
+        message='Failed to show command help for "{}"'.format(command_name)
+    ).console(
         """
         For more information on the various commands, enter help on the
         specific command:
@@ -140,9 +155,7 @@ def show_help(command_name: str = None, raw_args: str = '') -> Response:
             [COMMAND] help
         """,
         whitespace_bottom=1
-    )
-
-    return environ.output
+    ).get_response()
 
 
 def autocomplete(

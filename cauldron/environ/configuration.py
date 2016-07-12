@@ -109,17 +109,18 @@ class Configuration(object):
         else:
             self.session.update(**kwargs)
 
-    def remove(self, *args):
+    def remove(self, *args, include_persists: bool = True):
         """
 
         :param args:
+        :param include_persists:
         :return:
         """
 
         for key in args:
             if key in self.session:
                 del self.session[key]
-            if key in self.load().persistent:
+            if include_persists and key in self.load().persistent:
                 del self.persistent[key]
 
     def save(self) -> 'Configuration':

@@ -136,6 +136,14 @@ class ResponseMessage(object):
         )
         return self
 
+    def get_response(self) -> 'Response':
+        """
+
+        :return:
+        """
+
+        return self.response
+
 
 class Response(object):
     """

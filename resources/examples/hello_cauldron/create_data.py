@@ -8,6 +8,21 @@ df = pd.DataFrame(
 )
 
 cd.display.header('Random Data Frame:')
+cd.display.markdown(
+    """
+    We've created a random data frame with
+
+     * Shape: [{{ x }}, {{ y}}]
+     * Column Names: {{ columns }}
+
+    It looks like:
+    """,
+    x=df.shape[0],
+    y=df.shape[1],
+    columns=', '.join(df.columns.tolist())
+)
+
 cd.display.table(df)
 
+print('We store the DataFrame in shared variables for use by other steps.')
 cd.shared.df = df

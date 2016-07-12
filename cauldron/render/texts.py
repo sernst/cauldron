@@ -117,7 +117,7 @@ def tail(value, count: int = 5) -> str:
         out = ['{}'.format(v) for v in value[-count:]]
         return preformatted_text('\n'.join(out))
     except Exception:
-        return ''
+        pass
 
     out = '{}'.format(value).split('\n')
     return '\n'.join(out[-count:])

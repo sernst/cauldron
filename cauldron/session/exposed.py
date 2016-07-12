@@ -1,8 +1,10 @@
+import os
 import typing
 
 from cauldron.session import projects
 from cauldron.session.caching import SharedCache
 from cauldron.session import report
+from cauldron import environ
 
 
 class ExposedProject(object):
@@ -14,7 +16,7 @@ class ExposedProject(object):
     """
 
     def __init__(self):
-        self._project = None
+        self._project = None  # type: projects.Project
 
     @property
     def internal_project(self) -> projects.Project:
@@ -98,4 +100,23 @@ class ExposedProject(object):
 
         self._project = None
 
+    def path(self, *args: typing.List[str]) -> str:
+        """
+        Creates an absolute path in the project source directory from the
+        relative path components.
 
+        :param args:
+            Relative components for creating a path within the project source
+            directory
+        :return:
+            An absolute path to the specified file or directory within the
+            project source directory.
+        """
+
+        if not self._project:
+            return None
+
+        return environ.paths.clean(os.path.join(
+            self._project.source_directory,
+            *args
+        ))

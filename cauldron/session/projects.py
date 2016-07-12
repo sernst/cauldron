@@ -278,13 +278,14 @@ class Project(object):
         if self._results_path:
             return self._results_path
 
-        if self.settings and self.settings['path_results']:
+        if self.settings and self.settings.fetch('path_results'):
             return self.settings['path_results']
 
-        return environ.configs.make_path(
-            'results',
-            override_key='results_path'
-        )
+        p = environ.configs.fetch('results_directory')
+        if p:
+            return p
+
+        return environ.paths.user('results')
 
     @results_path.setter
     def results_path(self, value: str):

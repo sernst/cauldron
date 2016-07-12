@@ -12,6 +12,9 @@ def remove(path: str):
     :return:
     """
 
+    if not path:
+        return False
+
     if not os.path.exists(path):
         return True
 

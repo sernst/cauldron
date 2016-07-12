@@ -210,10 +210,13 @@ def open_project(path: str) -> bool:
 
     environ.output.update(
         project=project.kernel_serialize()
-    )
-
-    environ.log_header(project.title, level=2)
-    environ.log(
+    ).notify(
+        kind='SUCCESS',
+        code='PROJECT_OPENED',
+        message='Opened project: {}'.format(path)
+    ).console_header(
+        project.title, level=2
+    ).console(
         """
         PATH: {path}
          URL: {url}
