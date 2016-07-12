@@ -9,10 +9,18 @@ COMMANDS = dict()
 
 def fetch(reload: bool = False) -> dict:
     """
+    Returns a dictionary containing all of the available Cauldron commands
+    currently registered. This data is cached for performance. Unless the
+    reload argument is set to True, the command list will only be generated
+    the first time this function is called.
 
     :param reload:
+        Whether or not to disregard any cached command data and generate a
+        new dictionary of available commands.
 
     :return:
+        A dictionary where the keys are the name of the commands and the
+        values are the modules for the command .
     """
 
     if len(list(COMMANDS.keys())) > 0 and not reload:
