@@ -6,6 +6,9 @@ The un-notebook notebook: an interactive scientific analysis environment.
 .. image:: https://badge.fury.io/py/cauldron-notebook.svg
    :target: https://badge.fury.io/py/cauldron-notebook
 
+.. image:: https://anaconda.org/sernst/cauldron/badges/version.svg
+   :target: https://anaconda.org/sernst/cauldron
+
 .. image:: https://travis-ci.org/sernst/cauldron.svg?branch=master
    :target: https://travis-ci.org/sernst/cauldron
 

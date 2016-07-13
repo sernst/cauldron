@@ -55,12 +55,24 @@ def populate(
             """)
     )
 
+    parser.add_argument(
+        '-t', '--temporary',
+        dest='temporary',
+        default=False,
+        action='store_true',
+        help=cli.reformat("""
+            When this option is included, the alias will only remain for this
+            cauldron session. It will not be remembered for future sessions.
+            """)
+    )
+
 
 def execute(
         parser: ArgumentParser,
         command: str = None,
         name: str = None,
-        path: str = None
+        path: str = None,
+        temporary: bool = False
 ):
     """
 
@@ -68,10 +80,10 @@ def execute(
     """
 
     if name:
-        name = name.replace(' ', '_')
+        name = name.replace(' ', '_').strip('"').strip()
 
     if path:
-        path = environ.paths.clean(path)
+        path = environ.paths.clean(path.strip('"'))
         if not os.path.isdir(path):
             path = os.path.dirname(path)
             environ.log(
@@ -104,7 +116,10 @@ def execute(
         aliases[name] = dict(
             path=path
         )
-        environ.configs.put(persists=True, folder_aliases=aliases)
+        environ.configs.put(
+            persists=not bool(temporary),
+            folder_aliases=aliases
+        )
         environ.log(
             '[ADDED]: The alias "{}" has been saved'.format(name),
             whitespace=1

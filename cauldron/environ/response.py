@@ -150,10 +150,11 @@ class Response(object):
 
     """
 
-    def __init__(self):
+    def __init__(self, identifier: str = None):
         """
 
         """
+        self.identifier = identifier
         self.data = dict()
         self.messages = []  # type: typing.List[ResponseMessage]
         self.ended = False
@@ -166,8 +167,9 @@ class Response(object):
         """
 
         out = [
-            '=== Response [{}] ==='.format(
-                'FAILED' if self.failed else 'SUCCESS'
+            '=== [{}] {}Response ==='.format(
+                'FAILED' if self.failed else 'SUCCESS',
+                '{} '.format(self.identifier) if self.identifier else ''
             )
         ]
 

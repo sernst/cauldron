@@ -1,5 +1,8 @@
 {
   "steps": [
-    "hello.py"
+    "hello.py",
+    "portions.py",
+    "variables.py",
+    "equations.py"
   ]
 }

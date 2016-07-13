@@ -89,7 +89,8 @@ def bokeh_plot(
     """
 
     if responsive:
-        model.responsive = True
+        model.sizing_mode = "scale_width"
+        # model.responsive = True
         model.plot_width = 800
         model.plot_height = round((scale * 9 / 16) * 800)
 

@@ -1,21 +1,27 @@
 import cauldron as cd
 
-# Adding text
-cd.display.text('Hello World')
+cd.display.text('You can add text')
 
-# Adding preformatted text
 cd.display.text(
     """
-    * Hello
-    * World
+    You can also
+    add text that
+    preserves formatting
+    by setting the
+
+        "preformatted"
+
+    argument to true
     """,
     preformatted=True
 )
 
-# You can also use the print() function to add preformatted text
 print(
     """
-    Hello World
-    with the print() function
-    """
+    The print() function works just like it normally does, and adds
+    preformatted text. However, you can add more than just text:
+    """,
+    21 * 2,
+    cd
 )
+

@@ -1,6 +1,24 @@
+import re
+import readline
+from unittest.mock import patch
+
 from cauldron import environ
 from cauldron.cli import commander
+from cauldron.cli.shell import CauldronShell
 from cauldron.test.support import scaffolds
+from cauldron.test.support.messages import Message
+
+
+def run_command(command: str) -> 'environ.Response':
+    """
+
+    :param command:
+    :return:
+    """
+
+    cs = CauldronShell()
+    cs.default(command)
+    return environ.output
 
 
 def create_project(
@@ -48,3 +66,26 @@ def open_project(
     commander.execute('open', path, r)
     return r
 
+
+def autocomplete(command: str):
+    """
+
+    :param command:
+    :return:
+    """
+
+    with patch('readline.get_line_buffer', return_value=command):
+        cs = CauldronShell()
+        line = command.lstrip()
+
+        splits = re.split('[{}]{{1}}'.format(
+            re.escape(readline.get_completer_delims())),
+            line
+        )
+
+        return cs.completedefault(
+            text=splits[-1],
+            line=line,
+            begin_index=len(line) - len(splits[-1]),
+            end_index=len(line) - 1
+        )

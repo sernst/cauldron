@@ -174,7 +174,7 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
                 segment,
                 environ.paths.clean(os.path.join(
                     aliases[m[1:-1]]['path'],
-                    value[-1].split(':', 1)[-1]
+                    value.split(':', 1)[-1]
                 )),
                 include_files=False
             )

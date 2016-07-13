@@ -10,7 +10,7 @@ class TestRun(scaffolds.ResultsTest):
         """
         """
 
-        support.open_project(self, '@examples:hello_cauldron')
+        support.open_project(self, '@examples:hello_text')
 
         r = environ.Response()
         commander.execute('run', '', r)

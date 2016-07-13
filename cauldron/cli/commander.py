@@ -47,7 +47,7 @@ def execute(
     """
 
     if not output:
-        output = Response()
+        output = Response(identifier=name)
     environ.output = output
 
     module = fetch().get(name)
