@@ -49,14 +49,3 @@ class TestCommander(unittest.TestCase):
 
 
 
-
-################################################################################
-################################################################################
-
-if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestCommander)
-    unittest.TextTestRunner(verbosity=2).run(suite)
-
-
-
-

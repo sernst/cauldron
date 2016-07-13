@@ -1,8 +1,7 @@
-import unittest
-
 from cauldron import environ
 from cauldron.cli import commander
-from cauldron.test import scaffolds
+from cauldron.test.support import scaffolds
+from cauldron.test import support
 
 
 class TestRun(scaffolds.ResultsTest):
@@ -11,22 +10,45 @@ class TestRun(scaffolds.ResultsTest):
         """
         """
 
-        commander.execute('open', '@examples:hello_cauldron')
+        support.open_project(self, '@examples:hello_cauldron')
 
         r = environ.Response()
         commander.execute('run', '', r)
 
         self.assertFalse(r.failed)
 
+    def test_run_step_example(self):
+        """
+        """
 
-################################################################################
-################################################################################
+        support.open_project(self, '@examples:hello_cauldron')
 
-if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestRun)
-    unittest.TextTestRunner(verbosity=2).run(suite)
+        r = environ.Response()
+        commander.execute('run', '.', r)
 
+        self.assertFalse(r.failed)
 
+    def test_run_in_parts(self):
+        """
+        """
 
+        support.open_project(self, '@examples:hello_cauldron')
 
+        r = environ.Response()
+        commander.execute('run', 'create_data.py', r)
+        self.assertFalse(r.failed)
 
+        r = environ.Response()
+        commander.execute('run', 'plot_data.py', r)
+        self.assertFalse(r.failed)
+
+    def test_run_bokeh(self):
+        """
+        """
+
+        support.open_project(self, '@examples:bokeh')
+
+        r = environ.Response()
+        commander.execute('run', '', r)
+
+        self.assertFalse(r.failed)

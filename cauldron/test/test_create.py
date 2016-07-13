@@ -1,9 +1,7 @@
 import os
-import unittest
 
-from cauldron.test import scaffolds
-from cauldron.cli import commander
-from cauldron import environ
+from cauldron.test import support
+from cauldron.test.support import scaffolds
 
 
 class TestCreate(scaffolds.ResultsTest):
@@ -12,35 +10,67 @@ class TestCreate(scaffolds.ResultsTest):
         """
         """
 
-        r = environ.Response()
-        commander.execute('create', '', r)
+        r = support.create_project(self, '', '')
+        self.assertTrue(r.failed, 'should have failed')
 
+    def test_create_no_path(self):
+        """
+        """
+
+        r = support.create_project(self, 'test_create', '')
         self.assertTrue(r.failed, 'should have failed')
 
     def test_create_simple_success(self):
         """
         """
 
-        name = 'test_create'
-        path = self.get_temp_path('project')
+        r = support.create_project(self, 'test_create')
 
-        r = environ.Response()
-        args = [name, path]
-        commander.execute('create', ' '.join(args), r)
-
-        self.assertFalse(r.failed, 'create command failed')
-        self.assertTrue(
-            os.path.exists(os.path.join(path, name, 'cauldron.json')),
-            'no cauldron.json found'
+        self.assertFalse(
+            r.failed,
+            'Failed to create project\n:{}'.format(r.echo())
         )
 
-################################################################################
-################################################################################
+        self.assertTrue(
+            os.path.exists(
+                os.path.join(r.data['source_directory'], 'cauldron.json')
+            ),
+            'Missing cauldron.json in new project folder\n:{}'.format(r.echo())
+        )
 
-if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestCreate)
-    unittest.TextTestRunner(verbosity=2).run(suite)
+    def test_create_twice(self):
+        """
+        """
 
+        r = support.create_project(self, 'test_create')
+        r = support.create_project(self, 'test_create')
+
+        self.assertTrue(
+            r.failed, 'No second project\n:{}'.format(r.echo())
+        )
+
+    def test_create_full_success(self):
+        """
+        """
+
+        r = support.create_project(
+            self, 'test_create',
+            title='This is a test',
+            summary='More important information goes in this spot',
+            author='Kermit the Frog'
+        )
+
+        self.assertFalse(
+            r.failed,
+            'Failed to create project\n:{}'.format(r.echo())
+        )
+
+        self.assertTrue(
+            os.path.exists(
+                os.path.join(r.data['source_directory'], 'cauldron.json')
+            ),
+            'Missing cauldron.json in new project folder\n:{}'.format(r.echo())
+        )
 
 
 

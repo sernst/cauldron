@@ -159,6 +159,32 @@ class Response(object):
         self.ended = False
         self.failed = False
 
+    def echo(self) -> str:
+        """
+
+        :return:
+        """
+
+        out = [
+            '=== Response [{}] ==='.format(
+                'FAILED' if self.failed else 'SUCCESS'
+            )
+        ]
+
+        for k, v in self.data.items():
+            out.append('  * {}: {}'.format(k, v))
+
+        for m in self.messages:
+            out.append('--- Message [{kind}: {code}] ---\n{message}'.format(
+                kind=m.kind,
+                code=m.code,
+                message=m.message
+            ))
+            for k, v in m.data.items():
+                out.append('  * {}: {}'.format(k, v))
+
+        return '\n'.join(out)
+
     def update(self, **kwargs) -> 'Response':
         """
 

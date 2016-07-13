@@ -1,8 +1,5 @@
-import unittest
-
-from cauldron import environ
-from cauldron.cli import commander
-from cauldron.test import scaffolds
+from cauldron.test import support
+from cauldron.test.support import scaffolds
 
 
 class TestOpen(scaffolds.ResultsTest):
@@ -11,8 +8,8 @@ class TestOpen(scaffolds.ResultsTest):
         """
         """
 
-        r = environ.Response()
-        commander.execute('open', '@examples:hello_cauldron', r)
+        r = support.open_project(self, '@examples:hello_cauldron')
+
         self.assertFalse(r.failed, 'should have opened successfully')
         self.assertIn(
             'project', r.data,
@@ -23,15 +20,22 @@ class TestOpen(scaffolds.ResultsTest):
             'success response message?'
         )
 
+    def test_open_new_project(self):
+        """
+        """
 
+        r = support.create_project(self, 'test_project')
+        r = support.open_project(self, r.data['source_directory'])
 
-
-################################################################################
-################################################################################
-
-if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestOpen)
-    unittest.TextTestRunner(verbosity=2).run(suite)
+        self.assertFalse(r.failed, 'should have opened successfully')
+        self.assertIn(
+            'project', r.data,
+            'missing project data from response'
+        )
+        self.assertEqual(
+            len(r.messages), 1,
+            'success response message?'
+        )
 
 
 

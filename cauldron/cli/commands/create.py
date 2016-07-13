@@ -137,6 +137,10 @@ def execute(
 
     open_actions.open_project(directory)
 
+    environ.output.update(
+        source_directory=directory
+    )
+
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):
     """

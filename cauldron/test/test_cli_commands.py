@@ -14,12 +14,6 @@ class TestCliCommands(unittest.TestCase):
 
         self.assertEqual(len(parts), 6)
 
-################################################################################
-################################################################################
-
-if __name__ == '__main__':
-    suite = unittest.TestLoader().loadTestsFromTestCase(TestCliCommands)
-    unittest.TextTestRunner(verbosity=2).run(suite)
 
 
 
