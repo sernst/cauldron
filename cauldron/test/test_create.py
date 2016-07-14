@@ -6,6 +6,9 @@ from cauldron import environ
 
 
 class TestCreate(scaffolds.ResultsTest):
+    """
+
+    """
 
     def test_create_no_args(self):
         """
@@ -135,4 +138,3 @@ class TestCreate(scaffolds.ResultsTest):
                 items=items
             )
         )
-

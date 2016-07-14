@@ -68,13 +68,13 @@ def execute(
 
     if parser is None:
         # The parse failed and the execution should be aborted
-        return
+        return None
 
     if command_args is None or command_args['show_help']:
         # Overrides standard execution and instead displays the help for the
         # command
         parser.print_help()
-        return
+        return None
 
     del command_args['show_help']
 

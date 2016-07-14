@@ -2,15 +2,15 @@ from cauldron.test import support
 from cauldron.test.support import scaffolds
 
 
-class TestAlias(scaffolds.ResultsTest):
+class TestClear(scaffolds.ResultsTest):
     """
 
     """
 
-    def test_list(self):
+    def test_clear(self):
         """
         """
 
-        r = support.run_command('alias list')
+        r = support.run_command('open @examples:hello_cauldron')
+        r = support.run_command('clear')
         self.assertFalse(r.failed, 'should not have failed')
-

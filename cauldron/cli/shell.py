@@ -31,6 +31,7 @@ class CauldronShell(cmd.Cmd):
 
         super(CauldronShell, self).__init__(completekey='tab')
         self.history = []
+        self.last_response = None
 
     def default(self, line: str):
         """
@@ -59,10 +60,13 @@ class CauldronShell(cmd.Cmd):
 
         self.prompt = '<{}>: '.format(name)
         if hasattr(result, 'ended'):
+            self.last_response = result
             return result.ended
         elif hasattr(result, 'response'):
+            self.last_response = result.response
             return result.response.ended
         else:
+            self.last_response = None
             return result
 
     def do_help(self, arg):

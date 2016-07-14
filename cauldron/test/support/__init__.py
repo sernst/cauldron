@@ -18,7 +18,7 @@ def run_command(command: str) -> 'environ.Response':
 
     cs = CauldronShell()
     cs.default(command)
-    return environ.output
+    return cs.last_response
 
 
 def create_project(

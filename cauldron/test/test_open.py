@@ -1,5 +1,8 @@
+import os
+
 from cauldron.test import support
 from cauldron.test.support import scaffolds
+from cauldron import environ
 
 
 class TestOpen(scaffolds.ResultsTest):
@@ -37,6 +40,35 @@ class TestOpen(scaffolds.ResultsTest):
             'success response message?'
         )
 
+    def test_autocomplete_flags(self):
+        """
 
+        :return:
+        """
 
+        result = support.autocomplete('open --r')
+        self.assertEqual(result, ['recent'])
+
+        result = support.autocomplete('open -')
+        self.assertGreater(len(result), 3)
+
+    def test_autocomplete_aliases(self):
+        """
+
+        :return:
+        """
+
+        result = support.autocomplete('open @fake:')
+        self.assertEqual(len(result), 0)
+
+        # Get all directories in the examples folder
+        path = environ.paths.resources('examples')
+        items = [(e, os.path.join(path, e)) for e in os.listdir(path)]
+        items = [e for e in items if os.path.isdir(e[1])]
+
+        result = support.autocomplete('open @examples:')
+        self.assertEqual(len(result), len(items))
+
+        result = support.autocomplete('open @ex')
+        self.assertIn('examples:', result)
 
