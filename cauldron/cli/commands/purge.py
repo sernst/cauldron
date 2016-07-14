@@ -1,13 +1,12 @@
 import typing
 from argparse import ArgumentParser
 
+from cauldron import cli
 from cauldron import environ
 from cauldron.cli.interaction import query
 
 NAME = 'purge'
-DESCRIPTION = """
-    Removes all existing group and trial results from cached results folders
-    """
+DESCRIPTION = 'Removes all results files from Cauldron\'s cache'
 
 
 def populate(
@@ -22,16 +21,30 @@ def populate(
     :param assigned_args:
     :return:
     """
-    pass
+
+    parser.add_argument(
+        '-f', '--force',
+        dest='force',
+        default=False,
+        action='store_true',
+        help=cli.reformat("""
+            When this option is included, the purge operation will happen
+            without an interactive confirmation step
+            """
+        )
+    )
 
 
-def execute(parser: ArgumentParser):
+def execute(parser: ArgumentParser, force: bool = False):
     """
 
     :return:
     """
 
-    path = environ.configs.make_path('results', override_key='results_path')
+    path = environ.configs.fetch('results_directory')
+    if not path:
+        path = environ.paths.user('results')
+
     environ.log("""
         ==============
         REMOVE RESULTS
@@ -42,20 +55,30 @@ def execute(parser: ArgumentParser):
         {path}
         """.format(path=path), whitespace_bottom=1)
 
-    do_it = query.confirm(
-        'Are you sure you want to continue',
-        default=False
-    )
+    do_it = force
+    if not force:
+        do_it = query.confirm(
+            'Are you sure you want to continue',
+            default=False
+        )
 
     if not do_it:
-        environ.log('[ABORTED]: No files were deleted')
-        return
+        return environ.output.notify(
+            kind='ABORTED',
+            code='NO_PURGE',
+            message='No files were deleted'
+        ).console(whitespace=1)
 
     if environ.systems.remove(path):
-        msg = '[SUCCESS]: All results have been removed'
+        msg = 'SUCCESS', 'RESULTS_PURGED', 'All results have been removed'
     else:
-        msg = '[ERROR]: Failed to remove results directory'
+        environ.output.fail()
+        msg = 'ERROR', 'PURGE_FAILURE', 'Failed to remove results directory'
 
-    environ.log(msg, whitespace_top=1)
+    environ.output.notify(
+        kind=msg[0],
+        code=msg[1],
+        message=msg[2]
+    ).console(whitespace=1)
 
 

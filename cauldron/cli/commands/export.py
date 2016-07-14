@@ -1,16 +1,15 @@
-from argparse import ArgumentParser
 import os
 import shutil
 import typing
+from argparse import ArgumentParser
 
 import cauldron
-from cauldron import environ
 from cauldron import cli
+from cauldron import environ
+from cauldron import session
 
 NAME = 'export'
-DESCRIPTION = """
-    Export the current project's results html file
-    """
+DESCRIPTION = 'Export the current project\'s results html file'
 
 
 def populate(
@@ -29,9 +28,12 @@ def populate(
     parser.add_argument(
         'path',
         type=str,
-        help=cli.reformat("""
+        default=None,
+        help=cli.reformat(
+            """
             The path where the single html file will be exported
-            """)
+            """
+        )
     )
 
     parser.add_argument(
@@ -39,10 +41,12 @@ def populate(
         dest='directory_name',
         type=str,
         default=None,
-        help=cli.reformat("""
+        help=cli.reformat(
+            """
             The name of the directory where the results will be exported. If
             omitted, the default will be the identifier for the project.
-            """)
+            """
+        )
     )
 
 
@@ -51,12 +55,22 @@ def execute(parser: ArgumentParser, path: str, directory_name: str = None):
 
     :param parser:
     :param path:
+    :param directory_name:
     :return:
     """
-    results_path = environ.configs.make_path(
-        'results', override_key='results_path'
-    )
 
+    if path is None:
+        return environ.output.fail().notify(
+            kind='ERROR',
+            code='MISSING_PATH_ARG',
+            message='Missing export path argument'
+        ).console(whitespace=1)
+
+    path = path.strip('"')
+    directory_name = directory_name.strip('"') if directory_name else None
+
+    project = cauldron.project.internal_project
+    results_path = project.results_path
     pid = cauldron.project.internal_project.id
 
     if directory_name is None:
@@ -64,18 +78,10 @@ def execute(parser: ArgumentParser, path: str, directory_name: str = None):
     out_path = os.path.join(environ.paths.clean(path), directory_name)
 
     environ.systems.remove(out_path)
-    os.makedirs(out_path)
-
-    for item in os.listdir(results_path):
-        item_path = os.path.join(results_path, item)
-        if not os.path.isfile(item_path):
-            continue
-        item_out_path = os.path.join(out_path, item)
-
-        shutil.copy2(item_path, item_out_path)
+    session.initialize_results_path(out_path)
 
     report_path = os.path.join(results_path, 'reports', pid)
-    report_out_path = os.path.join(out_path, 'data')
+    report_out_path = os.path.join(out_path, 'reports', pid)
     shutil.copytree(report_path, report_out_path)
 
     html_path = os.path.join(out_path, 'project.html')
@@ -84,11 +90,13 @@ def execute(parser: ArgumentParser, path: str, directory_name: str = None):
 
     dom = dom.replace(
         '<!-- CAULDRON:EXPORT -->',
-        cli.reformat("""
+        cli.reformat(
+            """
             <script>
-                window.RESULTS_FILENAME = 'data/results.js';
+                window.RESULTS_FILENAME = 'reports/{}/latest/results.js';
             </script>
-            """)
+            """.format(pid)
+        )
     )
 
     with open(html_path, 'w+') as f:

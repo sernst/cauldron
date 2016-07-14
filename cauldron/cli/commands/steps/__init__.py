@@ -124,28 +124,24 @@ def execute(
     """
 
     if not cauldron.project or not cauldron.project.internal_project:
-        environ.output.fail().notify(
+        return environ.output.fail().notify(
             kind='ERROR',
             code='NO_OPEN_PROJECT',
             message='No project is open. Step commands require an open project'
-        ).console(
-            whitespace=1
-        )
-        return
+        ).console(whitespace=1)
 
     if not action or action == 'list':
         actions.echo_steps()
         return
 
     if not step_name:
-        environ.output.fail().notify(
+        return environ.output.fail().notify(
             kind='ABORTED',
             code='NO_STEP_NAME',
             message='A step name is required for this command'
-        ).console(
-            whitespace=1
-        )
-        return
+        ).console(whitespace=1)
+
+    step_name = step_name.strip('"')
 
     if action == 'add':
         actions.create_step(
@@ -205,10 +201,17 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
     project = cauldron.project.internal_project
 
     if len(parts) < 3 or parts[-1].startswith(('--position=', '-p ')):
+        prefix = parts[-1]
+        for remove in ['--position=', '-p ']:
+            if prefix.startswith(remove):
+                prefix = prefix[len(remove):]
+                break
+        prefix = prefix.strip().strip('"')
+
         step_names = [x.definition.name for x in project.steps]
         return autocompletion.match_in_path_list(
             segment,
-            parts[-1],
+            prefix,
             step_names
         )
 

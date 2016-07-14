@@ -7,6 +7,25 @@ from cauldron import environ
 
 class TestOpen(scaffolds.ResultsTest):
 
+    def test_list(self):
+        """
+
+        :return:
+        """
+
+        support.run_command('open --available')
+
+    def test_last(self):
+        """
+
+        :return:
+        """
+
+        support.run_command('open @examples:seaborn')
+        support.run_command('close')
+        r = support.run_command('open -l')
+        self.assertFalse(r.failed, 'should not have failed')
+
     def test_open_example(self):
         """
         """
@@ -22,6 +41,7 @@ class TestOpen(scaffolds.ResultsTest):
             len(r.messages), 1,
             'success response message?'
         )
+        support.run_command('close')
 
     def test_open_new_project(self):
         """
@@ -39,6 +59,7 @@ class TestOpen(scaffolds.ResultsTest):
             len(r.messages), 1,
             'success response message?'
         )
+        support.run_command('close')
 
     def test_autocomplete_flags(self):
         """

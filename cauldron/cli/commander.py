@@ -180,6 +180,8 @@ def autocomplete(
         return []
 
     parts = parse.explode_line(line)[1:]
+    if line.endswith(' '):
+        parts.append('')
 
     try:
         module = cmds[command_name]

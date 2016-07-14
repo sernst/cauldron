@@ -124,6 +124,7 @@ def create_step(
     environ.output.update(
         project=project.kernel_serialize(),
         step_name=result.definition.name,
+        step_path=result.source_path,
         step_changes=step_changes
     ).notify(
         kind='CREATED',

@@ -68,6 +68,14 @@ class Configuration(object):
             )
         return self
 
+    def fetch_session(self, key: str, default_value=None):
+        """
+
+        :param key:
+        :param default_value:
+        :return:
+        """
+
     def fetch(
             self,
             key: str,

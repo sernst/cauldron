@@ -1,3 +1,4 @@
+import os
 import re
 import readline
 from unittest.mock import patch
@@ -89,3 +90,48 @@ def autocomplete(command: str):
             begin_index=len(line) - len(splits[-1]),
             end_index=len(line) - 1
         )
+
+
+def initialize_project(
+        tester: 'scaffolds.ResultsTest',
+        name: str
+):
+    """
+
+    :param tester:
+    :param name:
+    :return:
+    """
+
+    directory = tester.get_temp_path('projects')
+    project_directory = os.path.join(directory, name)
+
+    run_command('create "{}" "{}"'.format(name, directory))
+    run_command('open "{}"'.format(project_directory))
+
+    return project_directory
+
+
+def add_step(
+        tester: 'scaffolds.ResultsTest',
+        name: str,
+        contents: str = ''
+):
+    """
+
+    :param tester:
+    :param name:
+    :param contents:
+    :return:
+    """
+
+    directory = tester.get_temp_path('projects')
+    project_directory = os.path.join(directory, name)
+
+    r = run_command('steps add "{}"'.format(name))
+    step_path = r.data['step_path']
+
+    with open(step_path, 'w+') as f:
+        f.write(contents)
+
+    return step_path

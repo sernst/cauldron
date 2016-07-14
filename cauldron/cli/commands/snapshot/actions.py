@@ -85,7 +85,8 @@ def create_snapshot(project: Project, *args: typing.List[str]):
     url = project.snapshot_url(snapshot_name)
 
     environ.log_header('Snapshot URL', 5)
-    environ.log('* {}'.format(url),
+    environ.log(
+        '* {}'.format(url),
         whitespace_bottom=1,
         indent_by=2
     )

@@ -56,24 +56,23 @@ def execute(parser: ArgumentParser, action: str, arguments: list):
     """
 
     if not action:
-        environ.log(
-            """
-            [ERROR]: An action is required for the snapshot command
-            """
-        )
-        return
+        return environ.output.fail().notify(
+            kind='ERROR',
+            code='NO_ACTION_ARG',
+            message='An action is required for the snapshot command'
+        ).console(whitespace=1)
 
     action = action.strip().lower()
     project = cauldron.project.internal_project
 
     if not project:
-        environ.log(
-            """
-            [ERROR]: No project has been opened. Use the "open" command to
-            open a project.
-            """
+        return environ.output.fail().notify(
+            kind='ERROR',
+            code='NO_OPEN_PROJECT',
+            message='No open project'
+        ).console(
+            '[ERROR]: No open project. Use the "open" command to open one.'
         )
-        return
 
     if action == 'remove':
         return actions.remove_snapshot(project, *arguments)
@@ -116,13 +115,6 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
     :param parts:
     :return:
     """
-
-    # print('{e}[9999D{e}[KAUTO "{prefix}" {parts}\n>>> {line}'.format(
-    #     prefix=segment,
-    #     parts=parts,
-    #     line=line,
-    #     e=chr(27)
-    # ), end='')
 
     if len(parts) < 2:
         return autocompletion.matches(

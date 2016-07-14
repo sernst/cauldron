@@ -4,9 +4,7 @@ from argparse import ArgumentParser
 from cauldron import environ
 
 NAME = 'version'
-DESCRIPTION = """
-    Displays Cauldron's version information
-    """
+DESCRIPTION = 'Displays Cauldron\'s version information'
 
 
 def get_package_data():

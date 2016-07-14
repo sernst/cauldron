@@ -16,6 +16,7 @@ class TestRun(scaffolds.ResultsTest):
         commander.execute('run', '', r)
 
         self.assertFalse(r.failed)
+        support.run_command('close')
 
     def test_run_step_example(self):
         """
@@ -27,6 +28,7 @@ class TestRun(scaffolds.ResultsTest):
         commander.execute('run', '.', r)
 
         self.assertFalse(r.failed)
+        support.run_command('close')
 
     def test_run_in_parts(self):
         """
@@ -41,6 +43,7 @@ class TestRun(scaffolds.ResultsTest):
         r = environ.Response()
         commander.execute('run', 'plot_data.py', r)
         self.assertFalse(r.failed)
+        support.run_command('close')
 
     def test_run_bokeh(self):
         """
@@ -52,3 +55,4 @@ class TestRun(scaffolds.ResultsTest):
         commander.execute('run', '', r)
 
         self.assertFalse(r.failed)
+        support.run_command('close')

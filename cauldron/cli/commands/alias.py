@@ -98,7 +98,8 @@ def execute(
             )
 
     environ.configs.load()
-    aliases = environ.configs.fetch('folder_aliases', {})
+    temporary_aliases = environ.configs.session.get('folder_aliases', {})
+    persistent_aliases = environ.configs.persistent.get('folder_aliases', {})
 
     if not name and command in ['add', 'remove']:
         environ.log('[ERROR]: You need to specify the name of the alias')
@@ -106,11 +107,18 @@ def execute(
 
     if command == 'list':
         items = []
+        aliases = dict(
+            list(temporary_aliases.items()) +
+            list(persistent_aliases.items())
+        )
+
         for k, v in aliases.items():
             items.append('{}\n   {}'.format(k, v['path']))
         environ.log_header('EXISTING ALIASES')
         environ.log(items)
         return
+
+    aliases = temporary_aliases if temporary else persistent_aliases
 
     if command == 'add':
         aliases[name] = dict(
@@ -120,26 +128,31 @@ def execute(
             persists=not bool(temporary),
             folder_aliases=aliases
         )
-        environ.log(
-            '[ADDED]: The alias "{}" has been saved'.format(name),
-            whitespace=1
-        )
-        return
+        return environ.output.notify(
+            kind='ADDED',
+            code='ALIAS_ADDED',
+            message='The alias "{}" has been saved'.format(name)
+        ).console(whitespace=1)
 
     if command == 'remove':
         if name in aliases:
             del aliases[name]
-        environ.configs.put(persists=True, folder_aliases=aliases)
-        environ.log(
-            '[REMOVED]: The alias "{}" has been removed'.format(name),
-            whitespace=1
+        environ.configs.put(
+            persists=not bool(temporary),
+            folder_aliases=aliases
         )
-        return
 
-    environ.log(
-        '[ERROR]: Unrecognized alias command "{}"'.format(command),
-        whitespace=1
-    )
+        return environ.output.notify(
+            kind='REMOVED',
+            code='ALIAS_REMOVED',
+            message='The alias "{}" has been removed'.format(name)
+        ).console(whitespace=1)
+
+    environ.output.fail().notify(
+        kind='ERROR',
+        code='UNKNOWN_COMMAND',
+        message='Unrecognized alias command "{}"'.format(command)
+    ).console(whitespace=1)
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):
