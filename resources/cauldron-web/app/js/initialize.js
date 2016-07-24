@@ -51,6 +51,32 @@
 
   /**
    *
+   * @returns {boolean}
+   */
+  function addSnapshotBar() {
+    var sid = exports.PARAMS['sid'];
+    if (!sid) {
+      return false;
+    }
+
+    $('<div></div>')
+        .addClass('snapshot-bar')
+        .text('Snapshot: ' + exports.PARAMS['sid'])
+        .prependTo(body);
+
+    $('<div></div>')
+        .addClass('snapshot-bar')
+        .addClass('snapshot-bar-overlay')
+        .text('Snapshot: ' + exports.PARAMS['sid'])
+        .prependTo(body);
+
+      exports.TITLE = '{' + sid + '} ' + exports.TITLE;
+  }
+  exports.addSnapshotBar = addSnapshotBar;
+
+
+  /**
+   *
    */
   function initialize() {
     var prom;
@@ -73,6 +99,7 @@
           exports.RESULTS = window.RESULTS;
           exports.DATA = window.RESULTS.data;
           exports.SETTINGS = window.RESULTS.settings;
+          exports.TITLE = exports.SETTINGS.title || exports.SETTINGS.id || id;
           return exports.loadSourceFiles(window.RESULTS.includes);
         })
         .then(function () {

@@ -330,6 +330,20 @@ class Project(object):
 
         return os.path.join(self.output_directory, 'results.js')
 
+    def make_remote_url(self, host: str = None):
+        """
+
+        :param host:
+        :return:
+        """
+
+        if host:
+            host = host.rstrip('/')
+        else:
+            host = ''
+
+        return '{}/view/project.html?id={}'.format(host, self.id)
+
     def snapshot_path(self, *args: typing.Tuple[str]) -> str:
         """
 
@@ -365,6 +379,7 @@ class Project(object):
             output_directory=self.output_directory,
             output_path=self.output_path,
             url=self.url,
+            remote_slug=self.make_remote_url(),
             title=self.title,
             id=self.id,
             steps=[s.kernel_serialize() for s in self.steps]

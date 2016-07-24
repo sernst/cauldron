@@ -1,104 +1,14 @@
-import logging
-import os
-import sys
-
 import flask
-from flask import Flask
+from cauldron.cli import commander
+from cauldron.cli.server import run as server_run
+from cauldron.cli.server.routes import display
+from cauldron.cli.server.routes import status
+from cauldron.environ import logger
+from cauldron.environ.response import Response
 from flask import request
 
-MY_DIRECTORY = os.path.abspath(os.path.dirname(__file__))
-sys.path.append(
-    os.path.abspath(os.path.join(MY_DIRECTORY, '..'))
-)
 
-import cauldron
-from cauldron.cli import commander
-from cauldron.environ.response import Response
-from cauldron.environ import logger
-from cauldron import environ
-
-APPLICATION = Flask('Cauldron')
-SERVER_VERSION = [0, 0, 1, 1]
-
-server_data = dict(
-    version=SERVER_VERSION
-)
-
-
-def get_server_data() -> dict:
-    """
-
-    :return:
-    """
-
-    out = dict(
-        test=1,
-        pid=os.getpid(),
-        uptime=environ.run_time().total_seconds()
-    )
-    out.update(server_data)
-    return out
-
-
-@APPLICATION.route('/ping', methods=['GET', 'POST'])
-def server_status():
-    """
-
-    :return:
-    """
-
-    r = Response()
-    r.update(
-        success=True,
-        __server__=get_server_data()
-    )
-
-    return flask.jsonify(r.serialize())
-
-
-@APPLICATION.route('/status', methods=['GET', 'POST'])
-def project_status():
-    """
-
-    :return:
-    """
-
-    r = Response()
-
-    try:
-        project = cauldron.project.internal_project
-        r.update(
-            project=project.status()
-        )
-    except Exception:
-        r.fail()
-
-    r.update(__server__=get_server_data())
-    return flask.jsonify(r.serialize())
-
-
-@APPLICATION.route('/project', methods=['GET', 'POST'])
-def project_data():
-    """
-
-    :return:
-    """
-
-    r = Response()
-
-    try:
-        project = cauldron.project.internal_project
-        r.update(
-            project=project.kernel_serialize()
-        )
-    except Exception:
-        r.fail()
-
-    r.update(__server__=get_server_data())
-    return flask.jsonify(r.serialize())
-
-
-@APPLICATION.route('/', methods=['GET', 'POST'])
+@server_run.APPLICATION.route('/', methods=['GET', 'POST'])
 def execute():
     """
 
@@ -106,7 +16,7 @@ def execute():
     """
 
     r = Response()
-    r.update(__server__=get_server_data())
+    r.update(__server__=server_run.get_server_data())
 
     cmd = None
     parts = None
@@ -161,21 +71,3 @@ def execute():
 
     return flask.jsonify(r.serialize())
 
-
-def run(port: int = 5010, debug: bool = False):
-    """
-
-    :param port:
-    :param debug:
-    :return:
-    """
-
-    server_data['port'] = port
-    server_data['debug'] = debug
-    server_data['id'] = environ.start_time.isoformat()
-
-    if not debug:
-        log = logging.getLogger('werkzeug')
-        log.setLevel(logging.ERROR)
-
-    APPLICATION.run(port=port, debug=debug)

@@ -55,6 +55,7 @@
         .then(function () {
           // Add the body for each step to the page body
           var body = $('.body-wrapper');
+          var before;
 
           updates.forEach(function (update) {
             var existing = $('[data-step-name="' + update.name + '"]');
@@ -76,17 +77,25 @@
               stepBody.find('.cd-step-title').html(
                   update.title || update.new_name
               );
+              stepBody.find('.step-anchor').attr('name', update.new_name);
               stepBody.detach();
             }
 
             // Modified or added steps get inserted into the dom
-            var after = update.after;
-            if (!after) {
-              body.prepend(stepBody);
+            if (update.after) {
+              before = body.find('[data-step-name="' + update.after + '"]');
             } else {
-              body.find('[data-step-name="' + after + '"]')
-                  .after(stepBody);
+              before = body.find('.cd-body-header').after(stepBody);
             }
+
+            if (before && before.length > 0) {
+              before.after(stepBody);
+            } else if (update.after) {
+              body.append(stepBody);
+            } else {
+              body.prepend(stepBody);
+            }
+
           });
 
           $(window).trigger('resize');

@@ -49,32 +49,17 @@
   function run() {
     return exports.initialize()
         .then(function () {
-          var title = exports.SETTINGS.title || exports.SETTINGS.id || id;
           var body = $('body');
   
-          if (exports.PARAMS['sid']) {
-            $('<div></div>')
-                .addClass('snapshot-bar')
-                .text('Snapshot: ' + exports.PARAMS['sid'])
-                .prependTo(body);
-  
-            $('<div></div>')
-                .addClass('snapshot-bar')
-                .addClass('snapshot-bar-overlay')
-                .text('Snapshot: ' + exports.PARAMS['sid'])
-                .prependTo(body);
-  
-            title = '{' + sid + '} ' + title;
-          }
-  
-          $('title').text(title);
+          exports.addSnapshotBar();
+          $('title').text(exports.TITLE);
 
           if (exports.SETTINGS.headerless) {
             return;
           }
 
           exports.createHeader();
-          $('.cd-body-header').find('.project-title').text(title);
+          $('.cd-body-header').find('.project-title').text(exports.TITLE);
         });
   }
   exports.run = run;
