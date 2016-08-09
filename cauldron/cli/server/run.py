@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+import site
 from argparse import ArgumentParser
 
 from cauldron import environ
@@ -11,7 +12,14 @@ APPLICATION = Flask('Cauldron')
 SERVER_VERSION = [0, 0, 1, 1]
 
 server_data = dict(
-    version=SERVER_VERSION
+    version=SERVER_VERSION,
+    user=os.environ.get('USER'),
+    python=dict(
+        version=list(sys.version_info),
+        executable=sys.executable,
+        directory=sys.exec_prefix,
+        site_packages=list(site.getsitepackages())
+    )
 )
 
 
@@ -30,7 +38,7 @@ def get_server_data() -> dict:
     return out
 
 
-def parse():
+def parse(args = None):
     parser = ArgumentParser(
         description='Cauldron server'
     )
@@ -56,7 +64,7 @@ def parse():
         action='store_true'
     )
 
-    return vars(parser.parse_args())
+    return vars(parser.parse_args(args=args))
 
 
 def execute(port: int = 5010, debug: bool = False, **kwargs):

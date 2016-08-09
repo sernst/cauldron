@@ -55,6 +55,8 @@
    */
   function addSnapshotBar() {
     var sid = exports.PARAMS['sid'];
+    var body = $('body');
+
     if (!sid) {
       return false;
     }

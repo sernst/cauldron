@@ -10,6 +10,5 @@ sys.path.append(
 
 from cauldron.cli.server import run
 
-kwargs = run.parse()
-run.execute(**kwargs)
+run.execute(**run.parse())
 
