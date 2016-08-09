@@ -11,6 +11,12 @@ from flask import Flask
 APPLICATION = Flask('Cauldron')
 SERVER_VERSION = [0, 0, 1, 1]
 
+
+try:
+    site_packages = list(site.getsitepackages())
+except Exception:
+    site_packages = []
+
 server_data = dict(
     version=SERVER_VERSION,
     user=os.environ.get('USER'),
@@ -18,7 +24,7 @@ server_data = dict(
         version=list(sys.version_info),
         executable=sys.executable,
         directory=sys.exec_prefix,
-        site_packages=list(site.getsitepackages())
+        site_packages=[]
     )
 )
 
