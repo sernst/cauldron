@@ -7,6 +7,7 @@ from cauldron import templating
 from cauldron.cli import commander
 from cauldron.cli import parse
 
+
 with open(environ.paths.package('package_data.json'), 'r+') as f:
     package_data = json.load(f)
 

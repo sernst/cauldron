@@ -7,11 +7,6 @@ from cauldron import render
 from cauldron.render import texts as render_texts
 from cauldron.render import plots as render_plots
 
-try:
-    from matplotlib import pyplot as mpl_plot
-except Exception:
-    mpl_plot = None
-
 
 def _get_report() -> 'report.Report':
     """
@@ -244,7 +239,7 @@ def workspace(values: bool = True, types: bool = True):
 
 
 def pyplot(
-        figure: 'mpl_plot.Figure' = None,
+        figure = None,
         scale: float = 0.8,
         clear: bool = True,
         aspect_ratio: typing.Union[list, tuple] = None

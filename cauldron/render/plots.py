@@ -1,26 +1,11 @@
 import typing
 import io
-from bs4 import BeautifulSoup
 
 from cauldron import templating
 
-try:
-    from matplotlib import pyplot as mpl_pyplot
-    from matplotlib.pyplot import Figure
-except Exception:
-    mpl_pyplot = None
-    Figure = None
-
-try:
-    from bokeh import embed
-    from bokeh.model import Model
-except Exception:
-    embed = None
-    Model = None
-
 
 def pyplot(
-        figure: Figure = None,
+        figure=None,
         scale: float = 0.8,
         clear: bool = True,
         aspect_ratio: typing.Union[list, tuple] = None
@@ -33,6 +18,13 @@ def pyplot(
     :param aspect_ratio:
     :return:
     """
+
+    try:
+        from matplotlib import pyplot as mpl_pyplot
+        from matplotlib.pyplot import Figure
+    except Exception:
+        mpl_pyplot = None
+        Figure = None
 
     if not figure:
         figure = mpl_pyplot.gcf()
@@ -76,7 +68,7 @@ def pyplot(
 
 
 def bokeh_plot(
-        model: Model,
+        model,
         scale: float = 0.7,
         responsive: bool = True
 ) -> str:
@@ -87,6 +79,15 @@ def bokeh_plot(
     :param responsive:
     :return:
     """
+
+    from bs4 import BeautifulSoup
+
+    try:
+        from bokeh import embed
+        from bokeh.model import Model
+    except Exception:
+        embed = None
+        Model = None
 
     if responsive:
         model.sizing_mode = "scale_width"

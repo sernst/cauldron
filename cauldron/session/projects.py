@@ -285,7 +285,7 @@ class Project(object):
         if p:
             return p
 
-        return environ.paths.user('results')
+        return environ.paths.results()
 
     @results_path.setter
     def results_path(self, value: str):
