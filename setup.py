@@ -14,7 +14,12 @@ MY_DIRECTORY = os.path.dirname(__file__)
 with open(os.path.join(MY_DIRECTORY, 'cauldron', 'settings.json'), 'r+') as f:
     settings = json.load(f)
 
+
 def populate_extra_files():
+    """
+    Creates a list of non-python data files to include in package distribution
+    """
+
     out = ['cauldron/settings.json']
 
     for entry in glob.iglob('cauldron/resources/examples/**/*', recursive=True):
