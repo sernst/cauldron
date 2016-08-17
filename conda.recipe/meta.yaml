@@ -1,14 +1,15 @@
 package:
     name: cauldron
-    version: "0.0.4"
+    version: "0.0.5"
 
 build:
     number: 1
     noarch_python: True
 
 source:
-    git_rev: "v0.0.4"
-    git_url: https://github.com/sernst/cauldron.git
+  fn: cauldron-notebook-0.0.5.tar.gz
+  url: https://pypi.python.org/packages/68/f1/da90b56a58e768df747aea3a723fa36bf039196a7f40641bf8a755dbe4ce/cauldron-notebook-0.0.5.tar.gz
+  md5: a4cce6e501bcc5c9c765bc372ad7c856
 
 requirements:
   build:

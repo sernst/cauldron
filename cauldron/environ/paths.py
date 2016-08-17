@@ -31,7 +31,7 @@ def package(*args: typing.List[str]) -> str:
         within the reporting
     """
 
-    return clean(os.path.join(os.path.dirname(__file__), '..', '..', *args))
+    return clean(os.path.join(os.path.dirname(__file__), '..', *args))
 
 
 def resources(*args: typing.List[str]) -> str:

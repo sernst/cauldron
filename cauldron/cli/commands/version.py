@@ -8,7 +8,7 @@ DESCRIPTION = 'Displays Cauldron\'s version information'
 
 
 def get_package_data():
-    with open(environ.paths.package('package_data.json'), 'r') as f:
+    with open(environ.paths.package('settings.json'), 'r') as f:
         return json.load(f)
 
 

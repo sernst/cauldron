@@ -204,7 +204,7 @@ def run_python_file(
         out = {'success': True}
     except Exception as err:
         frames = traceback.extract_tb(sys.exc_info()[-1])
-        cauldron_path = environ.paths.package('cauldron')
+        cauldron_path = environ.paths.package()
         while frames and frames[0].filename.startswith(cauldron_path):
             frames.pop(0)
 

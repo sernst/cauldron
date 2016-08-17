@@ -19,6 +19,8 @@ def pyplot(
     :return:
     """
 
+    from bs4 import BeautifulSoup
+
     try:
         from matplotlib import pyplot as mpl_pyplot
         from matplotlib.pyplot import Figure
@@ -79,8 +81,6 @@ def bokeh_plot(
     :param responsive:
     :return:
     """
-
-    from bs4 import BeautifulSoup
 
     try:
         from bokeh import embed

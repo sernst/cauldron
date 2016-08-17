@@ -10,7 +10,7 @@ var gulpif = require('gulp-if');
 var minimist = require('minimist');
 var rename = require('gulp-rename');
 
-var destRoot = '../web';
+var destRoot = '../cauldron/resources/web';
 var taskName = null;
 process.argv.some(function (arg) {
   switch (arg) {

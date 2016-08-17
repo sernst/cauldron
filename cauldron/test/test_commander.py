@@ -13,9 +13,7 @@ class TestCommander(unittest.TestCase):
         """
         """
 
-        commands_directory = environ.paths.package(
-            'cauldron', 'cli', 'commands'
-        )
+        commands_directory = environ.paths.package('cli', 'commands')
         items = [x for x in os.listdir(commands_directory) if x[0] != '_']
         command_count = len(items)
 
