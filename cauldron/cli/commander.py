@@ -123,7 +123,7 @@ def show_help(command_name: str = None, raw_args: str = '') -> Response:
     cmds = fetch()
     if command_name and command_name in cmds:
         parser, result = parse.get_parser(
-            command_name,
+            cmds[command_name],
             parse.explode_line(raw_args),
             dict()
         )
@@ -132,7 +132,7 @@ def show_help(command_name: str = None, raw_args: str = '') -> Response:
             out = parser.format_help()
             return environ.output.notify(
                 kind='INFO',
-                code='COMMAND_DESSCRIPTION'
+                code='COMMAND_DESCRIPTION'
             ).kernel(
                 commands=out
             ).console(
@@ -152,7 +152,7 @@ def show_help(command_name: str = None, raw_args: str = '') -> Response:
         For more information on the various commands, enter help on the
         specific command:
 
-            [COMMAND] help
+            help [COMMAND]
         """,
         whitespace_bottom=1
     ).get_response()
