@@ -73,11 +73,19 @@ def parse(args = None):
     return vars(parser.parse_args(args=args))
 
 
-def execute(port: int = 5010, debug: bool = False, **kwargs):
+def execute(
+        port: int = 5010,
+        debug: bool = False,
+        public: bool = False,
+        host=None,
+        **kwargs
+):
     """
 
     :param port:
     :param debug:
+    :param public:
+    :param host:
     :return:
     """
 
@@ -86,6 +94,10 @@ def execute(port: int = 5010, debug: bool = False, **kwargs):
         print('VERSION: {}'.format(data['version']))
         sys.exit(0)
 
+    if host is None and public:
+        host = '0.0.0.0'
+
+    server_data['host'] = host
     server_data['port'] = port
     server_data['debug'] = debug
     server_data['id'] = environ.start_time.isoformat()
@@ -94,5 +106,5 @@ def execute(port: int = 5010, debug: bool = False, **kwargs):
         log = logging.getLogger('werkzeug')
         log.setLevel(logging.ERROR)
 
-    APPLICATION.run(port=port, debug=debug)
+    APPLICATION.run(port=port, debug=debug, host=None)
 
