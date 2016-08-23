@@ -9,6 +9,11 @@ from cauldron.render import inspection
 from cauldron.render import syntax_highlighting
 from cauldron.render import utils as render_utils
 
+try:
+    import plotly as plotly_lib
+except ImportError:
+    plotly_lib = None
+
 
 def listing(source: list, ordered: bool = False) -> str:
     """
@@ -148,11 +153,6 @@ def plotly(data: dict, layout: dict, scale: float = 0.5) -> str:
     :param scale:
     :return:
     """
-
-    try:
-        import plotly as plotly_lib
-    except ImportError:
-        return ''
 
     if plotly_lib is None:
         raise ImportError('Unable to import Plotly library')
