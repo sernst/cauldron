@@ -23,10 +23,8 @@ def pyplot(
 
     try:
         from matplotlib import pyplot as mpl_pyplot
-        from matplotlib.pyplot import Figure
     except Exception:
         mpl_pyplot = None
-        Figure = None
 
     if not figure:
         figure = mpl_pyplot.gcf()
@@ -36,6 +34,8 @@ def pyplot(
             aspect_ratio[0],
             aspect_ratio[1]
         )
+    else:
+        figure.set_size_inches(12, 8)
 
     buffer = io.StringIO()
     figure.savefig(

@@ -1,8 +1,6 @@
 import typing
 import random
 
-import numpy as np
-
 PLOT_COLOR_PALETTE = (
     (31, 119, 180),
     (255, 127, 14),
@@ -110,9 +108,9 @@ def create_layout(
 
 
 def make_line_data(
-        x: typing.Union[list, tuple, np.ndarray],
-        y: typing.Union[list, tuple, np.ndarray],
-        y_unc: typing.Union[list, tuple, np.ndarray],
+        x,
+        y,
+        y_unc,
         name: str = None,
         color: str = None,
         fill_color: str = None,

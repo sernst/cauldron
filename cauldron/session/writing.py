@@ -8,16 +8,6 @@ from cauldron import environ
 from cauldron.session import projects
 from cauldron import templating
 
-try:
-    from bokeh.resources import Resources as BokehResources
-except Exception:
-    BokehResources = None
-
-try:
-    from plotly.offline import offline as plotly_offline
-except Exception:
-    plotly_offline = None
-
 
 def write_step(step: 'projects.ProjectStep') -> dict:
     """
@@ -283,6 +273,11 @@ def add_bokeh(step: 'projects.ProjectStep') -> typing.List[dict]:
     :return:
     """
 
+    try:
+        from bokeh.resources import Resources as BokehResources
+    except Exception:
+        return []
+
     out = []
 
     if BokehResources is None:
@@ -332,6 +327,11 @@ def add_plotly(step: 'projects.ProjectStep') -> typing.List[dict]:
     :param step:
     :return:
     """
+
+    try:
+        from plotly.offline import offline as plotly_offline
+    except Exception:
+        return []
 
     out = []
 

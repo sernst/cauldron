@@ -3,18 +3,11 @@ import os
 import random
 from datetime import datetime
 
-import pandas as pd
-
 from cauldron import environ
 from cauldron import templating
 from cauldron.render import inspection
 from cauldron.render import syntax_highlighting
 from cauldron.render import utils as render_utils
-
-try:
-    import plotly as plotly_lib
-except ImportError:
-    plotly_lib = None
 
 
 def listing(source: list, ordered: bool = False) -> str:
@@ -156,6 +149,11 @@ def plotly(data: dict, layout: dict, scale: float = 0.5) -> str:
     :return:
     """
 
+    try:
+        import plotly as plotly_lib
+    except ImportError:
+        return ''
+
     if plotly_lib is None:
         raise ImportError('Unable to import Plotly library')
 
@@ -170,7 +168,7 @@ def plotly(data: dict, layout: dict, scale: float = 0.5) -> str:
     )
 
 
-def table(data_frame: pd.DataFrame, scale: float = 0.7) -> str:
+def table(data_frame, scale: float = 0.7) -> str:
     """
 
     :param data_frame:

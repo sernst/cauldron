@@ -1,6 +1,5 @@
 import typing
 
-import pandas as pd
 import cauldron
 from cauldron.session import report
 from cauldron import render
@@ -134,7 +133,7 @@ def plotly(data, layout: dict, scale: float = 0.5):
     r.append_body(render.plotly(data, layout, scale))
 
 
-def table(data_frame: pd.DataFrame, scale: float = 0.7):
+def table(data_frame, scale: float = 0.7):
     """
     Adds the specified data frame to the display in a nicely formatted
     scrolling table
