@@ -37,11 +37,11 @@ class TestRun(scaffolds.ResultsTest):
         support.open_project(self, '@examples:hello_cauldron')
 
         r = environ.Response()
-        commander.execute('run', 'create_data.py', r)
+        commander.execute('run', 'S01-create-data.py', r)
         self.assertFalse(r.failed)
 
         r = environ.Response()
-        commander.execute('run', 'plot_data.py', r)
+        commander.execute('run', 'S02-plot-data.py', r)
         self.assertFalse(r.failed)
         support.run_command('close')
 
