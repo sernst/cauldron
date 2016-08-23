@@ -134,12 +134,12 @@ you a list of the example project subdirectories.
 
 A good example to start would be Cauldron's *hello-world*::
 
-    <>: open @examples:hello-world/
+    <>: open @examples:hello_cauldron/
 
-Once this command is run, the hello-world project will be opened and readied
+Once this command is run, the hello_cauldron project will be opened and readied
 for you to run. The Cauldron shell prompt updates to reflect the open project.
 Instead of ``<>:``, which signifies no open project, the prompt should now be
-``<hello-world>:``.
+``<hello_cauldron>:``.
 
 If you now enter the ``run`` command without any arguments, all steps (cells)
 in the project will run::
