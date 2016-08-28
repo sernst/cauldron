@@ -7,6 +7,7 @@ from cauldron import cli
 from cauldron import environ
 from cauldron.cli.commands.open import actions as open_actions
 from cauldron.cli.interaction import autocompletion
+from cauldron.session import projects
 
 NAME = 'create'
 DESCRIPTION = """
@@ -129,7 +130,8 @@ def execute(
         title=title,
         summary=summary,
         author=author,
-        steps=[]
+        steps=[],
+        naming_scheme=projects.DEFAULT_SCHEME
     )
 
     with open(os.path.join(directory, 'cauldron.json'), 'w+') as f:

@@ -17,7 +17,7 @@ class TestSteps(scaffolds.ResultsTest):
 
         r = support.run_command('steps add first.py')
         self.assertFalse(r.failed, 'should not have failed')
-        self.assertTrue(os.path.exists(os.path.join(directory, 'first.py')))
+        self.assertTrue(os.path.exists(os.path.join(directory, 'S01-first.py')))
 
         support.run_command('close')
 
@@ -29,10 +29,10 @@ class TestSteps(scaffolds.ResultsTest):
 
         support.run_command('steps add first.py')
 
-        r = support.run_command('steps mute first.py')
+        r = support.run_command('steps mute S01-first.py')
         self.assertFalse(r.failed, 'should not have failed')
 
-        r = support.run_command('steps unmute first.py')
+        r = support.run_command('steps unmute S01-first.py')
         self.assertFalse(r.failed, 'should nto have failed')
 
         support.run_command('close')
@@ -45,12 +45,16 @@ class TestSteps(scaffolds.ResultsTest):
 
         r = support.run_command('steps add first.py')
         self.assertFalse(r.failed, 'should not have failed')
-        self.assertTrue(os.path.exists(os.path.join(directory, 'first.py')))
+        self.assertTrue(os.path.exists(os.path.join(directory, 'S01-first.py')))
 
-        r = support.run_command('steps modify first.py --name="second.py"')
+        r = support.run_command('steps modify S01-first.py --name="second.py"')
         self.assertFalse(r.failed, 'should not have failed')
-        self.assertFalse(os.path.exists(os.path.join(directory, 'first.py')))
-        self.assertTrue(os.path.exists(os.path.join(directory, 'second.py')))
+        self.assertFalse(
+            os.path.exists(os.path.join(directory, 'S01-first.py'))
+        )
+        self.assertTrue(
+            os.path.exists(os.path.join(directory, 'S01-second.py'))
+        )
 
         support.run_command('close')
 
@@ -63,10 +67,10 @@ class TestSteps(scaffolds.ResultsTest):
         r = support.run_command('steps add first.py')
         self.assertFalse(r.failed, 'should not have failed')
 
-        r = support.run_command('steps remove first.py')
+        r = support.run_command('steps remove S01-first.py')
         self.assertFalse(r.failed, 'should not have failed')
 
-        r = support.run_command('steps remove fake.py')
+        r = support.run_command('steps remove S01-fake.py')
         self.assertTrue(r.failed, 'should have failed')
 
         support.run_command('close')

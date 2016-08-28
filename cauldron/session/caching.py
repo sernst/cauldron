@@ -32,7 +32,10 @@ class SharedCache(object):
             index += 2
 
         for key, value in kwargs.items():
-            self._shared_cache_data[key] = value
+            if value is None and key in self._shared_cache_data:
+                del self._shared_cache_data[key]
+            else:
+                self._shared_cache_data[key] = value
 
         return self
 

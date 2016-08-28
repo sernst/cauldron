@@ -12,6 +12,10 @@ from cauldron.session import definitions
 from cauldron.session import writing
 from cauldron.session.caching import SharedCache
 from cauldron.session.report import Report
+from cauldron.session import naming
+
+
+DEFAULT_SCHEME = 'S{{##}}-{{name}}.{{ext}}'
 
 
 class ProjectStep(object):
@@ -78,7 +82,11 @@ class ProjectStep(object):
             source_path=self.source_path,
             last_modified=self.last_modified,
             is_dirty=self.is_dirty(),
-            status=self.status()
+            status=self.status(),
+            exploded_name=naming.explode_filename(
+                self.definition.name,
+                self.project.naming_scheme
+            )
         )
 
     def status(self):
@@ -258,6 +266,17 @@ class Project(object):
         return 'unknown'
 
     @property
+    def naming_scheme(self) -> str:
+        if self.settings:
+            return self.settings.fetch('naming_scheme', None)
+        return None
+
+    @naming_scheme.setter
+    def naming_scheme(self, value):
+        if self.settings:
+            self.settings.put(naming_scheme=value)
+
+    @property
     def current_step(self) -> ProjectStep:
         if self._current_step:
             return self._current_step
@@ -382,7 +401,8 @@ class Project(object):
             remote_slug=self.make_remote_url(),
             title=self.title,
             id=self.id,
-            steps=[s.kernel_serialize() for s in self.steps]
+            steps=[s.kernel_serialize() for s in self.steps],
+            naming_scheme=self.naming_scheme
         )
 
     def refresh(self) -> bool:
@@ -429,6 +449,19 @@ class Project(object):
 
         self.last_modified = time.time()
         return True
+
+    def get_step(self, name) -> ProjectStep:
+        """
+
+        :param name:
+        :return:
+        """
+
+        for s in self.steps:
+            if s.definition.name == name:
+                return s
+
+        return None
 
     def index_of_step(self, name) -> int:
         """

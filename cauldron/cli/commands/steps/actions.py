@@ -1,11 +1,12 @@
 import os
-import typing
 import shutil
+import typing
 
 import cauldron
 from cauldron import environ
-from cauldron.session.projects import Project
+from cauldron.session import naming
 from cauldron.session import writing
+from cauldron.session.projects import Project
 
 
 def index_from_location(project: Project, location: str = None) -> int:
@@ -98,13 +99,21 @@ def create_step(
     title = title.strip('"') if title else title
 
     project = cauldron.project.internal_project
-    position = index_from_location(project, position)
+    index = index_from_location(project, position)
+
+    name_parts = naming.explode_filename(name, project.naming_scheme)
+    name_parts['index'] = index
+    name = naming.assemble_filename(
+        scheme=project.naming_scheme,
+        **name_parts
+    )
 
     step_data = {'name': name}
+
     if title:
         step_data['title'] = title
 
-    result = project.add_step(step_data, index=position)
+    result = project.add_step(step_data, index=index)
 
     if not os.path.exists(result.source_path):
         with open(result.source_path, 'w+') as f:
@@ -113,6 +122,8 @@ def create_step(
     project.save()
 
     index = project.steps.index(result)
+
+    step_renames = synchronize_step_names()
 
     step_changes = [dict(
         name=result.definition.name,
@@ -125,7 +136,8 @@ def create_step(
         project=project.kernel_serialize(),
         step_name=result.definition.name,
         step_path=result.source_path,
-        step_changes=step_changes
+        step_changes=step_changes,
+        step_renames=step_renames
     ).notify(
         kind='CREATED',
         code='STEP_CREATED',
@@ -162,6 +174,8 @@ def remove_step(name: str, keep_file: bool = False):
     if not keep_file:
         os.remove(step.source_path)
 
+    step_renames = synchronize_step_names()
+
     step_changes = [dict(
         name=name,
         action='removed'
@@ -169,7 +183,8 @@ def remove_step(name: str, keep_file: bool = False):
 
     environ.output.update(
         project=project.kernel_serialize(),
-        step_changes=step_changes
+        step_changes=step_changes,
+        step_renames=step_renames
     ).notify(
         kind='SUCCESS',
         code='STEP_REMOVED',
@@ -180,35 +195,94 @@ def remove_step(name: str, keep_file: bool = False):
     return True
 
 
+def synchronize_step_names():
+    """
+
+    :return:
+    """
+    project = cauldron.project.internal_project
+    results = dict()
+
+    if not project.naming_scheme:
+        return results
+
+    for s in reversed(project.steps):
+        name = s.definition.name
+        name_parts = naming.explode_filename(name, project.naming_scheme)
+        index = project.index_of_step(name)
+        name_parts['index'] = index
+        new_name = naming.assemble_filename(
+            scheme=project.naming_scheme,
+            **name_parts
+        )
+
+        if name == new_name:
+            continue
+
+        old_source_path = s.source_path
+        s.definition.name = new_name
+
+        if not os.path.exists(s.source_path):
+            if os.path.exists(old_source_path):
+                shutil.move(old_source_path, s.source_path)
+            else:
+                with open(s.source_path, 'w+') as f:
+                    f.write('')
+
+        results[name] = {
+            'name': new_name,
+            'title': s.definition.title
+        }
+
+    project.save()
+    return results
+
+
 def modify_step(
         name: str,
         new_name: str = None,
-        title: str = None,
-        position: typing.Union[str, int] = None
+        position: typing.Union[str, int] = None,
+        title: str = None
 ):
     """
 
     :param name:
     :param new_name:
-    :param title:
     :param position:
+    :param title:
     :return:
     """
 
-    project = cauldron.project.internal_project
-
     name = name.strip('"')
     new_name = new_name.strip('"') if new_name else name
-    step_data = {'name': new_name}
 
-    title = title.strip('"') if title else None
-    if title:
-        step_data['title'] = title
+    project = cauldron.project.internal_project
+    old_index = project.index_of_step(name)
 
-    old_position = project.index_of_step(name)
-    position = position.strip('"') if isinstance(position, str) else position
-    if position is None:
-        position = old_position
+    if isinstance(position, str):
+        new_index = index_from_location(project, position.strip('"'))
+    elif position is not None:
+        new_index = int(position)
+    else:
+        new_index = old_index
+
+    if new_index > old_index:
+        # If the current position of the step occurs before the new position
+        # of the step, the new index has to be shifted by one to account for
+        # the fact that this step will no longer be in this position when it
+        # get placed in the position within the project
+        new_index -= 1
+
+    new_name_parts = naming.explode_filename(new_name, project.naming_scheme)
+    new_name_parts['index'] = new_index
+    new_name = naming.assemble_filename(
+        scheme=project.naming_scheme,
+        **new_name_parts
+    )
+
+    if new_name == name and new_index == old_index:
+        # Do not carry out any modifications if nothing was actually changed
+        return
 
     old_step = project.remove_step(name)
     if not old_step:
@@ -221,9 +295,16 @@ def modify_step(
         )
         return False
 
-    index = index_from_location(project, position)
+    step_data = {'name': new_name}
+    if title is None:
+        if old_step.definition.get('title'):
+            step_data['title'] = old_step.definition['title']
+    else:
+        step_data['title'] = title.strip('"')
 
-    new_step = project.add_step(step_data, index=index)
+    new_step = project.add_step(step_data, new_index)
+
+    project.save()
 
     if not os.path.exists(new_step.source_path):
         if os.path.exists(old_step.source_path):
@@ -232,21 +313,28 @@ def modify_step(
             with open(new_step.source_path, 'w+') as f:
                 f.write('')
 
-    project.save()
+    if new_index > 0:
+        before_step = project.steps[new_index - 1].definition.name
+    else:
+        before_step = None
 
-    index = project.steps.index(new_step)
+    step_renames = synchronize_step_names()
+    step_renames[old_step.definition.name] = {
+        'name': new_step.definition.name,
+        'title': new_step.definition.title
+    }
 
     step_changes = [dict(
-        name=old_step.definition.name,
+        name=new_step.definition.name,
         action='modified',
-        new_name=new_step.definition.name,
-        after=None if index < 1 else project.steps[index - 1].definition.name
+        after=before_step
     )]
 
     environ.output.update(
         project=project.kernel_serialize(),
         step_name=new_step.definition.name,
-        step_changes=step_changes
+        step_changes=step_changes,
+        step_renames=step_renames
     ).notify(
         kind='SUCCESS',
         code='STEP_MODIFIED',

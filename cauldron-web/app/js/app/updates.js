@@ -40,6 +40,31 @@
 
   /**
    *
+   * @param renames
+   */
+  function processStepRenames(renames) {
+    console.log('RENAMES:', renames);
+    if (!renames) {
+      return Promise.resolve(renames);
+    }
+
+    var body = $('.body-wrapper');
+
+    Object.keys(renames).forEach(function (oldName) {
+      var data = renames[oldName];
+      var stepBody = body.find('[data-step-name="' + oldName + '"]');
+      stepBody.attr('data-step-name', data.name);
+      stepBody.find('.step-anchor').attr('name', data.name);
+      stepBody.find('.cd-step-title').html(data.title || data.name);
+    });
+
+    return Promise.resolve(renames);
+  }
+  exports.processStepRenames = processStepRenames;
+
+
+  /**
+   *
    */
   function processStepUpdates(updates) {
     console.log('UPDATES:', updates);
@@ -73,11 +98,7 @@
 
             if (update.action === 'modified') {
               stepBody = body.find('[data-step-name="' + update.name + '"]');
-              stepBody.attr('data-step-name', update.new_name);
-              stepBody.find('.cd-step-title').html(
-                  update.title || update.new_name
-              );
-              stepBody.find('.step-anchor').attr('name', update.new_name);
+              stepBody.find('.cd-step-title').html(update.title || update.name);
               stepBody.detach();
             }
 

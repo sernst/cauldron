@@ -1,8 +1,664 @@
-!function(){"use strict";function n(n,o){var t=[];n.forEach(function(n){"plotly"===n&&t.push(window.Plotly)}),o.apply(this,t)}function o(){var n=window.PROJECT_DIRECTORY,o=e.PARAMS.id,t=e.PARAMS.sid;return n||(n="reports/"+o,n+=t?"/snapshots/"+t:"/latest"),e.DATA_DIRECTORY=n,n}function t(){var n=e.PARAMS.sid;return n?($("<div></div>").addClass("snapshot-bar").text("Snapshot: "+e.PARAMS.sid).prependTo(body),$("<div></div>").addClass("snapshot-bar").addClass("snapshot-bar-overlay").text("Snapshot: "+e.PARAMS.sid).prependTo(body),void(e.TITLE="{"+n+"} "+e.TITLE)):!1}function i(){var n;return o(),n=window.RESULTS?Promise.resolve():e.loadSourceFile({name:"cauldron-project",src:"/results.js"}),n.then(function(){return e.RESULTS=window.RESULTS,e.DATA=window.RESULTS.data,e.SETTINGS=window.RESULTS.settings,e.TITLE=e.SETTINGS.title||e.SETTINGS.id||id,e.loadSourceFiles(window.RESULTS.includes)}).then(function(){return e.loadStepIncludes(e.RESULTS.steps)}).then(function(){var n=$(".body-wrapper");return window.RESULTS.steps.forEach(function(o){var t=e.prepareStepBody(o);t&&n.append(t)}),$(window).trigger("resize"),e.DATA})}var e=window.CAULDRON||{};window.CAULDRON=e,e.resizeCallbacks=[],window.require=n,e.addSnapshotBar=t,e.initialize=i}();
-!function(){"use strict";function d(){var d=$(r.join("")).prependTo($(".body-wrapper"));i.RESULTS.has_error&&d.addClass("project-error");d.find(".buttons")}var i=window.CAULDRON||{};window.CAULDRON=i;var r=['<div class="cd-body-header">','<div class="menu-icon"></div>','<div class="project-title"></div>','<div class="spacer"></div>','<div class="buttons"></div>',"</div>"];i.createHeader=d}();
-!function(){"use strict";function o(o){var a=$("a[name='"+o+"']");$("html,body").animate({scrollTop:a.offset().top},"slow")}function a(o){$(o).toggle()}function s(o){var a=$("#"+o),s=a.hasClass("closed"),e=a.attr("data-"+(s?"opens":"closes")),t=a.attr("data-marks-"+(s?"opened":"closed"))||"";return t=t.split("|").map(function(o){return $(o)}),t.push(a),t.forEach(function(o){s?o.removeClass("closed").addClass("opened"):o.removeClass("opened").addClass("closed")}),e?(e.split("|").forEach(function(o){o=$(o),s?(o.show(),a.removeClass("closed")):(o.hide(),o.addClass("closed"))}),void $(window).resize()):void $(window).resize()}function e(o,a){o=$(o);var s=parseFloat(o.attr("data-font-size"));s=a?Math.max(.1,s+.1*a):parseFloat(o.attr("data-font-size-default")),o.attr("data-font-size",s),o.css("font-size",s+"em")}var t=window.CAULDRON||{};window.CAULDRON=t,t.scrollToAnchor=o,t.toggleVisible=a,t.collapse=s,t.changeFontSize=e}();
-!function(){"use strict";function e(e){var r,n="?nocache="+o.getNoCacheString();r=e.src.startsWith(":")?e.src.slice(1):o.DATA_DIRECTORY+e.src;var t=window.document.getElementById(e.name);return t?Promise.resolve():/.*\.css$/.test(r)?new Promise(function(o){var t=document.createElement("link");t.rel="stylesheet",t.onload=o,t.href=r+n,t.id=e.name,document.head.appendChild(t)}):/.*\.js$/.test(r)?new Promise(function(o){var t=document.createElement("script");t.onload=o,t.src=r+n,t.id=e.name,document.head.appendChild(t)}):Promise.reject()}function r(e){if(!e)return Promise.resolve([]);var r=[];return e.forEach(function(e){r.push(o.loadSourceFile(e))}),Promise.all(r)}function n(e){if(!e)return Promise.resolve([]);var r=[];return e.forEach(function(e){e&&r.push(o.loadSourceFiles(e.includes))}),Promise.all(r)}var o=window.CAULDRON||{};window.CAULDRON=o,o.loadSourceFile=e,o.loadSourceFiles=r,o.loadStepIncludes=n}();
-!function(){"use strict";function i(){if(o.RUNNING){var i=$(window).width();Math.abs(i-e)<10||(e=i,o.resizeCallbacks.forEach(function(i){i()}),o.resizePlotly())}}function t(){$(".cd-plotly-box").each(function(i,t){var o=$(t),e=o.parents(".cd-project-step-body").hasClass("closed");e||Plotly.relayout(o.find(".plotly-graph-div")[0],{width:o.width(),height:o.height()})})}var o=window.CAULDRON||{};window.CAULDRON=o;var e=-100;window.onresize=i,o.resizePlotly=t}();
-!function(){"use strict";function e(e){if(!e||!e.body)return null;var t=$(e.body);return t.find("[data-src]").each(function(e,t){var n=$(t),r=n.attr("data-src");r.startsWith("/")&&(r=r.slice(1)),n.attr("src",a.DATA_DIRECTORY+"/"+r+"?nocache="+a.getNoCacheString()),n.attr("data-src",null)}),t}function t(e){if(console.log("UPDATES:",e),e){var t=e.map(function(e){return e.step});return a.loadStepIncludes(t).then(function(){var t,n=$(".body-wrapper");e.forEach(function(e){var r=$('[data-step-name="'+e.name+'"]');if("removed"===e.action)return void r.remove();var d=a.prepareStepBody(e.step);return"updated"===e.action?void r.replaceWith(d):("modified"===e.action&&(d=n.find('[data-step-name="'+e.name+'"]'),d.attr("data-step-name",e.new_name),d.find(".cd-step-title").html(e.title||e.new_name),d.find(".step-anchor").attr("name",e.new_name),d.detach()),t=e.after?n.find('[data-step-name="'+e.after+'"]'):n.find(".cd-body-header").after(d),void(t&&t.length>0?t.after(d):e.after?n.append(d):n.prepend(d)))}),$(window).trigger("resize")})}}var a=window.CAULDRON||{};window.CAULDRON=a,a.prepareStepBody=e,a.processStepUpdates=t}();
-!function(){"use strict";function t(){var t=new Date;return t.getUTCMilliseconds()+"-"+t.getUTCSeconds()+"-"+t.getUTCMinutes()+"-"+t.getUTCHours()+"-"+t.getUTCDay()+"-"+t.getUTCMonth()+"-"+t.getUTCFullYear()}function e(t){return(t?this.toLowerCase():this).replace(/(?:^|\s)\S/g,function(t){return t.toUpperCase()})}function n(t,e){return(.01*Math.round(100*t)).toFixed(2)+" &#177; "+(.01*Math.round(100*e)).toFixed(2)}var o=window.CAULDRON||{};window.CAULDRON=o,o.getNoCacheString=t,o.capitalize=e,o.toDisplayNumber=n}();
-!function(){"use strict";function e(){var e={};return document.location.search.replace(/(^\?)/,"").split("&").forEach(function(t){if(t=t.split("="),!(t.length<2)){var n=t[1];n=/[^0-9\.]+/.test(n)?"true"===n.toLowerCase()?!0:"false"===n.toLowerCase()?!1:decodeURIComponent(n):-1===n.indexOf(".")?parseInt(n,10):parseFloat(n),e[t[0]]=n}}),e}function t(){return n.initialize().then(function(){$("body");n.addSnapshotBar(),$("title").text(n.TITLE),n.SETTINGS.headerless||(n.createHeader(),$(".cd-body-header").find(".project-title").text(n.TITLE))})}var n=window.CAULDRON||{};window.CAULDRON=n,n.RUNNING=!1,n.parseUrlParameters=e,n.run=t,$(function(){n.PARAMS=n.parseUrlParameters(),n.run().then(function(){n.RUNNING=!0,n.__on__.ready(),$(window).resize()})})}();
+(function () {
+  'use strict';
+
+  var exports = window.CAULDRON || {};
+  window.CAULDRON = exports;
+
+  exports.resizeCallbacks = [];
+
+
+  /**
+   * A fake require function that is needed for the inclusion of some
+   * elements within the DOM (e.g. plotly offline)
+   *
+   * @param preloaders
+   * @param callback
+   */
+  function fakeRequire(preloaders, callback) {
+    var callers = [];
+    preloaders.forEach(function (entry) {
+      if (entry === 'plotly') {
+        callers.push(window.Plotly);
+      }
+    });
+    callback.apply(this, callers);
+  }
+  window.require = fakeRequire;
+
+
+  /**
+   *
+   * @returns {*}
+   */
+  function initializeDataDirectory() {
+    var dataDirectory = window.PROJECT_DIRECTORY;
+    var id = exports.PARAMS['id'];
+    var sid = exports.PARAMS['sid'];
+
+    if (!dataDirectory) {
+      dataDirectory = 'reports/' + id;
+      if (sid) {
+        dataDirectory += '/snapshots/' + sid;
+      } else {
+        dataDirectory += '/latest';
+      }
+    }
+
+    exports.DATA_DIRECTORY = dataDirectory;
+    return dataDirectory;
+  }
+
+
+  /**
+   *
+   * @returns {boolean}
+   */
+  function addSnapshotBar() {
+    var sid = exports.PARAMS['sid'];
+    var body = $('body');
+
+    if (!sid) {
+      return false;
+    }
+
+    $('<div></div>')
+        .addClass('snapshot-bar')
+        .text('Snapshot: ' + exports.PARAMS['sid'])
+        .prependTo(body);
+
+    $('<div></div>')
+        .addClass('snapshot-bar')
+        .addClass('snapshot-bar-overlay')
+        .text('Snapshot: ' + exports.PARAMS['sid'])
+        .prependTo(body);
+
+      exports.TITLE = '{' + sid + '} ' + exports.TITLE;
+  }
+  exports.addSnapshotBar = addSnapshotBar;
+
+
+  /**
+   *
+   */
+  function initialize() {
+    var prom;
+
+    initializeDataDirectory();
+
+    if (window.RESULTS) {
+      // If the results were included in the page directly, don't load them
+      // again
+      prom = Promise.resolve();
+    } else {
+      prom = exports.loadSourceFile({
+        name: 'cauldron-project',
+        src: '/results.js'
+      });
+    }
+
+    return prom
+        .then(function () {
+          exports.RESULTS = window.RESULTS;
+          exports.DATA = window.RESULTS.data;
+          exports.SETTINGS = window.RESULTS.settings;
+          exports.TITLE = exports.SETTINGS.title || exports.SETTINGS.id || id;
+          return exports.loadSourceFiles(window.RESULTS.includes);
+        })
+        .then(function () {
+          // Load the include files for each step
+          return exports.loadStepIncludes(exports.RESULTS.steps);
+        })
+        .then(function () {
+          // Add the body for each step to the page body
+          var body = $('.body-wrapper');
+
+          window.RESULTS.steps.forEach(function (step) {
+            var stepBody = exports.prepareStepBody(step);
+            if (stepBody) {
+              body.append(stepBody);
+            }
+          });
+
+          $(window).trigger('resize');
+          return exports.DATA;
+        });
+  }
+  exports.initialize = initialize;
+
+}());
+
+(function () {
+  'use strict';
+
+  var exports = window.CAULDRON || {};
+  window.CAULDRON = exports;
+
+  var headerDom = [
+    '<div class="cd-body-header">',
+    '<div class="menu-icon"></div>',
+    '<div class="project-title"></div>',
+    '<div class="spacer"></div>',
+    '<div class="buttons"></div>',
+    '</div>'
+  ];
+
+  /**
+   *
+   */
+  function createHeader() {
+    var header = $(headerDom.join(''))
+        .prependTo($('.body-wrapper'));
+    if (exports.RESULTS.has_error) {
+      header.addClass('project-error');
+    }
+    var buttons = header.find('.buttons');
+  }
+  exports.createHeader = createHeader;
+  
+}());
+(function () {
+  'use strict';
+
+  var exports = window.CAULDRON || {};
+  window.CAULDRON = exports;
+
+
+  /**
+   *
+   * @param name
+   */
+  function scrollToAnchor(name){
+    var aTag = $("a[name='"+ name +"']");
+    $('html,body').animate({scrollTop: aTag.offset().top}, 'slow');
+  }
+  exports.scrollToAnchor = scrollToAnchor;
+
+
+  /**
+   *
+   * @param selector
+   */
+  function toggleVisible(selector) {
+    $(selector).toggle();
+  }
+  exports.toggleVisible = toggleVisible;
+
+  /**
+   *
+   * @param buttonId
+   */
+  function collapse(buttonId) {
+    var btn = $('#' + buttonId);
+    var open = btn.hasClass('closed');
+    var items = btn.attr('data-' + (open ? 'opens' : 'closes'));
+    var marks = btn.attr('data-marks-' + (open ? 'opened' : 'closed')) || '';
+
+    marks = marks.split('|').map(function (selector) {
+      return $(selector);
+    });
+    marks.push(btn);
+    marks.forEach(function (target) {
+      if (open) {
+        target.removeClass('closed').addClass('opened');
+      } else {
+        target.removeClass('opened').addClass('closed');
+      }
+    });
+
+    if (!items) {
+      $(window).resize();
+      return;
+    }
+
+    items.split('|').forEach(function (target) {
+      target = $(target);
+      if (open) {
+        target.show();
+        btn.removeClass('closed');
+      } else {
+        target.hide();
+        target.addClass('closed');
+      }
+    });
+
+    $(window).resize();
+  }
+  exports.collapse = collapse;
+
+  /**
+   *
+   * @param target
+   * @param direction
+   */
+  function changeFontSize(target, direction) {
+    target = $(target);
+    var size = parseFloat(target.attr('data-font-size'));
+
+    if (!direction) {
+      size = parseFloat(target.attr('data-font-size-default'));
+    } else {
+      size = Math.max(0.1, size + direction * 0.1);
+    }
+
+    target.attr('data-font-size', size);
+    target.css('font-size', size + 'em');
+  }
+  exports.changeFontSize = changeFontSize;
+
+}());
+
+(function () {
+  'use strict';
+
+  var exports = window.CAULDRON || {};
+  window.CAULDRON = exports;
+
+  /**
+   * @param include
+   */
+  function loadSourceFile(include) {
+    var filename;
+    var noCache = '?nocache=' + exports.getNoCacheString();
+
+    if (include.src.startsWith(':')) {
+      filename = include.src.slice(1);
+    } else {
+      filename = exports.DATA_DIRECTORY + include.src;
+    }
+
+
+    var existing = window.document.getElementById(include.name);
+    if (existing) {
+      // If the source file is already loaded, don't load it again
+      return Promise.resolve();
+    }
+
+    if (/.*\.css$/.test(filename)) {
+      // Load Style sheet files
+      return new Promise(function (resolve) {
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.onload = resolve;
+        link.href = filename + noCache;
+        link.id = include.name;
+        document.head.appendChild(link);
+      });
+    }
+
+    if (/.*\.js$/.test(filename)) {
+      // Load Javascript files
+      return new Promise(function (resolve) {
+        var script = document.createElement('script');
+        script.onload = resolve;
+        script.src = filename + noCache;
+        script.id = include.name;
+        document.head.appendChild(script);
+      });
+    }
+
+    return Promise.reject();
+  }
+  exports.loadSourceFile = loadSourceFile;
+
+
+  /**
+   *
+   * @param includes
+   * @returns {*}
+   */
+  function loadSourceFiles(includes) {
+    if (!includes) {
+      return Promise.resolve([]);
+    }
+
+    var proms = [];
+    includes.forEach(function (include) {
+      proms.push(exports.loadSourceFile(include));
+    });
+
+    return Promise.all(proms);
+  }
+  exports.loadSourceFiles = loadSourceFiles;
+
+
+  /**
+   *
+   */
+  function loadStepIncludes(steps) {
+    if (!steps) {
+      return Promise.resolve([]);
+    }
+
+    var proms = [];
+    steps.forEach(function (step) {
+      if (!step) {
+        return;
+      }
+
+      proms.push(exports.loadSourceFiles(step.includes))
+    });
+
+    return Promise.all(proms);
+  }
+  exports.loadStepIncludes = loadStepIncludes;
+
+
+}());
+(function () {
+  'use strict';
+
+  var exports = window.CAULDRON || {};
+  window.CAULDRON = exports;
+
+  var previousWidth = -100;
+
+  /**
+   * Function called when
+   */
+  function onWindowResize() {
+    if (!exports.RUNNING) {
+      // Don't start resizing until everything has finished loading to prevent
+      // race conditions during the load process of external libraries
+      return;
+    }
+
+    var width = $(window).width();
+    if (Math.abs(width - previousWidth) < 10) {
+      return;
+    }
+
+    previousWidth = width;
+
+    exports.resizeCallbacks.forEach(function (func) {
+      func();
+    });
+    exports.resizePlotly();
+  }
+  window.onresize = onWindowResize;
+
+
+  /**
+   *
+   */
+  function resizePlotly() {
+    $('.cd-plotly-box').each(function (index, element) {
+      var e = $(element);
+      var skip = e.parents('.cd-project-step-body').hasClass('closed');
+      if (skip) {
+        // Do not resize plotly objects that are currently invisible
+        return;
+      }
+
+      Plotly.relayout(e.find('.plotly-graph-div')[0], {
+        width: e.width(),
+        height: e.height()
+      });
+      //Plotly.Plots.resize(e.find('.plotly-graph-div')[0]);
+    });
+  }
+  exports.resizePlotly = resizePlotly;
+
+}());
+(function () {
+  'use strict';
+
+  var exports = window.CAULDRON || {};
+  window.CAULDRON = exports;
+
+
+  /**
+   *
+   * @param step
+   * @returns {*}
+   */
+  function prepareStepBody(step) {
+    if (!step || !step.body) {
+      return null;
+    }
+
+    var stepBody = $(step.body);
+
+    stepBody.find('[data-src]').each(function (index, e) {
+      var element = $(e);
+      var src = element.attr('data-src');
+
+      if (src.startsWith('/')) {
+        src = src.slice(1);
+      }
+
+      element.attr(
+          'src',
+          exports.DATA_DIRECTORY + '/' + src +
+          '?nocache=' + exports.getNoCacheString()
+      );
+      element.attr('data-src', null);
+    });
+
+    return stepBody;
+  }
+  exports.prepareStepBody = prepareStepBody;
+
+
+  /**
+   *
+   * @param renames
+   */
+  function processStepRenames(renames) {
+    console.log('RENAMES:', renames);
+    if (!renames) {
+      return Promise.resolve(renames);
+    }
+
+    var body = $('.body-wrapper');
+
+    Object.keys(renames).forEach(function (oldName) {
+      var data = renames[oldName];
+      var stepBody = body.find('[data-step-name="' + oldName + '"]');
+      stepBody.attr('data-step-name', data.name);
+      stepBody.find('.step-anchor').attr('name', data.name);
+      stepBody.find('.cd-step-title').html(data.title || data.name);
+    });
+
+    return Promise.resolve(renames);
+  }
+  exports.processStepRenames = processStepRenames;
+
+
+  /**
+   *
+   */
+  function processStepUpdates(updates) {
+    console.log('UPDATES:', updates);
+    if (!updates) {
+      return;
+    }
+
+    var steps = updates.map(function(update) {
+      return update.step;
+    });
+
+    return exports.loadStepIncludes(steps)
+        .then(function () {
+          // Add the body for each step to the page body
+          var body = $('.body-wrapper');
+          var before;
+
+          updates.forEach(function (update) {
+            var existing = $('[data-step-name="' + update.name + '"]');
+            if (update.action === 'removed') {
+              existing.remove();
+              return;
+            }
+
+            var stepBody = exports.prepareStepBody(update.step);
+
+            if (update.action === 'updated') {
+              existing.replaceWith(stepBody);
+              return;
+            }
+
+            if (update.action === 'modified') {
+              stepBody = body.find('[data-step-name="' + update.name + '"]');
+              stepBody.find('.cd-step-title').html(update.title || update.name);
+              stepBody.detach();
+            }
+
+            // Modified or added steps get inserted into the dom
+            if (update.after) {
+              before = body.find('[data-step-name="' + update.after + '"]');
+            } else {
+              before = body.find('.cd-body-header').after(stepBody);
+            }
+
+            if (before && before.length > 0) {
+              before.after(stepBody);
+            } else if (update.after) {
+              body.append(stepBody);
+            } else {
+              body.prepend(stepBody);
+            }
+
+          });
+
+          $(window).trigger('resize');
+        });
+  }
+  exports.processStepUpdates = processStepUpdates;
+
+}());
+
+(function () {
+  'use strict';
+
+  var exports = window.CAULDRON || {};
+  window.CAULDRON = exports;
+
+
+  /**
+   *
+   */
+  function getNoCacheString() {
+    var d = new Date();
+    return d.getUTCMilliseconds() + '-' +
+        d.getUTCSeconds() + '-' +
+        d.getUTCMinutes() + '-' +
+        d.getUTCHours() + '-' +
+        d.getUTCDay() + '-' +
+        d.getUTCMonth() + '-' +
+        d.getUTCFullYear();
+  }
+  exports.getNoCacheString = getNoCacheString;
+
+
+  /**
+   *
+   * @param lower
+   * @returns {*|string|XML|void}
+   */
+  function capitalize(lower) {
+    return (lower ? this.toLowerCase() : this)
+        .replace(/(?:^|\s)\S/g, function(a) {
+          return a.toUpperCase();
+        });
+  }
+  exports.capitalize = capitalize;
+
+
+  /**
+   *
+   * @param value
+   * @param unc
+   * @returns {string}
+   */
+  function toDisplayNumber(value, unc) {
+    return (0.01*Math.round(100.0*value)).toFixed(2) +
+        ' &#177; ' +
+        (0.01*Math.round(100.0*unc)).toFixed(2);
+  }
+  exports.toDisplayNumber = toDisplayNumber;
+
+}());
+(function () {
+  'use strict';
+
+  var exports = window.CAULDRON || {};
+  window.CAULDRON = exports;
+
+  exports.RUNNING = false;
+
+
+  /**
+   *
+   */
+  function parseUrlParameters() {
+    var out = {};
+
+    document.location.search
+      .replace(/(^\?)/, '')
+      .split("&")
+      .forEach(function (item) {
+        item = item.split("=");
+        if (item.length < 2) {
+          return;
+        }
+
+        var v = item[1];
+        if (!/[^0-9\.]+/.test(v)) {
+          if (v.indexOf('.') === -1) {
+            v = parseInt(v, 10);
+          } else {
+            v = parseFloat(v);
+          }
+        } else if (v.toLowerCase() === 'true') {
+          v = true;
+        } else if (v.toLowerCase() === 'false') {
+          v = false;
+        } else {
+          v = decodeURIComponent(v);
+        }
+
+        out[item[0]] = v;
+      });
+    return out;
+  }
+  exports.parseUrlParameters = parseUrlParameters;
+
+  /**
+   *
+   */
+  function run() {
+    return exports.initialize()
+        .then(function () {
+          var body = $('body');
+  
+          exports.addSnapshotBar();
+          $('title').text(exports.TITLE);
+
+          if (exports.SETTINGS.headerless) {
+            return;
+          }
+
+          exports.createHeader();
+          $('.cd-body-header').find('.project-title').text(exports.TITLE);
+        });
+  }
+  exports.run = run;
+
+  /**
+   * RUN APPLICATION
+   */
+  $(function () {
+    exports.PARAMS = exports.parseUrlParameters();
+    exports.run()
+        .then(function () {
+          exports.RUNNING = true;
+
+          // Resolve the ready promise
+          exports.__on__.ready();
+
+          $(window).resize();
+        });
+  });
+
+}());
+
