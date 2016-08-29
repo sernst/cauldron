@@ -40,7 +40,18 @@ def populate(
     action = raw_args.pop(0).lower()
     assigned_args['action'] = action
 
-    if action != 'list':
+    if action == 'add':
+        parser.add_argument(
+            'step_name',
+            type=str,
+            nargs='?',
+            help=cli.reformat(
+                """
+                The name of the step you want to create
+                """
+            )
+        )
+    elif action != 'list':
         parser.add_argument(
             'step_name',
             type=str,
@@ -134,7 +145,9 @@ def execute(
         actions.echo_steps()
         return
 
-    if not step_name:
+    if action == 'add' and not step_name:
+            step_name = ''
+    elif not step_name:
         return environ.output.fail().notify(
             kind='ABORTED',
             code='NO_STEP_NAME',

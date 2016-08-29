@@ -40,6 +40,7 @@ def explode_filename(name: str, scheme: str) -> dict:
     }
 
     scheme_pattern = '^'
+    empty_scheme_pattern = ''
 
     offset = 0
     while offset < len(scheme):
@@ -47,17 +48,21 @@ def explode_filename(name: str, scheme: str) -> dict:
         next_char = scheme[offset + 1] if (offset + 1) < len(scheme) else None
 
         if char in '.()^$?*+\[]|':
-            scheme_pattern += '\\{}'.format(char)
+            addition = '\\{}'.format(char)
+            scheme_pattern += addition
+            empty_scheme_pattern += addition
             offset += 1
             continue
 
         if char != '{':
             scheme_pattern += char
+            empty_scheme_pattern += char
             offset += 1
             continue
 
         if next_char != '{':
             scheme_pattern += char
+            empty_scheme_pattern += char
             offset += 1
             continue
 
@@ -68,16 +73,24 @@ def explode_filename(name: str, scheme: str) -> dict:
         if contents in replacements:
             scheme_pattern += replacements[contents]
         elif contents == ('#' * len(contents)):
-            scheme_pattern += replacements['index'].format(length=len(contents))
+            addition = replacements['index'].format(length=len(contents))
+            scheme_pattern += addition
+            empty_scheme_pattern += addition
         else:
-            scheme_pattern += '{{{}}}'.format(contents)
+            addition = '{{{}}}'.format(contents)
+            scheme_pattern += addition
+            empty_scheme_pattern += addition
 
         offset = end_index + 2
 
     match = re.compile(scheme_pattern).match(name)
 
     if not match:
-        return split_filename(name)
+        parts = split_filename(name)
+        comparison = re.compile(empty_scheme_pattern.rstrip('-_: .\\'))
+        if comparison.match(parts['name']):
+            parts['name'] = ''
+        return parts
 
     index = match.group('index')
     index = int(index) if index else None
@@ -139,6 +152,6 @@ def assemble_filename(
     parts = split_filename(out)
 
     if not name:
-        parts['name'] = parts['name'].rstrip('-_: ')
+        parts['name'] = parts['name'].rstrip('-_: .')
 
     return '{}.{}'.format(parts['name'].strip(), parts['extension'])

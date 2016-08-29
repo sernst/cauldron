@@ -100,6 +100,8 @@ def create_step(
 
     project = cauldron.project.internal_project
     index = index_from_location(project, position)
+    if index is None:
+        index = len(project.steps)
 
     name_parts = naming.explode_filename(name, project.naming_scheme)
     name_parts['index'] = index
