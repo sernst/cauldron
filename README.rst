@@ -45,13 +45,13 @@ with the best elements of traditional software development workflow:
 - **Straight to Production**: Cauldron projects can be run in non-interactive
   mode as well as run from inside other python applications, which makes it
   easy to *productionize* and deploy an analysis when it's ready.
-- **Cleaner Version Control**: Common version control actions like diff-ing and
+- **Clean Version Control**: Common version control actions like diff-ing and
   merging are obstructed when the code is embedded in notebook files. In
   Cauldron, where code is stored in independent code files, you can take full
   advantage of version control functionality.
-- **Easier Code Review**: Embedded notebook code also makes reviews cumbersome
-  to say the least. Cauldron's independent code files provide all of the
-  flexibility available to traditional code review.
+- **Code Review Friendly**: Embedded notebook code also makes reviews
+  cumbersome to say the least. Cauldron's independent code files provide all
+  of the flexibility available to traditional code review.
 
 With Cauldron you write code in your choice of interactive development
 environment (IDE) or text editor, and run it using the Cauldron shell like a
@@ -132,7 +132,7 @@ If you enter the beginning of the command above::
 and hit the tab key with the cursor at the end of the line, Cauldron will give
 you a list of the example project subdirectories.
 
-A good example to start would be Cauldron's *hello-world*::
+A good example to start would be Cauldron's *hello_cauldron*::
 
     <>: open @examples:hello_cauldron/
 
@@ -144,14 +144,22 @@ Instead of ``<>:``, which signifies no open project, the prompt should now be
 If you now enter the ``run`` command without any arguments, all steps (cells)
 in the project will run::
 
-    <hello-world>: run
+    <hello_cauldron>: run
 
 Once complete, you can view the current state of the notebook display with the
 show command::
 
-    <hello-world>: show
+    <hello_cauldron>: show
 
-which opens the current project display file in your default browser.
+which opens the current project display file in your default browser. When you
+are finished working on a project, you use the close to command::
+
+   <hello_cauldron>: close
+
+This empties all of the information Cauldron has been storing for your project
+in memory, and takes you back to the initial command prompt where you started::
+
+   <>:
 
 Tutorial: First Project
 -----------------------
@@ -186,16 +194,22 @@ Add First Code Step
 ~~~~~~~~~~~~~~~~~~~
 
 Now that the project has been created, you need to add some code to it. To
-do that, use the ``step add`` command::
+do that, use the ``steps add`` command::
 
-    <hello_cauldron>: step add create_data.py
+    <hello_cauldron>: steps add create_data.py
 
-This will create a new step called *create_data.py* in your project
-directory and add modify the Cauldron project file to recognize the new step.
-The step file is ready to be modified. Open the *create_data.py* step file in
-your choice of Python code editor. You'll find the file in the project
-directory, which is *~/cauldron/hello_cauldron/*. Add the following code to
-the *create_data.py* file:
+This will create a new step called *S01-create_data.py* in your project
+directory and add it to the Cauldron project. Notice that the name you gave
+the step and the one actual step name are different. There's an *S01-* prefix
+added to the file. This prefix is added automatically by Cauldron to help you
+organize your files. You can disable this feature when you create a project if
+you really want to manage the names all yourself, but we'll get into that in
+an advanced tutorial.
+
+The step file you created is ready to be modified. Open the
+*S01-create_data.py* step file in your choice of Python code editor. You'll
+find the file in the project directory, which is *~/cauldron/hello_cauldron/*.
+Add the following code to the *S01-create_data.py* file:
 
 .. code-block:: python3
 
@@ -213,8 +227,8 @@ the *create_data.py* file:
 
     cd.shared.df = df
 
-Once you've saved that code to the *create_data.py* file, you can run this
-code with the ``run`` command::
+Once you've saved that code to the *S01-create_data.py* file, you can run your
+project using the ``run`` command::
 
     <hello_cauldron>: run
 
@@ -232,7 +246,7 @@ again use the steps command::
 
     <hello_cauldron>: steps add plot_data.py
 
-Open the *plot_data.py* step file and add the following code:
+Open the *S02-plot_data.py* step file and add the following code:
 
 .. code-block:: python3
 
@@ -252,7 +266,7 @@ Open the *plot_data.py* step file and add the following code:
 
 We used matplotlib for this tutorial, but Cauldron also supports Seaborn,
 Bokeh, Plotly or any other Python plotting library that can produce an HTML
-output. There is a Cauldron example project showing how to plot using each of
+output. There are Cauldron example projects showing how to plot using each of
 these libraries.
 
 Now run the project again::
@@ -262,11 +276,11 @@ Now run the project again::
 You'll notice that the shell output looks like::
 
     === RUNNING ===
-    [create_data.py]: Nothing to update
-    [plot_data.py]: Updated
+    [S01-create_data.py]: Nothing to update
+    [S02-plot_data.py]: Updated
 
-The *create_data.py* step was not run because it hasn't been modified since the
-last time you executed the ``run`` command. Just like other notebooks, the
+The *S01-create_data.py* step was not run because it hasn't been modified since
+the last time you executed the ``run`` command. Just like other notebooks, the
 results of running a step (cell) persist until you close the project and do not
 need to be updated each time. Cauldron watches for changes to your files and
 only updates steps if the files have been modified, or an early step was
@@ -276,4 +290,13 @@ Now you can view the updated project display simply by refreshing your browser.
 However, if you already closed the project display browser window, you can show
 it again at any time with the ``show`` command.
 
-And that's that. You've successfully created your first Cauldron project.
+And that's that. You've successfully created your first Cauldron project. You
+can close your project with the ``close`` command::
+
+   <hello_cauldron>: close
+
+Or, if you want to exit the Cauldron shell at any time, use the ``exit``
+command::
+
+   <>: exit
+
