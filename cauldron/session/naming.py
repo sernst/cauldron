@@ -1,5 +1,22 @@
 import os
 import re
+import typing
+
+
+def find_default_filename(existing_names: typing.List[str]) -> dict:
+    other_names = []
+
+    for n in existing_names:
+        other_names.append(split_filename(n)['name'])
+
+    index = 0
+    for i in range(1000):
+        index += 1
+        name = '{}'.format(index)
+        if name not in other_names:
+            return name
+
+    return None
 
 
 def split_filename(name: str) -> dict:

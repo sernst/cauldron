@@ -104,6 +104,12 @@ def create_step(
         index = len(project.steps)
 
     name_parts = naming.explode_filename(name, project.naming_scheme)
+
+    if not project.naming_scheme and not name_parts['name']:
+        name_parts['name'] = naming.find_default_filename(
+            [s.definition.name for s in project.steps]
+        )
+
     name_parts['index'] = index
     name = naming.assemble_filename(
         scheme=project.naming_scheme,
@@ -277,6 +283,12 @@ def modify_step(
 
     new_name_parts = naming.explode_filename(new_name, project.naming_scheme)
     new_name_parts['index'] = new_index
+
+    if not project.naming_scheme and not new_name_parts['name']:
+        new_name_parts['name'] = naming.find_default_filename(
+            [s.definition.name for s in project.steps]
+        )
+
     new_name = naming.assemble_filename(
         scheme=project.naming_scheme,
         **new_name_parts

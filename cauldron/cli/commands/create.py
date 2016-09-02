@@ -73,6 +73,14 @@ def populate(
         help=cli.reformat('Names of the author or authors of the project')
     )
 
+    parser.add_argument(
+        '--no-naming-scheme',
+        dest='no_naming_scheme',
+        default=False,
+        action='store_true',
+        help=cli.reformat('Disables the auto naming scheme for the project')
+    )
+
 
 def execute(
         parser: ArgumentParser,
@@ -80,7 +88,8 @@ def execute(
         directory: str,
         title: str = '',
         summary: str = '',
-        author: str = ''
+        author: str = '',
+        no_naming_scheme: bool = False
 ):
     """
 
@@ -131,7 +140,7 @@ def execute(
         summary=summary,
         author=author,
         steps=[],
-        naming_scheme=projects.DEFAULT_SCHEME
+        naming_scheme=None if no_naming_scheme else projects.DEFAULT_SCHEME
     )
 
     with open(os.path.join(directory, 'cauldron.json'), 'w+') as f:
