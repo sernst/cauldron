@@ -9,6 +9,8 @@ from setuptools import find_packages
 # rm -rf ./dist
 # python3 setup.py sdist bdist_wheel
 # twine upload dist/cauldron*
+#
+# conda build conda.recipe/
 
 MY_DIRECTORY = os.path.dirname(__file__)
 with open(os.path.join(MY_DIRECTORY, 'cauldron', 'settings.json'), 'r+') as f:
