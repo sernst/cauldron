@@ -1,5 +1,6 @@
 import re
 import textwrap
+from cauldron import environ
 
 try:
     import markdown as md
@@ -18,6 +19,8 @@ def latex(source: str, inline: bool = False) -> str:
     :return:
     """
 
+    environ.abort_thread()
+
     return templating.render_template(
         'katex.html',
         source=render_utils.format_latex(source),
@@ -32,6 +35,8 @@ def head(value, count: int = 5) -> str:
     :param count:
     :return:
     """
+
+    environ.abort_thread()
 
     if count < 1:
         return ''
@@ -84,6 +89,8 @@ def tail(value, count: int = 5) -> str:
     :return:
     """
 
+    environ.abort_thread()
+
     if count < 1:
         return ''
 
@@ -130,6 +137,8 @@ def text(value: str) -> str:
     :return:
     """
 
+    environ.abort_thread()
+
     value = render_utils.html_escape(value)
     lines = str(value).strip().split('\n')
 
@@ -149,6 +158,8 @@ def preformatted_text(source: str) -> str:
     :return:
     """
 
+    environ.abort_thread()
+
     source = render_utils.html_escape(source)
 
     return '<pre class="preformatted-textbox">{text}</pre>'.format(
@@ -162,6 +173,8 @@ def markdown(source: str, **kwargs) -> dict:
     :param source:
     :return:
     """
+
+    environ.abort_thread()
 
     library_includes = []
     source = templating.render(source, **kwargs)

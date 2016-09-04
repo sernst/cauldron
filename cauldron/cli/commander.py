@@ -3,6 +3,7 @@ from cauldron import environ
 from cauldron.cli import commands
 from cauldron.environ.response import Response
 from cauldron.cli import parse
+from cauldron.cli.threads import CauldronThread
 
 COMMANDS = dict()
 
@@ -78,9 +79,14 @@ def execute(
 
     del command_args['show_help']
 
-    module.execute(parser=parser, **command_args)
-    environ.output = None
+    t = CauldronThread()
+    t.command = module.execute
+    t.args = [parser]
+    t.kwargs = command_args
+    t.response = output
 
+    output.thread = t
+    t.start()
     return output
 
 

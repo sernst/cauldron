@@ -1,4 +1,6 @@
+import time
 import flask
+import cauldron as cd
 from cauldron.cli import commander
 from cauldron.cli.server import run as server_run
 from cauldron.cli.server.routes import display
@@ -6,6 +8,8 @@ from cauldron.cli.server.routes import status
 from cauldron.environ import logger
 from cauldron.environ.response import Response
 from flask import request
+
+active_execution_responses = dict()
 
 
 @server_run.APPLICATION.route('/', methods=['GET', 'POST'])
@@ -55,6 +59,37 @@ def execute():
 
     try:
         commander.execute(name, args, r)
+        if not r.thread:
+            return flask.jsonify(r.serialize())
+
+        active_execution_responses[r.thread.uid] = r
+
+        # Watch the thread for a bit to see if the command finishes in
+        # that time. If it does the command result will be returned directly
+        # to the caller. Otherwise, a waiting command will be issued
+        count = 0
+        while count < 4:
+            count += 1
+            time.sleep(0.25)
+            if not r.thread.is_alive():
+                break
+
+        if r.thread.is_alive():
+            return flask.jsonify(
+                Response()
+                .update(
+                    run_status='running',
+                    run_uid=r.thread.uid,
+                    __server__=server_run.get_server_data()
+                )
+                .serialize()
+            )
+
+        del active_execution_responses[r.thread.uid]
+        r.update(
+            run_status='complete',
+            run_uid=r.thread.uid
+        )
     except Exception as err:
         r.fail().notify(
             kind='ERROR',
@@ -71,3 +106,105 @@ def execute():
 
     return flask.jsonify(r.serialize())
 
+
+@server_run.APPLICATION.route(
+    '/run-status/<uid>',
+    methods=['GET', 'POST']
+)
+def run_status(uid: str):
+    """
+
+    :param uid:
+    :return:
+    """
+
+    try:
+        r = active_execution_responses.get(uid)
+
+        if not r:
+            return flask.jsonify(
+                Response()
+                .update(
+                    run_active_uids=list(active_execution_responses.keys()),
+                    run_status='unknown',
+                    run_uid=uid,
+                    __server__=server_run.get_server_data()
+                )
+                .serialize()
+            )
+
+        if r.thread.is_alive():
+            return flask.jsonify(
+                Response()
+                .update(
+                    run_status='running',
+                    run_uid=uid,
+                    __server__=server_run.get_server_data()
+                )
+                .serialize()
+            )
+
+        del active_execution_responses[uid]
+        r.update(
+            run_status='complete',
+            run_uid=r.thread.uid
+        )
+        return flask.jsonify(r.serialize())
+
+    except Exception as err:
+        return flask.jsonify(
+            Response()
+            .fail().notify(
+                kind='ERROR',
+                code='COMMAND_STATUS_FAILURE',
+                message='Unable to check command execution status'
+            )
+            .kernel(
+                uid=uid,
+                error=str(err),
+                stack=logger.get_error_stack()
+            )
+            .serialize()
+        )
+
+
+@server_run.APPLICATION.route('/abort', methods=['GET', 'POST'])
+def abort():
+
+    uids = list(active_execution_responses.keys())
+
+    while len(uids) > 0:
+        uid = uids.pop()
+
+        response = active_execution_responses.get(uid)
+        if not response:
+            continue
+
+        try:
+            del active_execution_responses[uid]
+        except Exception:
+            pass
+
+        if not response.thread or not response.thread.is_alive():
+            continue
+
+        # Try to stop the thread gracefully
+        response.thread.abort = True
+        response.thread.join(1)
+
+        try:
+            # Force stop the thread explicitly
+            if response.thread.is_alive():
+                response.thread._Thread_stop()
+        except Exception:
+            pass
+
+    project = cd.project.internal_project
+
+    return flask.jsonify(
+        Response()
+        .update(
+            project=project.kernel_serialize()
+        )
+        .serialize()
+    )

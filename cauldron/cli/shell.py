@@ -52,6 +52,8 @@ class CauldronShell(cmd.Cmd):
             return commander.show_help().ended
 
         result = commander.execute(name, raw_args)
+        if result.thread:
+            result.thread.join()
 
         p = cauldron.project
         if not p or not p.internal_project or not p.internal_project.id:

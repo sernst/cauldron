@@ -2,6 +2,7 @@ import typing
 import io
 
 from cauldron import templating
+from cauldron import environ
 
 
 def pyplot(
@@ -18,6 +19,8 @@ def pyplot(
     :param aspect_ratio:
     :return:
     """
+
+    environ.abort_thread()
 
     from bs4 import BeautifulSoup
 
@@ -81,6 +84,8 @@ def bokeh_plot(
     :param responsive:
     :return:
     """
+
+    environ.abort_thread()
 
     try:
         from bokeh import embed

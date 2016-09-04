@@ -1,5 +1,6 @@
 import json
 from cauldron import templating
+from cauldron import environ
 
 
 def render_tree(inspected_data: dict):
@@ -8,6 +9,8 @@ def render_tree(inspected_data: dict):
     :param inspected_data:
     :return:
     """
+
+    environ.abort_thread()
 
     def to_jstree_node(d: dict) -> dict:
         children = d.get('structure', [])
@@ -33,6 +36,8 @@ def inspect_data(source_key: str = None, source=None) -> dict:
     :param source:
     :return:
     """
+
+    environ.abort_thread()
 
     if isinstance(source, dict):
         out = {
@@ -74,6 +79,8 @@ def echo_inspection_data(
 
     :return:
     """
+
+    environ.abort_thread()
 
     if entries is None:
         entries = []
@@ -123,6 +130,8 @@ def inspect_json_structure(path: str) -> dict:
         The path to the JSON file to be inspected
     """
 
+    environ.abort_thread()
+
     with open(path, 'r+') as f:
         data = json.load(f)
 
@@ -138,6 +147,7 @@ def echo_json_structure(path: str) -> str:
     :param path:
         The source path to the JSON file
     """
+    environ.abort_thread()
 
     out = []
     echo_inspection_data(inspect_json_structure(path), -1, out)

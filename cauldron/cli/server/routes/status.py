@@ -60,3 +60,5 @@ def project_data():
 
     r.update(__server__=server_run.get_server_data())
     return flask.jsonify(r.serialize())
+
+

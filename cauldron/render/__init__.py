@@ -22,6 +22,7 @@ def listing(source: list, ordered: bool = False) -> str:
     :param ordered:
     :return:
     """
+    environ.abort_thread()
 
     return templating.render_template(
         'listing.html',
@@ -36,6 +37,7 @@ def inspect(source: dict) -> str:
     :param source:
     :return:
     """
+    environ.abort_thread()
 
     out = inspection.inspect_data(source=source)
     return inspection.render_tree(out)
@@ -53,6 +55,7 @@ def code_file(
     :param mime_type:
     :return:
     """
+    environ.abort_thread()
 
     path = environ.paths.clean(path)
 
@@ -84,6 +87,7 @@ def code(
     :param mime_type:
     :return:
     """
+    environ.abort_thread()
 
     if not source:
         return ''
@@ -103,6 +107,7 @@ def header(contents: str, level: int = 1) -> str:
     :param contents:
     :return:
     """
+    environ.abort_thread()
 
     return templating.render(
         """
@@ -120,6 +125,7 @@ def json(window_key: str, data) -> str:
     :param data:
     :return:
     """
+    environ.abort_thread()
 
     return templating.render(
         """
@@ -138,6 +144,7 @@ def html(content) -> str:
     :param content:
     :return:
     """
+    environ.abort_thread()
 
     return templating.render(
         '<div class="box">{{content}}</div>',
@@ -153,6 +160,7 @@ def plotly(data: dict, layout: dict, scale: float = 0.5) -> str:
     :param scale:
     :return:
     """
+    environ.abort_thread()
 
     if plotly_lib is None:
         raise ImportError('Unable to import Plotly library')
@@ -175,6 +183,7 @@ def table(data_frame, scale: float = 0.7) -> str:
     :param scale:
     :return:
     """
+    environ.abort_thread()
 
     table_id = 'table-{}-{}'.format(
         datetime.utcnow().strftime('%H-%M-%S-%f'),
@@ -204,6 +213,7 @@ def whitespace(lines: float = 1.0) -> str:
     :param lines:
     :return:
     """
+    environ.abort_thread()
 
     pixels = round(12 * lines)
     return '<div style="height:{}px"> </div>'.format(pixels)
@@ -216,6 +226,7 @@ def jinja(path: str, **kwargs) -> str:
     :param kwargs:
     :return:
     """
+    environ.abort_thread()
 
     return templating.render_file(path, **kwargs)
 
@@ -226,6 +237,7 @@ def svg(svg_data: str) -> str:
     :param svg_data:
     :return:
     """
+    environ.abort_thread()
 
     return templating.render(
         '<div class="svg-box">{{ svg }}</div>',
@@ -245,6 +257,7 @@ def status(
     :param types:
     :return:
     """
+    environ.abort_thread()
 
     out = []
     keys = list(data.keys())

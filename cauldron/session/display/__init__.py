@@ -30,11 +30,11 @@ def inspect(source: dict):
     r.append_body(render.inspect(source))
 
 
-def header(text: str, level: int = 1):
+def header(header_text: str, level: int = 1):
     """
     Adds a text header to the display with the specified level.
 
-    :param text:
+    :param header_text:
         The text to display in the header
     :param level:
         The level of the header, which corresponds to the html header
@@ -43,7 +43,7 @@ def header(text: str, level: int = 1):
     """
 
     r = _get_report()
-    r.append_body(render.header(text, level=level))
+    r.append_body(render.header(header_text, level=level))
 
 
 def text(text: str, preformatted: bool = False):

@@ -48,6 +48,8 @@ def create_project(
     args = ' '.join([a for a in args if a and len(a) > 0])
 
     commander.execute('create', args, r)
+    if r.thread:
+        r.thread.join()
 
     return r
 
@@ -65,6 +67,7 @@ def open_project(
 
     r = environ.Response()
     commander.execute('open', path, r)
+    r.thread.join()
     return r
 
 

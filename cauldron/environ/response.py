@@ -159,6 +159,7 @@ class Response(object):
         self.messages = []  # type: typing.List[ResponseMessage]
         self.ended = False
         self.failed = False
+        self.thread = None
 
     def echo(self) -> str:
         """

@@ -6,7 +6,7 @@ from pygments.lexers import get_lexer_for_mimetype
 from pygments.lexers import guess_lexer
 from pygments.lexers import guess_lexer_for_filename
 from pygments.util import ClassNotFound
-
+from cauldron import environ
 
 def as_html(
         source: str,
@@ -22,6 +22,8 @@ def as_html(
     :param mime_type:
     :return:
     """
+
+    environ.abort_thread()
 
     lexer = fetch_lexer(source, language, filename, mime_type)
     if not lexer:
@@ -44,6 +46,8 @@ def fetch_lexer(
     :param mime_type:
     :return:
     """
+
+    environ.abort_thread()
 
     try:
         if language:

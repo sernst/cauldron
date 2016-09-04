@@ -14,6 +14,7 @@ class TestRun(scaffolds.ResultsTest):
 
         r = environ.Response()
         commander.execute('run', '', r)
+        r.thread.join()
 
         self.assertFalse(r.failed)
         support.run_command('close')
@@ -26,6 +27,7 @@ class TestRun(scaffolds.ResultsTest):
 
         r = environ.Response()
         commander.execute('run', '.', r)
+        r.thread.join()
 
         self.assertFalse(r.failed)
         support.run_command('close')
@@ -38,10 +40,12 @@ class TestRun(scaffolds.ResultsTest):
 
         r = environ.Response()
         commander.execute('run', 'S01-create-data.py', r)
+        r.thread.join()
         self.assertFalse(r.failed)
 
         r = environ.Response()
         commander.execute('run', 'S02-plot-data.py', r)
+        r.thread.join()
         self.assertFalse(r.failed)
         support.run_command('close')
 
@@ -53,6 +57,7 @@ class TestRun(scaffolds.ResultsTest):
 
         r = environ.Response()
         commander.execute('run', '', r)
+        r.thread.join()
 
         self.assertFalse(r.failed)
         support.run_command('close')
