@@ -43,7 +43,6 @@
    * @param renames
    */
   function processStepRenames(renames) {
-    console.log('RENAMES:', renames);
     if (!renames) {
       return Promise.resolve(renames);
     }
@@ -67,7 +66,6 @@
    *
    */
   function processStepUpdates(updates) {
-    console.log('UPDATES:', updates);
     if (!updates) {
       return;
     }

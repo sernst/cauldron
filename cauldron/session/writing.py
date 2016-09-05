@@ -30,9 +30,12 @@ def write_step(step: 'projects.ProjectStep') -> dict:
 
     out['has_error'] = step.error
 
-    if step.dom is None:
-        step.dumps()
-    out['body'] = step.dom
+    if step.dom is None or step.is_running:
+        step_body = step.dumps()
+    else:
+        step_body = step.dom
+
+    out['body'] = step_body
 
     report = step.report
     out['data'].update(report.data.fetch(None))

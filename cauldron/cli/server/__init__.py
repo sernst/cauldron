@@ -1,12 +1,12 @@
-import time
-import flask
 import cauldron as cd
+import flask
 from cauldron.cli import commander
 from cauldron.cli.server import run as server_run
 from cauldron.cli.server.routes import display
 from cauldron.cli.server.routes import status
 from cauldron.environ import logger
 from cauldron.environ.response import Response
+from cauldron.session import writing
 from flask import request
 
 active_execution_responses = dict()
@@ -68,9 +68,9 @@ def execute():
         # that time. If it does the command result will be returned directly
         # to the caller. Otherwise, a waiting command will be issued
         count = 0
-        while count < 4:
+        while count < 5:
             count += 1
-            time.sleep(0.25)
+            r.thread.join(0.25)
             if not r.thread.is_alive():
                 break
 
@@ -80,6 +80,7 @@ def execute():
                 .update(
                     run_status='running',
                     run_uid=r.thread.uid,
+                    step_changes=get_running_step_changes(),
                     __server__=server_run.get_server_data()
                 )
                 .serialize()
@@ -139,6 +140,7 @@ def run_status(uid: str):
                 .update(
                     run_status='running',
                     run_uid=uid,
+                    step_changes=get_running_step_changes(),
                     __server__=server_run.get_server_data()
                 )
                 .serialize()
@@ -208,3 +210,23 @@ def abort():
         )
         .serialize()
     )
+
+
+def get_running_step_changes() -> list:
+    """
+
+    :return:
+    """
+
+    project = cd.project.internal_project
+
+    step_changes = []
+    for ps in project.steps:
+        if ps.is_running:
+            step_changes.append(dict(
+                name=ps.definition.name,
+                action='updated',
+                step=writing.write_step(ps)
+            ))
+
+    return step_changes

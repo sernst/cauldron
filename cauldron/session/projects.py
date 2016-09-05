@@ -35,6 +35,7 @@ class ProjectStep(object):
         self.report = Report(self)
         self.last_modified = None
         self.code = None
+        self.is_running = False
         self._is_dirty = True
         self.error = None
         self.is_muted = False
@@ -157,7 +158,13 @@ class ProjectStep(object):
                 code=render.code_file(fn_path)
             ))
 
-        body = ''.join(self.report.body)
+        body = self.report.body
+        if self.is_running:
+            body_prints = self.report.read_prints()
+            if body_prints:
+                body = body + [body_prints]
+        body = ''.join(body)
+
         has_body = len(body) > 0 and (
             body.find('<div') != -1 or
             body.find('<span') != -1 or
@@ -169,7 +176,7 @@ class ProjectStep(object):
             body.find('<li') != -1
         )
 
-        self.dom = templating.render_template(
+        dom = templating.render_template(
             'step-body.html',
             codes=codes,
             body=body,
@@ -181,7 +188,11 @@ class ProjectStep(object):
             error=self.error,
             index=self.index
         )
-        return self.dom
+
+        if not self.is_running:
+            self.dom = dom
+
+        return dom
 
 
 class Project(object):

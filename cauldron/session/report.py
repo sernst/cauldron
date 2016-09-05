@@ -1,4 +1,5 @@
 import io
+import sys
 
 from cauldron.render import texts as render_texts
 from cauldron.session.caching import SharedCache
@@ -57,6 +58,27 @@ class Report(object):
 
         self.flush_prints()
         self.body.append(dom)
+
+    def read_prints(self):
+        """
+        Reads the current state of the print buffer (if it exists) and returns
+        a body-ready dom object of those contents without adding them to the
+        actual report body. This is useful for creating intermediate body
+        values for display while the method is still executing.
+
+        :return:
+            A dom string for the current state of the print buffer contents
+        """
+
+        try:
+            buffered_bytes = self.print_buffer.buffer.getvalue()
+            contents = buffered_bytes.decode(sys.stdout.encoding)
+        except Exception as err:
+            return render_texts.preformatted_text(
+                'Print Buffer Error: {}'.format(err)
+            )
+
+        return render_texts.preformatted_text(contents)
 
     def flush_prints(self):
         """
