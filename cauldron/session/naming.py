@@ -105,17 +105,18 @@ def explode_filename(name: str, scheme: str) -> dict:
     if not match:
         parts = split_filename(name)
         comparison = re.compile(empty_scheme_pattern.rstrip('-_: .\\'))
-        if comparison.match(parts['name']):
-            parts['name'] = ''
-        return parts
+        match = comparison.match(parts['name'])
+        if not match:
+            return parts
 
-    index = match.group('index')
+    parts = match.groupdict()
+    index = parts.get('index')
     index = int(index) if index else None
 
     return dict(
         index=index - 1,
-        name=match.group('name'),
-        extension=match.group('extension')
+        name=parts.get('name', ''),
+        extension=parts.get('extension', 'py')
     )
 
 

@@ -116,6 +116,8 @@ def create_step(
         **name_parts
     )
 
+    step_renames = synchronize_step_names(index)
+
     step_data = {'name': name}
 
     if title:
@@ -125,13 +127,11 @@ def create_step(
 
     if not os.path.exists(result.source_path):
         with open(result.source_path, 'w+') as f:
-            f.write('')
+            f.write('import cauldron as cd\n\n')
 
     project.save()
 
     index = project.steps.index(result)
-
-    step_renames = synchronize_step_names()
 
     step_changes = [dict(
         name=result.definition.name,
@@ -203,11 +203,12 @@ def remove_step(name: str, keep_file: bool = False):
     return True
 
 
-def synchronize_step_names():
+def synchronize_step_names(insert_index: int = None):
     """
-
+    :param insert_index:
     :return:
     """
+
     project = cauldron.project.internal_project
     results = dict()
 
@@ -217,8 +218,16 @@ def synchronize_step_names():
     for s in reversed(project.steps):
         name = s.definition.name
         name_parts = naming.explode_filename(name, project.naming_scheme)
+
         index = project.index_of_step(name)
+
+        if insert_index is not None and insert_index <= index:
+            # Adjusts indexing when renaming is for the purpose of
+            # inserting a new step
+            index += 1
+
         name_parts['index'] = index
+        print('NAME PARTS:', name_parts, 'INDEX:', index)
         new_name = naming.assemble_filename(
             scheme=project.naming_scheme,
             **name_parts
