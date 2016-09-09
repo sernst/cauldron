@@ -89,6 +89,11 @@
       // If the results were included in the page directly, don't load them
       // again
       prom = Promise.resolve();
+    } else if (window.RESULTS_FILENAME) {
+      prom = exports.loadSourceFile({
+        name: 'cauldron-project',
+        src: ':' + window.RESULTS_FILENAME
+      });
     } else {
       prom = exports.loadSourceFile({
         name: 'cauldron-project',

@@ -91,6 +91,7 @@ def run_step(
         step.last_modified = time.time()
         environ.log('[{}]: Updated'.format(step.definition.name))
     else:
+        step.last_modified = 0.0
         step.error = result['html_message']
         environ.output.fail(
             project=project.kernel_serialize()

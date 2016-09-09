@@ -102,4 +102,8 @@ def execute(parser: ArgumentParser, path: str, directory_name: str = None):
     with open(html_path, 'w+') as f:
         f.write(dom)
 
+    index_path = os.path.join(out_path, 'index.html')
+    with open(index_path, 'w+') as f:
+        f.write(dom)
+
 
