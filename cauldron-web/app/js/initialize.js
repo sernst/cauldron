@@ -32,16 +32,24 @@
    */
   function initializeDataDirectory() {
     var dataDirectory = window.PROJECT_DIRECTORY;
-    var id = exports.PARAMS['id'];
+    var id = exports.PARAMS['id'] || window.PROJECT_ID;
     var sid = exports.PARAMS['sid'];
 
     if (!dataDirectory) {
-      dataDirectory = 'reports/' + id;
-      if (sid) {
-        dataDirectory += '/snapshots/' + sid;
-      } else {
-        dataDirectory += '/latest';
+      dataDirectory = ['reports'];
+
+      if (id) {
+        dataDirectory.push(id);
       }
+
+      if (sid) {
+        dataDirectory.push('snapshots');
+        dataDirectory.push(sid);
+      } else {
+        dataDirectory.push('latest');
+      }
+
+      dataDirectory = dataDirectory.join('/');
     }
 
     exports.DATA_DIRECTORY = dataDirectory;

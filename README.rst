@@ -86,11 +86,22 @@ directory and run the command::
 Getting Started
 ---------------
 
-Once the installation is complete, you'll have access to the Cauldron shell
-from a terminal. Cauldron is a shell-based program you start from a terminal
-with the ``cauldron`` command::
+Cauldron is a shell-based program you start from a terminal. On platforms that
+support python script installation (e.g. OSX, Linux) you can start Cauldron
+once the installation is complete with the ``cauldron`` command::
 
     $ cauldron
+
+On windows, or any other situation where script installation was not
+permitted, you can start Cauldron from within Python. First start python 3 in
+a terminal::
+
+    % python3
+
+Then inside of python run the following commands::
+
+    >>> import cauldron
+    >>> cauldron.run_shell()
 
 Once started, the Cauldron shell provides all of the functionality you need to
 manage your analysis projects through a collection of commands. To see a list

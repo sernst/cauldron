@@ -4,6 +4,7 @@ import os
 import sys
 import time
 import typing
+import hashlib
 
 from cauldron import environ
 from cauldron import render
@@ -236,6 +237,15 @@ class Project(object):
         self.refresh()
 
     @property
+    def uuid(self):
+        """
+
+        :return:
+        """
+
+        return hashlib.sha1(self.source_path.encode()).hexdigest()
+
+    @property
     def library_directory(self):
         """
 
@@ -315,7 +325,7 @@ class Project(object):
         if p:
             return p
 
-        return environ.paths.results()
+        return environ.paths.results(self.uuid)
 
     @results_path.setter
     def results_path(self, value: str):
@@ -333,7 +343,7 @@ class Project(object):
 
         return 'file://{path}?id={id}'.format(
             path=os.path.join(self.results_path, 'project.html'),
-            id=self.id
+            id=self.uuid
         )
 
     @property
@@ -346,7 +356,9 @@ class Project(object):
         if not self.results_path:
             return None
 
-        return os.path.join(self.results_path, 'reports', self.id, 'latest')
+        return os.path.join(
+            self.results_path, 'reports', self.uuid, 'latest'
+        )
 
     @property
     def output_path(self) -> str:
@@ -372,7 +384,8 @@ class Project(object):
         else:
             host = ''
 
-        return '{}/view/project.html?id={}'.format(host, self.id)
+        return '{}/view/project.html?id={}'.format(host, self.uuid)
+
 
     def snapshot_path(self, *args: typing.Tuple[str]) -> str:
         """
@@ -402,6 +415,7 @@ class Project(object):
         """
 
         return dict(
+            uuid=self.uuid,
             serial_time=time.time(),
             last_modified=self.last_modified,
             source_directory=self.source_directory,

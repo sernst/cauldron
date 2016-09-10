@@ -86,6 +86,14 @@ def populate(
         )
     )
 
+    parser.add_argument(
+        '--forget',
+        dest='forget',
+        default=False,
+        action='store_true',
+        help=cli.reformat('Forget that this project was opened')
+    )
+
 
 def execute(
         parser: ArgumentParser,
@@ -93,7 +101,8 @@ def execute(
         last_opened_project: bool = False,
         a_recent_project: bool = False,
         show_in_browser: bool = False,
-        list_available: bool = False
+        list_available: bool = False,
+        forget: bool = False
 ):
     """
 
@@ -110,18 +119,18 @@ def execute(
         path = actions.fetch_last()
         if not path:
             return
-        actions.open_project(path)
     elif a_recent_project:
         path = actions.fetch_recent()
         if not path:
             return
-        actions.open_project(path)
     elif not path or not path.strip():
         actions.echo_known_projects()
         return
     else:
         p = actions.fetch_location(path)
-        actions.open_project(p if p else path)
+        path = p if p else path
+
+    actions.open_project(path, forget=forget)
 
     if show_in_browser:
         webbrowser.open(cauldron.project.internal_project.url)
@@ -141,7 +150,7 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
             segment=segment,
             value=parts[-1],
             shorts=['s', 'l', 'r', 'a'],
-            longs=['show', 'last', 'recent', 'available']
+            longs=['show', 'last', 'recent', 'available', 'forget']
         )
 
     if len(parts) == 1:

@@ -147,9 +147,11 @@ def fetch_last() -> str:
     return recent_paths[0]
 
 
-def open_project(path: str) -> bool:
+def open_project(path: str, forget: bool = False) -> bool:
     """
 
+    :param path:
+    :param forget:
     :return:
     """
 
@@ -189,11 +191,12 @@ def open_project(path: str) -> bool:
         ).console()
         return
 
-    if path in recent_paths:
-        recent_paths.remove(path)
-    recent_paths.insert(0, path)
-    environ.configs.put(recent_paths=recent_paths[:10], persists=True)
-    environ.configs.save()
+    if not forget:
+        if path in recent_paths:
+            recent_paths.remove(path)
+        recent_paths.insert(0, path)
+        environ.configs.put(recent_paths=recent_paths[:10], persists=True)
+        environ.configs.save()
 
     project = cauldron.project.internal_project
 

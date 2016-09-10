@@ -66,7 +66,7 @@ def open_project(
     """
 
     r = environ.Response()
-    commander.execute('open', path, r)
+    commander.execute('open', '{} --forget'.format(path), r)
     r.thread.join()
     return r
 
@@ -110,7 +110,7 @@ def initialize_project(
     project_directory = os.path.join(directory, name)
 
     run_command('create "{}" "{}"'.format(name, directory))
-    run_command('open "{}"'.format(project_directory))
+    run_command('open "{}" --forget'.format(project_directory))
 
     return project_directory
 
