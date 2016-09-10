@@ -86,19 +86,19 @@ directory and run the command::
 Getting Started
 ---------------
 
-Cauldron is a shell-based program you start from a terminal. On platforms that
-support python script installation (e.g. OSX, Linux) you can start Cauldron
+Cauldron is a shell-based program you start from a terminal. For installations
+that support python script installation you can start Cauldron
 once the installation is complete with the ``cauldron`` command::
 
     $ cauldron
 
-On windows, or any other situation where script installation was not
-permitted, you can start Cauldron from within Python. First start python 3 in
-a terminal::
+or on Windows using the ``cauldron.exe`` command:
 
-    % python3
+    % cauldron.exe
 
-Then inside of python run the following commands::
+For installations where the installation of scripts was not permitted, you can
+start Cauldron from within a Python shell. To do this import cauldron and
+run the ``cauldron.run_shell()`` function as follows::
 
     >>> import cauldron
     >>> cauldron.run_shell()
@@ -310,4 +310,3 @@ Or, if you want to exit the Cauldron shell at any time, use the ``exit``
 command::
 
    <>: exit
-

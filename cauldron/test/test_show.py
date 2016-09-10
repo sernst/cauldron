@@ -1,3 +1,4 @@
+import sys
 from unittest.mock import patch
 
 import cauldron
@@ -29,10 +30,13 @@ class TestShow(scaffolds.ResultsTest):
 
         support.run_command('open @examples:hello_cauldron')
 
+        if sys.platform == 'win32':
+            url = cauldron.project.internal_project.baked_url
+        else:
+            url = cauldron.project.internal_project.url
+
         with patch('webbrowser.open') as func:
             r = support.run_command('show')
             self.assertFalse(r.failed, 'should not have failed')
-            func.assert_called_once_with(
-                cauldron.project.internal_project.url
-            )
+            func.assert_called_once_with(url)
         support.run_command('close')

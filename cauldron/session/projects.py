@@ -347,6 +347,23 @@ class Project(object):
         )
 
     @property
+    def baked_url(self) -> str:
+        """
+        Returns the URL that will open this project results file in the browser
+        with the loading information baked into the file so that no URL
+        parameters are needed to view it, which is needed on platforms like
+        windows
+        """
+
+        if not self.results_path:
+            return None
+
+        return 'file://{path}'.format(
+            path=os.path.join(self.results_path, 'display.html'),
+            id=self.uuid
+        )
+
+    @property
     def output_directory(self) -> str:
         """
         Returns the directory where the project results files will be written

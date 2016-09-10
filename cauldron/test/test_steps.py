@@ -1,4 +1,5 @@
 import os
+import sys
 
 from cauldron.test import support
 from cauldron.test.support import scaffolds
@@ -95,6 +96,10 @@ class TestSteps(scaffolds.ResultsTest):
 
         :return:
         """
+
+        if sys.platform == 'win32':
+            # Autocomplete is not available on  windows
+            return
 
         support.initialize_project(self, 'gina')
         support.add_step(self, 'a.py')

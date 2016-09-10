@@ -1,9 +1,11 @@
 import os
+import sys
 import shutil
 import glob
 import json
 import typing
 
+from cauldron import cli
 from cauldron import environ
 from cauldron.session import projects
 from cauldron import templating
@@ -48,6 +50,45 @@ def write_step(step: 'projects.ProjectStep') -> dict:
 
     return out
 
+def write_baked_html_file(
+        project: 'projects.Project',
+        template_path: str,
+        destination_directory: str = None,
+        destination_filename: str = None
+):
+    """
+
+    """
+
+    with open(template_path, 'r+') as f:
+        dom = f.read()
+
+    dom = dom.replace(
+        '<!-- CAULDRON:EXPORT -->',
+        cli.reformat(
+            """
+            <script>
+                window.RESULTS_FILENAME = 'reports/{uuid}/latest/results.js';
+                window.PROJECT_ID = '{uuid}';
+            </script>
+            """.format(uuid=project.uuid)
+        )
+    )
+
+    if not destination_directory:
+        destination_directory = os.path.dirname(template_path)
+
+    if not destination_filename:
+        destination_filename = '{}.html'.format(project.uuid)
+
+    html_out_path = os.path.join(
+        destination_directory,
+        destination_filename
+    )
+
+    with open(html_out_path, 'w+') as f:
+        f.write(dom)
+
 
 def write_project(project: 'projects.Project'):
     """
@@ -80,6 +121,12 @@ def write_project(project: 'projects.Project'):
         ))
 
     copy_assets(project)
+
+    write_baked_html_file(
+        project,
+        os.path.join(project.results_path, 'project.html'),
+        destination_filename='display.html'
+    )
 
 
 def copy_files(file_copies: dict, project: 'projects.Project'):

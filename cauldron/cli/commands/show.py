@@ -1,8 +1,11 @@
+import sys
+import os
 import webbrowser
 from argparse import ArgumentParser
 
 import cauldron
 from cauldron import environ
+from cauldron import cli
 
 NAME = 'show'
 DESCRIPTION = 'Opens the current project display in the default browser'
@@ -28,8 +31,4 @@ def execute(parser: ArgumentParser):
             whitespace=1
         )
 
-    webbrowser.open(project.url)
-
-
-
-
+    cli.open_in_browser(project)

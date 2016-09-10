@@ -1,6 +1,5 @@
 import os
 import typing
-import webbrowser
 from argparse import ArgumentParser
 
 import cauldron
@@ -133,7 +132,7 @@ def execute(
     actions.open_project(path, forget=forget)
 
     if show_in_browser:
-        webbrowser.open(cauldron.project.internal_project.url)
+        cli.open_in_browser(cauldron.project.internal_project)
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):

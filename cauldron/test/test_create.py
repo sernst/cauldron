@@ -1,4 +1,5 @@
 import os
+import sys
 
 from cauldron.test import support
 from cauldron.test.support import scaffolds
@@ -98,6 +99,10 @@ class TestCreate(scaffolds.ResultsTest):
 
         :return:
         """
+
+        if sys.platform == 'win32':
+            # Autocomplete is not available on  windows
+            return
 
         alias = 'ex'
         path = environ.paths.resources('examples')
