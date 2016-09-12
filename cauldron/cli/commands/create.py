@@ -8,6 +8,7 @@ from cauldron import environ
 from cauldron.cli.commands.open import actions as open_actions
 from cauldron.cli.interaction import autocompletion
 from cauldron.session import projects
+from cauldron.environ import Response
 
 NAME = 'create'
 DESCRIPTION = """
@@ -18,7 +19,8 @@ DESCRIPTION = """
 def populate(
         parser: ArgumentParser,
         raw_args: typing.List[str],
-        assigned_args: dict
+        assigned_args: dict,
+        response: Response = None
 ):
     """
 
@@ -89,7 +91,8 @@ def execute(
         title: str = '',
         summary: str = '',
         author: str = '',
-        no_naming_scheme: bool = False
+        no_naming_scheme: bool = False,
+        response: Response = None
 ):
     """
 

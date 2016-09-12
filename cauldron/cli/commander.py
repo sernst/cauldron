@@ -63,7 +63,7 @@ def execute(
             "{name}" is not a recognized command. For a list of available
             commands enter help or ?.
             """.format(name=name)
-        )
+        ).response
 
     parser, command_args = parse.args(module, raw_args)
 

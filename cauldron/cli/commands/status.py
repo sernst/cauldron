@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 
 import cauldron
 from cauldron import environ
+from cauldron.environ import Response
 
 NAME = 'status'
 DESCRIPTION = """
@@ -9,7 +10,10 @@ DESCRIPTION = """
     """
 
 
-def execute(parser: ArgumentParser):
+def execute(
+        parser: ArgumentParser,
+        response: Response = None
+):
 
     project = cauldron.project.internal_project
 

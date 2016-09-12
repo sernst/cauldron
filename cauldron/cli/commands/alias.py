@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 
 from cauldron import cli
 from cauldron import environ
+from cauldron.environ import Response
 from cauldron.cli.interaction import autocompletion
 
 NAME = 'alias'
@@ -72,7 +73,8 @@ def execute(
         command: str = None,
         name: str = None,
         path: str = None,
-        temporary: bool = False
+        temporary: bool = False,
+        response: Response = None
 ):
     """
 

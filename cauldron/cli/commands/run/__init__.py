@@ -9,6 +9,7 @@ from cauldron import runner
 from cauldron.cli.commands.run import actions as run_actions
 from cauldron.cli.interaction import autocompletion
 from cauldron.session import writing
+from cauldron.environ import Response
 
 NAME = 'run'
 DESCRIPTION = cli.reformat("""
@@ -105,7 +106,8 @@ def execute(
         continue_after: bool = False,
         single_step: bool = False,
         limit: int = -1,
-        print_status: bool = False
+        print_status: bool = False,
+        response: Response = None
 ):
     """
 

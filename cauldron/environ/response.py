@@ -161,6 +161,10 @@ class Response(object):
         self.failed = False
         self.thread = None
 
+    @property
+    def response(self):
+        return self
+
     def echo(self) -> str:
         """
 

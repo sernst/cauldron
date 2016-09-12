@@ -8,6 +8,7 @@ import cauldron
 from cauldron import cli
 from cauldron import environ
 from cauldron.cli.interaction import autocompletion
+from cauldron.environ import Response
 
 NAME = 'export'
 DESCRIPTION = 'Export the current project\'s results html file'
@@ -77,7 +78,8 @@ def execute(
         path: str,
         directory_name: str = None,
         force: bool = False,
-        append: bool = False
+        append: bool = False,
+        response: Response = None
 ):
     """
 

@@ -6,6 +6,7 @@ import cauldron
 from cauldron import environ
 from cauldron import runner
 from cauldron import session
+from cauldron.environ import Response
 
 NAME = 'reload'
 DESCRIPTION = """
@@ -29,7 +30,10 @@ def populate(
     pass
 
 
-def execute(parser: ArgumentParser):
+def execute(
+        parser: ArgumentParser,
+        response: Response = None
+):
 
     recent_paths = environ.configs.fetch('recent_paths', [])
 

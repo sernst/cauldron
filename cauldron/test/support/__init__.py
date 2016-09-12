@@ -47,7 +47,7 @@ def create_project(
         args.append('--{}="{}"'.format(key, value))
     args = ' '.join([a for a in args if a and len(a) > 0])
 
-    commander.execute('create', args, r)
+    commander.execute('create', args, output=r)
     if r.thread:
         r.thread.join()
 

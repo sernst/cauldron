@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 
 import cauldron
 from cauldron import environ
+from cauldron.environ import Response
 
 NAME = 'clear'
 DESCRIPTION = """
@@ -10,7 +11,7 @@ DESCRIPTION = """
     """
 
 
-def execute(parser: ArgumentParser):
+def execute(parser: ArgumentParser, response: Response = None):
     """
 
     :return:

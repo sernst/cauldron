@@ -4,6 +4,7 @@ import typing
 import cauldron
 from cauldron import environ
 from cauldron import session
+from cauldron.environ import Response
 
 NAME = 'refresh'
 DESCRIPTION = """
@@ -27,7 +28,10 @@ def populate(
     pass
 
 
-def execute(parser: ArgumentParser):
+def execute(
+        parser: ArgumentParser,
+        response: Response = None
+):
     """
 
     :return:

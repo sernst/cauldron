@@ -76,7 +76,8 @@ class TestCreate(scaffolds.ResultsTest):
         """
 
         r = support.create_project(
-            self, 'test_create',
+            self,
+            'test_create',
             title='This is a test',
             summary='More important information goes in this spot',
             author='Kermit the Frog'

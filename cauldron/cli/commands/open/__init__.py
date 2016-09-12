@@ -7,6 +7,7 @@ from cauldron import cli
 from cauldron import environ
 from cauldron.cli.commands.open import actions
 from cauldron.cli.interaction import autocompletion
+from cauldron.environ import Response
 
 NAME = 'open'
 DESCRIPTION = 'Opens a cauldron project'
@@ -101,7 +102,8 @@ def execute(
         a_recent_project: bool = False,
         show_in_browser: bool = False,
         list_available: bool = False,
-        forget: bool = False
+        forget: bool = False,
+        response: Response = None
 ):
     """
 

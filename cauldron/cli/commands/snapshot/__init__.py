@@ -7,6 +7,7 @@ import cauldron
 from cauldron import environ
 from cauldron.cli.commands.snapshot import actions
 from cauldron.cli.interaction import autocompletion
+from cauldron.environ import Response
 
 NAME = 'snapshot'
 DESCRIPTION = """
@@ -46,7 +47,12 @@ def populate(
     )
 
 
-def execute(parser: ArgumentParser, action: str, arguments: list):
+def execute(
+        parser: ArgumentParser,
+        action: str,
+        arguments: list,
+        response: Response = None
+):
     """
 
     :param parser:

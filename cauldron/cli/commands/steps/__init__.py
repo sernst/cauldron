@@ -6,6 +6,7 @@ from cauldron import cli
 from cauldron import environ
 from cauldron.cli.commands.steps import actions
 from cauldron.cli.interaction import autocompletion
+from cauldron.environ import Response
 
 NAME = 'steps'
 DESCRIPTION = """
@@ -127,7 +128,8 @@ def execute(
         position: str = None,
         title: str = None,
         new_name: str = None,
-        keep: bool = False
+        keep: bool = False,
+        response: Response = None
 ):
     """
 

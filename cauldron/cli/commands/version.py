@@ -2,6 +2,7 @@ import json
 from argparse import ArgumentParser
 
 from cauldron import environ
+from cauldron.environ import Response
 
 NAME = 'version'
 DESCRIPTION = 'Displays Cauldron\'s version information'
@@ -12,7 +13,10 @@ def get_package_data():
         return json.load(f)
 
 
-def execute(parser: ArgumentParser):
+def execute(
+        parser: ArgumentParser,
+        response: Response = None
+):
     """
 
     :return:

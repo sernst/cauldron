@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 from cauldron import cli
 from cauldron import environ
 from cauldron.cli.commands.configure import actions
+from cauldron.environ import Response
 
 NAME = 'configure'
 DESCRIPTION = """
@@ -74,7 +75,8 @@ def execute(
         key: str = None,
         value: typing.List[str] = None,
         list_all: bool = False,
-        remove: bool = False
+        remove: bool = False,
+        response: Response = None
 ):
     """
 

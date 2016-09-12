@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 from cauldron import cli
 from cauldron import environ
 from cauldron.cli.interaction import query
+from cauldron.environ import Response
 
 NAME = 'purge'
 DESCRIPTION = 'Removes all results files from Cauldron\'s cache'
@@ -35,7 +36,11 @@ def populate(
     )
 
 
-def execute(parser: ArgumentParser, force: bool = False):
+def execute(
+        parser: ArgumentParser,
+        force: bool = False,
+        response: Response = None
+):
     """
 
     :return:
