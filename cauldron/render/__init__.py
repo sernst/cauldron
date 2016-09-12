@@ -62,8 +62,17 @@ def code_file(
     if not os.path.exists(path):
         return 'File does not exist: {}'.format(path)
 
-    with open(path, 'r+') as f:
-        source = f.read()
+    source = None
+    for encoding in ['utf-8', 'mac_roman', 'cp1250']:
+        try:
+            with open(path, 'r+', encoding=encoding) as f:
+                source = f.read()
+        except Exception:
+            print('Failed with encoding:', encoding)
+            continue
+
+    if source is None:
+        return ''
 
     return code(
         source=source,

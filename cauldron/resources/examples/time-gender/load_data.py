@@ -1,13 +1,13 @@
 import pandas as pd
 import plotly.graph_objs as go
 
+import cauldron as cd
 from cauldron import plotting
-from cauldron import project
 
 df = pd.read_csv('TIME_Gender_Ratio.csv')
 # project.display.text(str(df.head()), preformatted=True)
 
-project.display.table(df, scale=0.5)
+cd.display.table(df, scale=0.5)
 
 data = go.Scatter(
     x=df['Year'],
@@ -15,7 +15,7 @@ data = go.Scatter(
     mode='lines+markers'
 )
 
-project.display.plotly(
+cd.display.plotly(
     data=data,
     layout=plotting.create_layout(
         title='Female Time Covers',
@@ -24,4 +24,4 @@ project.display.plotly(
     )
 )
 
-project.shared.df = df
+cd.shared.df = df
