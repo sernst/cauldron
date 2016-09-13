@@ -1,12 +1,19 @@
 import re
 import typing
 from argparse import ArgumentParser
+from collections import namedtuple
 
 from cauldron import cli
 from cauldron import environ
+from cauldron.environ import Response
 
 FLAG_PATTERN = re.compile(
     '^(?P<prefix>-{1,2})(?P<name>[a-zA-Z0-9\-_]+)=?(?P<value>.*)$'
+)
+
+ARGS_RESPONSE_NT = namedtuple(
+    'ArgsResponse_nt',
+    ['parser', 'args', 'response']
 )
 
 
@@ -55,7 +62,7 @@ def explode_line(raw: str) -> typing.List[str]:
 def args(
         module,
         args_str: str
-) -> typing.Tuple[ArgumentParser, dict]:
+) -> ARGS_RESPONSE_NT:
     """
 
     :param module:
@@ -65,14 +72,14 @@ def args(
 
     args_list = explode_line(args_str)
     assigned_args = dict()
-    parser, status = get_parser(module, args_list, assigned_args)
+    parser, response = get_parser(module, args_list, assigned_args)
 
-    if parser is None or status is 'error':
-        return None, None
+    if parser is None or response.failed:
+        return ARGS_RESPONSE_NT(None, None, response)
 
     for arg in args_str:
         if arg in ['?', '-?', '--?', '-h', '--h', 'help', '-help', '--help']:
-            return parser, None
+            return ARGS_RESPONSE_NT(parser, None, response)
 
     def error_overload(message):
         """
@@ -87,33 +94,35 @@ def args(
             The error message from the parser
         """
 
-        environ.output.fail().notify(
+        response.fail().notify(
             kind='ERROR',
             code='INVALID_ARGUMENTS',
             message=message
         ).kernel(
             raw_args=args_str
-        ).console()
+        ).console(
+            whitespace=1
+        )
 
     parser.error = error_overload
 
     parsed_args = vars(parser.parse_args(args_list))
 
-    if environ.output.failed:
-        return None, None
+    if response.failed:
+        return ARGS_RESPONSE_NT(None, None, response)
 
-    out = dict()
-    out.update(assigned_args)
-    out.update(parsed_args)
+    args_result = dict()
+    args_result.update(assigned_args)
+    args_result.update(parsed_args)
 
-    return parser, out
+    return ARGS_RESPONSE_NT(parser, args_result, response)
 
 
 def get_parser(
         module,
         raw_args: typing.List[str],
         assigned_args: dict
-) -> typing.Tuple[ArgumentParser, str]:
+) -> typing.Tuple[ArgumentParser, Response]:
     """
 
     :param module:
@@ -121,6 +130,8 @@ def get_parser(
     :param assigned_args:
     :return:
     """
+
+    response = Response()
 
     description = None
     if hasattr(module, 'DESCRIPTION'):
@@ -145,15 +156,12 @@ def get_parser(
     )
 
     if not hasattr(module, 'populate'):
-        return parser, None
+        return parser, response
 
     try:
         getattr(module, 'populate')(parser, raw_args, assigned_args)
-        if environ.output.failed:
-            return parser, 'error'
-        return parser, None
     except Exception as err:
-        environ.output.fail().notify(
+        response.fail().notify(
             kind='ERROR',
             code='ARGS_PARSE_ERROR',
             message='Unable to parse command arguments'
@@ -161,4 +169,5 @@ def get_parser(
             name=module.NAME,
             error=str(err)
         ).console()
-        return parser, 'error'
+
+    return parser, response

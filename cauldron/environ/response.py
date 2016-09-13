@@ -154,8 +154,10 @@ class Response(object):
         """
 
         """
+
         self.identifier = identifier
         self.data = dict()
+        self.parent = None  # type: Response
         self.messages = []  # type: typing.List[ResponseMessage]
         self.ended = False
         self.failed = False
@@ -163,13 +165,15 @@ class Response(object):
 
     @property
     def response(self):
-        return self
+        return self.parent.response if self.parent else self
 
     def echo(self) -> str:
         """
 
         :return:
         """
+        if self.parent:
+            return self.parent.echo()
 
         out = [
             '=== [{}] {}Response ==='.format(
@@ -192,12 +196,39 @@ class Response(object):
 
         return '\n'.join(out)
 
+    def consume(self, other: 'Response'):
+        """
+
+        :param other:
+        :return:
+        """
+
+        if self.parent:
+            return self.parent.consume(other)
+
+        def either(a, b):
+            return a if a else b
+
+        self.identifier = either(self.identifier, other.identifier)
+        self.failed = self.failed or other.failed
+        self.ended = self.ended or other.ended
+        self.data.update(other.data)
+        self.messages += other.messages
+        self.thread = either(self.thread, other.thread)
+
+        other.parent = self
+
+        return self
+
     def update(self, **kwargs) -> 'Response':
         """
 
         :param kwargs:
         :return:
         """
+
+        if self.parent:
+            return self.parent.update(**kwargs)
 
         self.data.update(kwargs)
         return self
@@ -213,6 +244,9 @@ class Response(object):
 
         :return:
         """
+
+        if self.parent:
+            return self.parent.notify(kind, message, code, **kwargs)
 
         rm = ResponseMessage(
             kind=kind if kind else 'INFO',
@@ -237,7 +271,17 @@ class Response(object):
         )
 
     def fail(self, **kwargs) -> 'Response':
+        """
+
+        :param kwargs:
+        :return:
+        """
+
         self.failed = True
+
+        if self.parent:
+            return self.parent.fail(**kwargs)
+
         if kwargs:
             self.update(**kwargs)
         return self
@@ -247,6 +291,9 @@ class Response(object):
 
         :return:
         """
+
+        if self.parent:
+            return self.parent.end()
 
         self.ended = True
         return self

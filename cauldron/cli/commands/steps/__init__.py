@@ -3,7 +3,6 @@ from argparse import ArgumentParser
 
 import cauldron
 from cauldron import cli
-from cauldron import environ
 from cauldron.cli.commands.steps import actions
 from cauldron.cli.interaction import autocompletion
 from cauldron.environ import Response
@@ -123,44 +122,49 @@ def populate(
 
 def execute(
         parser: ArgumentParser,
+        response: Response,
         action: str = None,
         step_name: str = None,
         position: str = None,
         title: str = None,
         new_name: str = None,
-        keep: bool = False,
-        response: Response = None
-):
+        keep: bool = False
+) -> Response:
     """
 
     :return:
     """
 
     if not cauldron.project or not cauldron.project.internal_project:
-        return environ.output.fail().notify(
+        return response.fail().notify(
             kind='ERROR',
             code='NO_OPEN_PROJECT',
             message='No project is open. Step commands require an open project'
-        ).console(whitespace=1)
+        ).console(
+            whitespace=1
+        ).response
 
     if not action or action == 'list':
-        actions.echo_steps()
+        actions.echo_steps(response)
         return
 
     if action == 'add' and not step_name:
             step_name = ''
     elif not step_name:
-        return environ.output.fail().notify(
+        return response.fail().notify(
             kind='ABORTED',
             code='NO_STEP_NAME',
             message='A step name is required for this command'
-        ).console(whitespace=1)
+        ).console(
+            whitespace=1
+        ).response
 
     step_name = step_name.strip('"')
 
     if action == 'add':
         actions.create_step(
-            step_name,
+            response=response,
+            name=step_name,
             position=position,
             title=title.strip('"') if title else title
         )
@@ -168,6 +172,7 @@ def execute(
 
     if action == 'modify':
         actions.modify_step(
+            response=response,
             name=step_name,
             new_name=new_name,
             title=title,
@@ -176,18 +181,21 @@ def execute(
 
     if action == 'remove':
         actions.remove_step(
+            response=response,
             name=step_name,
             keep_file=keep
         )
 
     if action == 'unmute':
         actions.toggle_muting(
+            response=response,
             step_name=step_name,
             value=False
         )
 
     if action == 'mute':
         actions.toggle_muting(
+            response=response,
             step_name=step_name,
             value=True
         )

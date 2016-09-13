@@ -1,9 +1,9 @@
 from cauldron import cli
 from cauldron import environ
 from cauldron.cli import commands
-from cauldron.environ.response import Response
 from cauldron.cli import parse
 from cauldron.cli.threads import CauldronThread
+from cauldron.environ.response import Response
 
 COMMANDS = dict()
 
@@ -40,20 +40,19 @@ def fetch(reload: bool = False) -> dict:
 def execute(
         name: str,
         raw_args: str,
-        output: Response = None
+        response: Response = None
 ) -> Response:
     """
 
     :return:
     """
 
-    if not output:
-        output = Response(identifier=name)
-    environ.output = output
+    if not response:
+        response = Response(identifier=name)
 
     module = fetch().get(name)
     if module is None:
-        return environ.output.fail().notify(
+        return response.fail().notify(
             kind='ERROR',
             code='NO_SUCH_COMMAND'
         ).kernel(
@@ -65,32 +64,33 @@ def execute(
             """.format(name=name)
         ).response
 
-    parser, command_args = parse.args(module, raw_args)
+    args = parse.args(module, raw_args)
+    response.consume(args.response)
 
-    if parser is None:
+    if args.parser is None:
         # The parse failed and the execution should be aborted
-        return output
+        return response
 
-    if command_args is None or command_args['show_help']:
+    if args.args is None or args.args['show_help']:
         # Overrides standard execution and instead displays the help for the
         # command
-        parser.print_help()
-        return output
+        args.parser.print_help()
+        return response
 
-    del command_args['show_help']
+    del args.args['show_help']
 
     t = CauldronThread()
     t.command = module.execute
-    t.args = [parser]
-    t.kwargs = command_args
-    t.response = output
+    t.parser = args.parser
+    t.kwargs = args.args
+    t.response = response
 
-    output.thread = t
+    response.thread = t
     t.start()
-    return output
+    return response
 
 
-def print_module_help():
+def print_module_help() -> Response:
     """
 
     :return:
@@ -109,7 +109,7 @@ def print_module_help():
                 description=entries[key].replace('\n', '\n   ')
             ))
 
-    return environ.output.notify(
+    return Response().notify(
         kind='INFO',
         code='MODULE_DESCRIPTIONS'
     ).kernel(
@@ -117,14 +117,13 @@ def print_module_help():
     ).console(
         '\n'.join(msg),
         whitespace=1
-    ).get_response()
+    ).response
 
 
 def show_help(command_name: str = None, raw_args: str = '') -> Response:
     """ Prints the basic command help to the console """
 
-    if not environ.output:
-        environ.output = Response()
+    response = Response()
 
     cmds = fetch()
     if command_name and command_name in cmds:
@@ -136,7 +135,7 @@ def show_help(command_name: str = None, raw_args: str = '') -> Response:
 
         if parser is not None:
             out = parser.format_help()
-            return environ.output.notify(
+            return response.notify(
                 kind='INFO',
                 code='COMMAND_DESCRIPTION'
             ).kernel(
@@ -144,12 +143,12 @@ def show_help(command_name: str = None, raw_args: str = '') -> Response:
             ).console(
                 out,
                 whitespace=1
-            ).get_response()
+            ).response
 
     environ.log_header('Available Commands')
-    print_module_help()
+    response.consume(print_module_help())
 
-    return environ.output.fail().notify(
+    return response.fail().notify(
         kind='ERROR',
         code='NO_SUCH_COMMAND',
         message='Failed to show command help for "{}"'.format(command_name)
@@ -161,7 +160,7 @@ def show_help(command_name: str = None, raw_args: str = '') -> Response:
             help [COMMAND]
         """,
         whitespace_bottom=1
-    ).get_response()
+    ).response
 
 
 def autocomplete(

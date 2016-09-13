@@ -6,9 +6,10 @@ from cauldron import environ
 from cauldron import runner
 from cauldron import session
 from cauldron.cli.interaction import query
+from cauldron.environ import Response
 
 
-def echo_known_projects() -> dict:
+def echo_known_projects(response: Response) -> dict:
     """
 
     :return:
@@ -70,7 +71,7 @@ def echo_known_projects() -> dict:
     environ.log_blanks()
 
 
-def fetch_recent() -> str:
+def fetch_recent(response: Response) -> str:
     """
 
     :return:
@@ -79,7 +80,7 @@ def fetch_recent() -> str:
     recent_paths = environ.configs.fetch('recent_paths', [])
 
     if len(recent_paths) < 1:
-        environ.output.fail().notify(
+        response.fail().notify(
             kind='ABORTED',
             code='NO_RECENT_PROJECTS',
             message='There are no recent projects available'
@@ -98,7 +99,7 @@ def fetch_recent() -> str:
     return path
 
 
-def fetch_location(path: str) -> str:
+def fetch_location(response: Response, path: str) -> str:
     """
 
     :param path:
@@ -128,7 +129,7 @@ def fetch_location(path: str) -> str:
     return None
 
 
-def fetch_last() -> str:
+def fetch_last(response: Response) -> str:
     """
 
     :return:
@@ -137,7 +138,7 @@ def fetch_last() -> str:
     recent_paths = environ.configs.fetch('recent_paths', [])
 
     if len(recent_paths) < 1:
-        environ.output.fail().notify(
+        response.fail().notify(
             kind='ABORTED',
             code='NO_RECENT_PROJECTS',
             message='No projects have been opened recently'
@@ -147,9 +148,14 @@ def fetch_last() -> str:
     return recent_paths[0]
 
 
-def open_project(path: str, forget: bool = False) -> bool:
+def open_project(
+        response: Response,
+        path: str,
+        forget: bool = False
+) -> bool:
     """
 
+    :param response:
     :param path:
     :param forget:
     :return:
@@ -164,7 +170,7 @@ def open_project(path: str, forget: bool = False) -> bool:
     path = environ.paths.clean(path)
 
     if not os.path.exists(path):
-        environ.output.fail().notify(
+        response.fail().notify(
             kind='ERROR',
             code='PROJECT_NOT_FOUND',
             message='The project path does not exist'
@@ -184,7 +190,7 @@ def open_project(path: str, forget: bool = False) -> bool:
     try:
         runner.initialize(path)
     except FileNotFoundError:
-        environ.output.fail().notify(
+        response.fail().notify(
             kind='ERROR',
             code='PROJECT_NOT_FOUND',
             message='Project not found'
@@ -211,7 +217,7 @@ def open_project(path: str, forget: bool = False) -> bool:
     if not path or not os.path.exists(path):
         project.write()
 
-    environ.output.update(
+    response.update(
         project=project.kernel_serialize()
     ).notify(
         kind='SUCCESS',

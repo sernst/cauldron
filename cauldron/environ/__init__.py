@@ -16,8 +16,6 @@ from cauldron.cli.threads import CauldronThread
 
 start_time = datetime.utcnow()
 
-output = Response()  # type: Response
-
 configs = Configuration()
 
 

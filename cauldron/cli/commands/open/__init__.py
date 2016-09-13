@@ -97,14 +97,14 @@ def populate(
 
 def execute(
         parser: ArgumentParser,
+        response: Response,
         path: str = None,
         last_opened_project: bool = False,
         a_recent_project: bool = False,
         show_in_browser: bool = False,
         list_available: bool = False,
         forget: bool = False,
-        response: Response = None
-):
+) -> Response:
     """
 
     :return:
@@ -113,25 +113,25 @@ def execute(
     path = path.strip('"') if path else None
 
     if list_available:
-        actions.echo_known_projects()
-        return
+        actions.echo_known_projects(response)
+        return response
 
     if last_opened_project:
-        path = actions.fetch_last()
+        path = actions.fetch_last(response)
         if not path:
-            return
+            return response
     elif a_recent_project:
-        path = actions.fetch_recent()
+        path = actions.fetch_recent(response)
         if not path:
-            return
+            return response
     elif not path or not path.strip():
-        actions.echo_known_projects()
-        return
+        actions.echo_known_projects(response)
+        return response
     else:
-        p = actions.fetch_location(path)
+        p = actions.fetch_location(response, path)
         path = p if p else path
 
-    actions.open_project(path, forget=forget)
+    actions.open_project(response, path, forget=forget)
 
     if show_in_browser:
         cli.open_in_browser(cauldron.project.internal_project)

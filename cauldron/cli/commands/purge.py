@@ -38,11 +38,14 @@ def populate(
 
 def execute(
         parser: ArgumentParser,
-        force: bool = False,
-        response: Response = None
-):
+        response: Response,
+        force: bool = False
+) -> Response:
     """
 
+    :param parser:
+    :param response:
+    :param force:
     :return:
     """
 
@@ -68,22 +71,24 @@ def execute(
         )
 
     if not do_it:
-        return environ.output.notify(
+        return response.notify(
             kind='ABORTED',
             code='NO_PURGE',
             message='No files were deleted'
-        ).console(whitespace=1)
+        ).console(
+            whitespace=1
+        ).response
 
     if environ.systems.remove(path):
         msg = 'SUCCESS', 'RESULTS_PURGED', 'All results have been removed'
     else:
-        environ.output.fail()
+        response.fail()
         msg = 'ERROR', 'PURGE_FAILURE', 'Failed to remove results directory'
 
-    environ.output.notify(
+    return response.notify(
         kind=msg[0],
         code=msg[1],
         message=msg[2]
-    ).console(whitespace=1)
-
-
+    ).console(
+        whitespace=1
+    ).response

@@ -75,15 +75,16 @@ def populate(
 
 def execute(
         parser: ArgumentParser,
+        response: Response,
         path: str,
         directory_name: str = None,
         force: bool = False,
-        append: bool = False,
-        response: Response = None
-):
+        append: bool = False
+) -> Response:
     """
 
     :param parser:
+    :param response:
     :param path:
     :param directory_name:
     :param force:
@@ -92,11 +93,13 @@ def execute(
     """
 
     if path is None:
-        return environ.output.fail().notify(
+        return response.fail().notify(
             kind='ERROR',
             code='MISSING_PATH_ARG',
             message='Missing export path argument'
-        ).console(whitespace=1)
+        ).console(
+            whitespace=1
+        ).response
 
     path = path.strip('"')
     directory_name = directory_name.strip('"') if directory_name else None
@@ -115,11 +118,13 @@ def execute(
     exists = os.path.exists(out_path)
 
     if not append and exists:
-        return environ.output.fail().notify(
+        return response.fail().notify(
             kind='ERROR',
             code='ALREADY_EXISTS',
             message='Export directory already exists'
-        ).console(whitespace=1)
+        ).console(
+            whitespace=1
+        ).response
 
     if append and exists:
         append_to_existing_export(results_path, out_path)
@@ -147,6 +152,7 @@ def execute(
         f.write(dom)
 
     environ.systems.remove(html_path)
+    return response
 
 
 def append_to_existing_export(source_directory, output_directory):

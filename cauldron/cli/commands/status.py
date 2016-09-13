@@ -12,17 +12,19 @@ DESCRIPTION = """
 
 def execute(
         parser: ArgumentParser,
-        response: Response = None
-):
+        response: Response
+) -> Response:
 
     project = cauldron.project.internal_project
 
     if not project:
-        return environ.output.fail().notify(
+        return response.fail().notify(
             kind='ABORTED',
             code='NO_OPEN_PROJECT',
             message='No project is currently open'
-        ).console(whitespace=1)
+        ).console(
+            whitespace=1
+        ).response
 
     data = project.shared.fetch(None)
     keys = list(data.keys())
@@ -52,3 +54,5 @@ def execute(
             ),
             whitespace_bottom=1
         )
+
+    return response

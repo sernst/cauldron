@@ -51,18 +51,19 @@ def execute(
         parser: ArgumentParser,
         action: str,
         arguments: list,
-        response: Response = None
+        response: Response
 ):
     """
 
     :param parser:
     :param action:
     :param arguments:
+    :param response:
     :return:
     """
 
     if not action:
-        return environ.output.fail().notify(
+        return response.fail().notify(
             kind='ERROR',
             code='NO_ACTION_ARG',
             message='An action is required for the snapshot command'
@@ -72,7 +73,7 @@ def execute(
     project = cauldron.project.internal_project
 
     if not project:
-        return environ.output.fail().notify(
+        return response.fail().notify(
             kind='ERROR',
             code='NO_OPEN_PROJECT',
             message='No open project'

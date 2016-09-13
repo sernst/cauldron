@@ -70,11 +70,11 @@ def populate(
 
 def execute(
         parser: ArgumentParser,
+        response: Response,
         command: str = None,
         name: str = None,
         path: str = None,
-        temporary: bool = False,
-        response: Response = None
+        temporary: bool = False
 ):
     """
 
@@ -104,8 +104,13 @@ def execute(
     persistent_aliases = environ.configs.persistent.get('folder_aliases', {})
 
     if not name and command in ['add', 'remove']:
-        environ.log('[ERROR]: You need to specify the name of the alias')
-        return
+        return response.fail().notify(
+            kind='ERROR',
+            code='MISSING_ARG',
+            message='You need to specify the name of the alias'
+        ).console(
+            whitespace=1
+        ).response
 
     if command == 'list':
         items = []
@@ -118,7 +123,7 @@ def execute(
             items.append('{}\n   {}'.format(k, v['path']))
         environ.log_header('EXISTING ALIASES')
         environ.log(items)
-        return
+        return response
 
     aliases = temporary_aliases if temporary else persistent_aliases
 
@@ -130,11 +135,13 @@ def execute(
             persists=not bool(temporary),
             folder_aliases=aliases
         )
-        return environ.output.notify(
+        return response.notify(
             kind='ADDED',
             code='ALIAS_ADDED',
             message='The alias "{}" has been saved'.format(name)
-        ).console(whitespace=1)
+        ).console(
+            whitespace=1
+        ).response
 
     if command == 'remove':
         if name in aliases:
@@ -144,17 +151,21 @@ def execute(
             folder_aliases=aliases
         )
 
-        return environ.output.notify(
+        return response.notify(
             kind='REMOVED',
             code='ALIAS_REMOVED',
             message='The alias "{}" has been removed'.format(name)
-        ).console(whitespace=1)
+        ).console(
+            whitespace=1
+        ).response
 
-    environ.output.fail().notify(
+    return response.fail().notify(
         kind='ERROR',
         code='UNKNOWN_COMMAND',
         message='Unrecognized alias command "{}"'.format(command)
-    ).console(whitespace=1)
+    ).console(
+        whitespace=1
+    ).response
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):

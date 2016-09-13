@@ -14,6 +14,7 @@ PLOT_COLOR_PALETTE = (
     (23, 190, 207)
 )
 
+
 def get_gray_color(
         level: int = 128,
         opacity: float = None,
@@ -27,8 +28,11 @@ def get_gray_color(
     :return:
     """
 
+    if opacity is None:
+        opacity = 1
+
     level = max(0, min(255, level))
-    out = (level, level, level, opacity)
+    out = (int(level), int(level), int(level), opacity)
 
     if as_string:
         return 'rgba({}, {}, {}, {})'.format(*out)

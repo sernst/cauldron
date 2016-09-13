@@ -9,6 +9,7 @@ from cauldron import environ
 from cauldron.runner import source
 from cauldron.session.projects import Project
 from cauldron.session.projects import ProjectStep
+from cauldron.environ import Response
 
 
 def initialize(project: typing.Union[str, Project]):
@@ -56,6 +57,7 @@ def reload_libraries():
 
 
 def section(
+        response: Response,
         project: typing.Union[Project, None],
         starting: ProjectStep = None,
         limit: int = 1,
@@ -93,7 +95,7 @@ def section(
             continue
 
         steps_run.append(ps)
-        if not source.run_step(project, ps, force=force):
+        if not source.run_step(response, project, ps, force=force):
             return steps_run
 
         count += 1
@@ -102,6 +104,7 @@ def section(
 
 
 def complete(
+        response: Response,
         project: typing.Union[Project, None],
         starting: ProjectStep = None,
         force: bool = False,
@@ -146,7 +149,7 @@ def complete(
         count += 1
 
         steps_run.append(ps)
-        if not source.run_step(project, ps, force=True):
+        if not source.run_step(response, project, ps, force=True):
             return steps_run
 
     return steps_run

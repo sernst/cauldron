@@ -11,7 +11,7 @@ DESCRIPTION = """
     """
 
 
-def execute(parser: ArgumentParser, response: Response = None):
+def execute(parser: ArgumentParser, response: Response) -> Response:
     """
 
     :return:
@@ -20,23 +20,25 @@ def execute(parser: ArgumentParser, response: Response = None):
     project = cauldron.project.internal_project
 
     if not project:
-        environ.output.fail().notify(
+        return response.fail().notify(
             kind='ABORTED',
             code='NO_OPEN_PROJECT',
             message='No open project on which to clear data'
-        ).console(whitespace=1)
-        return
+        ).console(
+            whitespace=1
+        ).response
 
     project.shared.clear()
 
     for ps in project.steps:
         ps.mark_dirty(True)
 
-    environ.output.update(
+    return response.update(
         project=project.kernel_serialize()
     ).notify(
         kind='SUCCESS',
         code='SHARED_CLEARED',
         message='Shared data has been cleared'
-    ).console(whitespace=1)
-
+    ).console(
+        whitespace=1
+    ).response

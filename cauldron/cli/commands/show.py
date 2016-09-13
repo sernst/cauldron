@@ -11,8 +11,8 @@ DESCRIPTION = 'Opens the current project display in the default browser'
 
 def execute(
         parser: ArgumentParser,
-        response: Response = None
-):
+        response: Response
+) -> Response:
     """
 
     :return:
@@ -20,7 +20,7 @@ def execute(
 
     project = cauldron.project.internal_project
     if not project:
-        return environ.output.fail().notify(
+        return response.fail().notify(
             kind='ABORTED',
             code='NO_OPEN_PROJECT',
             message='No project is currently open.'
@@ -30,6 +30,7 @@ def execute(
                 command to load a project.
             """,
             whitespace=1
-        )
+        ).response
 
     cli.open_in_browser(project)
+    return response

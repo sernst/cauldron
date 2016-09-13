@@ -9,6 +9,7 @@ from importlib.abc import InspectLoader
 
 import cauldron
 from cauldron import environ
+from cauldron.environ import Response
 from cauldron import templating
 from cauldron.session.projects import Project
 from cauldron.session.projects import ProjectStep
@@ -40,6 +41,7 @@ def get_step(
 
 
 def run_step(
+        response: Response,
         project: Project,
         step: typing.Union[ProjectStep, str],
         force: bool = False
@@ -56,7 +58,7 @@ def run_step(
     if step is None:
         return False
 
-    status = check_status(project, step, force)
+    status = check_status(response, project, step, force)
     if status == ERROR_STATUS:
         return False
 
@@ -93,7 +95,7 @@ def run_step(
     else:
         step.last_modified = 0.0
         step.error = result['html_message']
-        environ.output.fail(
+        response.fail(
             project=project.kernel_serialize()
         ).notify(
             kind='ERROR',
@@ -112,12 +114,14 @@ def run_step(
 
 
 def check_status(
+        response: Response,
         project: Project,
         step: ProjectStep,
         force: bool = False
 ) -> str:
     """
 
+    :param response:
     :param project:
     :param step:
     :param force:
@@ -131,7 +135,7 @@ def check_status(
         return SKIP_STATUS
 
     if not os.path.exists(path):
-        environ.output.fail().notify(
+        response.fail().notify(
             kind='ERROR',
             code='MISSING_SOURCE_FILE',
             message='Source file not found "{}"'.format(path)

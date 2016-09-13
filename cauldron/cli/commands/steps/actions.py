@@ -7,9 +7,13 @@ from cauldron import environ
 from cauldron.session import naming
 from cauldron.session import writing
 from cauldron.session.projects import Project
+from cauldron.environ import Response
 
-
-def index_from_location(project: Project, location: str = None) -> int:
+def index_from_location(
+        response: Response,
+        project: Project,
+        location: str = None
+) -> int:
     """
 
     :param project:
@@ -39,7 +43,7 @@ def index_from_location(project: Project, location: str = None) -> int:
     return None
 
 
-def echo_steps():
+def echo_steps(response: Response):
     """
 
     :return:
@@ -48,7 +52,7 @@ def echo_steps():
     project = cauldron.project.internal_project
 
     if len(project.steps) < 1:
-        environ.output.update(
+        response.update(
             steps=[]
         ).notify(
             kind='SUCCESS',
@@ -67,7 +71,7 @@ def echo_steps():
         )
         return
 
-    environ.output.update(
+    response.update(
         steps=[ps.kernel_serialize() for ps in project.steps]
     ).notify(
         kind='SUCCESS',
@@ -83,6 +87,7 @@ def echo_steps():
 
 
 def create_step(
+        response: Response,
         name: str,
         position: typing.Union[str, int],
         title: str = None
@@ -140,7 +145,7 @@ def create_step(
         after=None if index < 1 else project.steps[index - 1].definition.name
     )]
 
-    environ.output.update(
+    response.update(
         project=project.kernel_serialize(),
         step_name=result.definition.name,
         step_path=result.source_path,
@@ -155,7 +160,11 @@ def create_step(
     )
 
 
-def remove_step(name: str, keep_file: bool = False):
+def remove_step(
+        response: Response,
+        name: str,
+        keep_file: bool = False
+):
     """
 
     :param name:
@@ -166,7 +175,7 @@ def remove_step(name: str, keep_file: bool = False):
     project = cauldron.project.internal_project
     step = project.remove_step(name)
     if not step:
-        environ.output.fail().notify(
+        response.fail().notify(
             kind='ABORTED',
             code='NO_SUCH_STEP',
             message='Step "{}" not found. Unable to remove.'.format(name)
@@ -189,7 +198,7 @@ def remove_step(name: str, keep_file: bool = False):
         action='removed'
     )]
 
-    environ.output.update(
+    response.update(
         project=project.kernel_serialize(),
         step_changes=step_changes,
         step_renames=step_renames
@@ -203,7 +212,10 @@ def remove_step(name: str, keep_file: bool = False):
     return True
 
 
-def synchronize_step_names(insert_index: int = None):
+def synchronize_step_names(
+        response: Response,
+        insert_index: int = None
+):
     """
     :param insert_index:
     :return:
@@ -256,6 +268,7 @@ def synchronize_step_names(insert_index: int = None):
 
 
 def modify_step(
+        response: Response,
         name: str,
         new_name: str = None,
         position: typing.Union[str, int] = None,
@@ -309,7 +322,7 @@ def modify_step(
 
     old_step = project.remove_step(name)
     if not old_step:
-        environ.output.fail().notify(
+        response.fail().notify(
             kind='ABORTED',
             code='NO_SUCH_STEP',
             message='Unable to modify unknown step "{}"'.format(name)
@@ -353,7 +366,7 @@ def modify_step(
         after=before_step
     )]
 
-    environ.output.update(
+    response.update(
         project=project.kernel_serialize(),
         step_name=new_step.definition.name,
         step_changes=step_changes,
@@ -370,6 +383,7 @@ def modify_step(
 
 
 def toggle_muting(
+        response: Response,
         step_name: str,
         value: bool = None
 ):
@@ -384,7 +398,7 @@ def toggle_muting(
 
     index = project.index_of_step(step_name)
     if index is None:
-        return environ.output.fail().notify(
+        return response.fail().notify(
             kind='ERROR',
             code='NO_SUCH_STEP',
             message='No step found with name: "{}"'.format(step_name)
@@ -398,7 +412,7 @@ def toggle_muting(
 
     step.is_muted = value
 
-    return environ.output.notify(
+    return response.notify(
         kind='SUCCESS',
         code='STEP_MUTE_ENABLED' if step.is_muted else 'STEP_MUTE_DISABLED',
         message='Muting has been {}'.format(
@@ -406,4 +420,4 @@ def toggle_muting(
         )
     ).kernel(
         project=project.kernel_serialize()
-    ).console()
+    ).console().response

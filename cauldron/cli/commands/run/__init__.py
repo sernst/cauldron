@@ -101,17 +101,18 @@ def populate(
 
 def execute(
         parser: ArgumentParser,
+        response: Response,
         step: list = None,
         force: bool = False,
         continue_after: bool = False,
         single_step: bool = False,
         limit: int = -1,
-        print_status: bool = False,
-        response: Response = None
-):
+        print_status: bool = False
+) -> Response:
     """
 
     :param parser:
+    :param response:
     :param step:
     :param force:
     :param continue_after:
@@ -121,11 +122,11 @@ def execute(
     :return:
     """
 
-    project = run_actions.get_project()
+    project = run_actions.get_project(response)
     if not project:
-        return
+        return response
 
-    run_actions.preload_project(project)
+    run_actions.preload_project(response, project)
 
     if not step:
         step = []
@@ -154,7 +155,7 @@ def execute(
     if len(step) > 0:
         message = ['  * "{}"'.format(x) for x in step]
         message.insert(0, '[ABORTED]: Unable to locate the following step(s):')
-        environ.output.fail().notify(
+        return response.fail().notify(
             kind='ABORTED',
             code='MISSING_STEP',
             message='Unable to locate steps'
@@ -163,8 +164,7 @@ def execute(
         ).console(
             message,
             whitespace=1
-        )
-        return
+        ).response
 
     runner.reload_libraries()
 
@@ -186,8 +186,13 @@ def execute(
         # specified, run the entire project with the specified flags.
 
         ps = project_steps[0] if len(project_steps) > 0 else None
-        steps_run = runner.complete(project, ps, force=force, limit=limit)
-
+        steps_run = runner.complete(
+            response,
+            project,
+            ps,
+            force=force,
+            limit=limit
+        )
     else:
         for ps in project_steps:
             if ps in steps_run:
@@ -210,14 +215,12 @@ def execute(
             step=writing.write_step(ps)
         ))
 
-    environ.output.update(
-        step_changes=step_changes
-    )
+    response.update(step_changes=step_changes)
 
-    if print_status or environ.output.failed:
-        environ.output.update(
-            project=project.kernel_serialize()
-        )
+    if print_status or response.failed:
+        response.update(project=project.kernel_serialize())
+
+    return response
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):

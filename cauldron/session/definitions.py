@@ -40,14 +40,7 @@ class FileDefinition(object):
     @property
     def name(self):
         if 'name' not in self.data or not self.data['name']:
-            environ.output.notify(
-                kind='ERROR',
-                code='MISSING_FILE_NAME',
-                message='Missing name in file definition: {}'.format(self.data)
-            ).console(
-                whitespace=1
-            )
-            return None
+            return 'invalid-file-name'
 
         return self.data.get('name')
 

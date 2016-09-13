@@ -10,21 +10,25 @@ DESCRIPTION = """
     """
 
 
-def execute(parser: ArgumentParser, response: Response = None):
+def execute(parser: ArgumentParser, response: Response) -> Response:
     """
 
     :return:
     """
 
     if runner.close():
-        environ.output.notify(
+        return response.notify(
             kind='SUCCESS',
             code='PROJECT_CLOSED',
             message='Project has been closed'
-        ).console(whitespace=1)
-    else:
-        environ.output.notify(
-            kind='ABORTED',
-            code='NO_OPEN_PROJECT',
-            message='There was no open project to close'
-        ).console(whitespace=1)
+        ).console(
+            whitespace=1
+        ).response
+
+    return response.notify(
+        kind='ABORTED',
+        code='NO_OPEN_PROJECT',
+        message='There was no open project to close'
+    ).console(
+        whitespace=1
+    ).response

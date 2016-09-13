@@ -15,8 +15,8 @@ def get_package_data():
 
 def execute(
         parser: ArgumentParser,
-        response: Response = None
-):
+        response: Response
+) -> Response:
     """
 
     :return:
@@ -25,7 +25,7 @@ def execute(
     package_data = get_package_data()
 
     if package_data:
-        environ.output.update(
+        return response.update(
             **package_data
         ).notify(
             kind='SUCCESS',
@@ -34,11 +34,12 @@ def execute(
         ).console(
             'Version: {version}'.format(version=package_data['version']),
             whitespace=1
-        )
-    else:
-        environ.output.notify(
-            kind='ERROR',
-            code='MISSING_PACKAGE_DATA',
-            message='Unable to locate version information'
-        ).console(whitespace=1)
+        ).response
 
+    return response.notify(
+        kind='ERROR',
+        code='MISSING_PACKAGE_DATA',
+        message='Unable to locate version information'
+    ).console(
+        whitespace=1
+    ).response

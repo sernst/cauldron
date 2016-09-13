@@ -13,7 +13,7 @@ class CauldronThread(threading.Thread):
         self.daemon = True
         self.uid = str(uuid.uuid4())
         self.command = None
-        self.args = None
+        self.parser = None
         self.kwargs = None
         self.result = None
         self.response = None
@@ -23,7 +23,7 @@ class CauldronThread(threading.Thread):
         """
 
         self.result = self.command(
-            *self.args,
+            parser=self.parser,
             response=self.response,
             **self.kwargs
         )

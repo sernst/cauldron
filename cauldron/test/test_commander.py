@@ -39,9 +39,7 @@ class TestCommander(unittest.TestCase):
 
         target = 'cauldron.environ.response.ResponseMessage.console'
         with mock.patch(target) as console_func:
-            r = Response()
-            environ.output = r
-            commander.print_module_help()
+            r = commander.print_module_help()
             self.assertEqual(1, console_func.call_count)
 
 

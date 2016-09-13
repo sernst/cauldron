@@ -7,12 +7,13 @@ NAME = 'exit'
 DESCRIPTION = 'Exit the cauldron shell'
 
 
-def execute(parser: ArgumentParser, response: Response = None):
+def execute(parser: ArgumentParser, response: Response) -> Response:
     """
 
     :param parser:
+    :param response:
     :return:
     """
 
     environ.configs.save()
-    environ.output.end()
+    return response.end()

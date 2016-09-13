@@ -19,8 +19,7 @@ DESCRIPTION = """
 def populate(
         parser: ArgumentParser,
         raw_args: typing.List[str],
-        assigned_args: dict,
-        response: Response = None
+        assigned_args: dict
 ):
     """
 
@@ -34,21 +33,25 @@ def populate(
         'project_name',
         type=str,
         default=None,
-        help=cli.reformat("""
+        help=cli.reformat(
+            """
             The name of the project you want to create. A folder with this
             name will be created and the cauldron project will be stored
             within
-            """)
+            """
+        )
     )
 
     parser.add_argument(
         'directory',
         type=str,
         default=None,
-        help=cli.reformat("""
+        help=cli.reformat(
+            """
             The parent directory where the cauldron project directory will be
             created.
-            """)
+            """
+        )
     )
 
     parser.add_argument(
@@ -86,13 +89,13 @@ def populate(
 
 def execute(
         parser: ArgumentParser,
+        response: Response,
         project_name: str,
         directory: str,
         title: str = '',
         summary: str = '',
         author: str = '',
         no_naming_scheme: bool = False,
-        response: Response = None
 ):
     """
 
@@ -108,7 +111,7 @@ def execute(
     if not title:
         title = project_name.replace('_', ' ').replace('-', ' ').capitalize()
 
-    location = open_actions.fetch_location(directory)
+    location = open_actions.fetch_location(response, directory)
     if location:
         directory = location
 
@@ -118,7 +121,7 @@ def execute(
 
     if os.path.exists(directory):
         if os.path.exists(os.path.join(directory, 'cauldron.json')):
-            environ.output.fail().notify(
+            return response.fail().notify(
                 kind='ABORTED',
                 code='ALREADY_EXISTS',
                 message='Cauldron project exists in the specified directory'
@@ -132,10 +135,9 @@ def execute(
                     {}
                 """.format(directory),
                 whitespace=1
-            )
-            return
-    else:
-        os.makedirs(directory)
+            ).response
+
+    os.makedirs(directory)
 
     project_data = dict(
         name=project_name,
@@ -149,11 +151,9 @@ def execute(
     with open(os.path.join(directory, 'cauldron.json'), 'w+') as f:
         json.dump(project_data, f, indent=2, sort_keys=True)
 
-    open_actions.open_project(directory)
+    open_actions.open_project(response, directory)
 
-    environ.output.update(
-        source_directory=directory
-    )
+    return response.update(source_directory=directory)
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):

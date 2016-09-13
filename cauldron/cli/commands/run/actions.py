@@ -2,9 +2,10 @@ import cauldron
 from cauldron import environ
 from cauldron import session
 from cauldron.session.projects import Project
+from cauldron.environ import Response
 
 
-def get_project():
+def get_project(response: Response):
     """
 
     :return:
@@ -13,7 +14,7 @@ def get_project():
     project = cauldron.project.internal_project
 
     if not project:
-        environ.output.fail().notify(
+        response.fail().notify(
             kind='ERROR',
             code='NO_OPEN_PROJECT',
             message='No project opened'
@@ -29,7 +30,7 @@ def get_project():
     return project
 
 
-def preload_project(project: Project):
+def preload_project(response: Response, project: Project):
     """
 
     :param project:
@@ -38,7 +39,7 @@ def preload_project(project: Project):
 
     was_loaded = bool(project.last_modified is not None)
     if project.refresh() and was_loaded:
-        environ.output.fail().notify(
+        response.fail().notify(
             kind='WARNING',
             code='PROJECT_RELOADED',
             message="""
