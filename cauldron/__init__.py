@@ -3,6 +3,8 @@ from cauldron.session import display
 
 project = session.project
 
+step = session.step
+
 shared = session.project.shared
 
 

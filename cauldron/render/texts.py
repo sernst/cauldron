@@ -113,7 +113,7 @@ def tail(value, count: int = 5) -> str:
 
     if isinstance(value, dict):
         out = []
-        for k, v in reversed(value.items()):
+        for k, v in reversed(list(value.items())):
             if len(out) >= count:
                 break
             out.append('{}: {}'.format(k, v))
@@ -180,10 +180,7 @@ def markdown(source: str, **kwargs) -> dict:
     source = templating.render(source, **kwargs)
 
     if md is None:
-        raise ImportError(textwrap.dedent(
-            """
-            Unable to import the markdown package. Please check
-            """).strip())
+        raise ImportError('Unable to import the markdown package')
 
     source = textwrap.dedent(source)
 

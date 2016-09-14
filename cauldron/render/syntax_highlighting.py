@@ -8,6 +8,7 @@ from pygments.lexers import guess_lexer_for_filename
 from pygments.util import ClassNotFound
 from cauldron import environ
 
+
 def as_html(
         source: str,
         language: str = None,

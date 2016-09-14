@@ -100,12 +100,15 @@ def bokeh_plot(
         model.plot_width = 800
         model.plot_height = round((scale * 9 / 16) * 800)
 
-    results = embed.components(model, wrap_plot_info=False)
+    results = embed.components(model)
+
+    script = results[0] \
+        .split('>', 1)[1] \
+        .rsplit('</', 1)[0]
 
     return templating.render_template(
         'bokeh_component.html',
-        script=results[0],
-        id=results[1]['elementid'],
-        model_id=results[1]['modelid'],
+        script=script,
+        dom=results[1],
         scale=round(100 * scale) if scale is not None else 1000
     )

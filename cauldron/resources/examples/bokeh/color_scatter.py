@@ -1,30 +1,18 @@
-import numpy as np
+import cauldron as cd
 from bokeh.plotting import figure
 
-import cauldron as cd
+# prepare some data
+x = [1, 2, 3, 4, 5]
+y = [6, 7, 2, 4, 5]
 
-N = 4000
-x = np.random.random(size=N) * 100
-y = np.random.random(size=N) * 100
-radii = np.random.random(size=N) * 1.5
-colors = [
-    "#%02x%02x%02x" % (int(r), int(g), 150) for r, g in
-    zip(50 + 2 * x, 30 + 2 * y)
-    ]
-
-TOOLS = [
-    'resize','crosshair','pan','wheel_zoom','box_zoom','undo','redo','reset',
-    'tap','previewsave','box_select','poly_select','lasso_select'
-]
-
-p = figure(tools=','.join(TOOLS))
-
-p.scatter(
-    x, y,
-    radius=radii,
-    fill_color=colors,
-    fill_alpha=0.6,
-    line_color=None
+# create a new plot with a title and axis labels
+p = figure(
+    title="simple line example",
+    x_axis_label='x',
+    y_axis_label='y'
 )
+
+# add a line renderer with legend and line thickness
+p.line(x, y, legend="Temp.", line_width=2)
 
 cd.display.bokeh(p)

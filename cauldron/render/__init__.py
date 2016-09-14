@@ -5,6 +5,7 @@ from datetime import datetime
 
 from cauldron import environ
 from cauldron import templating
+from cauldron.render import encoding
 from cauldron.render import inspection
 from cauldron.render import syntax_highlighting
 from cauldron.render import utils as render_utils
@@ -143,7 +144,7 @@ def json(window_key: str, data) -> str:
         </script>
         """,
         key=window_key,
-        data=json_internal.dumps(data)
+        data=json_internal.dumps(data, cls=encoding.ComplexJsonEncoder)
     )
 
 
@@ -207,11 +208,13 @@ def table(data_frame, scale: float = 0.7) -> str:
     for index, row in data_frame.iterrows():
         data.append(row.tolist())
 
+    json_data = json_internal.dumps(data, cls=encoding.ComplexJsonEncoder)
+
     return templating.render_template(
         'table.html.template',
         id=table_id,
         scale=min(0.95, max(0.05, scale)),
-        data=json_internal.dumps(data),
+        data=json_data,
         column_headers=', '.join(column_headers)
     )
 

@@ -3,8 +3,10 @@ import shutil
 
 from cauldron import environ
 from cauldron.session.exposed import ExposedProject
+from cauldron.session.exposed import ExposedStep
 
 project = ExposedProject()
+step = ExposedStep()
 
 
 def initialize_results_path(results_path: str):

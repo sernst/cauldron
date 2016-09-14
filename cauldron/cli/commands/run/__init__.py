@@ -178,7 +178,13 @@ def execute(
 
         ps = project_steps[0] if len(project_steps) > 0 else None
         force = force or (single_step and bool(ps is not None))
-        steps_run = runner.section(project, ps, limit=1, force=force)
+        steps_run = runner.section(
+            response=response,
+            project=project,
+            starting=ps,
+            limit=1,
+            force=force
+        )
 
     elif continue_after or len(project_steps) == 0:
         # If the continue after flag is set, start with the specified step
@@ -199,7 +205,9 @@ def execute(
                 continue
 
             steps_run += runner.section(
-                project, ps,
+                response=response,
+                project=project,
+                starting=ps,
                 limit=max(1, limit),
                 force=force or (limit < 1 and len(project_steps) < 2)
             )

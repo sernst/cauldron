@@ -5,6 +5,7 @@ from cauldron.session import projects
 from cauldron.session.caching import SharedCache
 from cauldron.session import report
 from cauldron import environ
+from cauldron.runner.python_file import UserAbortError
 
 
 class ExposedProject(object):
@@ -120,3 +121,35 @@ class ExposedProject(object):
             self._project.source_directory,
             *args
         ))
+
+
+class ExposedStep(object):
+    """
+
+    """
+
+    @property
+    def _step(self):
+        """
+        Internal access to the source step. Should not be used outside
+        of Cauldron development
+
+        :return:
+        """
+
+        import cauldron
+        try:
+            return cauldron.project.internal_project.current_step
+        except Exception:
+            return None
+
+    def stop(self):
+        """
+        Stops the execution of the current step immediately
+
+        :return:
+        """
+
+        step = self._step
+        if step:
+            raise UserAbortError()

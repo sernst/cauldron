@@ -65,6 +65,7 @@ def section(
 ) -> list:
     """
 
+    :param response:
     :param project:
     :param starting:
     :param limit:
