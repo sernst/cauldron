@@ -128,9 +128,6 @@ def add_step(
     :return:
     """
 
-    directory = tester.get_temp_path('projects')
-    project_directory = os.path.join(directory, name)
-
     r = run_command('steps add "{}"'.format(name))
     step_path = r.data['step_path']
 

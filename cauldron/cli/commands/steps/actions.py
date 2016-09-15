@@ -3,26 +3,29 @@ import shutil
 import typing
 
 import cauldron
-from cauldron import environ
+from cauldron.environ import Response
 from cauldron.session import naming
 from cauldron.session import writing
 from cauldron.session.projects import Project
-from cauldron.environ import Response
+
 
 def index_from_location(
         response: Response,
         project: Project,
-        location: str = None
+        location: str = None,
+        default: int = None
 ) -> int:
     """
 
+    :param response:
     :param project:
     :param location:
+    :param default:
     :return:
     """
 
     if location is None:
-        return None
+        return default
 
     if isinstance(location, (int, float)):
         return int(location)
@@ -40,12 +43,12 @@ def index_from_location(
             else:
                 return None
 
-    return None
+    return default
 
 
 def echo_steps(response: Response):
     """
-
+    :param response:
     :return:
     """
 
@@ -94,6 +97,7 @@ def create_step(
 ) -> str:
     """
 
+    :param response:
     :param name:
     :param position:
     :param title:
@@ -104,7 +108,7 @@ def create_step(
     title = title.strip('"') if title else title
 
     project = cauldron.project.internal_project
-    index = index_from_location(project, position)
+    index = index_from_location(response, project, position)
     if index is None:
         index = len(project.steps)
 
@@ -121,7 +125,7 @@ def create_step(
         **name_parts
     )
 
-    step_renames = synchronize_step_names(index)
+    step_renames = synchronize_step_names(response, index)
 
     step_data = {'name': name}
 
@@ -167,6 +171,7 @@ def remove_step(
 ):
     """
 
+    :param response:
     :param name:
     :param keep_file:
     :return:
@@ -191,7 +196,7 @@ def remove_step(
     if not keep_file:
         os.remove(step.source_path)
 
-    step_renames = synchronize_step_names()
+    step_renames = synchronize_step_names(response)
 
     step_changes = [dict(
         name=name,
@@ -217,6 +222,7 @@ def synchronize_step_names(
         insert_index: int = None
 ):
     """
+    :param response:
     :param insert_index:
     :return:
     """
@@ -239,7 +245,6 @@ def synchronize_step_names(
             index += 1
 
         name_parts['index'] = index
-        print('NAME PARTS:', name_parts, 'INDEX:', index)
         new_name = naming.assemble_filename(
             scheme=project.naming_scheme,
             **name_parts
@@ -276,6 +281,7 @@ def modify_step(
 ):
     """
 
+    :param response:
     :param name:
     :param new_name:
     :param position:
@@ -285,16 +291,11 @@ def modify_step(
 
     name = name.strip('"')
     new_name = new_name.strip('"') if new_name else name
+    position = position.strip('"') if isinstance(position, str) else position
 
     project = cauldron.project.internal_project
     old_index = project.index_of_step(name)
-
-    if isinstance(position, str):
-        new_index = index_from_location(project, position.strip('"'))
-    elif position is not None:
-        new_index = int(position)
-    else:
-        new_index = old_index
+    new_index = index_from_location(response, project, position, old_index)
 
     if new_index > old_index:
         # If the current position of the step occurs before the new position
@@ -302,6 +303,26 @@ def modify_step(
         # the fact that this step will no longer be in this position when it
         # get placed in the position within the project
         new_index -= 1
+
+    old_step = project.remove_step(name)
+    if not old_step:
+        response.fail().notify(
+            kind='ABORTED',
+            code='NO_SUCH_STEP',
+            message='Unable to modify unknown step "{}"'.format(name)
+        ).console(
+            whitespace=1
+        )
+        return False
+
+    source_path = old_step.source_path
+    if os.path.exists(source_path):
+        temp_path = '{}.cauldron_moving'.format(source_path)
+        shutil.move(source_path, temp_path)
+    else:
+        temp_path = None
+
+    step_renames = synchronize_step_names(response, new_index)
 
     new_name_parts = naming.explode_filename(new_name, project.naming_scheme)
     new_name_parts['index'] = new_index
@@ -320,17 +341,6 @@ def modify_step(
         # Do not carry out any modifications if nothing was actually changed
         return
 
-    old_step = project.remove_step(name)
-    if not old_step:
-        response.fail().notify(
-            kind='ABORTED',
-            code='NO_SUCH_STEP',
-            message='Unable to modify unknown step "{}"'.format(name)
-        ).console(
-            whitespace=1
-        )
-        return False
-
     step_data = {'name': new_name}
     if title is None:
         if old_step.definition.get('title'):
@@ -343,8 +353,8 @@ def modify_step(
     project.save()
 
     if not os.path.exists(new_step.source_path):
-        if os.path.exists(old_step.source_path):
-            shutil.move(old_step.source_path, new_step.source_path)
+        if temp_path and os.path.exists(temp_path):
+            shutil.move(temp_path, new_step.source_path)
         else:
             with open(new_step.source_path, 'w+') as f:
                 f.write('')
@@ -354,7 +364,6 @@ def modify_step(
     else:
         before_step = None
 
-    step_renames = synchronize_step_names()
     step_renames[old_step.definition.name] = {
         'name': new_step.definition.name,
         'title': new_step.definition.title
@@ -389,6 +398,7 @@ def toggle_muting(
 ):
     """
 
+    :param response:
     :param step_name:
     :param value:
     :return:

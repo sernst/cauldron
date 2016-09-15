@@ -182,8 +182,21 @@ class Response(object):
             )
         ]
 
-        for k, v in self.data.items():
-            out.append('  * {}: {}'.format(k, v))
+        def print_data(key, value, level=0):
+            if level < 5 and isinstance(value, dict):
+                for k, v in value.items():
+                    print_data(k, v, level + 1)
+                return
+
+            if level < 5 and isinstance(value, (list, tuple)):
+                for i, v in enumerate(value):
+                    print_data(i, v, level + 1)
+                return
+
+            prefix = '  ' * (level + 1)
+            out.append('{}* {}: {}'.format(prefix, key, value))
+
+        print_data('DATA', self.data)
 
         for m in self.messages:
             out.append('--- Message [{kind}: {code}] ---\n{message}'.format(
@@ -191,8 +204,7 @@ class Response(object):
                 code=m.code,
                 message=m.message
             ))
-            for k, v in m.data.items():
-                out.append('  * {}: {}'.format(k, v))
+            print_data('MESSAGE DATA', m.data)
 
         return '\n'.join(out)
 

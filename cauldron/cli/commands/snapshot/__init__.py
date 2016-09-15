@@ -8,6 +8,7 @@ from cauldron import environ
 from cauldron.cli.commands.snapshot import actions
 from cauldron.cli.interaction import autocompletion
 from cauldron.environ import Response
+from cauldron import cli
 
 NAME = 'snapshot'
 DESCRIPTION = """
@@ -46,28 +47,44 @@ def populate(
             """
     )
 
+    parser.add_argument(
+        '--no-show',
+        dest='no_show',
+        default=False,
+        action='store_true',
+        help=cli.reformat(
+            'Do not open the snapshot in the browser after running the command'
+        )
+    )
+
 
 def execute(
         parser: ArgumentParser,
         action: str,
         arguments: list,
-        response: Response
-):
+        response: Response,
+        no_show: bool = False
+) -> Response:
     """
 
     :param parser:
     :param action:
     :param arguments:
     :param response:
+    :param no_show:
     :return:
     """
+
+    show = not no_show
 
     if not action:
         return response.fail().notify(
             kind='ERROR',
             code='NO_ACTION_ARG',
             message='An action is required for the snapshot command'
-        ).console(whitespace=1)
+        ).console(
+            whitespace=1
+        ).response
 
     action = action.strip().lower()
     project = cauldron.project.internal_project
@@ -85,7 +102,7 @@ def execute(
         return actions.remove_snapshot(project, *arguments)
 
     if action == 'add':
-        return actions.create_snapshot(project, *arguments)
+        return actions.create_snapshot(project, *arguments, show=show)
 
     if action == 'list':
         return actions.list_snapshots(project)
@@ -111,7 +128,8 @@ def execute(
             whitespace=1
         )
 
-        webbrowser.open(result['url'])
+        if show:
+            webbrowser.open(result['url'])
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):

@@ -1,15 +1,15 @@
 package:
     name: cauldron
-    version: "0.0.14"
+    version: "0.0.15"
 
 build:
     number: 1
     noarch_python: True
 
 source:
-  fn: cauldron-notebook-0.0.14.tar.gz
-  url: https://pypi.python.org/packages/fa/a3/690febf82f8b0dc4a507069107cd13225599deb2649e8af6e6020aa12093/cauldron-notebook-0.0.14.tar.gz
-  md5: 46f29e80d66e444332c8f0601b5bdf4d
+  fn: cauldron-notebook-0.0.15.tar.gz
+  url: https://pypi.python.org/packages/67/4d/b198f17bfa264ea41f266f6bc8ba6bc2f47d5e54d805acabbf1590b3fe60/cauldron-notebook-0.0.15.tar.gz
+  md5: 3fb7d83ed40e4fe00c558121959ab1c6
 
 requirements:
   build:

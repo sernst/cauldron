@@ -19,11 +19,24 @@ class Message(object):
     def __str__(self):
         out = ['[FAILED]: {}'.format(self.name)]
 
+        def print_data(key, value, level = 0):
+            if level < 5 and isinstance(value, dict):
+                for k, v in value.items():
+                    print_data(k, v, level + 1)
+                return
+
+            if level < 5 and isinstance(value, (list, tuple)):
+                for i, v in enumerate(value):
+                    print_data(i, v, level + 1)
+                return
+
+            prefix = '  ' * (level + 1)
+            out.append('{}* {}: {}'.format(prefix, key, value))
+
         if self.text:
             out.append('{}'.format(self.text.strip()))
 
-        for k, v in self.data.items():
-            out.append('   * {}: {}'.format(k, v))
+        print_data('DATA', self.data)
 
         if self.response:
             if not hasattr(self.response, 'echo'):

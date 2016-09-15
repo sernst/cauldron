@@ -39,6 +39,8 @@
 
 
   /**
+   * Renames steps. This is carried out in a two-step process to prevent collisions between shared old names and new
+   * names among different steps.
    *
    * @param renames
    */
@@ -49,12 +51,22 @@
 
     var body = $('.body-wrapper');
 
+    // Add rename attributes
     Object.keys(renames).forEach(function (oldName) {
       var data = renames[oldName];
       var stepBody = body.find('[data-step-name="' + oldName + '"]');
-      stepBody.attr('data-step-name', data.name);
-      stepBody.find('.step-anchor').attr('name', data.name);
+      stepBody.attr('data-step-rename', data.name);
       stepBody.find('.cd-step-title').html(data.title || data.name);
+    });
+
+    // Process rename attributes
+    body.find('[data-step-rename]').each(function (index, element) {
+      var e = $(element);
+      var newName = e.attr('data-step-rename');
+
+      e.attr('data-step-rename', null);
+      e.attr('data-step-name', newName);
+      e.find('.step-anchor').attr('name', newName);
     });
 
     return Promise.resolve(renames);

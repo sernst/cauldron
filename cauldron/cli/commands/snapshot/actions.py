@@ -60,10 +60,15 @@ def list_snapshots(project: Project):
     environ.log(entries, whitespace_bottom=1, indent_by=3)
 
 
-def create_snapshot(project: Project, *args: typing.List[str]):
+def create_snapshot(
+        project: Project,
+        *args: typing.List[str],
+        show: bool = True
+):
     """
 
     :param project:
+    :param show:
     :return:
     """
 
@@ -91,10 +96,14 @@ def create_snapshot(project: Project, *args: typing.List[str]):
         indent_by=2
     )
 
-    webbrowser.open(url)
+    if show:
+        webbrowser.open(url)
 
 
-def remove_snapshot(project: Project, *args: typing.List[str]):
+def remove_snapshot(
+        project: Project,
+        *args: typing.List[str]
+):
     """
 
     :param project:

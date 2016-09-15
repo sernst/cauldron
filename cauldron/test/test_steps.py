@@ -3,6 +3,7 @@ import sys
 
 from cauldron.test import support
 from cauldron.test.support import scaffolds
+from cauldron.test.support.messages import Message
 
 
 class TestSteps(scaffolds.ResultsTest):
@@ -81,6 +82,11 @@ class TestSteps(scaffolds.ResultsTest):
         """
 
         support.initialize_project(self, 'angelica')
+        r = support.run_command('steps list')
+        self.assertEqual(len(r.data['steps']), 0, Message(
+            'New project should have no steps to list',
+            response=r
+        ))
 
         for v in ['a.py', 'b.md', 'c.html', 'd.rst']:
             r = support.run_command('steps add "{}"'.format(v))
@@ -122,5 +128,39 @@ class TestSteps(scaffolds.ResultsTest):
             len(result), 2,
             'there are two steps in {}'.format(result)
         )
+
+        support.run_command('close')
+
+    def test_modify_move(self):
+        """
+
+        :return:
+        """
+
+        support.initialize_project(self, 'harvey')
+        support.add_step(self, '', '#S1')
+        support.add_step(self, '', '#S2')
+
+        r = support.run_command('steps list')
+        step = r.data['steps'][-1]
+
+        r = support.run_command(
+            'steps modify {} --position=0'.format(step['name'])
+        )
+        self.assertFalse(r.failed, Message(
+            'Failed to move step 2 to the beginning',
+            response=r
+        ))
+
+        r = support.run_command('steps list')
+        step = r.data['steps'][0]
+
+        with open(step['source_path'], 'r+') as f:
+            contents = f.read()
+
+        self.assertEqual(contents.strip(), '#S2', Message(
+            'Step 2 should now be Step 1',
+            response=r
+        ))
 
         support.run_command('close')
