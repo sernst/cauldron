@@ -1,5 +1,6 @@
 import datetime
 import json
+import numpy as np
 
 
 class ComplexJsonEncoder(json.JSONEncoder):
@@ -12,5 +13,8 @@ class ComplexJsonEncoder(json.JSONEncoder):
             return value.isoformat()
         elif isinstance(value, datetime.datetime):
             return value.isoformat()
+        elif isinstance(value, (np.int32, np.int64)):
+            return int(value)
+
 
         return json.JSONEncoder.default(self, value)

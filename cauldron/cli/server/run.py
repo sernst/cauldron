@@ -44,7 +44,7 @@ def get_server_data() -> dict:
     return out
 
 
-def parse(args = None):
+def parse(args=None):
     parser = ArgumentParser(
         description='Cauldron server'
     )

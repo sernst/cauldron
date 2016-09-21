@@ -117,7 +117,7 @@ def initialize_project(
 
 def add_step(
         tester: 'scaffolds.ResultsTest',
-        name: str,
+        name: str = '',
         contents: str = ''
 ):
     """

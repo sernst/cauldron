@@ -1,0 +1,22 @@
+{
+  "extends": "./node_modules/eslint-config-airbnb/index.js",
+  "rules": {
+    // Airbnb imposed rule for JSON compatibility
+    "comma-dangle": 0,
+
+    // Console output is allowed because of Node.js context, as
+    // recommended by ESLint documentation
+    "no-console": 0,
+
+    // While they should be avoided in JS code, they do arise in data
+    // structures from external sources. Reduce this to a warning to
+    // restrict its use
+    "no-underscore-dangle": "warn"
+  },
+
+  "env": {
+    "browser": true,
+    "node": true,
+    "jasmine": true
+  }
+}

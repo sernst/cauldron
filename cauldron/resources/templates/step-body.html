@@ -91,6 +91,8 @@
   {%  endif %}
 
   {% if error %}
+    <a class="step-error-anchor" name="{{ id }}-error"></a>
     {{ error }}
   {% endif %}
+  <a class="step-end-anchor" name="{{ id }}-end"></a>
 </div>

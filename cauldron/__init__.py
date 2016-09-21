@@ -1,11 +1,13 @@
-from cauldron import session
+from cauldron import session as _session
 from cauldron.session import display
+from cauldron.session.reloading import refresh
+from cauldron.session.caching import SharedCache as _SharedCache
 
-project = session.project
+project = _session.project  # type: _session.ExposedProject
 
-step = session.step
+step = _session.step  # type: _session.ExposedStep
 
-shared = session.project.shared
+shared = _session.project.shared  # type: _SharedCache
 
 
 def run_shell():
