@@ -34,7 +34,10 @@ def run(
     with open(step.source_path, 'r+') as f:
         code = f.read()
 
-    code = InspectLoader.source_to_code(code, step.source_path)
+    try:
+        code = InspectLoader.source_to_code(code, step.source_path)
+    except SyntaxError as error:
+        return render_syntax_error(project, code, error)
 
     setattr(module, '__file__', step.source_path)
     setattr(
@@ -66,9 +69,9 @@ def run(
 
     try:
         exec(code, module.__dict__)
-    except Exception as err:
-        if not isinstance(err, UserAbortError):
-            out = render_error(project, err)
+    except Exception as error:
+        if not isinstance(error, UserAbortError):
+            out = render_error(project, error)
 
     if out is None:
         step.last_modified = time.time()
@@ -82,6 +85,43 @@ def run(
     step.report.print_buffer = None
 
     return out
+
+
+def render_syntax_error(project, code, error: SyntaxError):
+    """
+
+    :param project:
+    :param code:
+    :param error:
+    :return:
+    """
+
+    stack = [dict(
+        filename=error.filename,
+        location=None,
+        line_number=error.lineno,
+        line=error.text.rstrip()
+    )]
+
+    render_data = dict(
+        type=error.__class__.__name__,
+        message='{}'.format(error),
+        stack=stack
+    )
+
+    return dict(
+        success=False,
+        error=error,
+        message=templating.render_template(
+            'user-code-error.txt',
+            **render_data
+        ),
+        html_message=templating.render_template(
+            'user-code-error.html',
+            **render_data
+        )
+    )
+
 
 
 def render_error(project, error):

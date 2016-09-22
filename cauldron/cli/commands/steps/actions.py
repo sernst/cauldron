@@ -1,6 +1,7 @@
 import os
 import shutil
 import typing
+import uuid
 
 import cauldron
 from cauldron.environ import Response
@@ -198,8 +199,14 @@ def remove_step(
 
     step_renames = synchronize_step_names(response)
 
+    removed_name = 'REMOVED--{}'.format(uuid.uuid4())
+    step_renames[name] = dict(
+        name=removed_name,
+        title=''
+    )
+
     step_changes = [dict(
-        name=name,
+        name=removed_name,
         action='removed'
     )]
 
@@ -224,7 +231,7 @@ def synchronize_step_names(
     """
     :param response:
     :param insert_index:
-    :return:
+    :return:F
     """
 
     project = cauldron.project.internal_project
