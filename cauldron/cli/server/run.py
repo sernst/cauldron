@@ -106,5 +106,5 @@ def execute(
         log = logging.getLogger('werkzeug')
         log.setLevel(logging.ERROR)
 
-    APPLICATION.run(port=port, debug=debug, host=None)
+    APPLICATION.run(port=port, debug=debug, host=host)
 

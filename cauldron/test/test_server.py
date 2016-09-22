@@ -1,6 +1,8 @@
 import json
+from unittest import mock
 
 from cauldron.cli import server
+from cauldron.cli.server import run as server_run
 from cauldron.test.support import scaffolds
 
 
@@ -20,6 +22,21 @@ class TestServer(scaffolds.ResultsTest):
             '/',
             data=json.dumps(dict(
                 command='open',
+                args=''
+            )),
+            content_type='application/json'
+        )
+
+        self.assertIsNotNone(response)
+
+    def test_execute_invalid_command(self):
+        """
+        """
+
+        response = self.app.post(
+            '/',
+            data=json.dumps(dict(
+                command='fake-command',
                 args=''
             )),
             content_type='application/json'
@@ -86,3 +103,70 @@ class TestServer(scaffolds.ResultsTest):
 
         response = self.app.post('/project')
         self.assertIsNotNone(response)
+
+    def test_run_status(self):
+        """
+
+        :return:
+        """
+
+        response = self.app.post(
+            '/run-status/fake-uid',
+            content_type='application/json'
+        )
+
+        self.assertIsNotNone(response)
+
+    def test_abort_invalid(self):
+        """
+
+        :return:
+        """
+
+        response = self.app.post(
+            '/abort/fake-uid',
+            content_type='application/json'
+        )
+
+        self.assertIsNotNone(response)
+
+    def test_start_server(self):
+        """
+
+        :return:
+        """
+
+        kwargs = dict(
+            port=9999,
+            debug=True,
+            host='TEST'
+        )
+
+        with mock.patch('cauldron.cli.server.run.APPLICATION.run') as func:
+            server_run.execute(**kwargs)
+            func.assert_called_once_with(**kwargs)
+
+    def test_start_server_version(self):
+        """
+
+        :return:
+        """
+
+        with mock.patch('cauldron.cli.server.run.APPLICATION.run') as func:
+            try:
+                server_run.execute(version=True)
+            except SystemExit:
+                pass
+            func.assert_not_called()
+
+    def test_parse(self):
+        """
+
+        :return:
+        """
+
+        args = server_run.parse(['--port=9999', '--version', '--debug'])
+        self.assertTrue(args.get('version'))
+        self.assertTrue(args.get('debug'))
+        self.assertEqual(args.get('port'), 9999)
+

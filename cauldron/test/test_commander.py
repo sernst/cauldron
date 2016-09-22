@@ -4,7 +4,6 @@ from unittest import mock
 
 from cauldron import environ
 from cauldron.cli import commander
-from cauldron.environ import Response
 
 
 class TestCommander(unittest.TestCase):
@@ -42,6 +41,29 @@ class TestCommander(unittest.TestCase):
             r = commander.print_module_help()
             self.assertEqual(1, console_func.call_count)
 
+    def test_execute_invalid(self):
+        """
 
+        :return:
+        """
 
+        result = commander.execute('fake-module', '')
+        self.assertTrue(result.failed)
 
+    def test_show_help_invalid(self):
+        """
+
+        :return:
+        """
+
+        result = commander.show_help('fake-module')
+        self.assertTrue(result.failed)
+
+    def test_show_help(self):
+        """
+
+        :return:
+        """
+
+        result = commander.show_help('open')
+        self.assertFalse(result.failed)
