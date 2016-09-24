@@ -14,8 +14,7 @@ def get_project(response: Response):
     project = cauldron.project.internal_project
 
     if not project:
-        response.fail().notify(
-            kind='ERROR',
+        response.fail(
             code='NO_OPEN_PROJECT',
             message='No project opened'
         ).console(
@@ -39,7 +38,7 @@ def preload_project(response: Response, project: Project):
 
     was_loaded = bool(project.last_modified is not None)
     if project.refresh() and was_loaded:
-        response.fail().notify(
+        response.notify(
             kind='WARNING',
             code='PROJECT_RELOADED',
             message="""

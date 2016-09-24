@@ -31,11 +31,16 @@ def project_status():
 
     try:
         project = cauldron.project.internal_project
-        r.update(
-            project=project.status()
+        if project:
+            r.update(project=project.status())
+        else:
+            r.update(project=None)
+    except Exception as err:
+        r.fail(
+            code='PROJECT_STATUS_ERROR',
+            message='Unable to check status of currently opened project',
+            error=str(err)
         )
-    except Exception:
-        r.fail()
 
     r.update(__server__=server_run.get_server_data())
     return flask.jsonify(r.serialize())
@@ -52,11 +57,16 @@ def project_data():
 
     try:
         project = cauldron.project.internal_project
-        r.update(
-            project=project.kernel_serialize()
+        if project:
+            r.update(project=project.kernel_serialize())
+        else:
+            r.update(project=None)
+    except Exception as err:
+        r.fail(
+            code='PROJECT_FETCH_ERROR',
+            message='Unable to check status of currently opened project',
+            error=str(err)
         )
-    except Exception:
-        r.fail()
 
     r.update(__server__=server_run.get_server_data())
     return flask.jsonify(r.serialize())

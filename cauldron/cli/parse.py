@@ -4,7 +4,6 @@ from argparse import ArgumentParser
 from collections import namedtuple
 
 from cauldron import cli
-from cauldron import environ
 from cauldron.environ import Response
 
 FLAG_PATTERN = re.compile(
@@ -94,8 +93,7 @@ def args(
             The error message from the parser
         """
 
-        response.fail().notify(
-            kind='ERROR',
+        response.fail(
             code='INVALID_ARGUMENTS',
             message=message
         ).kernel(
@@ -115,7 +113,18 @@ def args(
     args_result.update(assigned_args)
     args_result.update(parsed_args)
 
-    return ARGS_RESPONSE_NT(parser, args_result, response)
+    # Clean the argument values of quote characters and hanging whitespace
+
+    def cleanArguments(item):
+        if isinstance(item[1], str):
+            return item[0], item[1].strip('" \t')
+        return item
+
+    return ARGS_RESPONSE_NT(
+        parser,
+        dict(map(cleanArguments, args_result.items())),
+        response
+    )
 
 
 def get_parser(
@@ -161,8 +170,7 @@ def get_parser(
     try:
         getattr(module, 'populate')(parser, raw_args, assigned_args)
     except Exception as err:
-        response.fail().notify(
-            kind='ERROR',
+        response.fail(
             code='ARGS_PARSE_ERROR',
             message='Unable to parse command arguments'
         ).kernel(

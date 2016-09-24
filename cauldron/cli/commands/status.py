@@ -18,8 +18,7 @@ def execute(
     project = cauldron.project.internal_project
 
     if not project:
-        return response.fail().notify(
-            kind='ABORTED',
+        return response.fail(
             code='NO_OPEN_PROJECT',
             message='No project is currently open'
         ).console(

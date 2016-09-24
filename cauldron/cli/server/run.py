@@ -90,8 +90,7 @@ def execute(
     """
 
     if kwargs.get('version'):
-        data = version.get_package_data()
-        print('VERSION: {}'.format(data['version']))
+        print('VERSION: {}'.format(environ.version))
         sys.exit(0)
 
     if host is None and public:

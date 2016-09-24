@@ -159,6 +159,8 @@ class Response(object):
         self.data = dict()
         self.parent = None  # type: Response
         self.messages = []  # type: typing.List[ResponseMessage]
+        self.errors = []  # type: typing.List[ResponseMessage]
+        self.warnings = []  # type: typing.List[ResponseMessage]
         self.ended = False
         self.failed = False
         self.thread = None
@@ -198,6 +200,20 @@ class Response(object):
 
         print_data('DATA', self.data)
 
+        for e in self.errors:
+            out.append('--- ERROR [{code}] ---\n{message}'.format(
+                code=e.code,
+                message=e.message
+            ))
+            print_data('ERROR DATA', e.data)
+
+        for w in self.warnings:
+            out.append('--- WARNING [{code}] ---\n{message}'.format(
+                code=w.code,
+                message=w.message
+            ))
+            print_data('WARNING DATA', w.data)
+
         for m in self.messages:
             out.append('--- Message [{kind}: {code}] ---\n{message}'.format(
                 kind=m.kind,
@@ -226,6 +242,8 @@ class Response(object):
         self.ended = self.ended or other.ended
         self.data.update(other.data)
         self.messages += other.messages
+        self.errors += other.errors
+        self.warnings += other.warnings
         self.thread = either(self.thread, other.thread)
 
         other.parent = self
@@ -260,13 +278,20 @@ class Response(object):
         if self.parent:
             return self.parent.notify(kind, message, code, **kwargs)
 
+        message_kind = (kind if kind else 'INFO').upper()
         rm = ResponseMessage(
-            kind=kind if kind else 'INFO',
+            kind=message_kind,
             message=message,
             code=code,
             response=self
         )
-        self.messages.append(rm)
+
+        if kind == 'ERROR':
+            self.errors.append(rm)
+        elif kind == 'WARNING':
+            self.warnings.append(rm)
+        else:
+            self.messages.append(rm)
         return rm
 
     def serialize(self) -> dict:
@@ -277,26 +302,54 @@ class Response(object):
 
         return dict(
             data=self.data,
+            errors=[x.serialize() for x in self.errors],
+            warnings=[x.serialize() for x in self.warnings],
             messages=[x.serialize() for x in self.messages],
             ended=self.ended,
             success=not self.failed
         )
 
-    def fail(self, **kwargs) -> 'Response':
+    def fail(
+            self,
+            message: str = None,
+            code: str = None,
+            **kwargs
+    ) -> ResponseMessage:
         """
 
-        :param kwargs:
         :return:
         """
 
         self.failed = True
 
-        if self.parent:
-            return self.parent.fail(**kwargs)
+        return self.notify(
+            kind='ERROR',
+            message=cli.as_single_line(message),
+            code=code,
+            failed=True,
+            **kwargs
+        )
 
-        if kwargs:
-            self.update(**kwargs)
-        return self
+    def warn(
+            self,
+            message: str = None,
+            code: str = None,
+            **kwargs
+    ) -> ResponseMessage:
+        """
+
+        :param message:
+        :param code:
+        :param kwargs:
+        :return:
+        """
+
+        return self.notify(
+            kind='WARNING',
+            message=message,
+            code=code,
+            **kwargs
+        )
 
     def end(self) -> 'Response':
         """

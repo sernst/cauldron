@@ -80,8 +80,7 @@ def fetch_recent(response: Response) -> str:
     recent_paths = environ.configs.fetch('recent_paths', [])
 
     if len(recent_paths) < 1:
-        response.fail().notify(
-            kind='ABORTED',
+        response.fail(
             code='NO_RECENT_PROJECTS',
             message='There are no recent projects available'
         ).console()
@@ -138,8 +137,7 @@ def fetch_last(response: Response) -> str:
     recent_paths = environ.configs.fetch('recent_paths', [])
 
     if len(recent_paths) < 1:
-        response.fail().notify(
-            kind='ABORTED',
+        response.fail(
             code='NO_RECENT_PROJECTS',
             message='No projects have been opened recently'
         ).console()
@@ -147,89 +145,4 @@ def fetch_last(response: Response) -> str:
 
     return recent_paths[0]
 
-
-def open_project(
-        response: Response,
-        path: str,
-        forget: bool = False
-) -> bool:
-    """
-
-    :param response:
-    :param path:
-    :param forget:
-    :return:
-    """
-
-    try:
-        runner.close()
-    except Exception:
-        pass
-
-    recent_paths = environ.configs.fetch('recent_paths', [])
-    path = environ.paths.clean(path)
-
-    if not os.path.exists(path):
-        response.fail().notify(
-            kind='ERROR',
-            code='PROJECT_NOT_FOUND',
-            message='The project path does not exist'
-        ).kernel(
-            path=path
-        ).console(
-            """
-            [ERROR]: The specified path does not exist
-
-              {path}
-
-            The operation was aborted
-            """.format(path=path)
-        )
-        return False
-
-    try:
-        runner.initialize(path)
-    except FileNotFoundError:
-        response.fail().notify(
-            kind='ERROR',
-            code='PROJECT_NOT_FOUND',
-            message='Project not found'
-        ).console()
-        return
-
-    if not forget:
-        if path in recent_paths:
-            recent_paths.remove(path)
-        recent_paths.insert(0, path)
-        environ.configs.put(recent_paths=recent_paths[:10], persists=True)
-        environ.configs.save()
-
-    project = cauldron.project.internal_project
-
-    # Set the top-level display and cache values to the current project values
-    # before running the step for availability within the step scripts
-    cauldron.shared = cauldron.project.shared
-
-    if project.results_path:
-        session.initialize_results_path(project.results_path)
-
-    path = project.output_path
-    if not path or not os.path.exists(path):
-        project.write()
-
-    response.update(
-        project=project.kernel_serialize()
-    ).notify(
-        kind='SUCCESS',
-        code='PROJECT_OPENED',
-        message='Opened project: {}'.format(path)
-    ).console_header(
-        project.title, level=2
-    ).console(
-        """
-        PATH: {path}
-         URL: {url}
-        """.format(path=path, url=project.url),
-        whitespace=1
-    )
 

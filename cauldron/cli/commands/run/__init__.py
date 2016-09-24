@@ -155,8 +155,7 @@ def execute(
     if len(step) > 0:
         message = ['  * "{}"'.format(x) for x in step]
         message.insert(0, '[ABORTED]: Unable to locate the following step(s):')
-        return response.fail().notify(
-            kind='ABORTED',
+        return response.fail(
             code='MISSING_STEP',
             message='Unable to locate steps'
         ).kernel(

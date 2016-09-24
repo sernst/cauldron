@@ -1,4 +1,3 @@
-import json
 from argparse import ArgumentParser
 
 from cauldron import environ
@@ -6,11 +5,6 @@ from cauldron.environ import Response
 
 NAME = 'version'
 DESCRIPTION = 'Displays Cauldron\'s version information'
-
-
-def get_package_data():
-    with open(environ.paths.package('settings.json'), 'r') as f:
-        return json.load(f)
 
 
 def execute(
@@ -22,17 +16,17 @@ def execute(
     :return:
     """
 
-    package_data = get_package_data()
+    data = environ.package_settings
 
-    if package_data:
+    if data:
         return response.update(
-            **package_data
+            **data
         ).notify(
             kind='SUCCESS',
             code='VERSION',
-            message='Version is: {}'.format(package_data['version'])
+            message='Version is: {}'.format(data['version'])
         ).console(
-            'Version: {version}'.format(version=package_data['version']),
+            'Version: {version}'.format(version=data['version']),
             whitespace=1
         ).response
 

@@ -27,6 +27,7 @@ def execute():
     name = None
     args = None
     request_args = None
+
     try:
         request_args = request.get_json(silent=True)
         if not request_args:
@@ -41,8 +42,7 @@ def execute():
             args = ' '.join(args)
         args += ' {}'.format(parts[1] if len(parts) > 1 else '').strip()
     except Exception as err:
-        r.fail().notify(
-            kind='ERROR',
+        r.fail(
             code='INVALID_COMMAND',
             message='Unable to parse command'
         ).kernel(
@@ -92,8 +92,7 @@ def execute():
             run_uid=r.thread.uid
         )
     except Exception as err:
-        r.fail().notify(
-            kind='ERROR',
+        r.fail(
             code='KERNEL_EXECUTION_FAILURE',
             message='Unable to execute command'
         ).kernel(
@@ -156,8 +155,7 @@ def run_status(uid: str):
     except Exception as err:
         return flask.jsonify(
             Response()
-            .fail().notify(
-                kind='ERROR',
+            .fail(
                 code='COMMAND_STATUS_FAILURE',
                 message='Unable to check command execution status'
             )

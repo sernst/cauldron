@@ -1,22 +1,30 @@
-import typing
 import threading
+import typing
+from collections import namedtuple
 from datetime import datetime
 from datetime import timedelta
 
+from cauldron.cli.threads import CauldronThread
 from cauldron.environ import paths
 from cauldron.environ import systems
 from cauldron.environ.configuration import Configuration
-from cauldron.environ.logger import header as log_header
 from cauldron.environ.logger import blanks as log_blanks
-from cauldron.environ.logger import raw as log_raw
+from cauldron.environ.logger import header as log_header
 from cauldron.environ.logger import log
+from cauldron.environ.logger import raw as log_raw
 from cauldron.environ.response import Response
-from cauldron.cli.threads import CauldronThread
 
+VersionInfo = namedtuple('VersionInfo', ['major', 'minor', 'micro'])
 
 start_time = datetime.utcnow()
 
 configs = Configuration()
+
+package_settings = systems.get_package_data()
+
+version = package_settings.get('version', '0.0.0')
+
+version_info = VersionInfo(*[int(x) for x in version.split('.')])
 
 
 def run_time() -> typing.Union[None, timedelta]:
@@ -32,6 +40,11 @@ def run_time() -> typing.Union[None, timedelta]:
 
 
 def abort_thread():
+    """
+
+    :return:
+    """
+
     thread = threading.current_thread()
 
     if not isinstance(thread, CauldronThread):

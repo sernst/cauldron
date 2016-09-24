@@ -6,6 +6,7 @@ from argparse import ArgumentParser
 from cauldron import cli
 from cauldron import environ
 from cauldron.cli.commands.open import actions as open_actions
+from cauldron.cli.commands.open import opener as project_opener
 from cauldron.cli.interaction import autocompletion
 from cauldron.session import projects
 from cauldron.environ import Response
@@ -87,6 +88,38 @@ def populate(
     )
 
 
+def create_project_directory(directory):
+    """
+
+    :param directory:
+    :return:
+    """
+
+    if os.path.exists(directory):
+        return True
+
+    try:
+        os.makedirs(directory)
+        return os.path.exists(directory)
+    except Exception as err:
+        return False
+
+
+def write_project_data(project_directory, data):
+    """
+
+    :param project_directory:
+    :param data:
+    :return:
+    """
+
+    project_path = os.path.join(project_directory, 'cauldron.json')
+    with open(project_path, 'w+') as f:
+        json.dump(data, f, indent=2, sort_keys=True)
+
+    return True
+
+
 def execute(
         parser: ArgumentParser,
         response: Response,
@@ -102,12 +135,6 @@ def execute(
     :return:
     """
 
-    project_name = project_name.strip('" \t')
-    directory = directory.strip('" \t')
-    summary = summary.strip('" \t')
-    title = title.strip('" \t')
-    author = author.strip('" \t')
-
     if not title:
         title = project_name.replace('_', ' ').replace('-', ' ').capitalize()
 
@@ -119,25 +146,45 @@ def execute(
     if not directory.endswith(project_name):
         directory = os.path.join(directory, project_name)
 
-    if os.path.exists(directory):
-        if os.path.exists(os.path.join(directory, 'cauldron.json')):
-            return response.fail().notify(
-                kind='ABORTED',
-                code='ALREADY_EXISTS',
-                message='Cauldron project exists in the specified directory'
-            ).kernel(
-                directory=directory
-            ).console(
+    project_file_path = os.path.join(directory, 'cauldron.json')
+    if os.path.exists(project_file_path):
+        return response.fail(
+            code='ALREADY_EXISTS',
+            message='A Cauldron project already exists in this directory'
+        ).kernel(
+            directory=directory
+        ).console(
+            """
+            [ABORTED]: Directory already exists and contains a cauldron
+                project file.
+
+                {}
+            """.format(directory),
+            whitespace=1
+        ).response
+
+    if not create_project_directory(directory):
+        return response.fail(
+            message=(
                 """
-                [ABORTED]: Directory already exists and contains a cauldron
-                    project file.
+                Unable to create project folder in the specified directory.
+                Do you have the necessary write permissions for this
+                location?
+                """
+            ),
+            code='DIRECTORY_CREATE_FAILED',
+            directory=directory
+        ).console(
+            """
+            [ERROR]: Unable to create project folder. Do you have the necessary
+                write permissions to the path:
 
-                    {}
-                """.format(directory),
-                whitespace=1
-            ).response
+                "{}"
+            """.format(directory),
+            whitespace=1
+        ).response
 
-    os.makedirs(directory)
+    response.update(source_directory=directory)
 
     project_data = dict(
         name=project_name,
@@ -148,12 +195,30 @@ def execute(
         naming_scheme=None if no_naming_scheme else projects.DEFAULT_SCHEME
     )
 
-    with open(os.path.join(directory, 'cauldron.json'), 'w+') as f:
-        json.dump(project_data, f, indent=2, sort_keys=True)
+    if not write_project_data(directory, project_data):
+        return response.fail(
+            message=(
+                """
+                Unable to write to the specified project directory.
+                Do you have the necessary write permissions for this
+                location?
+                """
+            ),
+            code='PROJECT_CREATE_FAILED',
+            directory=directory
+        ).console(
+            """
+            [ERROR]: Unable to write project data. Do you have the necessary
+                write permissions in the path:
 
-    open_actions.open_project(response, directory)
+                "{}"
+            """.format(directory),
+            whitespace=1
+        ).response
 
-    return response.update(source_directory=directory)
+    project_opener.open_project(response, directory)
+
+    return response
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):

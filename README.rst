@@ -18,6 +18,10 @@ The un-notebook notebook: an interactive scientific analysis environment.
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg
    :target: https://raw.githubusercontent.com/sernst/cauldron/master/LICENSE
 
+.. image:: https://badges.gitter.im/gitterHQ/gitter.svg(
+   :target: https://gitter.im/cauldron-notebook/Lobby
+
+
 - `About Cauldron`_
 - `Installation`_
 - `Getting Started`_

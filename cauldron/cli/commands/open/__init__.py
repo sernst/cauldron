@@ -6,6 +6,7 @@ import cauldron
 from cauldron import cli
 from cauldron import environ
 from cauldron.cli.commands.open import actions
+from cauldron.cli.commands.open import opener
 from cauldron.cli.interaction import autocompletion
 from cauldron.environ import Response
 
@@ -131,9 +132,9 @@ def execute(
         p = actions.fetch_location(response, path)
         path = p if p else path
 
-    actions.open_project(response, path, forget=forget)
+    opener.open_project(response, path, forget=forget)
 
-    if show_in_browser:
+    if not response.failed and show_in_browser:
         cli.open_in_browser(cauldron.project.internal_project)
 
 

@@ -145,9 +145,9 @@ class ExposedStep(object):
 
     def stop(self):
         """
-        Stops the execution of the current step immediately
-
-        :return:
+        Stops the execution of the current step immediately without raising
+        an error. Use this to abort the step running process if you want
+        to return early.
         """
 
         step = self._step

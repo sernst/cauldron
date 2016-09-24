@@ -78,8 +78,7 @@ def execute(
     show = not no_show
 
     if not action:
-        return response.fail().notify(
-            kind='ERROR',
+        return response.fail(
             code='NO_ACTION_ARG',
             message='An action is required for the snapshot command'
         ).console(
@@ -90,8 +89,7 @@ def execute(
     project = cauldron.project.internal_project
 
     if not project:
-        return response.fail().notify(
-            kind='ERROR',
+        return response.fail(
             code='NO_OPEN_PROJECT',
             message='No open project'
         ).console(

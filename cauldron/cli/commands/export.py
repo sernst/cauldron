@@ -93,8 +93,7 @@ def execute(
     """
 
     if path is None:
-        return response.fail().notify(
-            kind='ERROR',
+        return response.fail(
             code='MISSING_PATH_ARG',
             message='Missing export path argument'
         ).console(
@@ -118,8 +117,7 @@ def execute(
     exists = os.path.exists(out_path)
 
     if not append and exists:
-        return response.fail().notify(
-            kind='ERROR',
+        return response.fail(
             code='ALREADY_EXISTS',
             message='Export directory already exists'
         ).console(

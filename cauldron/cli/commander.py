@@ -52,9 +52,9 @@ def execute(
 
     module = fetch().get(name)
     if module is None:
-        return response.fail().notify(
-            kind='ERROR',
-            code='NO_SUCH_COMMAND'
+        return response.fail(
+            code='NO_SUCH_COMMAND',
+            message='There is no command "{}"'.format(name)
         ).kernel(
             name=name
         ).console(
@@ -148,8 +148,7 @@ def show_help(command_name: str = None, raw_args: str = '') -> Response:
     environ.log_header('Available Commands')
     response.consume(print_module_help())
 
-    return response.fail().notify(
-        kind='ERROR',
+    return response.fail(
         code='NO_SUCH_COMMAND',
         message='Failed to show command help for "{}"'.format(command_name)
     ).console(

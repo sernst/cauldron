@@ -136,8 +136,7 @@ def execute(
     """
 
     if not cauldron.project or not cauldron.project.internal_project:
-        return response.fail().notify(
-            kind='ERROR',
+        return response.fail(
             code='NO_OPEN_PROJECT',
             message='No project is open. Step commands require an open project'
         ).console(
@@ -146,13 +145,12 @@ def execute(
 
     if not action or action == 'list':
         actions.echo_steps(response)
-        return
+        return response
 
     if action == 'add' and not step_name:
             step_name = ''
     elif not step_name:
-        return response.fail().notify(
-            kind='ABORTED',
+        return response.fail(
             code='NO_STEP_NAME',
             message='A step name is required for this command'
         ).console(

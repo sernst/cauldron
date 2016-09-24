@@ -1,13 +1,20 @@
 from cauldron import session as _session
-from cauldron.session import display
-from cauldron.session.reloading import refresh
+from cauldron.session import display as _display
+from cauldron.session.reloading import refresh as _refresh
 from cauldron.session.caching import SharedCache as _SharedCache
+from cauldron import environ as _environ
+
+# Version Information in commonly viewed formats
+__version__ = _environ.version  # type: str
+version = _environ.version  # type: str
+version_info = _environ.version_info  # type: _environ.VersionInfo
 
 project = _session.project  # type: _session.ExposedProject
-
 step = _session.step  # type: _session.ExposedStep
-
 shared = _session.project.shared  # type: _SharedCache
+
+display = _display
+refresh = _refresh
 
 
 def run_shell():
@@ -34,5 +41,5 @@ def run_server(port=5010, debug=False, **kwargs):
     :return:
     """
 
-    from cauldron.cli.server import run as run_server
-    run_server.execute(port, debug, **kwargs)
+    from cauldron.cli.server import run as server_runner
+    server_runner.execute(port, debug, **kwargs)

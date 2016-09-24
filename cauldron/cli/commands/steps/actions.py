@@ -140,6 +140,7 @@ def create_step(
             f.write('import cauldron as cd\n\n')
 
     project.save()
+    project.write()
 
     index = project.steps.index(result)
 
@@ -181,8 +182,7 @@ def remove_step(
     project = cauldron.project.internal_project
     step = project.remove_step(name)
     if not step:
-        response.fail().notify(
-            kind='ABORTED',
+        response.fail(
             code='NO_SUCH_STEP',
             message='Step "{}" not found. Unable to remove.'.format(name)
         ).kernel(
@@ -193,6 +193,7 @@ def remove_step(
         return False
 
     project.save()
+    project.write()
 
     if not keep_file:
         os.remove(step.source_path)
@@ -313,8 +314,7 @@ def modify_step(
 
     old_step = project.remove_step(name)
     if not old_step:
-        response.fail().notify(
-            kind='ABORTED',
+        response.fail(
             code='NO_SUCH_STEP',
             message='Unable to modify unknown step "{}"'.format(name)
         ).console(
@@ -395,6 +395,8 @@ def modify_step(
         whitespace=1
     )
 
+    project.write()
+
     return True
 
 
@@ -415,8 +417,7 @@ def toggle_muting(
 
     index = project.index_of_step(step_name)
     if index is None:
-        return response.fail().notify(
-            kind='ERROR',
+        return response.fail(
             code='NO_SUCH_STEP',
             message='No step found with name: "{}"'.format(step_name)
         ).kernel(

@@ -1,19 +1,14 @@
-import io
 import os
-import sys
 import time
-import traceback
-import types
 import typing
-from importlib.abc import InspectLoader
 
 import cauldron
 from cauldron import environ
-from cauldron.environ import Response
 from cauldron import templating
+from cauldron.environ import Response
+from cauldron.runner import python_file
 from cauldron.session.projects import Project
 from cauldron.session.projects import ProjectStep
-from cauldron.runner import python_file
 
 ERROR_STATUS = 'error'
 OK_STATUS = 'ok'
@@ -98,12 +93,10 @@ def run_step(
         step.last_modified = 0.0
         step.error = result['html_message']
         response.fail(
-            project=project.kernel_serialize()
-        ).notify(
-            kind='ERROR',
             message='Step execution error',
             code='EXECUTION_ERROR'
         ).kernel(
+            project=project.kernel_serialize(),
             step_name=step.definition.name
         ).console_raw(
             result['message']
@@ -137,8 +130,7 @@ def check_status(
         return SKIP_STATUS
 
     if not os.path.exists(path):
-        response.fail().notify(
-            kind='ERROR',
+        response.fail(
             code='MISSING_SOURCE_FILE',
             message='Source file not found "{}"'.format(path)
         ).kernel(

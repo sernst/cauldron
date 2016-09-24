@@ -2,6 +2,7 @@ from textwrap import dedent
 import webbrowser
 import sys
 
+
 def open_in_browser(project):
     if sys.platform == 'win32':
         webbrowser.open(project.baked_url)
@@ -19,3 +20,12 @@ def reformat(source: str) -> str:
     """
 
     return dedent(source.strip('\n')).strip()
+
+
+def as_single_line(source: str) -> str:
+    """
+
+    :param source:
+    :return:
+    """
+    return reformat(source).replace('\n', ' ').replace('  ', ' ')

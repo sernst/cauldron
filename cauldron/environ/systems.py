@@ -1,8 +1,22 @@
 import os
 import shutil
 import sys
+import json
 
 from cauldron.environ.logger import log
+from cauldron.environ import paths
+
+
+def get_package_data() -> dict:
+    """
+    Retrieves the package information for the Cauldron installation
+
+    :return:
+        A dictionary with package information such as version
+    """
+
+    with open(paths.package('settings.json'), 'r') as f:
+        return json.load(f)
 
 
 def remove(path: str):

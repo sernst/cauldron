@@ -104,8 +104,7 @@ def execute(
     persistent_aliases = environ.configs.persistent.get('folder_aliases', {})
 
     if not name and command in ['add', 'remove']:
-        return response.fail().notify(
-            kind='ERROR',
+        return response.fail(
             code='MISSING_ARG',
             message='You need to specify the name of the alias'
         ).console(
@@ -159,8 +158,7 @@ def execute(
             whitespace=1
         ).response
 
-    return response.fail().notify(
-        kind='ERROR',
+    return response.fail(
         code='UNKNOWN_COMMAND',
         message='Unrecognized alias command "{}"'.format(command)
     ).console(

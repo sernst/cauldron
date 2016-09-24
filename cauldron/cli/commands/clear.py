@@ -1,7 +1,6 @@
 from argparse import ArgumentParser
 
 import cauldron
-from cauldron import environ
 from cauldron.environ import Response
 
 NAME = 'clear'
@@ -20,8 +19,7 @@ def execute(parser: ArgumentParser, response: Response) -> Response:
     project = cauldron.project.internal_project
 
     if not project:
-        return response.fail().notify(
-            kind='ABORTED',
+        return response.fail(
             code='NO_OPEN_PROJECT',
             message='No open project on which to clear data'
         ).console(
