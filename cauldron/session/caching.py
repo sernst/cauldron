@@ -45,6 +45,20 @@ class SharedCache(object):
 
         return self
 
+    def grab(
+            self,
+            *keys: typing.List[str],
+            default_value=None
+    ) -> typing.Tuple:
+        """
+
+        :param keys:
+        :param default_value:
+        :return:
+        """
+
+        return tuple([self.fetch(k, default_value) for k in keys])
+
     def fetch(self, key: typing.Union[str, None], default_value=None):
         """
 
