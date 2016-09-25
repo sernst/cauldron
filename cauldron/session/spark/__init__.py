@@ -84,4 +84,3 @@ def initialize(spark_home_path: str = None):
         spark_pylib_path=spark_pylib_path,
         libs=lib_sources
     ))
-
