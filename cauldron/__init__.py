@@ -2,6 +2,7 @@ from cauldron import session as _session
 from cauldron.session import display as _display
 from cauldron.session.reloading import refresh as _refresh
 from cauldron.session.caching import SharedCache as _SharedCache
+from cauldron.session import spark as _spark
 from cauldron import environ as _environ
 
 # Version Information in commonly viewed formats
@@ -15,6 +16,7 @@ shared = _session.project.shared  # type: _SharedCache
 
 display = _display
 refresh = _refresh
+spark = _spark
 
 
 def get_environment_info() -> dict:
