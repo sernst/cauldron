@@ -1,11 +1,12 @@
 import logging
 import os
-import sys
 import site
+import sys
 from argparse import ArgumentParser
 
+import cauldron as cd
+from cauldron.session import writing
 from cauldron import environ
-from cauldron.cli.commands import version
 from flask import Flask
 
 APPLICATION = Flask('Cauldron')
@@ -17,15 +18,14 @@ try:
 except Exception:
     site_packages = []
 
+active_execution_responses = dict()
+
+
 server_data = dict(
     version=SERVER_VERSION,
     user=os.environ.get('USER'),
-    python=dict(
-        version=list(sys.version_info),
-        executable=sys.executable,
-        directory=sys.exec_prefix,
-        site_packages=[]
-    )
+    test=1,
+    pid=os.getpid()
 )
 
 
@@ -36,18 +36,41 @@ def get_server_data() -> dict:
     """
 
     out = dict(
-        test=1,
-        pid=os.getpid(),
         uptime=environ.run_time().total_seconds()
     )
     out.update(server_data)
+    out.update(environ.systems.get_system_data())
     return out
 
 
+def get_running_step_changes() -> list:
+    """
+
+    :return:
+    """
+
+    project = cd.project.internal_project
+
+    step_changes = []
+    for ps in project.steps:
+        if ps.is_running:
+            step_changes.append(dict(
+                name=ps.definition.name,
+                action='updated',
+                step=writing.write_step(ps)
+            ))
+
+    return step_changes
+
+
 def parse(args=None):
-    parser = ArgumentParser(
-        description='Cauldron server'
-    )
+    """
+
+    :param args:
+    :return:
+    """
+
+    parser = ArgumentParser(description='Cauldron server')
 
     parser.add_argument(
         '-p', '--port',

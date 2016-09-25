@@ -94,8 +94,7 @@ def run_step(
         step.error = result['html_message']
         response.fail(
             message='Step execution error',
-            code='EXECUTION_ERROR'
-        ).kernel(
+            code='EXECUTION_ERROR',
             project=project.kernel_serialize(),
             step_name=step.definition.name
         ).console_raw(
@@ -132,8 +131,7 @@ def check_status(
     if not os.path.exists(path):
         response.fail(
             code='MISSING_SOURCE_FILE',
-            message='Source file not found "{}"'.format(path)
-        ).kernel(
+            message='Source file not found "{}"'.format(path),
             id=step.definition.name,
             path=path
         ).console(

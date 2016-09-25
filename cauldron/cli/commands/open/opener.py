@@ -38,7 +38,7 @@ def load_project(response, path):
         response.fail(
             code='PROJECT_INIT_FAILURE',
             message='Unable to load the project',
-            error=str(err)
+            error=err
         ).console(whitespace=1)
 
     return False
@@ -81,7 +81,7 @@ def initialize_results(response, project):
         response.fail(
             code='RESULTS_INIT_FAILED',
             message='Unable to updated project results data',
-            error=str(err)
+            error=err
         )
 
     return False
@@ -97,7 +97,7 @@ def write_results(response, project):
         response.fail(
             code='WRITE_FAILED',
             message='Unable to write project output data',
-            error=str(err)
+            error=err
         )
         return False
 

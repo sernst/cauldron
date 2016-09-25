@@ -313,6 +313,7 @@ class Response(object):
             self,
             message: str = None,
             code: str = None,
+            error: Exception = None,
             **kwargs
     ) -> ResponseMessage:
         """
@@ -322,11 +323,16 @@ class Response(object):
 
         self.failed = True
 
+        stack = logger.get_error_stack() if error else None
+        error = str(error) if error else None
+
         return self.notify(
             kind='ERROR',
             message=cli.as_single_line(message),
             code=code,
             failed=True,
+            stack=stack,
+            error=error,
             **kwargs
         )
 

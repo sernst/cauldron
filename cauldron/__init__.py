@@ -17,6 +17,21 @@ display = _display
 refresh = _refresh
 
 
+def get_environment_info() -> dict:
+    """
+    Information about Cauldron and its Python interpreter
+
+    :return:
+        A dictionary containing information about the Cauldron and its
+        Python environment. This information is useful when providing feedback
+        and bug reports
+    """
+
+    data = _environ.systems.get_system_data()
+    data['cauldron'] = _environ.package_settings.copy()
+    return data
+
+
 def run_shell():
     """
     Starts the cauldron shell environment for console based interaction

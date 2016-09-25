@@ -1,10 +1,11 @@
 import cauldron
-from cauldron.cli.server import run as server_run
-from cauldron.environ.response import Response
 import flask
+from cauldron.cli.server import run as server_runner
+from cauldron.environ import logger
+from cauldron.environ.response import Response
 
 
-@server_run.APPLICATION.route('/ping', methods=['GET', 'POST'])
+@server_runner.APPLICATION.route('/ping', methods=['GET', 'POST'])
 def server_status():
     """
 
@@ -14,13 +15,13 @@ def server_status():
     r = Response()
     r.update(
         success=True,
-        __server__=server_run.get_server_data()
+        server=server_runner.get_server_data()
     )
 
     return flask.jsonify(r.serialize())
 
 
-@server_run.APPLICATION.route('/status', methods=['GET', 'POST'])
+@server_runner.APPLICATION.route('/status', methods=['GET', 'POST'])
 def project_status():
     """
 
@@ -39,14 +40,14 @@ def project_status():
         r.fail(
             code='PROJECT_STATUS_ERROR',
             message='Unable to check status of currently opened project',
-            error=str(err)
+            error=err
         )
 
-    r.update(__server__=server_run.get_server_data())
+    r.update(server=server_runner.get_server_data())
     return flask.jsonify(r.serialize())
 
 
-@server_run.APPLICATION.route('/project', methods=['GET', 'POST'])
+@server_runner.APPLICATION.route('/project', methods=['GET', 'POST'])
 def project_data():
     """
 
@@ -65,10 +66,63 @@ def project_data():
         r.fail(
             code='PROJECT_FETCH_ERROR',
             message='Unable to check status of currently opened project',
-            error=str(err)
+            error=err
         )
 
-    r.update(__server__=server_run.get_server_data())
+    r.update(server=server_runner.get_server_data())
     return flask.jsonify(r.serialize())
 
 
+@server_runner.APPLICATION.route(
+    '/run-status/<uid>',
+    methods=['GET', 'POST']
+)
+def run_status(uid: str):
+    """
+
+    :param uid:
+    :return:
+    """
+
+    try:
+        r = server_runner.active_execution_responses.get(uid)
+
+        if not r:
+            return flask.jsonify(
+                Response().update(
+                    run_active_uids=list(
+                        server_runner.active_execution_responses.keys()
+                    ),
+                    run_status='unknown',
+                    run_uid=uid,
+                    server=server_runner.get_server_data()
+                ).serialize()
+            )
+
+        if r.thread.is_alive():
+            return flask.jsonify(
+                Response()
+                .update(
+                    run_status='running',
+                    run_uid=uid,
+                    step_changes=server_runner.get_running_step_changes(),
+                    server=server_runner.get_server_data()
+                ).serialize()
+            )
+
+        del server_runner.active_execution_responses[uid]
+        r.update(
+            run_status='complete',
+            run_uid=r.thread.uid
+        )
+        return flask.jsonify(r.serialize())
+
+    except Exception as err:
+        return flask.jsonify(
+            Response().fail(
+                code='COMMAND_STATUS_FAILURE',
+                message='Unable to check command execution status',
+                uid=uid,
+                error=err
+            ).serialize()
+        )

@@ -172,10 +172,9 @@ def get_parser(
     except Exception as err:
         response.fail(
             code='ARGS_PARSE_ERROR',
-            message='Unable to parse command arguments'
-        ).kernel(
-            name=module.NAME,
-            error=str(err)
-        ).console()
+            message='Unable to parse command arguments',
+            error=err,
+            name=module.NAME
+        ).console(whitespace=1)
 
     return parser, response
