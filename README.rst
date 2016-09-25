@@ -3,6 +3,7 @@ Cauldron
 
 The un-notebook notebook: an interactive scientific analysis environment.
 
+
 .. image:: https://badge.fury.io/py/cauldron-notebook.svg
    :target: https://badge.fury.io/py/cauldron-notebook
 
@@ -18,7 +19,7 @@ The un-notebook notebook: an interactive scientific analysis environment.
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg
    :target: https://raw.githubusercontent.com/sernst/cauldron/master/LICENSE
 
-.. image:: https://badges.gitter.im/gitterHQ/gitter.svg(
+.. image:: https://badges.gitter.im/gitterHQ/gitter.svg
    :target: https://gitter.im/cauldron-notebook/Lobby
 
 
