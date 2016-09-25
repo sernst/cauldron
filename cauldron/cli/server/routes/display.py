@@ -10,13 +10,12 @@ import flask
 def view(route: str):
 
     project = cauldron.project.internal_project
-    results_path = project.results_path
+    results_path = project.results_path if project else None
+    if not project or not results_path:
+        return '', 204
 
     path = os.path.join(results_path, route)
     if not os.path.exists(path):
-        return None
+        return '', 204
 
-    return flask.send_file(
-        path,
-        mimetype=mimetypes.guess_type(path)[0]
-    )
+    return flask.send_file(path, mimetype=mimetypes.guess_type(path)[0])

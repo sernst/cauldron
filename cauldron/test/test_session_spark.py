@@ -16,8 +16,11 @@ class TestSessionReloading(scaffolds.ResultsTest):
         :return:
         """
 
+        fake_root_path = self.get_temp_path('not_spark')
+        fake_path = os.path.join(fake_root_path, 'this_does_not_exist')
+
         with self.assertRaises(FileNotFoundError):
-            spark.initialize(self.get_temp_path('not_spark'))
+            spark.initialize(fake_path)
 
     def test_init_no_spark_python(self):
         """

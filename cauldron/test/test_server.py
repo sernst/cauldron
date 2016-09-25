@@ -1,9 +1,11 @@
 import json
 from unittest import mock
 
+from cauldron import cli
 from cauldron.cli import server
 from cauldron.cli.server import run as server_run
 from cauldron.test.support import scaffolds
+from cauldron.test import support
 
 
 class TestServer(scaffolds.ResultsTest):
@@ -170,3 +172,31 @@ class TestServer(scaffolds.ResultsTest):
         self.assertTrue(args.get('debug'))
         self.assertEqual(args.get('port'), 9999)
 
+    def test_abort_nothing(self):
+        response = self.app.get('/abort')
+        self.assertIsNotNone(response)
+
+    def test_abort_running(self):
+        support.create_project(self, 'walter')
+        support.add_step(
+            self,
+            contents=cli.reformat(
+                """
+                import time
+                time.sleep(10)
+                """
+            )
+        )
+
+        self.app.post(
+            '/',
+            data=json.dumps(dict(
+                command='run',
+                args=''
+            )),
+            content_type='application/json'
+        )
+        response = self.app.get('/abort')
+        self.assertIsNotNone(response)
+
+        support.run_command('close')

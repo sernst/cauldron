@@ -41,6 +41,10 @@ def run_time() -> typing.Union[None, timedelta]:
 
 def abort_thread():
     """
+    This function checks to see if the user has indicated that they want the
+    currently running execution to stop prematurely by marking the running
+    thread as aborted. It only applies to operations that are run within
+    CauldronThreads and not the main thread.
 
     :return:
     """

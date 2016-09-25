@@ -2,7 +2,6 @@ import cauldron as cd
 import flask
 from cauldron.cli import commander
 from cauldron.cli.server import run as server_runner
-from cauldron.environ import logger
 from cauldron.environ.response import Response
 from flask import request
 
@@ -71,13 +70,13 @@ def execute():
         if r.thread.is_alive():
             return flask.jsonify(
                 Response()
-                    .update(
+                .update(
                     run_status='running',
                     run_uid=r.thread.uid,
                     step_changes=server_runner.get_running_step_changes(),
                     server=server_runner.get_server_data()
                 )
-                    .serialize()
+                .serialize()
             )
 
         del server_runner.active_execution_responses[r.thread.uid]
@@ -101,10 +100,15 @@ def execute():
 
 @server_runner.APPLICATION.route('/abort', methods=['GET', 'POST'])
 def abort():
-    uids = list(server_runner.active_execution_responses.keys())
+    """
 
-    while len(uids) > 0:
-        uid = uids.pop()
+    :return:
+    """
+
+    uid_list = list(server_runner.active_execution_responses.keys())
+
+    while len(uid_list) > 0:
+        uid = uid_list.pop()
 
         response = server_runner.active_execution_responses.get(uid)
         if not response:
@@ -130,11 +134,10 @@ def abort():
             pass
 
     project = cd.project.internal_project
+    project_data = project.kernel_serialize() if project else None
 
     return flask.jsonify(
         Response()
-            .update(
-            project=project.kernel_serialize()
-        )
-            .serialize()
+        .update(project=project_data)
+        .serialize()
     )
