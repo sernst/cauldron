@@ -3,7 +3,9 @@
      data-step-name="{{ id }}"
 >
   <a class="step-anchor" name="{{ id }}"></a>
-  <div class="header standard">
+  <div class="cd-project-step__header cd-project-step__header--standard"
+       data-default-modifier="cd-project-step__header--standard"
+  >
 
     <div id="{{ "title-box" | id }}"
          class="title-box {{ 'clicker opened' if body else '' }}"
@@ -44,7 +46,8 @@
   {% if codes %}
   <div class="code-box"
        id="{{ "code" | id }}"
-       style="display:none">
+       style="display:none"
+  >
     <div class="code-toolbar">
       <div class="spacer"></div>
       <div class="tool-button"
@@ -69,13 +72,11 @@
          style="font-size: 0.6em"
     >
       {% for entry in codes %}
-      <div class="code-file-header">{{ entry.filename }}</div>
       <div class="code-file-box">
         {{ entry.code }}
       </div>
       {% endfor %}
     </div>
-
   </div>
   {% endif %}
 
@@ -91,8 +92,8 @@
   {%  endif %}
 
   {% if error %}
-    <a class="step-error-anchor" name="{{ id }}-error"></a>
+    <a class="step-error-anchor" name="{{ id }}--error"></a>
     {{ error }}
   {% endif %}
-  <a class="step-end-anchor" name="{{ id }}-end"></a>
+  <a class="step-end-anchor" name="{{ id }}--end"></a>
 </div>

@@ -8,10 +8,37 @@
   /**
    *
    * @param name
+   * @param location
+   * @param animationSpeed
    */
-  function scrollToAnchor(name){
-    var aTag = $("a[name='"+ name +"']");
-    $('html,body').animate({scrollTop: aTag.offset().top}, 'slow');
+  function scrollToAnchor(name, location, animationSpeed){
+    var stepDom = $('.body-wrapper')
+      .find('.cd-project-step[data-step-name="' + name + '"]');
+
+    // Don't use locations if the step dom height is short
+    if (stepDom.height() < ($(window).height() - 100)) {
+      location = null;
+    }
+
+    var anchorName = name;
+    if (location && location.length > 0) {
+      anchorName += '--' + location;
+    }
+
+    function getOffset() {
+      switch (location) {
+        case 'end':
+          return $(window).height() - 100;
+        default:
+          return 0;
+      }
+    }
+
+    var aTag = $("a[name='"+ anchorName +"']");
+    $('html,body').animate(
+      {scrollTop: aTag.offset().top - getOffset()},
+      animationSpeed || 'slow'
+    );
   }
   exports.scrollToAnchor = scrollToAnchor;
 
