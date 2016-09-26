@@ -1,4 +1,3 @@
-import io
 import os
 import sys
 import time
@@ -8,8 +7,8 @@ from importlib.abc import InspectLoader
 
 from cauldron import environ
 from cauldron import templating
-from cauldron.session.projects import Project
-from cauldron.session.projects import ProjectStep
+from cauldron.session.buffering import RedirectBuffer
+from cauldron.session import projects
 
 
 class UserAbortError(Exception):
@@ -17,8 +16,8 @@ class UserAbortError(Exception):
 
 
 def run(
-        project: Project,
-        step: ProjectStep,
+        project: 'projects.Project',
+        step: 'projects.ProjectStep',
 ) -> dict:
     """
 
@@ -57,11 +56,7 @@ def run(
     # is being written to.
     #
     # noinspection PyTypeChecker
-    print_redirect = io.TextIOWrapper(
-        io.BytesIO(),
-        sys.stdout.encoding,
-        write_through=True
-    )
+    print_redirect = RedirectBuffer()
     sys.stdout = print_redirect
     step.report.print_buffer = print_redirect
 
@@ -87,7 +82,11 @@ def run(
     return out
 
 
-def render_syntax_error(project, code, error: SyntaxError):
+def render_syntax_error(
+        project: 'projects.Project',
+        code: str,
+        error: SyntaxError
+):
     """
 
     :param project:
@@ -123,8 +122,10 @@ def render_syntax_error(project, code, error: SyntaxError):
     )
 
 
-
-def render_error(project, error):
+def render_error(
+        project: 'projects.Project',
+        error: Exception
+) -> dict:
     """
 
     :param project:

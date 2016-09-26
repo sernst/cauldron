@@ -160,6 +160,9 @@ def preformatted_text(source: str) -> str:
 
     environ.abort_thread()
 
+    if not source:
+        return ''
+
     source = render_utils.html_escape(source)
 
     return '<pre class="preformatted-textbox">{text}</pre>'.format(

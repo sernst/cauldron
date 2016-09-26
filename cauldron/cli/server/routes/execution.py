@@ -82,6 +82,7 @@ def execute():
         del server_runner.active_execution_responses[r.thread.uid]
         r.update(
             run_status='complete',
+            run_multiple_updates=False,
             run_uid=r.thread.uid
         )
     except Exception as err:
@@ -124,7 +125,7 @@ def abort():
 
         # Try to stop the thread gracefully
         response.thread.abort = True
-        response.thread.join(1)
+        response.thread.join(2)
 
         try:
             # Force stop the thread explicitly

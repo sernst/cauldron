@@ -94,6 +94,7 @@ def run_status(uid: str):
                         server_runner.active_execution_responses.keys()
                     ),
                     run_status='unknown',
+                    run_multiple_updates=True,
                     run_uid=uid,
                     server=server_runner.get_server_data()
                 ).serialize()
@@ -104,6 +105,7 @@ def run_status(uid: str):
                 Response()
                 .update(
                     run_status='running',
+                    run_multiple_updates=True,
                     run_uid=uid,
                     step_changes=server_runner.get_running_step_changes(),
                     server=server_runner.get_server_data()
@@ -113,6 +115,7 @@ def run_status(uid: str):
         del server_runner.active_execution_responses[uid]
         r.update(
             run_status='complete',
+            run_multiple_updates=True,
             run_uid=r.thread.uid
         )
         return flask.jsonify(r.serialize())

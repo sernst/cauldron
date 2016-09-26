@@ -1,7 +1,5 @@
-import io
-import sys
-
 from cauldron.render import texts as render_texts
+from cauldron.session.buffering import RedirectBuffer
 from cauldron.session.caching import SharedCache
 
 
@@ -22,7 +20,7 @@ class Report(object):
         self.subtitle = self.definition.get('subtitle')
         self.summary = self.definition.get('summary')
         self.library_includes = []
-        self.print_buffer = None  # type: io.TextIOWrapper
+        self.print_buffer = None  # type: RedirectBuffer
 
     @property
     def project(self):
@@ -71,12 +69,9 @@ class Report(object):
         """
 
         try:
-            buffered_bytes = self.print_buffer.buffer.getvalue()
-            contents = buffered_bytes.decode(sys.stdout.encoding)
+            contents = self.print_buffer.read_all()
         except Exception as err:
-            return render_texts.preformatted_text(
-                'Print Buffer Error: {}'.format(err)
-            )
+            contents = ''
 
         return render_texts.preformatted_text(contents)
 
@@ -86,15 +81,10 @@ class Report(object):
         :return:
         """
 
-        if not self.print_buffer:
+        try:
+            contents = self.print_buffer.flush_all()
+        except Exception:
             return
-
-        pb = self.print_buffer
-
-        pb.seek(0)
-        contents = pb.read()
-        pb.truncate(0)
-        pb.seek(0)
 
         if len(contents) > 0:
             self.body.append(render_texts.preformatted_text(contents))

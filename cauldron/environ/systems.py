@@ -3,9 +3,11 @@ import shutil
 import sys
 import json
 import site
+import threading
 
 from cauldron.environ.logger import log
 from cauldron.environ import paths
+from cauldron.cli.threads import CauldronThread
 
 try:
     site_packages = list(site.getsitepackages())
