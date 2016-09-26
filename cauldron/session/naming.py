@@ -4,12 +4,9 @@ import typing
 
 
 def find_default_filename(existing_names: typing.List[str]) -> dict:
-    other_names = []
-
-    for n in existing_names:
-        other_names.append(split_filename(n)['name'])
-
+    other_names = [split_filename(n)['name'] for n in existing_names]
     index = 0
+
     for i in range(1000):
         index += 1
         name = '{}'.format(index)

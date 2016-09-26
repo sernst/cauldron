@@ -297,10 +297,7 @@ def modify_step(
     :return:
     """
 
-    name = name.strip('"')
-    new_name = new_name.strip('"') if new_name else name
-    position = position.strip('"') if isinstance(position, str) else position
-
+    new_name = new_name if new_name else name
     project = cauldron.project.internal_project
     old_index = project.index_of_step(name)
     new_index = index_from_location(response, project, position, old_index)

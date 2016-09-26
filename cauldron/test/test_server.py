@@ -188,14 +188,16 @@ class TestServer(scaffolds.ResultsTest):
             )
         )
 
-        self.app.post(
+        response = self.read_flask_response(self.app.post(
             '/',
             data=json.dumps(dict(
                 command='run',
                 args=''
             )),
             content_type='application/json'
-        )
+        ))
+        run_uid = response['data']['run_uid']
+        self.app.get('/run-status/{}'.format(run_uid))
         response = self.app.get('/abort')
         self.assertIsNotNone(response)
 

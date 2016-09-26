@@ -1,6 +1,7 @@
 import os
 import tempfile
 import unittest
+import json
 
 from cauldron import environ
 
@@ -45,5 +46,14 @@ class ResultsTest(unittest.TestCase):
             os.path.join(self.temp_directories[identifier], *args)
         )
 
+    @classmethod
+    def read_flask_response(cls, response):
+        """
+
+        :param response:
+        :return:
+        """
+
+        return json.loads(response.data.decode('utf-8', 'ignore'))
 
 
