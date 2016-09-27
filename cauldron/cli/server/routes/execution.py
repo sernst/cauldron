@@ -1,3 +1,5 @@
+import typing
+import warnings
 import cauldron as cd
 import flask
 from cauldron.cli import commander
@@ -7,15 +9,26 @@ from flask import request
 
 
 @server_runner.APPLICATION.route('/', methods=['GET', 'POST'])
-def execute():
+def execute_deprecated_route():
     """
-
+    This exists for backward compatibility
     :return:
     """
 
-    r = Response()
-    r.update(server=server_runner.get_server_data())
+    return execute(True)
 
+
+@server_runner.APPLICATION.route('/command-sync', methods=['POST'])
+def execute_sync():
+    return execute(False)
+
+
+@server_runner.APPLICATION.route('/command-async', methods=['POST'])
+def execute_async():
+    return execute(True)
+
+
+def parse_command_args(response: 'Response') -> typing.Tuple[str, str]:
     cmd = None
     parts = None
     name = None
@@ -36,7 +49,7 @@ def execute():
             args = ' '.join(args)
         args += ' {}'.format(parts[1] if len(parts) > 1 else '').strip()
     except Exception as err:
-        r.fail(
+        response.fail(
             code='INVALID_COMMAND',
             message='Unable to parse command',
             cmd=cmd if cmd else '',
@@ -48,12 +61,33 @@ def execute():
             request_data='{}'.format(request.data),
             request_args=request_args
         )
+
+    return name, args
+
+
+def execute(async:bool = False):
+    """
+    :param async:
+        Whether or not to allow asynchronous command execution that returns
+        before the command is complete with a run_uid that can be used to
+        track the continued execution of the command until completion.
+    :return:
+    """
+
+    r = Response()
+    r.update(server=server_runner.get_server_data())
+
+    cmd, args = parse_command_args(r)
+    if r.failed:
         return flask.jsonify(r.serialize())
 
     try:
-        commander.execute(name, args, r)
+        commander.execute(cmd, args, r)
         if not r.thread:
             return flask.jsonify(r.serialize())
+
+        if not async:
+            r.thread.join()
 
         server_runner.active_execution_responses[r.thread.uid] = r
 
@@ -90,8 +124,6 @@ def execute():
             code='KERNEL_EXECUTION_FAILURE',
             message='Unable to execute command',
             cmd=cmd,
-            parts=parts,
-            name=name,
             args=args,
             error=err
         )

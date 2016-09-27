@@ -234,6 +234,10 @@ class Response(object):
         if self.parent:
             return self.parent.consume(other)
 
+        if not other:
+            # Do nothing if there is no other
+            return self
+
         def either(a, b):
             return a if a else b
 
