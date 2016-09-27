@@ -51,7 +51,7 @@ def echo_known_projects(response: Response) -> dict:
         home={
             'path': environ.paths.clean(os.path.join('~', 'cauldron'))
         },
-        example={
+        examples={
             'path': environ.paths.package('resources', 'examples')
         }
     )

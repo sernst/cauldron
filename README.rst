@@ -28,6 +28,7 @@ The un-notebook notebook: an interactive scientific analysis environment.
 - `Getting Started`_
 - `Example Projects`_
 - `Tutorial: First Project`_
+- `Programming Guide`_
 
 About Cauldron
 --------------
@@ -54,9 +55,13 @@ with the best elements of traditional software development workflow:
   merging are obstructed when the code is embedded in notebook files. In
   Cauldron, where code is stored in independent code files, you can take full
   advantage of version control functionality.
-- **Code Review Friendly**: Embedded notebook code also makes reviews
+- **Pull Request & Code Review Friendly**: Embedded notebook code also makes reviews
   cumbersome to say the least. Cauldron's independent code files provide all
   of the flexibility available to traditional code review.
+- **Variable Scope Management**: Variables in Cauldron are locally scoped unless
+  explicitly shared. This prevents polluting the notebook with global variables
+  and the many potential errors that come from sharing all variables in a non-linear
+  computational environment.
 
 With Cauldron you write code in your choice of interactive development
 environment (IDE) or text editor, and run it using the Cauldron shell like a
@@ -316,3 +321,185 @@ command::
 
    <>: exit
 
+Programming Guide
+-----------------
+
+There are a few key concepts when programming Cauldron notebooks that differ from traditional
+notebooks. The first is the display. Anything that you want to appear in the notebook from
+text to graphs, must be added to the notebook display:
+
+.. code-block:: python3
+
+   from cauldron import cd
+
+   cd.display.text('Hello World!')
+
+You access the display from the imported cauldron library as shown in the code example above. The one
+exception is that Python's built-in **print** function will also add text to the display in a monospaced
+font that preserves whitespace just like printing to a console.
+
+The different display functions that can be used for displaying different types of content include:
+
+Display Functions
+~~~~~~~~~~~~~~~~~
+
+- **bokeh**: Adds a Bokeh plot model/figure
+
+  - model: The model to be added
+  - scale: How tall the plot should be in the notebook as a fraction of screen height. A number
+    between 0.1 and 1.0.
+  - responsive: Whether or not the plot should responsively scale to fill the width of the notebook.
+    The default it True.
+
+- **head**: Displays a specified number of elements in a source object of many different possible
+  types.
+
+  - source: DataFrames will show *count* rows of that DataFrame. A list, tuple or other
+    iterable, will show the first *count* rows. Dictionaries will show *count* keys from the
+    dictionary, which will be randomly selected unless you are using an OrderedDict. Strings will
+    show the first *count* characters.
+  - count: The number of elements to show from the source.
+
+- **header**: Adds a text header to the display with the specified level.
+
+  - header_text: The text to display in the header
+  - level: The level of the header, which corresponds to the html header levels, such as
+    <h1>, <h2>, ...
+
+- **html**: A string containing an HTML DOM snippet
+
+  - dom: The HTML string to add to the display
+
+- **inspect**: Inspects the data and structure of the source dictionary object and adds the
+  results to the display for viewing.
+
+  - source: The dictionary object to be inspected
+
+- **jinja**: Renders the specified jinja template to HTML and adds the output to the display
+
+  - path: The fully-qualified path to the template to be rendered.
+  - kwargs: Any keyword arguments that will be use as variable replacements within the template
+
+- **json**: Adds the specified data to the the output display window with the specified key. This
+  allows you to make available arbitrary JSON-compatible data to the display for runtime use.
+
+  - window_key: The key on the global window object to which this data will be assigned.
+  - data: The data to be assigned to the window object. This data must be serializable as
+    JSON data.
+
+- **latex**: Add a mathematical equation in latex math-mode syntax to the display. Instead of the
+  traditional backslash escape character, the @ character is used instead to prevent backslash
+  conflicts with Python strings. For example, \delta would be @delta.
+
+  - source: The string representing the latex equation to be rendered.
+
+- **listing**: An unordered or ordered bulleted list of the specified *source* iterable where
+  each element is converted to a string representation for display.
+
+  - source: The iterable to display as a list
+  - ordered: Whether or not the list should be ordered. If False, which is the default, an unordered
+    bulleted list is created.
+
+- **markdown**: Renders the source string using markdown and adds the resulting html
+    to the display
+
+  - source: A markdown formatted string.
+  - kwargs: Any variable replacements to make within the string using Jinja2 templating syntax.
+
+- **plotly**: Creates a Plotly plot in the display with the specified data and layout
+
+  - data: The Plotly trace data to be plotted. Or an iterable (list, tuple) of plotly traces
+    to be plotted on the same plot.
+  - layout: The layout data used for the plot
+  - scale: The display scale with units of fractional screen height. A value of 0.5 constrains
+    the output to a maximum height equal to half the height of browser window when viewed. Values
+    below 1.0 are usually recommended so the entire output can be viewed without scrolling.
+
+- **pyplot**: Creates a matplotlib plot in the display for the specified figure. The size of the
+  plot is determined automatically to best fit the notebook.
+
+  - figure: The matplotlib figure to plot. If omitted, the currently active figure will be used.
+  - scale: The display scale with units of fractional screen height. A value of 0.5 constrains the
+    output to a maximum height equal to half the height of browser window when viewed. Values below
+    1.0 are usually recommended so the entire output can be viewed without scrolling.
+  - clear: Clears the figure after it has been rendered. This is useful to prevent persisting old
+    plot data between repeated runs of the project files. This can be disabled if the plot is going
+    to be used later in the project files.
+  - aspect_ratio: The aspect ratio for the displayed plot as a two-element list or tuple. The first
+    element is the width and the second element the height. The units are "inches," which is an
+    important consideration for the display of text within the figure. If no aspect ratio is
+    specified, the currently assigned values to the plot will be used instead.
+
+- **svg**: Adds the specified SVG string to the display. If a filename is included, the SVG data
+  will also be saved to that filename within the project results folder.
+
+  - svg: The SVG string data to add to the display
+  - filename: An optional filename where the SVG data should be saved within the project results
+    folder.
+
+- **table**: Adds the specified data frame to the display in a nicely formatted scrolling table
+
+  - data_frame: The pandas data frame to be rendered to a table
+  - scale: The display scale with units of fractional screen height. A value of 0.5 constrains the
+    output to a maximum height equal to half the height of browser window when viewed. Values below
+    1.0 are usually recommended so the entire output can be viewed without scrolling.
+
+- **tail**: The opposite of the **head** function described above. Displays the last *count*
+  elements of the *source* object.
+
+  - source: DataFrames will show the last *count* rows of that DataFrame. A list, tuple or other
+    iterable, will show the last *count* rows. Dictionaries will show *count* keys from the
+    dictionary, which will be randomly selected unless you are using an OrderedDict. Strings will
+    show the last *count* characters.
+  - count: The number of elements to show from the source.
+
+- **text**: Adds text to the display. If the text is not preformatted, it will be displayed in
+  paragraph format. Preformatted text will be displayed inside a pre tag with a monospace font.
+
+  - text: The text to display
+  -  preformatted: Whether or not to preserve the whitespace display the text
+
+- **whitespace**: Adds a specified number of lines of whitespace.
+
+  - lines: The number of lines of whitespace to show.
+
+Shared & Local Variables
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Cauldron does not share all variables between cells. Instead all variables are local unless you
+explicitly share them using the cauldron shared object. Consider a step (cell) in a notebook with
+the following code:
+
+.. code-block:: python3
+
+   import cauldron as cd
+
+   x = 12
+
+And then another step (cell) with the following code:
+
+.. code-block:: python3
+
+   import cauldron as cd
+
+   print(x)
+
+If you run these steps in order the second step will raise an exception because the *x* variable
+is not defined in that step. The proper way to share variables between steps is to add them to
+the cauldron shared object like this:
+
+.. code-block:: python3
+
+   import cauldron as cd
+
+   cd.shared.x = 12
+
+And then another step (cell) with the following code:
+
+.. code-block:: python3
+
+   import cauldron as cd
+
+   print(cd.shared.x)
+
+In this case the second step will correctly print a value of *12* in the second step.
