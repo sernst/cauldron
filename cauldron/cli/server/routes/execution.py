@@ -1,5 +1,5 @@
 import typing
-import warnings
+
 import cauldron as cd
 import flask
 from cauldron.cli import commander
@@ -11,7 +11,10 @@ from flask import request
 @server_runner.APPLICATION.route('/', methods=['GET', 'POST'])
 def execute_deprecated_route():
     """
-    This exists for backward compatibility
+    This exists for backward compatibility. It has been replaced
+    by explicit async and sync routes for more flexibility and
+    control.
+
     :return:
     """
 
@@ -20,15 +23,43 @@ def execute_deprecated_route():
 
 @server_runner.APPLICATION.route('/command-sync', methods=['POST'])
 def execute_sync():
+    """
+    Execution method for synchronous commands. Command thread
+    blocks until it is complete to prevent returning any
+    intermediately running states
+
+    :return:
+    """
+
     return execute(False)
 
 
 @server_runner.APPLICATION.route('/command-async', methods=['POST'])
 def execute_async():
+    """
+    Execution method for synchronous commands. Command threads
+    are added to the background stack with a unique run uid
+    so that they can be polled later for status changes. The
+    async method returns a response containing that uid if the
+    command execution doesn't end quickly.
+
+    :return:
+    """
+
     return execute(True)
 
 
 def parse_command_args(response: 'Response') -> typing.Tuple[str, str]:
+    """
+
+    :param response:
+        The response object to modify with status or error data
+    :return:
+        A tuple where the first element if the name of the command
+        to execute, and the second is a string representing the arguments
+        to apply to that command.
+    """
+
     cmd = None
     parts = None
     name = None

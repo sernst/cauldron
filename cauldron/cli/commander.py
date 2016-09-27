@@ -8,6 +8,19 @@ from cauldron.environ.response import Response
 COMMANDS = dict()
 
 
+def preload():
+    """
+
+    :return:
+    """
+
+    # Plotly must be preloaded in the main thread
+    try:
+        import plotly as plotly_lib
+    except ImportError:
+        plotly_lib = None
+
+
 def fetch(reload: bool = False) -> dict:
     """
     Returns a dictionary containing all of the available Cauldron commands
@@ -78,6 +91,9 @@ def execute(
         return response
 
     del args.args['show_help']
+
+    if name == 'run':
+        preload()
 
     t = CauldronThread()
     t.command = module.execute
