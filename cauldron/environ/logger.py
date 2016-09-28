@@ -1,10 +1,36 @@
 import sys
+import os
 import typing
 import traceback
 from textwrap import dedent
 from textwrap import indent
 
 from cauldron.environ import paths
+
+_logging_paths = []
+
+def add_output_path(path: str) -> str:
+    if not path:
+        path = paths.clean(os.getcwd())
+    else:
+        path = paths.clean(path)
+
+    if path not in _logging_paths:
+        _logging_paths.append(path)
+
+    return path
+
+
+def remove_output_path(path: str) -> str:
+    if not path:
+        path = paths.clean(os.getcwd())
+    else:
+        path = paths.clean(path)
+
+    if path in _logging_paths:
+        _logging_paths.remove(path)
+
+    return path
 
 
 def header(
@@ -171,9 +197,10 @@ def raw(
 
     if trace:
         print(message)
-    if file_path:
-        file_path = paths.clean(file_path)
-        with open(file_path, 'a+' if append_to_file else 'w+') as f:
+
+    file_paths = [p for p in (_logging_paths + [file_path]) if p]
+    for path in file_paths:
+        with open(paths.clean(path), 'a+' if append_to_file else 'w+') as f:
             f.write('{}\n'.format(message))
 
 

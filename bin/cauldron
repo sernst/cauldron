@@ -10,11 +10,8 @@ sys.path.append(
 )
 
 from cauldron.cli.shell import CauldronShell
-from cauldron.cli.commands import version
 from cauldron import environ
-from cauldron.cli.commands import open
-from cauldron.cli.commands import run
-from cauldron.cli.commands import close
+from cauldron.cli import batcher
 
 
 parser = ArgumentParser(
@@ -29,8 +26,22 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '-r', '--run',
-    dest='run',
+    '-p', '--project',
+    dest='project_directory',
+    type=str,
+    default=None
+)
+
+parser.add_argument(
+    '-l', '--log',
+    dest='logging_path',
+    type=str,
+    default=None
+)
+
+parser.add_argument(
+    '-o', '--output',
+    dest='output_directory',
     type=str,
     default=None
 )
@@ -38,19 +49,15 @@ parser.add_argument(
 args = parser.parse_args()
 
 if args.version:
-    data = version.get_package_data()
-    print('VERSION: {}'.format(data['version']))
+    print('VERSION: {}'.format(environ.package_settings().get('version', 'unknown')))
     sys.exit(0)
 
-if args.run:
-    run_path = environ.paths.clean(args.run)
-    environ.log('Running: {}'.format(run_path))
-    open.execute(parser, run_path)
-    run.execute(parser, None)
-    close.execute(parser)
-    environ.log('Run Complete')
+if args.project_directory:
+    batcher.run_project(
+        project_directory=args.project_directory,
+        log_path=args.logging_path,
+        output_directory=args.output_directory
+    )
     sys.exit(0)
-
-
 
 CauldronShell().cmdloop()

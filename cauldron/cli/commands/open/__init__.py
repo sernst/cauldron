@@ -105,6 +105,7 @@ def execute(
         show_in_browser: bool = False,
         list_available: bool = False,
         forget: bool = False,
+        results_path: str = None
 ) -> Response:
     """
 
@@ -132,7 +133,7 @@ def execute(
         p = actions.fetch_location(response, path)
         path = p if p else path
 
-    opener.open_project(response, path, forget=forget)
+    opener.open_project(response, path, forget=forget, results_path=results_path)
 
     if not response.failed and show_in_browser:
         cli.open_in_browser(cauldron.project.internal_project)

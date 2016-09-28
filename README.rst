@@ -29,6 +29,7 @@ The un-notebook notebook: an interactive scientific analysis environment.
 - `Example Projects`_
 - `Tutorial: First Project`_
 - `Programming Guide`_
+- `Running in Production`_
 
 About Cauldron
 --------------
@@ -400,8 +401,7 @@ Display Functions
   - ordered: Whether or not the list should be ordered. If False, which is the default, an unordered
     bulleted list is created.
 
-- **markdown**: Renders the source string using markdown and adds the resulting html
-    to the display
+- **markdown**: Renders the source string using markdown and adds the resulting HTML to the display
 
   - source: A markdown formatted string.
   - kwargs: Any variable replacements to make within the string using Jinja2 templating syntax.
@@ -503,3 +503,33 @@ And then another step (cell) with the following code:
    print(cd.shared.x)
 
 In this case the second step will correctly print a value of *12* in the second step.
+
+Running in Production
+---------------------
+
+Cauldron is designed to make it easy to run a notebook in a production environment from
+within Python or directly from a command line.
+
+When called from within Python the execution would look like this:
+
+.. code-block:: python3
+
+    project_directory = '/directory/of/my/cauldron/notebook/project'
+    output_directory = '/save/my/results/in/this/directory'
+    logging_path = '/log/data/to/this/filename.log'
+
+    cauldron.run_project(project_directory, output_directory, logging_path)
+
+This will open, run and then close the specified project. The HTML will be exported to the output
+directory. The data normally printed to the console will be saved to the specified logging_path
+file.
+
+The exact same command can be run from the command line using the ``cauldron`` command and
+supplying the necessary arguments::
+
+   $ cauldron --project='/directory/of/my/cauldron/notebook/project' \
+              --output='/save/my/results/in/this/directory' \
+              --log='/log/data/to/this/filename.log'
+
+This does exactly the same thing as the python script shown above, but can be called directly from
+a terminal or added to a shell script.

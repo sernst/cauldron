@@ -60,3 +60,35 @@ def run_server(port=5010, debug=False, **kwargs):
 
     from cauldron.cli.server import run as server_runner
     server_runner.execute(port, debug, **kwargs)
+
+
+def run_project(
+        project_directory: str,
+        output_directory: str = None,
+        logging_path: str = None
+) -> _environ.Response:
+    """
+    Runs a project as a single command directly within the current Python
+    interpreter.
+
+    :param project_directory:
+        The fully-qualified path to the directory where the Cauldron project is located
+    :param output_directory:
+        The fully-qualified path to the directory where the results will be written. All of the
+        results files will be written within this directory. If the directory does not exist,
+        it will be created.
+    :param logging_path:
+        The fully-qualified path to a file that will be used for logging. If a directory is
+        specified instead of a file, a file will be created using the default filename of
+        cauldron_run.log. If a file already exists at that location it will be removed and a
+        new file created in its place.
+    :return:
+        A response object that contains information about the run process
+    """
+
+    from cauldron.cli import batcher
+    return batcher.run_project(
+        project_directory=project_directory,
+        output_directory=output_directory,
+        log_path=logging_path
+    )

@@ -105,13 +105,15 @@ def write_results(response, project):
 def open_project(
         response: Response,
         path: str,
-        forget: bool = False
+        forget: bool = False,
+        results_path: str = None
 ) -> bool:
     """
 
     :param response:
     :param path:
     :param forget:
+    :param results_path:
     :return:
     """
 
@@ -132,6 +134,8 @@ def open_project(
         return False
 
     project = cauldron.project.internal_project
+    if results_path:
+        project.results_path = results_path
 
     # Set the top-level display and cache values to the current project values
     # before running the step for availability within the step scripts
