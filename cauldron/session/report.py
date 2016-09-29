@@ -1,3 +1,5 @@
+import os
+
 from cauldron.render import texts as render_texts
 from cauldron.session.buffering import RedirectBuffer
 from cauldron.session.caching import SharedCache
@@ -27,14 +29,32 @@ class Report(object):
         return self.step.project if self.step else None
 
     @property
+    def results_cache_path(self) -> str:
+        """
+        Location where step report is cached between sessions to
+        prevent loss of display data between runs
+
+        :return:
+        """
+
+        if not self.project:
+            return ''
+        return os.path.join(
+            self.project.results_path,
+            '.cache',
+            'steps',
+            '{}.json'.format(self.id)
+        )
+
+    @property
     def id(self):
         return self.step.definition.name if self.step else None
 
     @property
-    def definition(self):
+    def definition(self) -> dict:
         return self.step.definition if self.step else None
 
-    def clear(self):
+    def clear(self) -> 'Report':
         """
         Clear all user-data stored in this instance and reset it to its
         originally loaded state

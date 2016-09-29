@@ -111,6 +111,8 @@
 
     return prom
         .then(function () {
+          window.CAULDRON_VERSION = window.RESULTS.cauldron_version;
+
           exports.RESULTS = window.RESULTS;
           exports.DATA = window.RESULTS.data;
           exports.SETTINGS = window.RESULTS.settings;

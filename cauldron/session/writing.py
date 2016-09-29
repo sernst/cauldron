@@ -1,14 +1,121 @@
-import os
-import sys
-import shutil
 import glob
 import json
+import os
+import shutil
 import typing
 
 from cauldron import cli
 from cauldron import environ
-from cauldron.session import projects
 from cauldron import templating
+from cauldron.session import projects
+
+
+def create_step_data(step: 'projects.ProjectStep') -> dict:
+    """
+    Creates the data object that stores the step information in the notebook
+    results JavaScript file.
+
+    :param step:
+        Project step for which to create the data
+    :return:
+        Dictionary containing scaffold data structure for the step output.
+        The dictionary must then be populated with data from the step to
+        correctly reflect the current state of the step.
+
+        This is essentially a "blank" step dictionary, which is what the step
+        would look like if it had not yet run
+    """
+
+    return dict(
+        name=step.definition.name,
+        status=step.status(),
+        has_error=False,
+        body=None,
+        data=dict(),
+        includes=[],
+        cauldron_version=list(environ.version_info)
+    )
+
+
+def get_cached_step_data(
+        step: 'projects.ProjectStep'
+) -> typing.Union[None, dict]:
+    """
+
+    :param step:
+    :return:
+    """
+
+    cache_path = step.report.results_cache_path
+    if not os.path.exists(cache_path):
+        return None
+
+    try:
+        with open(cache_path, 'r+') as f:
+            return json.load(f)
+    except Exception:
+        return None
+
+
+def get_step_dom(step: 'projects.ProjectStep') -> str:
+    """
+
+    :param step:
+    :return:
+    """
+
+    if step.dom is None or step.is_running:
+        return step.dumps()
+
+    return step.dom
+
+
+def write_step_cache(step: 'projects.ProjectStep', data: dict) -> bool:
+    """
+
+    :param step:
+    :param data:
+    :return:
+    """
+
+    cache_path = step.report.results_cache_path
+    if not cache_path:
+        return False
+
+    directory = os.path.dirname(cache_path)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    with open(cache_path, 'w+') as f:
+        json.dump(data, f)
+
+    return True
+
+
+def populate_step_data(
+        step: 'projects.ProjectStep',
+        source: dict = None
+) -> dict:
+    """
+
+    :param step:
+    :param source:
+    :return:
+    """
+
+    out = create_step_data(step) if source is None else source.copy()
+
+    report = step.report
+
+    out['has_error'] = step.error
+    out['body'] = get_step_dom(step)
+    out['data'].update(report.data.fetch(None))
+    out['includes'] += (
+        add_web_includes(step.web_includes, step.project) +
+        add_components(step)
+    )
+
+    return out
 
 
 def write_step(step: 'projects.ProjectStep') -> dict:
@@ -18,37 +125,19 @@ def write_step(step: 'projects.ProjectStep') -> dict:
     :return:
     """
 
-    out = dict(
-        name=step.definition.name,
-        status=step.status(),
-        has_error=False,
-        body=None,
-        data=dict(),
-        includes=[]
-    )
+    cached = get_cached_step_data(step) if not step.last_modified else None
+    if cached:
+        return cached
 
     if step.is_muted:
-        return out
+        return create_step_data(step)
 
-    out['has_error'] = step.error
-
-    if step.dom is None or step.is_running:
-        step_body = step.dumps()
-    else:
-        step_body = step.dom
-
-    out['body'] = step_body
-
-    report = step.report
-    out['data'].update(report.data.fetch(None))
-    out['includes'] += (
-        add_web_includes(step.web_includes, step.project) +
-        add_components(step)
-    )
-
-    write_files(report.files.fetch(None), step.project)
+    out = populate_step_data(step)
+    write_files(step.report.files.fetch(None), step.project)
+    write_step_cache(step, out)
 
     return out
+
 
 def write_baked_html_file(
         project: 'projects.Project',
@@ -70,8 +159,12 @@ def write_baked_html_file(
             <script>
                 window.RESULTS_FILENAME = 'reports/{uuid}/latest/results.js';
                 window.PROJECT_ID = '{uuid}';
+                window.CAULDRON_VERSION = '{version}';
             </script>
-            """.format(uuid=project.uuid)
+            """.format(
+                uuid=project.uuid,
+                version=environ.version
+            )
         )
     )
 
@@ -116,7 +209,8 @@ def write_project(project: 'projects.Project'):
             DATA=json.dumps({
                 'steps': steps,
                 'includes': web_includes,
-                'settings': project.settings.fetch(None)
+                'settings': project.settings.fetch(None),
+                'cauldron_version': list(environ.version_info)
             })
         ))
 
@@ -256,7 +350,9 @@ def add_global_component(name, step):
     """
 
     component_directory = environ.paths.resources(
-        'web', 'components', name
+        'web',
+        'components',
+        name
     )
 
     out = []
