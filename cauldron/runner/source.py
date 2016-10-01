@@ -9,6 +9,7 @@ from cauldron.environ import Response
 from cauldron.runner import python_file
 from cauldron.session.projects import Project
 from cauldron.session.projects import ProjectStep
+from cauldron import render
 
 ERROR_STATUS = 'error'
 OK_STATUS = 'ok'
@@ -192,10 +193,12 @@ def run_html_file(
     with open(step.source_path, 'r+') as f:
         code = f.read()
 
-    step.report.html(templating.render(
+
+    step.report.append_body(render.html(templating.render(
         template=code,
         **project.shared.fetch(None)
-    ))
+    )))
+
     step.last_modified = time.time()
     environ.log('[{}]: Updated'.format(step.definition.name))
     step.mark_dirty(False)

@@ -54,8 +54,6 @@ def run(
     # BytesIO buffer. This is needed so that we can safely access the buffer
     # data in a multi-threaded environment to display updates while the buffer
     # is being written to.
-    #
-    # noinspection PyTypeChecker
     print_redirect = RedirectBuffer()
     sys.stdout = print_redirect
     step.report.print_buffer = print_redirect
@@ -69,7 +67,6 @@ def run(
             out = render_error(project, error)
 
     if out is None:
-        step.last_modified = time.time()
         step.mark_dirty(False)
         out = {'success': True}
 
@@ -122,6 +119,55 @@ def render_syntax_error(
     )
 
 
+def get_stack_frames():
+    """
+
+    :return:
+    """
+
+    cauldron_path = environ.paths.package()
+    resources_path = environ.paths.resources()
+    frames = list(traceback.extract_tb(sys.exc_info()[-1])).copy()
+
+    def is_cauldron_code(test_filename: str) -> bool:
+        if not test_filename or not test_filename.startswith(cauldron_path):
+            return False
+
+        if test_filename.startswith(resources_path):
+            return False
+
+        return True
+
+    while len(frames) > 1 and is_cauldron_code(frames[0].filename):
+        frames.pop(0)
+
+    return frames
+
+
+def format_stack_frame(stack_frame, project: 'projects.Project'):
+    """
+
+    :param stack_frame:
+    :param project:
+    :return:
+    """
+
+    filename = stack_frame.filename
+    if filename.startswith(project.source_directory):
+        filename = filename[len(project.source_directory) + 1:]
+
+    location = stack_frame.name
+    if location == '<module>':
+        location = None
+
+    return dict(
+        filename=filename,
+        location=location,
+        line_number=stack_frame.lineno,
+        line=stack_frame.line
+    )
+
+
 def render_error(
         project: 'projects.Project',
         error: Exception
@@ -133,32 +179,10 @@ def render_error(
     :return:
     """
 
-    frames = traceback.extract_tb(sys.exc_info()[-1])
-    cauldron_path = environ.paths.package()
-    while frames and frames[0].filename.startswith(cauldron_path):
-        frames.pop(0)
-
-    stack = []
-    for frame in frames:
-        filename = frame.filename
-        if filename.startswith(project.source_directory):
-            filename = filename[len(project.source_directory) + 1:]
-
-        location = frame.name
-        if location == '<module>':
-            location = None
-
-        stack.append(dict(
-            filename=filename,
-            location=location,
-            line_number=frame.lineno,
-            line=frame.line
-        ))
-
     render_data = dict(
         type=error.__class__.__name__,
         message='{}'.format(error),
-        stack=stack
+        stack=[format_stack_frame(f, project) for f in get_stack_frames()]
     )
 
     return dict(
