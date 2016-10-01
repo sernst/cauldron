@@ -1,6 +1,12 @@
 {
+  "id": "time-gender",
+  "web_includes": ["_styles.css"],
   "steps": [
-    "introduction.md",
-    "load_data.py"
+    "S01-introduction.md",
+    "S02-load-data.py",
+    "S03-graph-raw-data.py",
+    "S04-smoothed-plot.py",
+    "S05-export-data.py",
+    "S06-activity.html"
   ]
 }

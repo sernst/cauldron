@@ -10,15 +10,20 @@
 
   <script type="application/javascript">
     (function () {
+      window.CD = window.CD || { data: {} };
+      var cd = window.CD;
+
       var c = window.CAULDRON || {};
       window.CAULDRON = c;
 
       c.on = {};
+      cd.on = c.on;
+
       c.__on__ = {};
+
       c.on.ready = new Promise(function (resolve) {
         c.__on__.ready = resolve;
       });
-
     }());
   </script>
 

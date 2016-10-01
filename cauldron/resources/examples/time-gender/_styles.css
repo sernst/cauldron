@@ -1,0 +1,6 @@
+#activityDisplayChart div {
+  display: inline-block;
+  width: 10px;
+  height: 15px;
+  margin-right: 3px;
+}

@@ -125,7 +125,10 @@ def write_step(step: 'projects.ProjectStep') -> dict:
     :return:
     """
 
-    cached = get_cached_step_data(step) if not step.last_modified else None
+    def disable_caching():
+        return step.last_modified or step.error
+
+    cached = None if disable_caching() else get_cached_step_data(step)
     if cached:
         return cached
 
@@ -264,7 +267,10 @@ def write_files(file_writes: dict, project: 'projects.Project'):
             f.write(contents)
 
 
-def add_web_includes(include_paths: list, project: 'projects.Project') -> list:
+def add_web_includes(
+        include_paths: list,
+        project: 'projects.Project'
+) -> typing.List[dict]:
     """
 
     :param include_paths:
@@ -302,7 +308,10 @@ def add_web_includes(include_paths: list, project: 'projects.Project') -> list:
             shutil.copy2(source_path, item_path)
             web_includes.append('/{}'.format(item.replace('\\', '/')))
 
-    return web_includes
+    return [
+        {'src': url, 'name': ':project:{}'.format(url)}
+        for url in web_includes
+    ]
 
 
 def copy_assets(project: 'projects.Project'):

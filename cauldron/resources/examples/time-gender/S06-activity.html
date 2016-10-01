@@ -1,0 +1,21 @@
+<div id="activityDisplayChart"></div>
+<script>
+  CD.on.ready
+    .then(function () {
+      console.log('hello!');
+    
+      var colorMap = d3.interpolateRgb(
+        d3.rgb('#d6e685'),
+        d3.rgb('#1e6823')
+      );
+
+      d3.select('#activityDisplayChart')
+          .selectAll("div")
+          .data(CD.data.percentages)
+          .enter()
+          .append("div")
+          .style("background-color", function (d) {
+            return d == 0 ? '#eee' : colorMap(d);
+          });
+    });
+</script>
