@@ -123,23 +123,17 @@ def header(contents: str, level: int = 1) -> str:
     )
 
 
-def json(window_key: str, data) -> str:
+def json(**kwargs) -> str:
     """
 
-    :param window_key:
-    :param data:
+    :param kwargs:
     :return:
     """
     environ.abort_thread()
 
-    return templating.render(
-        """
-        <script>
-            window.{{ key }} = {{ data }};
-        </script>
-        """,
-        key=window_key,
-        data=json_internal.dumps(data, cls=encoding.ComplexJsonEncoder)
+    return templating.render_template(
+        'json_include.html',
+        data=json_internal.dumps(kwargs, cls=encoding.ComplexJsonEncoder)
     )
 
 

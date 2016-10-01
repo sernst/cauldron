@@ -46,7 +46,7 @@ class TestRenderTexts(scaffolds.ResultsTest):
 
         data = {'a': 1, 'b': 'hello', 'c': True, 'd': date(2016, 9, 9)}
 
-        result = render.json('HELLO', data)
+        result = render.json(hello=data)
         self.assertGreater(len(result), 1)
 
     def test_html(self):

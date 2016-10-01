@@ -86,23 +86,20 @@ def markdown(source: str, **kwargs):
     r.append_body(result['body'])
 
 
-def json(window_key: str, data):
+def json(**kwargs):
     """
     Adds the specified data to the the output display window with the
     specified key. This allows the user to make available arbitrary
     JSON-compatible data to the display for runtime use.
 
-    :param window_key:
-        The key on the global window object to which this data will be
-        assigned.
-    :param data:
-        The data to be assigned to the window object. This data must be
-        serializable as JSON data.
+    :param kwargs:
+        Each keyword argument is added to the CD.data object with the
+        specified key and value.
     :return:
     """
 
     r = _get_report()
-    r.append_body(render.json(window_key, data))
+    r.append_body(render.json(**kwargs))
 
 
 def plotly(data, layout: dict, scale: float = 0.5):

@@ -202,3 +202,32 @@ class TestServer(scaffolds.ResultsTest):
         self.assertIsNotNone(response)
 
         support.run_command('close')
+
+    def test_long_running_print_buffering(self):
+        support.create_project(self, 'walter2')
+        support.add_step(
+            self,
+            contents=cli.reformat(
+                """
+                import time
+                print('Printing to step print buffer...')
+                for i in range(100):
+                    print(i)
+                    time.sleep(0.25)
+                """
+            )
+        )
+
+        response = self.read_flask_response(self.app.post(
+            '/',
+            data=json.dumps(dict(
+                command='run',
+                args=''
+            )),
+            content_type='application/json'
+        ))
+        run_uid = response['data']['run_uid']
+        self.app.get('/run-status/{}'.format(run_uid))
+        self.app.get('/abort')
+
+        support.run_command('close')

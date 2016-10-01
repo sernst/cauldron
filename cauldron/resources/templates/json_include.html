@@ -1,0 +1,9 @@
+<script>
+  (function () {
+    window.CD = window.CD || {};
+    var data = {{ data }};
+    Object.keys(data).forEach(function (key) {
+      window.CD.data[key] = data[key];  
+    });
+  }());
+</script>

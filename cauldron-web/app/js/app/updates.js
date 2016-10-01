@@ -8,7 +8,7 @@
   var selectionTimeout;
 
   function setSelected(stepDom) {
-    if (stepDom.hasClass('cd-project-step--selected')) {
+    if (!stepDom || stepDom.hasClass('cd-project-step--selected')) {
       return;
     }
 
