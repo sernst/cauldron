@@ -1,6 +1,7 @@
 {
   "id": "time-gender",
   "web_includes": ["_styles.css"],
+  "naming_scheme": "S{{##}}-{{name}}.{{ext}}",
   "steps": [
     "S01-introduction.md",
     "S02-load-data.py",
