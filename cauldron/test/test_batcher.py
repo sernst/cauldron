@@ -2,6 +2,7 @@ import os
 
 import cauldron
 from cauldron.test.support import scaffolds
+from cauldron.test.support.messages import Message
 
 
 class TestBatcher(scaffolds.ResultsTest):
@@ -17,8 +18,11 @@ class TestBatcher(scaffolds.ResultsTest):
             output_directory=output_directory,
             logging_path=logging_path
         )
-
-        self.assertFalse(response.failed)
+ 
+        self.assertFalse(response.failed, Message(
+            'Failed to run project',
+            response=response
+        ))
         self.assertTrue(os.path.exists(output_directory))
         self.assertTrue(os.path.exists(os.path.join(output_directory, 'display.html')))
         self.assertTrue(os.path.exists(logging_path))

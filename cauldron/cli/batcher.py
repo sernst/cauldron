@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 
 import cauldron
 from cauldron import environ
+from cauldron.cli import commander
 from cauldron.cli.commands import close as close_command
 from cauldron.cli.commands import open as open_command
 from cauldron.cli.commands import run as run_command
@@ -59,6 +60,7 @@ def run_project(
 
     output_directory = cauldron.project.internal_project.results_path
 
+    commander.preload()
     run_command.execute(parser, response)
     if response.failed:
         return onComplete('[ERROR]: Aborted trying to run project steps')

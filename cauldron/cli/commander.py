@@ -14,6 +14,16 @@ def preload():
     :return:
     """
 
+    # Set a backend that will generally work across platforms and Cauldron does 
+    # not need interactive rendering because it saves plots to image file strings
+    # that are included in the web results. The "agg" backend is the most reliable
+    # choice across platforms
+    try:
+        import matplotlib
+        matplotlib.use('agg')
+    except Exception:
+        pass
+
     # Plotly must be preloaded in the main thread
     try:
         import plotly as plotly_lib
