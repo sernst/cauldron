@@ -4,11 +4,14 @@ var uglify = require('gulp-uglify');
 var es = require('event-stream');
 var bowerData = require('./bower.json');
 var addSrc = require('gulp-add-src');
-var cleanCss = require('gulp-clean-css');
-var sass = require('gulp-sass');
-var gulpif = require('gulp-if');
-var minimist = require('minimist');
-var rename = require('gulp-rename');
+const cleanCss = require('gulp-clean-css');
+const sass = require('gulp-sass');
+const gulpif = require('gulp-if');
+const minimist = require('minimist');
+const rename = require('gulp-rename');
+const babel = require('gulp-babel');
+const sourcemaps = require('gulp-sourcemaps');
+const iife = require('gulp-iife');
 
 var destRoot = '../cauldron/resources/web';
 var taskName = null;
@@ -37,9 +40,13 @@ gulp.task('build-js', function () {
     'app/js/app/**/*.js',
     'app/js/run.js'
   ])
-      .pipe(gulpif(taskName === 'build', uglify()))
-      .pipe(concat('app.js'))
-      .pipe(gulp.dest(destRoot + '/js'));
+    .pipe(gulpif(taskName === 'develop', sourcemaps.init()))
+    .pipe(babel({ presets: ['es2015'] }))
+    .pipe(gulpif(taskName === 'build', uglify()))
+    .pipe(iife())
+    .pipe(gulpif(taskName === 'develop', sourcemaps.write()))
+    .pipe(concat('app.js'))
+    .pipe(gulp.dest(destRoot + '/js'));
 });
 
 

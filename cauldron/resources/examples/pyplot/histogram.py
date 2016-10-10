@@ -4,8 +4,22 @@ import matplotlib.pyplot as plt
 
 import cauldron as cd
 
-mu, sigma = 100, 15
+# Create data to plot
+mu = 100
+sigma = 15
 x = mu + sigma * np.random.randn(10000)
+
+cd.display.markdown(
+   """
+   # Plotting with PyPlot
+
+   We created a normally-randomized data set centered at $$ @mu = {{ mu }} $$
+   and with a standard deviation of $$ @sigma = {{ sigma }} $$.
+   """,
+   mu=mu,
+   sigma=sigma
+)
+
 
 # the histogram of the data
 n, bins, patches = plt.hist(x, 50, normed=1, facecolor='green', alpha=0.75)
