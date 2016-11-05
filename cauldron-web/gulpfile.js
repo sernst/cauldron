@@ -1,165 +1,216 @@
-var gulp = require('gulp');
-var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
-var es = require('event-stream');
-var bowerData = require('./bower.json');
-var addSrc = require('gulp-add-src');
-const cleanCss = require('gulp-clean-css');
-const sass = require('gulp-sass');
-const gulpif = require('gulp-if');
-const minimist = require('minimist');
-const rename = require('gulp-rename');
 const babel = require('gulp-babel');
-const sourcemaps = require('gulp-sourcemaps');
+const bowerData = require('./bower.json');
+const cleanCss = require('gulp-clean-css');
+const concat = require('gulp-concat');
+const dedupe = require('gulp-dedupe');
+const del = require('del');
+const gulp = require('gulp');
+const gulpif = require('gulp-if');
 const iife = require('gulp-iife');
+const merge = require('merge-stream');
+const rename = require('gulp-rename');
+const sass = require('gulp-sass');
+const sourcemaps = require('gulp-sourcemaps');
+const uglify = require('gulp-uglify');
 
-var destRoot = '../cauldron/resources/web';
-var taskName = null;
-process.argv.some(function (arg) {
-  switch (arg) {
-    case 'develop':
-      taskName = 'develop';
-      return true;
-
-    case 'build':
-      taskName = 'build';
-      return true;
-  }
-
-  return false;
-});
+const isDevelop = process.argv.develop;
+const isProduction = !isDevelop;
 
 
 /**
+ * Creates a relative path to the a location within the root destination
+ * directory for deployment
  *
+ * @param segments
+ *  Zero or more folder or file elements specifying a location within the
+ *  root destination directory
+ * @returns {string}
+ *  The assembled destination path
  */
-gulp.task('build-js', function () {
+function makeDestinationPath(...segments) {
+  return ['..', 'cauldron', 'resources', 'web']
+    .concat(segments)
+    .join('/');
+}
+
+
+/**
+ * Returns a gulp stream destination targeting a location within the root
+ * destination directory specified by the segment arguments
+ *
+ * @param segments
+ *  Zero or more folder or file elements specifying a location within the
+ *  root destination directory
+ * @returns {*}
+ *  A gulp stream destination for the given destination location
+ */
+function getStreamOutput(...segments) {
+  return gulp.dest(makeDestinationPath(...segments));
+}
+
+
+/**
+ * TASK: javascript
+ *    Deploys the application JavaScript files by bundling them into a single
+ *    app.js file with appropriate modifications depending on the task
+ */
+function javascript() {
   return gulp.src([
-    'app/js/utils.js',
+    'app/js/app/utils.js',
     'app/js/initialize.js',
     'app/js/app/**/*.js',
     'app/js/run.js'
   ])
-    .pipe(gulpif(taskName === 'develop', sourcemaps.init()))
+    .pipe(dedupe())
+    .pipe(gulpif(isDevelop, sourcemaps.init()))
     .pipe(babel({ presets: ['es2015'] }))
-    .pipe(gulpif(taskName === 'build', uglify()))
+    .pipe(gulpif(isProduction, uglify()))
     .pipe(iife())
-    .pipe(gulpif(taskName === 'develop', sourcemaps.write()))
+    .pipe(gulpif(isDevelop, sourcemaps.write()))
     .pipe(concat('app.js'))
-    .pipe(gulp.dest(destRoot + '/js'));
-});
+    .pipe(getStreamOutput('js'));
+}
+exports.javascript = javascript;
 
 
 /**
- *
+ * TASK: copyBowerComponents
+ *    For each Cauldron component installed via bower and specified in the
+ *    bower.json file, the component files are copied to their destination
+ *    component folder according to the component entry in the bower.json file
  */
-gulp.task('copy-bower-components', function () {
-  var copies = bowerData.__copies__;
-  var streams = [];
+function copyBowerComponents() {
+  const copies = bowerData.appCopies;
+  const streams = copies
+    .map((copyEntry) => {
+      const files = Object.keys(copyEntry.files).map((filename) => {
+        const sourcePath = copyEntry.files[filename];
 
-  copies.forEach(function (copy) {
-    var outputDirectory = destRoot + '/components/' + copy.name;
-    Object.keys(copy.files).forEach(function (name) {
-      streams.push(
-          gulp.src('bower_components/' + copy.files[name])
-              .pipe(rename(name))
-              .pipe(gulp.dest(outputDirectory))
-      );
-    });
+        return gulp.src(`bower_components/${sourcePath}`)
+          .pipe(rename(filename))
+          .pipe(getStreamOutput('components', copyEntry.name));
+      });
 
-    Object.keys(copy.directories).forEach(function (name) {
-      streams.push(
-          gulp.src('bower_components/' + copy.directories[name] + '/**/*')
-            .pipe(gulp.dest(outputDirectory + '/' + name))
-      );
-    });
-  });
+      const directories = Object.keys(copyEntry.directories).map((name) => {
+        const sourceFolder = copyEntry.directories[name];
 
-  return es.merge.apply(null, streams);
-});
+        return gulp.src(`bower_components/${sourceFolder}/**/*`)
+          .pipe(getStreamOutput('components', copyEntry.name, name));
+      });
+
+      return files.concat(directories);
+    })
+    .reduce((flattened, streamList) => flattened.concat(streamList), []);
+
+  return merge(...streams);
+}
+exports.copyBowerComponents = copyBowerComponents;
 
 
 /**
- *
+ * TASK: javascriptExternal
+ *    Copies external JavaScript files to the destination directory, minifying
+ *    any files that are not already available in a minified format
  */
-gulp.task('build-bower-js', function () {
-  var bowerFiles = bowerData.__installs__;
+function javascriptExternal() {
+  const installs = bowerData.appInstalls;
+  const unminified = installs.js.map(item => `bower_components/${item}`);
+  const minified = installs.jsMin.map(item => `bower_components/${item}`);
 
-  var bowerStream = gulp.src(bowerFiles.js.map(function (item) {
-    return 'bower_components/' + item;
-  }))
-      .pipe(gulpif(taskName === 'build', uglify()));
+  const minifiedStream = gulp.src(minified);
+  const externalStream = gulp.src('app/js/ext/**/*.js');
+  const unminifiedStream = gulp.src(unminified)
+    .pipe(gulpif(isProduction, uglify()));
 
-  var jsMinStream = gulp.src(bowerFiles.js_min.map(function (item) {
-    return 'bower_components/' + item;
-  }));
-
-  var extStream = gulp.src('app/js/ext/**/*.js');
-
-  return es.merge(jsMinStream, bowerStream, extStream)
+  return merge(minifiedStream, unminifiedStream, externalStream)
       .pipe(concat('bower.js'))
-      .pipe(gulp.dest(destRoot + '/js'));
-});
+      .pipe(getStreamOutput('js'));
+}
+exports.javascriptExternal = javascriptExternal;
 
 
 /**
- *
+ * TASK: css
+ *    Compiles the application SCSS files and concatenates them with
+ *    external bower css files into a single CSS file
  */
-gulp.task('build-css', function () {
-
-  var sassStream = gulp.src('app/style/app.scss')
+function css() {
+  const sassStream = gulp.src('app/style/app.scss')
         .pipe(sass().on('error', sass.logError));
 
-  var files = bowerData.__installs__.css.map(function (item) {
-    return 'bower_components/' + item;
-  });
+  const files = bowerData.appInstalls.css
+    .map(item => `bower_components/${item}`);
   files.push('app/style/**/*.css');
 
-  return es.merge(sassStream, gulp.src(files))
-      .pipe(gulpif(taskName === 'build', cleanCss()))
+  return merge(sassStream, gulp.src(files))
+      .pipe(gulpif(isProduction, cleanCss()))
       .pipe(concat('project.css'))
-      .pipe(gulp.dest(destRoot + '/css'));
-});
+      .pipe(getStreamOutput('css'));
+}
+exports.css = css;
+
 
 /**
- *
+ * TASK: cssExternal
+ *    Copies bower-based CSS resources such as images and fonts to their
+ *    destination location
  */
-gulp.task('copy-css-resources', function () {
+function cssExternal() {
+  const files = bowerData.appInstalls.cssResources
+    .map((item) => `bower_components/${item}`);
 
-  var files = bowerData.__installs__.css_resources.map(function (item) {
-    return 'bower_components/' + item;
-  });
+  return gulp.src(files)
+    .pipe(getStreamOutput('css'));
+}
+exports.copyCssResources = cssExternal;
 
-  return gulp.src(files).pipe(gulp.dest(destRoot + '/css'));
-});
 
 /**
- *
+ * TASK: html
+ *    Deploys HTML files to their destination locations
  */
-gulp.task('build-html', function () {
+function html() {
   return gulp.src('app/*.html')
-      .pipe(gulp.dest(destRoot));
-});
+      .pipe(getStreamOutput());
+}
+exports.html = html;
 
 
 /**
- *
+ * TASK: copyIcons
+ *    Copies all of the material design icon resources files
  */
-gulp.task('copy-icons', function () {
+function copyIcons() {
   return gulp.src('app/style/icons/*.*')
-      .pipe(gulp.dest(destRoot + '/css/icons'));
-});
+      .pipe(getStreamOutput('css', 'icons'));
+}
+exports.copyIcons = copyIcons;
 
 
-var pre = [
-  'copy-icons',
-  'build-bower-js',
-  'build-js',
-  'build-css',
-  'build-html',
-  'copy-css-resources',
-  'copy-bower-components'
-];
+/**
+ * TASK: clean
+ *    Empties the bin directory for a fresh population
+ */
+function clean() {
+  return del(makeDestinationPath('**'), { force: true });
+}
+exports.clean = clean;
 
-gulp.task('develop', pre);
-gulp.task('build', pre);
+
+/**
+ * TASK build
+ *    The debug and production build task, which first clean the deployment
+ *    by removing all existing files. Then the collection of common build
+ *    tasks are run to produce a fresh destination build of the type indicated
+ *    by the task being run
+ */
+const pre = gulp.series(clean, gulp.parallel(
+  javascript,
+  javascriptExternal,
+  css,
+  cssExternal,
+  html,
+  copyIcons,
+  copyBowerComponents
+));
+exports.build = pre;

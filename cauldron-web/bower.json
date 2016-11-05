@@ -25,12 +25,12 @@
     "jstree": "^3.3.1",
     "KaTeX": "katex#^0.6.0"
   },
-  "__installs__": {
+  "appInstalls": {
     "js": [
       "pikaday/pikaday.js",
       "pikaday/plugins/pikaday.jquery.js"
     ],
-    "js_min": [
+    "jsMin": [
       "jquery/dist/jquery.min.js",
       "d3/d3.min.js",
       "jstree/dist/jstree.min.js",
@@ -45,13 +45,13 @@
       "handsontable/dist/handsontable.full.min.css",
       "jstree/dist/themes/default/style.min.css"
     ],
-    "css_resources": [
+    "cssResources": [
       "jstree/dist/themes/default/32px.png",
       "jstree/dist/themes/default/40px.png",
       "jstree/dist/themes/default/throbber.gif"
     ]
   },
-  "__copies__": [
+  "appCopies": [
     {
       "name": "katex",
       "files": {

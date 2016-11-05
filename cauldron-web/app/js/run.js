@@ -1,84 +1,49 @@
-(function () {
-  'use strict';
+/* global $ */
 
-  var exports = window.CAULDRON || {};
-  window.CAULDRON = exports;
+const exports = window.CAULDRON || {};
+window.CAULDRON = exports;
 
-  exports.RUNNING = false;
+exports.RUNNING = false;
 
 
-  /**
-   *
-   */
-  function parseUrlParameters() {
-    var out = {};
+/**
+ *
+ */
+function populateDom() {
+  exports.addSnapshotBar();
+  $('title').text(exports.TITLE);
 
-    document.location.search
-      .replace(/(^\?)/, '')
-      .split("&")
-      .forEach(function (item) {
-        item = item.split("=");
-        if (item.length < 2) {
-          return;
-        }
-
-        var v = item[1];
-        if (!/[^0-9\.]+/.test(v)) {
-          if (v.indexOf('.') === -1) {
-            v = parseInt(v, 10);
-          } else {
-            v = parseFloat(v);
-          }
-        } else if (v.toLowerCase() === 'true') {
-          v = true;
-        } else if (v.toLowerCase() === 'false') {
-          v = false;
-        } else {
-          v = decodeURIComponent(v);
-        }
-
-        out[item[0]] = v;
-      });
-    return out;
+  if (exports.SETTINGS.headerless) {
+    // If no heading should be displayed skip creating one
+    return;
   }
-  exports.parseUrlParameters = parseUrlParameters;
 
-  /**
-   *
-   */
-  function run() {
-    return exports.initialize()
-        .then(function () {
-          var body = $('body');
-  
-          exports.addSnapshotBar();
-          $('title').text(exports.TITLE);
+  exports.createHeader();
+  $('.cd-body-header')
+    .find('.project-title')
+    .text(exports.TITLE);
+}
 
-          if (exports.SETTINGS.headerless) {
-            return;
-          }
 
-          exports.createHeader();
-          $('.cd-body-header').find('.project-title').text(exports.TITLE);
-        });
-  }
-  exports.run = run;
+/**
+ *
+ */
+function start() {
+  exports.RUNNING = true;
 
-  /**
-   * RUN APPLICATION
-   */
-  $(function () {
-    exports.PARAMS = exports.parseUrlParameters();
-    exports.run()
-        .then(function () {
-          exports.RUNNING = true;
+  // Resolve the ready promise
+  exports.__on__.ready();
 
-          // Resolve the ready promise
-          exports.__on__.ready();
+  $(window).resize();
+}
 
-          $(window).resize();
-        });
-  });
 
-}());
-
+/**
+ * RUN APPLICATION
+ */
+$(() => {
+  exports.PARAMS = exports.parseUrlParameters();
+  exports.initialize()
+    .then(populateDom)
+    .then(start);
+});
