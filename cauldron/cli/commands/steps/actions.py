@@ -147,7 +147,7 @@ def create_step(
     step_changes = [dict(
         name=result.definition.name,
         action='added',
-        step=writing.write_step(result),
+        step=writing.step_writer.serialize(result)._asdict(),
         after=None if index < 1 else project.steps[index - 1].definition.name
     )]
 

@@ -219,7 +219,7 @@ def execute(
         step_changes.append(dict(
             name=ps.definition.name,
             action='updated',
-            step=writing.write_step(ps)
+            step=writing.step_writer.serialize(ps)._asdict()
         ))
 
     response.update(step_changes=step_changes)

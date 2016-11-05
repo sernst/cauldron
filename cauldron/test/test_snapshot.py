@@ -117,10 +117,6 @@ class TestSnapshot(scaffolds.ResultsTest):
         :return:
         """
 
-        if sys.platform == 'win32':
-            # Autocomplete is not available on  windows
-            return
-
         support.initialize_project(self, 'gina')
 
         result = support.autocomplete('snapshot a')

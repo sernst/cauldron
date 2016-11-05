@@ -57,7 +57,7 @@ def get_running_step_changes() -> list:
             step_changes.append(dict(
                 name=ps.definition.name,
                 action='updated',
-                step=writing.write_step(ps)
+                step=writing.step_writer.serialize(ps)._asdict()
             ))
 
     return step_changes

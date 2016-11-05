@@ -101,10 +101,6 @@ class TestCreate(scaffolds.ResultsTest):
         :return:
         """
 
-        if sys.platform == 'win32':
-            # Autocomplete is not available on  windows
-            return
-
         alias = 'ex'
         path = environ.paths.resources('examples')
         support.run_command(

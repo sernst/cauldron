@@ -1,6 +1,5 @@
 import os
 import re
-import readline
 from unittest.mock import patch
 
 from cauldron import environ
@@ -8,6 +7,11 @@ from cauldron.cli import commander
 from cauldron.cli.shell import CauldronShell
 from cauldron.test.support import scaffolds
 from cauldron.test.support.messages import Message
+
+try:
+  import readline
+except ImportError:
+  import pyreadline as readline
 
 
 def run_command(command: str) -> 'environ.Response':
@@ -78,12 +82,19 @@ def autocomplete(command: str):
     :return:
     """
 
+    # On Linux/OSX the completer delims are retrieved from the readline module,
+    # but the delims are different on Windows. So for testing consistency we
+    # supply the Linux/OSX delims explicitly here in place of:
+    # readline.get_completer_delims()
+
+    completer_delims = ' \t\n`~!@#$%^&*()-=+[{]}\\|;:\'",<>/?'
+
     with patch('readline.get_line_buffer', return_value=command):
         cs = CauldronShell()
         line = command.lstrip()
 
         splits = re.split('[{}]{{1}}'.format(
-            re.escape(readline.get_completer_delims())),
+            re.escape(completer_delims)),
             line
         )
 

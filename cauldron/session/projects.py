@@ -130,6 +130,16 @@ class ProjectStep(object):
 
         self._is_dirty = bool(value)
 
+    def get_dom(self) -> dict:
+        """ Retrieves the current value of the DOM for the step """
+
+        if self.is_running:
+            return self.dumps()
+
+        if self.dom is None:
+            self.dom = self.dumps()
+        return self.dom
+
     def dumps(self):
         """
 
@@ -403,7 +413,6 @@ class Project(object):
 
         return '{}/view/project.html?id={}'.format(host, self.uuid)
 
-
     def snapshot_path(self, *args: typing.Tuple[str]) -> str:
         """
 
@@ -612,7 +621,7 @@ class Project(object):
         :return:
         """
 
-        writing.write_project(self)
+        writing.save(self)
         return self.url
 
     def status(self) -> dict:

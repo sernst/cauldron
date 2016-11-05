@@ -68,10 +68,6 @@ class TestOpen(scaffolds.ResultsTest):
         :return:
         """
 
-        if sys.platform == 'win32':
-            # Autocomplete is not available on  windows
-            return
-
         result = support.autocomplete('open --r')
         self.assertEqual(result, ['recent'])
 
@@ -83,10 +79,6 @@ class TestOpen(scaffolds.ResultsTest):
 
         :return:
         """
-
-        if sys.platform == 'win32':
-            # Autocomplete is not available on  windows
-            return
 
         result = support.autocomplete('open @fake:')
         self.assertEqual(len(result), 0)

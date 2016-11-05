@@ -6,6 +6,7 @@ try:
 except:
     plotly = None
 
+
 class TestWriting(scaffolds.ResultsTest):
     """
 
