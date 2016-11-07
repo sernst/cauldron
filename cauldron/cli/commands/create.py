@@ -87,6 +87,14 @@ def populate(
         help=cli.reformat('Disables the auto naming scheme for the project')
     )
 
+    parser.add_argument(
+        '--forget',
+        dest='forget',
+        default=False,
+        action='store_true',
+        help=cli.reformat('Forget that this project was opened')
+    )
+
 
 def create_project_directory(directory):
     """
@@ -128,6 +136,7 @@ def execute(
         title: str = '',
         summary: str = '',
         author: str = '',
+        forget: bool = False,
         no_naming_scheme: bool = False,
 ):
     """
@@ -216,7 +225,7 @@ def execute(
             whitespace=1
         ).response
 
-    project_opener.open_project(response, directory)
+    project_opener.open_project(response, directory, forget=forget)
 
     return response
 

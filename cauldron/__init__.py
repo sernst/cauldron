@@ -59,7 +59,7 @@ def run_server(port=5010, debug=False, **kwargs):
     """
 
     from cauldron.cli.server import run as server_runner
-    server_runner.execute(port, debug, **kwargs)
+    server_runner.execute(port=port, debug=debug, **kwargs)
 
 
 def run_project(

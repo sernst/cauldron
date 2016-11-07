@@ -30,6 +30,7 @@ def create_project(
         tester: scaffolds.ResultsTest,
         name: str,
         path: str = None,
+        forget: bool = True,
         **kwargs
 ) -> 'environ.Response':
     """
@@ -49,6 +50,10 @@ def create_project(
     args = [name, path]
     for key, value in kwargs.items():
         args.append('--{}="{}"'.format(key, value))
+
+    if forget:
+        args.append('--forget')
+
     args = ' '.join([a for a in args if a and len(a) > 0])
 
     commander.execute('create', args, response=r)

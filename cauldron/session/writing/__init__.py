@@ -72,7 +72,11 @@ def to_write_list(project: 'projects.Project') -> typing.List[tuple]:
     ))
 
     file_writes.extend(list_asset_writes(project))
-    file_writes.append(html.create(project, project.results_path))
+    file_writes.append(html.create(
+        project,
+        project.results_path,
+        'display.html'
+    ))
 
     return file_writes
 

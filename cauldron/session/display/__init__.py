@@ -152,13 +152,13 @@ def table(data_frame, scale: float = 0.7):
     ))
 
 
-def svg(svg: str, filename: str = None):
+def svg(svg_dom: str, filename: str = None):
     """
     Adds the specified SVG string to the display. If a filename is
     included, the SVG data will also be saved to that filename within the
     project results folder.
 
-    :param svg:
+    :param svg_dom:
         The SVG string data to add to the display
     :param filename:
         An optional filename where the SVG data should be saved within
@@ -167,7 +167,7 @@ def svg(svg: str, filename: str = None):
     """
 
     r = _get_report()
-    r.append_body(render.svg(svg))
+    r.append_body(render.svg(svg_dom))
 
     if not filename:
         return
@@ -175,7 +175,7 @@ def svg(svg: str, filename: str = None):
     if not filename.endswith('.svg'):
         filename += '.svg'
 
-    r.files[filename] = svg
+    r.files[filename] = svg_dom
 
 
 def jinja(path, **kwargs):
