@@ -67,7 +67,7 @@ function javascript() {
     .pipe(gulpif(isProduction, uglify()))
     .pipe(iife())
     .pipe(gulpif(isDevelop, sourcemaps.write()))
-    .pipe(concat('app.js'))
+    .pipe(concat('app.js', { newLine: '\n' }))
     .pipe(getStreamOutput('js'));
 }
 exports.javascript = javascript;
@@ -123,7 +123,7 @@ function javascriptExternal() {
     .pipe(gulpif(isProduction, uglify()));
 
   return merge(minifiedStream, unminifiedStream, externalStream)
-      .pipe(concat('bower.js'))
+      .pipe(concat('bower.js', { newLine: '\n' }))
       .pipe(getStreamOutput('js'));
 }
 exports.javascriptExternal = javascriptExternal;
@@ -144,7 +144,7 @@ function css() {
 
   return merge(sassStream, gulp.src(files))
       .pipe(gulpif(isProduction, cleanCss()))
-      .pipe(concat('project.css'))
+      .pipe(concat('project.css', { newLine: '\n' }))
       .pipe(getStreamOutput('css'));
 }
 exports.css = css;
