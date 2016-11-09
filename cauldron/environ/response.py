@@ -164,10 +164,15 @@ class Response(object):
         self.ended = False
         self.failed = False
         self.thread = None
+        self.returned = None
 
     @property
     def response(self):
         return self.parent.response if self.parent else self
+
+    def debug_echo(self) -> 'Response':
+        print(self.echo())
+        return self
 
     def echo(self) -> str:
         """
@@ -196,7 +201,8 @@ class Response(object):
                 return
 
             prefix = '  ' * (level + 1)
-            out.append('{}* {}: {}'.format(prefix, key, value))
+            value_str = '\n'.join('{}'.format(value).split('\n')[:10])[:200]
+            out.append('{}* {}: {}'.format(prefix, key, value_str))
 
         print_data('DATA', self.data)
 
@@ -287,7 +293,8 @@ class Response(object):
             kind=message_kind,
             message=message,
             code=code,
-            response=self
+            response=self,
+            **kwargs
         )
 
         if kind == 'ERROR':

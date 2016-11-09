@@ -15,7 +15,6 @@ from cauldron.session.caching import SharedCache
 from cauldron.session.report import Report
 from cauldron.session import naming
 
-
 DEFAULT_SCHEME = 'S{{##}}-{{name}}.{{ext}}'
 
 
@@ -26,11 +25,15 @@ class ProjectStep(object):
     the project itself.
     """
 
+    _reference_index = 0
+
     def __init__(
             self,
             project: 'Project' = None,
             definition: definitions.FileDefinition = None
     ):
+        self.__class__._reference_index += 1
+        self._reference_id = '{}'.format(self.__class__._reference_index)
         self.definition = definition
         self.project = project
         self.report = Report(self)
@@ -41,6 +44,19 @@ class ProjectStep(object):
         self.error = None
         self.is_muted = False
         self.dom = None
+
+    @property
+    def reference_id(self):
+        return self._reference_id
+
+    @property
+    def uuid(self):
+        """
+
+        :return:
+        """
+
+        return hashlib.sha1(self.source_path.encode()).hexdigest()
 
     @property
     def filename(self) -> str:
@@ -207,6 +223,9 @@ class ProjectStep(object):
 
 
 class Project(object):
+    """
+
+    """
 
     def __init__(
             self,
@@ -501,7 +520,7 @@ class Project(object):
         self.last_modified = time.time()
         return True
 
-    def get_step(self, name) -> ProjectStep:
+    def get_step(self, name: str) -> ProjectStep:
         """
 
         :param name:
@@ -510,6 +529,19 @@ class Project(object):
 
         for s in self.steps:
             if s.definition.name == name:
+                return s
+
+        return None
+
+    def get_step_by_reference_id(self, reference_id: str) -> ProjectStep:
+        """
+
+        :param reference_id:
+        :return:
+        """
+
+        for s in self.steps:
+            if s.reference_id == reference_id:
                 return s
 
         return None
@@ -592,7 +624,6 @@ class Project(object):
                 self.steps[i].mark_dirty(True)
 
         self.steps.remove(step)
-
         return step
 
     def save(self, path: str = None):

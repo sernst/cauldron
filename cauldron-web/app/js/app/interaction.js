@@ -12,7 +12,7 @@ window.CAULDRON = exports;
  */
 function scrollToAnchor(name, location, animationSpeed) {
   const stepDom = $('.body-wrapper')
-    .find(`.cd-project-step[data-step-name="${name}"]`);
+    .find(`.cd-project-step[data-step-name='${name}']`);
 
   // Don't use locations if the step dom height is short
   const isShortDom = stepDom.height() < ($(window).height() - 100);

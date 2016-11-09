@@ -65,7 +65,7 @@ function parseUrlParameters() {
   return document.location.search
     .replace(/(^\?)/, '')
     .split('&')
-    .forEach(entry => entry.split('='))
+    .map(entry => entry.split('='))
     .filter(explodedEntry => (explodedEntry.length === 2))
     .reduce((result, [key, value]) => {
       const r = result;

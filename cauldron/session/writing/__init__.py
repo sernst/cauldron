@@ -58,13 +58,15 @@ def to_write_list(project: 'projects.Project') -> typing.List[tuple]:
         del out['file_writes']
         return out
 
+    project_includes = [inc._asdict() for inc in project_component.includes]
+
     file_writes.append(file_io.FILE_WRITE_ENTRY(
         path=project.output_path,
         contents=templating.render_template(
             'report.js.template',
             DATA=json.dumps({
                 'steps': [to_step_dict(sd) for sd in steps_data],
-                'includes': project_component.includes,
+                'includes': project_includes,
                 'settings': project.settings.fetch(None),
                 'cauldron_version': list(environ.version_info)
             })

@@ -96,7 +96,7 @@ def parse_command_args(response: 'Response') -> typing.Tuple[str, str]:
     return name, args
 
 
-def execute(async:bool = False):
+def execute(async: bool = False):
     """
     :param async:
         Whether or not to allow asynchronous command execution that returns

@@ -1,9 +1,9 @@
 import os
 import shutil
 import typing
-import uuid
 
 import cauldron
+from cauldron.cli.commands.steps import renaming as step_support
 from cauldron.environ import Response
 from cauldron.session import naming
 from cauldron.session import writing
@@ -95,7 +95,7 @@ def create_step(
         name: str,
         position: typing.Union[str, int],
         title: str = None
-) -> str:
+) -> Response:
     """
 
     :param response:
@@ -126,8 +126,12 @@ def create_step(
         **name_parts
     )
 
-    step_renames = synchronize_step_names(response, index)
+    res = step_support.synchronize_step_names(index)
+    response.consume(res)
+    if response.failed:
+        return response
 
+    step_renames = res.returned
     step_data = {'name': name}
 
     if title:
@@ -136,8 +140,14 @@ def create_step(
     result = project.add_step(step_data, index=index)
 
     if not os.path.exists(result.source_path):
+        contents = (
+            'import cauldron as cd\n\n'
+            if result.source_path.endswith('.py')
+            else ''
+        )
+
         with open(result.source_path, 'w+') as f:
-            f.write('import cauldron as cd\n\n')
+            f.write(contents)
 
     project.save()
     project.write()
@@ -151,7 +161,7 @@ def create_step(
         after=None if index < 1 else project.steps[index - 1].definition.name
     )]
 
-    response.update(
+    return response.update(
         project=project.kernel_serialize(),
         step_name=result.definition.name,
         step_path=result.source_path,
@@ -163,121 +173,7 @@ def create_step(
         message='"{}" step has been created'.format(result.definition.name)
     ).console(
         whitespace=1
-    )
-
-
-def remove_step(
-        response: Response,
-        name: str,
-        keep_file: bool = False
-):
-    """
-
-    :param response:
-    :param name:
-    :param keep_file:
-    :return:
-    """
-
-    project = cauldron.project.internal_project
-    step = project.remove_step(name)
-    if not step:
-        response.fail(
-            code='NO_SUCH_STEP',
-            message='Step "{}" not found. Unable to remove.'.format(name)
-        ).kernel(
-            name=name
-        ).console(
-            whitespace=1
-        )
-        return False
-
-    project.save()
-    project.write()
-
-    if not keep_file:
-        os.remove(step.source_path)
-
-    step_renames = synchronize_step_names(response)
-
-    removed_name = 'REMOVED--{}'.format(uuid.uuid4())
-    step_renames[name] = dict(
-        name=removed_name,
-        title=''
-    )
-
-    step_changes = [dict(
-        name=removed_name,
-        action='removed'
-    )]
-
-    response.update(
-        project=project.kernel_serialize(),
-        step_changes=step_changes,
-        step_renames=step_renames
-    ).notify(
-        kind='SUCCESS',
-        code='STEP_REMOVED',
-        message='Removed "{}" step from project'.format(name)
-    ).console(
-        whitespace=1
-    )
-    return True
-
-
-def synchronize_step_names(
-        response: Response,
-        insert_index: int = None
-):
-    """
-    :param response:
-    :param insert_index:
-    :return:F
-    """
-
-    project = cauldron.project.internal_project
-    results = dict()
-
-    if not project.naming_scheme:
-        return results
-
-    for s in reversed(project.steps):
-        name = s.definition.name
-        name_parts = naming.explode_filename(name, project.naming_scheme)
-
-        index = project.index_of_step(name)
-
-        if insert_index is not None and insert_index <= index:
-            # Adjusts indexing when renaming is for the purpose of
-            # inserting a new step
-            index += 1
-
-        name_parts['index'] = index
-        new_name = naming.assemble_filename(
-            scheme=project.naming_scheme,
-            **name_parts
-        )
-
-        if name == new_name:
-            continue
-
-        old_source_path = s.source_path
-        s.definition.name = new_name
-
-        if not os.path.exists(s.source_path):
-            if os.path.exists(old_source_path):
-                shutil.move(old_source_path, s.source_path)
-            else:
-                with open(s.source_path, 'w+') as f:
-                    f.write('')
-
-        results[name] = {
-            'name': new_name,
-            'title': s.definition.title
-        }
-
-    project.save()
-    return results
+    ).response
 
 
 def modify_step(
@@ -326,7 +222,9 @@ def modify_step(
     else:
         temp_path = None
 
-    step_renames = synchronize_step_names(response, new_index)
+    res = step_support.synchronize_step_names(new_index)
+    response.consume(res)
+    step_renames = res.returned
 
     new_name_parts = naming.explode_filename(new_name, project.naming_scheme)
     new_name_parts['index'] = new_index

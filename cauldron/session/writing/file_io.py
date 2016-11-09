@@ -9,6 +9,14 @@ FILE_WRITE_ENTRY = namedtuple('FILE_WRITE_ENTRY', ['path', 'contents'])
 FILE_COPY_ENTRY = namedtuple('FILE_COY_ENTRY', ['source', 'destination'])
 
 
+def entry_from_dict(
+        data: dict
+) -> typing.Union[FILE_WRITE_ENTRY, FILE_COPY_ENTRY]:
+    if 'contents' in data:
+        return FILE_WRITE_ENTRY(**data)
+    return FILE_COPY_ENTRY(**data)
+
+
 def deploy(files_list: typing.List[tuple]):
     """
     Iterates through the specified files_list and copies or writes each entry depending

@@ -52,28 +52,38 @@ def get_cached_data(
         step: 'projects.ProjectStep'
 ) -> typing.Union[None, STEP_DATA]:
     """
-    Attempts to load and return the cached step data for the specified step. If not cached
-    data exists, or the cached data is corrupt, a None value is returned instead.
+    Attempts to load and return the cached step data for the specified step. If
+    not cached data exists, or the cached data is corrupt, a None value is
+    returned instead.
 
     :param step:
         The step for which the cached data should be loaded
 
     :return:
-        Either a step data structure containing the cached step data or None if no cached data
-        exists for the step
+        Either a step data structure containing the cached step data or None
+        if no cached data exists for the step
     """
 
     cache_path = step.report.results_cache_path
     if not os.path.exists(cache_path):
         return None
 
+    out = create_data(step)
+
     try:
-        out = create_data(step)
         with open(cache_path, 'r+') as f:
             cached_data = json.load(f)
-        return out._replace(**cached_data)
     except Exception:
         return None
+
+    file_writes = [
+        file_io.entry_from_dict(**fw)
+        for fw in cached_data['file_writes']
+    ]
+
+    return out \
+        ._replace(**cached_data) \
+        ._replace(file_writes=file_writes)
 
 
 def make_cache_write_entry(
@@ -91,9 +101,13 @@ def make_cache_write_entry(
     if not cache_path:
         return None
 
+    storable_step_data = step_data \
+        ._replace(file_writes=[fw._asdict() for fw in step_data.file_writes]) \
+        ._asdict()
+
     return file_io.FILE_WRITE_ENTRY(
         path=environ.paths.clean(cache_path),
-        contents=json.dumps(step_data._asdict())
+        contents=json.dumps(storable_step_data)
     )
 
 
@@ -110,7 +124,7 @@ def populate_data(step: 'projects.ProjectStep') -> STEP_DATA:
     component = components.get(step)
 
     includes = step_data.includes.copy()
-    includes.extend(component.includes)
+    includes.extend([include._asdict() for include in component.includes])
 
     file_writes = step_data.file_writes.copy()
     file_writes.extend(component.files)

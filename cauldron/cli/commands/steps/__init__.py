@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 import cauldron
 from cauldron import cli
 from cauldron.cli.commands.steps import actions
+from cauldron.cli.commands.steps import removal
 from cauldron.cli.interaction import autocompletion
 from cauldron.environ import Response
 
@@ -160,13 +161,12 @@ def execute(
     step_name = step_name.strip('"')
 
     if action == 'add':
-        actions.create_step(
+        return actions.create_step(
             response=response,
             name=step_name,
             position=position,
             title=title.strip('"') if title else title
         )
-        return
 
     if action == 'modify':
         actions.modify_step(
@@ -176,9 +176,10 @@ def execute(
             title=title,
             position=position
         )
+        return response
 
     if action == 'remove':
-        actions.remove_step(
+        return removal.remove_step(
             response=response,
             name=step_name,
             keep_file=keep
@@ -190,6 +191,7 @@ def execute(
             step_name=step_name,
             value=False
         )
+        return response
 
     if action == 'mute':
         actions.toggle_muting(
@@ -197,6 +199,7 @@ def execute(
             step_name=step_name,
             value=True
         )
+        return response
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):

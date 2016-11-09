@@ -107,7 +107,7 @@ function prepareStepBody(step) {
 
   function getSrc(targetElement) {
     const result = targetElement.attr('data-src');
-    return result.startsWith('/') ? result.slice(1) : result;
+    return (result && result.startsWith('/')) ? result.slice(1) : result;
   }
 
   stepBody.find('[data-src]').each((index, e) => {
@@ -142,7 +142,7 @@ function processStepRenames(renames) {
   // Add rename attributes
   Object.keys(renames).forEach((oldName) => {
     const data = renames[oldName];
-    const stepBody = body.find(`[data-step-name="${oldName}"]'`);
+    const stepBody = body.find(`[data-step-name="${oldName}"]`);
     stepBody.attr('data-step-rename', data.name);
     stepBody.find('.cd-step-title').html(data.title || data.name);
   });
