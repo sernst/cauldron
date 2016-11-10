@@ -24,13 +24,18 @@ STEP_RENAME = namedtuple('STEP_RENAME', [
 
 def create_rename_entry(
         step: 'projects.ProjectStep',
-        insert_index: int = None,
+        insertion_index: int = None,
         stash_path: str = None
 ) -> STEP_RENAME:
     """
+    Creates a STEP_RENAME for the given ProjectStep instance
 
     :param step:
-    :param insert_index:
+        The ProjectStep instance for which the STEP_RENAME will be created
+    :param insertion_index:
+        An optional index where a step will be inserted as part of this
+        renaming process. Allows files to be renamed prior to the insertion
+        of the step to prevent conflicts.
     :param stash_path:
     :return:
     """
@@ -41,7 +46,7 @@ def create_rename_entry(
     index = project.index_of_step(name)
     name_index = index
 
-    if insert_index is not None and insert_index <= index:
+    if insertion_index is not None and insertion_index <= index:
         # Adjusts indexing when renaming is for the purpose of
         # inserting a new step
         name_index += 1
@@ -57,7 +62,7 @@ def create_rename_entry(
 
     if not stash_path:
         fd, stash_path = tempfile.mkstemp(
-            prefix='{}-{}--{}-'.format(step.reference_id, name, new_name)
+            prefix='{}-{}--{}--'.format(step.reference_id, name, new_name)
         )
         os.close(fd)
 
@@ -182,7 +187,7 @@ def synchronize_step_names(insert_index: int = None) -> Response:
 
     create_mapper_func = functools.partial(
         create_rename_entry,
-        insert_index=insert_index
+        insertion_index=insert_index
     )
 
     step_renames = list([create_mapper_func(s) for s in project.steps])

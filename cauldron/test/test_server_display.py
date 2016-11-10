@@ -1,12 +1,7 @@
-import json
-from unittest import mock
-
 from cauldron.cli import server
-from cauldron.cli.server import run as server_run
-from cauldron.test.support import scaffolds
 from cauldron.test import support
+from cauldron.test.support import scaffolds
 from flask import Response as FlaskResponse
-from cauldron.environ import Response
 
 
 class TestServer(scaffolds.ResultsTest):

@@ -1,6 +1,7 @@
 import os
-import sys
+import json
 
+import cauldron
 from cauldron.test import support
 from cauldron.test.support import scaffolds
 from cauldron.test.support.messages import Message
@@ -77,6 +78,27 @@ class TestSteps(scaffolds.ResultsTest):
 
         support.run_command('close')
 
+    def test_steps_remove_renaming(self):
+
+        STEP_COUNT = 6
+
+        support.initialize_project(self, 'bellatrix')
+        results = [support.run_command('steps add') for i in range(STEP_COUNT)]
+
+        if any([r.failed for r in results]):
+            self.fail('Failed to add step')
+
+        r = support.run_command('steps remove S02.py')
+        self.assertFalse(r.failed, 'Removal should have succeeded')
+
+        project = cauldron.project.internal_project
+        step_names = [s.definition.name for s in project.steps]
+
+        for i in range(STEP_COUNT - 1):
+            self.assertEqual('S0{}.py'.format(i + 1), step_names[i])
+
+        support.run_command('close')
+
     def test_steps_list(self):
         """
         """
@@ -134,8 +156,8 @@ class TestSteps(scaffolds.ResultsTest):
         """
 
         support.initialize_project(self, 'harvey')
-        support.add_step(self, '', '#S1')
-        support.add_step(self, '', '#S2')
+        support.add_step(self, contents='#S1')
+        support.add_step(self, contents='#S2')
 
         r = support.run_command('steps list')
         step = r.data['steps'][-1]

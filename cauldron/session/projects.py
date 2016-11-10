@@ -32,11 +32,19 @@ class ProjectStep(object):
             project: 'Project' = None,
             definition: definitions.FileDefinition = None
     ):
+        """
+
+        :param project:
+        :param definition:
+        """
+
         self.__class__._reference_index += 1
         self._reference_id = '{}'.format(self.__class__._reference_index)
+
         self.definition = definition
         self.project = project
         self.report = Report(self)
+
         self.last_modified = None
         self.code = None
         self.is_running = False
@@ -94,6 +102,8 @@ class ProjectStep(object):
         """
 
         return dict(
+            uuid=self.uuid,
+            reference_id=self.reference_id,
             name=self.definition.name,
             slug=self.definition.slug,
             index=self.index,
@@ -113,11 +123,16 @@ class ProjectStep(object):
         :return:
         """
 
+        is_dirty = self.is_dirty()
+
         return dict(
+            uuid=self.uuid,
+            reference_id=self.reference_id,
             name=self.definition.name,
             muted=self.is_muted,
             last_modified=self.last_modified,
-            dirty=self.is_dirty(),
+            dirty=is_dirty,
+            is_dirty=is_dirty,
             run=self.last_modified is not None,
             error=self.error is not None
         )
@@ -166,24 +181,11 @@ class ProjectStep(object):
             self.project.source_directory,
             self.filename
         )
-        codes = [dict(
+        code = dict(
             filename=self.filename,
             path=code_file_path,
             code=render.code_file(code_file_path)
-        )]
-
-        for fn in self.definition.get('web_includes', []):
-            fn_path = os.path.join(
-                self.project.source_directory,
-                self.definition.get('folder', ''),
-                fn.replace('/', os.sep)
-            )
-
-            codes.append(dict(
-                filename=fn,
-                path=fn_path,
-                code=render.code_file(fn_path)
-            ))
+        )
 
         body = self.report.body
         if self.is_running:
@@ -205,7 +207,7 @@ class ProjectStep(object):
 
         dom = templating.render_template(
             'step-body.html',
-            codes=codes,
+            code=code,
             body=body,
             has_body=has_body,
             id=self.definition.name,
@@ -675,9 +677,8 @@ def load_project_settings(path: str) -> dict:
     if os.path.isdir(path):
         path = os.path.join(path, 'cauldron.json')
     if not os.path.exists(path):
-        raise FileNotFoundError(
-            'No project file found at: {}'.format(path)
-        )
+        raise FileNotFoundError('No project file found at: {}'.format(path))
+
     with open(path, 'r+') as f:
         out = json.load(f)
 

@@ -381,7 +381,7 @@ Display Functions
   - path: The fully-qualified path to the template to be rendered.
   - kwargs: Any keyword arguments that will be use as variable replacements within the template
 
-- **json**: Adds the specified data to the the output display window with the specified key. This
+- **json**: Adds the specified data to the output display window with the specified key. This
   allows you to make available arbitrary JSON-compatible data to the display for runtime use.
 
   - window_key: The key on the global window object to which this data will be assigned.

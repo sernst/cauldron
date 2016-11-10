@@ -29,7 +29,7 @@
     <div class="spacer"> </div>
 
     <div class="button-bar">
-      {% if codes %}
+      {% if code %}
       <div id="{{ "code-toggler" | id }}"
            class="clicker closed centered"
            data-closes="#{{ "code" | id }}"
@@ -43,7 +43,7 @@
     </div>
   </div>
 
-  {% if codes %}
+  {% if code %}
   <div class="code-box"
        id="{{ "code" | id }}"
        style="display:none"
@@ -71,11 +71,9 @@
          data-font-size-default="0.6"
          style="font-size: 0.6em"
     >
-      {% for entry in codes %}
       <div class="code-file-box">
-        {{ entry.code }}
+        {{ code.code }}
       </div>
-      {% endfor %}
     </div>
   </div>
   {% endif %}
