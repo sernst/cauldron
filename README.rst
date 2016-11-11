@@ -94,6 +94,13 @@ directory and run the command::
 
     $ python3 setup.py develop
 
+Or in an Anaconda installation using its develop command::
+
+   $ conda develop .
+
+which must be executed in the root project directory of your local copy of
+Cauldron.
+
 Getting Started
 ---------------
 

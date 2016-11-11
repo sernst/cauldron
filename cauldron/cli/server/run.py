@@ -7,9 +7,11 @@ from argparse import ArgumentParser
 import cauldron as cd
 from cauldron.session import writing
 from cauldron import environ
+from cauldron.render.encoding import ComplexJsonEncoder
 from flask import Flask
 
 APPLICATION = Flask('Cauldron')
+APPLICATION.json_encoder = ComplexJsonEncoder
 SERVER_VERSION = [0, 0, 1, 1]
 
 

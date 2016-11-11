@@ -9,7 +9,7 @@ from cauldron.session.writing import file_io
 def create(
         project: 'projects.Project',
         destination_directory,
-        destination_filename: str = 'display.html'
+        destination_filename: str = None
 ) -> file_io.FILE_WRITE_ENTRY:
     """
     Creates a FILE_WRITE_ENTRY for the rendered HTML file for the given
@@ -21,7 +21,8 @@ def create(
     :param destination_directory:
         The absolute path to the folder where the HTML file will be saved
     :param destination_filename:
-        The name of the HTML file to be written in the destination directory
+        The name of the HTML file to be written in the destination directory.
+        Defaults to the project uuid.
     :return:
         A FILE_WRITE_ENTRY for the project's HTML file output
     """

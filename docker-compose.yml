@@ -1,0 +1,9 @@
+ version: '2'
+ services:
+   app:
+     build: .
+     volumes:
+       - .:/cauldron
+     ports:
+       - "8000:8000"
+     container_name: cauldron_app

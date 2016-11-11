@@ -4,7 +4,7 @@ from cauldron.test.support import scaffolds
 from flask import Response as FlaskResponse
 
 
-class TestServer(scaffolds.ResultsTest):
+class TestServerDisplay(scaffolds.ResultsTest):
     """
 
     """

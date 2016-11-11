@@ -27,5 +27,7 @@ class ComplexJsonEncoder(json.JSONEncoder):
             return float(value)
         elif isinstance(value, pd.Series):
             return value.tolist()
+        elif isinstance(value, bytes):
+            return value.decode()
 
         return json.JSONEncoder.default(self, value)

@@ -189,13 +189,15 @@ class TestServer(scaffolds.ResultsTest):
         )
 
         response = self.read_flask_response(self.app.post(
-            '/',
+            '/command-async',
             data=json.dumps(dict(
                 command='run',
                 args=''
             )),
             content_type='application/json'
         ))
+        self.assertIsNotNone(response)
+
         run_uid = response['data']['run_uid']
         self.app.get('/run-status/{}'.format(run_uid))
         response = self.app.get('/abort')
@@ -219,7 +221,7 @@ class TestServer(scaffolds.ResultsTest):
         )
 
         response = self.read_flask_response(self.app.post(
-            '/',
+            '/command-async',
             data=json.dumps(dict(
                 command='run',
                 args=''

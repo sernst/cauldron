@@ -4,10 +4,7 @@ import sys
 
 
 def open_in_browser(project):
-    if sys.platform == 'win32':
-        webbrowser.open(project.baked_url)
-    else:
-        webbrowser.open(project.url)
+    webbrowser.open(project.baked_url)
 
 
 def reformat(source: str) -> str:

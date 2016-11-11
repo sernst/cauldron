@@ -1,5 +1,5 @@
+include LICENSE
 include cauldron/settings.json
-recursive-include bin *
 recursive-include cauldron/resources/web *
 recursive-include cauldron/resources/examples *
 recursive-include cauldron/resources/templates *

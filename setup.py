@@ -7,6 +7,8 @@ from setuptools import find_packages
 # python3 setup.py register -r pypitest
 
 # rm -rf ./dist
+# rmdir dist /s /q
+#
 # python3 setup.py sdist bdist_wheel
 # twine upload dist/cauldron*
 #
@@ -47,10 +49,12 @@ setup(
     package_data={'': populate_extra_files()},
     include_package_data=True,
     zip_safe=False,
-    scripts=[
-        'bin/cauldron',
-        'bin/cauldron-server'
-    ],
+    entry_points=dict(
+        console_scripts=[
+            'cauldron=cauldron.scripts.cauldron_shell:run',
+            'cauldron-server=cauldron.scripts.cauldron_server:run'
+        ]
+    ),
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',

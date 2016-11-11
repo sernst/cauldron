@@ -16,14 +16,15 @@ def save(
         write_list: typing.List[tuple] = None
 ) -> typing.List[tuple]:
     """
-    Computes the file write list for the current state of the project if no write_list was
-    specified in the arguments, and then writes each entry in that list to disk.
+    Computes the file write list for the current state of the project if no
+    write_list was specified in the arguments, and then writes each entry in
+    that list to disk.
 
     :param project:
         The project to be saved
     :param write_list:
-        The file writes list for the project if one already exists, or None if a new
-        writes list should be computed
+        The file writes list for the project if one already exists, or None
+        if a new writes list should be computed
     :return:
         The file write list that was used to save the project to disk
     """
