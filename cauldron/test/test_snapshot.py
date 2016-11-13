@@ -16,7 +16,7 @@ class TestSnapshot(scaffolds.ResultsTest):
         """
         """
 
-        support.initialize_project(self, 'ted')
+        support.create_project(self, 'ted')
 
         r = support.run_command('snapshot')
         self.assertTrue(r.failed, Message(
@@ -117,7 +117,7 @@ class TestSnapshot(scaffolds.ResultsTest):
         :return:
         """
 
-        support.initialize_project(self, 'gina')
+        support.create_project(self, 'gina')
 
         result = support.autocomplete('snapshot a')
         self.assertIn('add', result)

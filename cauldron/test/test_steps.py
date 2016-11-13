@@ -1,5 +1,4 @@
 import os
-import json
 
 import cauldron
 from cauldron.test import support
@@ -16,11 +15,14 @@ class TestSteps(scaffolds.ResultsTest):
         """
         """
 
-        directory = support.initialize_project(self, 'bob')
+        support.create_project(self, 'bob')
+        project = cauldron.project.internal_project
 
         r = support.run_command('steps add first.py')
         self.assertFalse(r.failed, 'should not have failed')
-        self.assertTrue(os.path.exists(os.path.join(directory, 'S01-first.py')))
+        self.assertTrue(os.path.exists(
+            os.path.join(project.source_directory, 'S01-first.py')
+        ))
 
         support.run_command('close')
 
@@ -28,7 +30,7 @@ class TestSteps(scaffolds.ResultsTest):
         """
         """
 
-        support.initialize_project(self, 'larry')
+        support.create_project(self, 'larry')
 
         support.run_command('steps add first.py')
 
@@ -44,7 +46,9 @@ class TestSteps(scaffolds.ResultsTest):
         """
         """
 
-        directory = support.initialize_project(self, 'lindsey')
+        support.create_project(self, 'lindsey')
+        project = cauldron.project.internal_project
+        directory = project.source_directory
 
         r = support.run_command('steps add first.py')
         self.assertFalse(r.failed, 'should not have failed')
@@ -65,7 +69,7 @@ class TestSteps(scaffolds.ResultsTest):
         """
         """
 
-        support.initialize_project(self, 'angelica')
+        support.create_project(self, 'angelica')
 
         r = support.run_command('steps add first.py')
         self.assertFalse(r.failed, 'should not have failed')
@@ -82,7 +86,7 @@ class TestSteps(scaffolds.ResultsTest):
 
         STEP_COUNT = 6
 
-        support.initialize_project(self, 'bellatrix')
+        support.create_project(self, 'bellatrix')
         results = [support.run_command('steps add') for i in range(STEP_COUNT)]
 
         if any([r.failed for r in results]):
@@ -103,7 +107,7 @@ class TestSteps(scaffolds.ResultsTest):
         """
         """
 
-        support.initialize_project(self, 'angelica')
+        support.create_project(self, 'angelica')
         r = support.run_command('steps list')
         self.assertEqual(len(r.data['steps']), 0, Message(
             'New project should have no steps to list',
@@ -125,7 +129,7 @@ class TestSteps(scaffolds.ResultsTest):
         :return:
         """
 
-        support.initialize_project(self, 'gina')
+        support.create_project(self, 'gina')
         support.add_step(self, 'a.py')
         support.add_step(self, 'b.py')
 
@@ -155,7 +159,7 @@ class TestSteps(scaffolds.ResultsTest):
         :return:
         """
 
-        support.initialize_project(self, 'harvey')
+        support.create_project(self, 'harvey')
         support.add_step(self, contents='#S1')
         support.add_step(self, contents='#S2')
 

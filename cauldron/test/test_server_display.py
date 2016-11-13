@@ -10,6 +10,7 @@ class TestServerDisplay(scaffolds.ResultsTest):
     """
 
     def setUp(self):
+        super(TestServerDisplay, self).setUp()
         self.app = server.server_run.APPLICATION.test_client()
 
     def test_view_no_project(self):

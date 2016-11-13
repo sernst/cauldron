@@ -2,6 +2,10 @@ import threading
 import uuid
 
 
+class ThreadAbortError(Exception):
+    pass
+
+
 class CauldronThread(threading.Thread):
 
     def __init__(self, *args, **kwargs):
@@ -17,16 +21,21 @@ class CauldronThread(threading.Thread):
         self.kwargs = None
         self.result = None
         self.response = None
+        self.is_executing = False
+        self.exception = None
 
     def run(self):
         """
         """
 
-        self.result = self.command(
-            parser=self.parser,
-            response=self.response,
-            **self.kwargs
-        )
+        try:
+            self.result = self.command(
+                parser=self.parser,
+                response=self.response,
+                **self.kwargs
+            )
+        except Exception as err:
+            self.exception = err
 
 
 def abort_thread():
@@ -44,5 +53,5 @@ def abort_thread():
     if not isinstance(thread, CauldronThread):
         return
 
-    if thread.abort:
-        raise RuntimeError('User Aborted Execution')
+    if thread.is_executing and thread.abort:
+        raise ThreadAbortError('User Aborted Execution')

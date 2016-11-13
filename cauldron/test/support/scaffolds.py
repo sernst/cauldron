@@ -4,6 +4,7 @@ import unittest
 import json
 
 from cauldron import environ
+from cauldron.cli import commander
 
 
 class ResultsTest(unittest.TestCase):
@@ -15,12 +16,19 @@ class ResultsTest(unittest.TestCase):
 
     def setUp(self):
         super(ResultsTest, self).setUp()
-        results_directory = tempfile.mkdtemp(prefix='cauldron_test')
-        environ.configs.put(results_directory=results_directory)
+        results_directory = tempfile.mkdtemp(
+            prefix='cd-test-results-{}--'.format(self.__class__.__name__)
+        )
+        self.results_directory = results_directory
+        environ.configs.put(results_directory=results_directory, persists=False)
         self.temp_directories = dict()
 
     def tearDown(self):
         super(ResultsTest, self).tearDown()
+
+        # Close any open project so that it doesn't persist to the next test
+        commander.execute('close', '')
+
         environ.configs.remove('results_directory', include_persists=False)
 
         environ.systems.remove(self.results_directory)
@@ -39,7 +47,7 @@ class ResultsTest(unittest.TestCase):
 
         if identifier not in self.temp_directories:
             self.temp_directories[identifier] = tempfile.mkdtemp(
-                prefix='cauldron_test_{}'.format(identifier)
+                prefix='cd-test-{}'.format(identifier)
             )
 
         return os.path.realpath(

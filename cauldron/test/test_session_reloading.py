@@ -14,6 +14,7 @@ class TestSessionReloading(scaffolds.ResultsTest):
     """
 
     def setUp(self):
+        super(TestSessionReloading, self).setUp()
         support.run_command('close')
 
     def test_watch_bad_argument(self):

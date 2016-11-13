@@ -14,6 +14,7 @@ class TestServer(scaffolds.ResultsTest):
     """
 
     def setUp(self):
+        super(TestServer, self).setUp()
         self.app = server.server_run.APPLICATION.test_client()
 
     def test_execute(self):

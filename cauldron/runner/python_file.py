@@ -1,6 +1,6 @@
 import os
 import sys
-import time
+import threading
 import traceback
 import types
 from importlib.abc import InspectLoader
@@ -9,10 +9,24 @@ from cauldron import environ
 from cauldron import templating
 from cauldron.session.buffering import RedirectBuffer
 from cauldron.session import projects
+from cauldron.cli import threads
 
 
 class UserAbortError(Exception):
     pass
+
+
+def set_executing(on: bool):
+    """
+
+    :param on:
+    :return:
+    """
+
+    my_thread = threading.current_thread()
+
+    if isinstance(my_thread, threads.CauldronThread):
+        my_thread.is_executing = on
 
 
 def run(
@@ -58,13 +72,21 @@ def run(
     sys.stdout = print_redirect
     step.report.print_buffer = print_redirect
 
-    out = None
-
     try:
+        set_executing(True)
+        threads.abort_thread()
+
         exec(code, module.__dict__)
+        out = None
+    except threads.ThreadAbortError:
+        out = {'success': False}
+        step.mark_dirty(True)
+    except UserAbortError:
+        out = None
     except Exception as error:
-        if not isinstance(error, UserAbortError):
-            out = render_error(project, error)
+        out = render_error(project, error)
+
+    set_executing(False)
 
     if out is None:
         step.mark_dirty(False)
@@ -83,7 +105,7 @@ def render_syntax_error(
         project: 'projects.Project',
         code: str,
         error: SyntaxError
-):
+) -> dict:
     """
 
     :param project:

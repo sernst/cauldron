@@ -110,23 +110,23 @@ def remove(path: str):
         return True
 
     if os.path.isfile(path):
-        try:
-            os.remove(path)
-        except Exception:
+        for attempt in range(3):
             try:
                 os.remove(path)
-            except Exception:
-                return False
-        return True
+                return True
+            except Exception as err:
+                pass
 
-    try:
-        shutil.rmtree(path)
-    except Exception:
+        return False
+
+    for attempt in range(3):
         try:
             shutil.rmtree(path)
-        except Exception:
-            return False
-    return True
+            return True
+        except Exception as err:
+            pass
+
+    return False
 
 
 def end(code: int):

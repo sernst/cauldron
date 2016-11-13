@@ -34,6 +34,7 @@ def close():
     :return:
     """
 
+    os.chdir(os.path.expanduser('~'))
     project = cauldron.project.internal_project
     if not project:
         return False
@@ -115,6 +116,7 @@ def complete(
     Runs the entire project, writes the results files, and returns the URL to
     the report file
 
+    :param response:
     :param project:
     :param starting:
     :param force:

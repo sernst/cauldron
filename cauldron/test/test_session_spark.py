@@ -5,10 +5,10 @@ from cauldron.session import spark
 from cauldron.test.support import scaffolds
 
 
-class TestSessionReloading(scaffolds.ResultsTest):
+class TestSessionSpark(scaffolds.ResultsTest):
 
     def setUp(self):
-        super(TestSessionReloading, self).setUp()
+        super(TestSessionSpark, self).setUp()
 
     def test_init_no_spark(self):
         """

@@ -86,6 +86,7 @@ def run_step(
     [x.mark_dirty(True) for x in project.steps[(step.index + 1):]]
 
     result = python_file.run(project, step)
+    os.chdir(os.path.expanduser('~'))
 
     if result['success']:
         step.last_modified = time.time()

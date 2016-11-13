@@ -6,11 +6,6 @@ from cauldron import environ
 
 class TestTemplating(unittest.TestCase):
 
-    def setUp(self):
-        """
-        """
-        pass
-
     def test_id_filter(self):
         """
         """

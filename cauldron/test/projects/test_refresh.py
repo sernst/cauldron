@@ -43,7 +43,7 @@ class TestRefresh(scaffolds.ResultsTest):
 
         STEP_NAME = 'S01-FAKE.py'
 
-        support.initialize_project(self, 'draco')
+        support.create_project(self, 'draco')
 
         project_data = self.read_project_file()
         project_data['steps'].append(STEP_NAME)
@@ -61,7 +61,7 @@ class TestRefresh(scaffolds.ResultsTest):
         Project should update with a results path that matches the source path
         """
 
-        support.initialize_project(self, 'lucius')
+        support.create_project(self, 'lucius')
 
         project = cd.project.internal_project
         project_data = self.read_project_file()
@@ -78,7 +78,7 @@ class TestRefresh(scaffolds.ResultsTest):
         Project should recognize the additional python path
         """
 
-        support.initialize_project(self, 'cassie')
+        support.create_project(self, 'cassie')
 
         project = cd.project.internal_project
         project_data = self.read_project_file()

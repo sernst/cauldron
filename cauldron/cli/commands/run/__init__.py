@@ -12,9 +12,11 @@ from cauldron.session import writing
 from cauldron.environ import Response
 
 NAME = 'run'
-DESCRIPTION = cli.reformat("""
+DESCRIPTION = cli.reformat(
+    """
     Runs one or more steps within the currently opened project
-    """)
+    """
+)
 
 
 def populate(

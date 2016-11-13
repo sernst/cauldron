@@ -12,7 +12,7 @@ class TestRunner(scaffolds.ResultsTest):
         """
         """
 
-        support.initialize_project(self, 'brad')
+        support.create_project(self, 'brad')
         support.add_step(
             self, 'brad_one.py', cli.reformat(
                 """
