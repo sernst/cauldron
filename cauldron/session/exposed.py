@@ -6,6 +6,7 @@ from cauldron.session.caching import SharedCache
 from cauldron.session import report
 from cauldron import environ
 from cauldron.runner.python_file import UserAbortError
+from cauldron.cli import threads
 
 
 class ExposedProject(object):
@@ -153,3 +154,13 @@ class ExposedStep(object):
         step = self._step
         if step:
             raise UserAbortError()
+
+    def breathe(self):
+        """
+        Checks the current execution state for the running step and responds
+        to any changes in that state. Particular useful for checking to see
+        if a step has been aborted by the user during long-running executions.
+        """
+
+        if self._step:
+            threads.abort_thread()
