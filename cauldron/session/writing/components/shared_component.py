@@ -20,14 +20,13 @@ def create(name: str) -> COMPONENT:
 
     glob_path = os.path.join(component_directory, '**', '*')
 
-    web_includes = map(
-        functools.partial(to_web_include, component_directory),
-        glob.iglob(glob_path, recursive=True)
-    )
+    web_includes = []
+    for file_path in glob.iglob(glob_path, recursive=True):
+        web_includes.append(to_web_include(name, file_path))
 
     return COMPONENT(
         files=[],
-        includes=filter(lambda w: w is not None, web_includes)
+        includes=list(filter(lambda w: w is not None, web_includes))
     )
 
 
@@ -56,15 +55,19 @@ def to_web_include(component_name: str, file_path: str) -> WEB_INCLUDE:
         return None
 
     component_directory = get_component_directory(component_name)
-    slug = file_path[len(component_directory):]
+    slug = (
+        file_path[len(component_directory):]
+        .replace('\\', '/')
+        .strip('/')
+    )
 
     # web includes that start with a : are relative to the root
     # results folder, not the project itself. They are for shared
     # resource files
-    WEB_INCLUDE(
+    return WEB_INCLUDE(
         name='components-{}-{}'.format(
             component_name,
-            slug.strip('/').replace('/', '_').replace('.', '_')
+            slug.replace('/', '_').replace('.', '_')
         ),
-        src=':components/{}{}'.format(component_name, slug)
+        src=':components/{}/{}'.format(component_name, slug)
     )

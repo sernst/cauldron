@@ -24,9 +24,11 @@ def get(step: 'projects.ProjectStep') -> COMPONENT:
 
         return shared_component.create(lib_name)
 
+    components = list(map(get_components, step.report.library_includes))
+
     return definitions.merge_components(
         project_component.create_many(step.project, step.web_includes),
-        *map(get_components, step.report.library_includes),
+        *components,
     )
 
 

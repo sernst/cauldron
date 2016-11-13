@@ -6,13 +6,17 @@ from setuptools import find_packages
 
 # python3 setup.py register -r pypitest
 
+# UNIX:
 # rm -rf ./dist
-# rmdir dist /s /q
-#
 # python3 setup.py sdist bdist_wheel
 # twine upload dist/cauldron*
-#
-# conda build conda.recipe/
+# python3 conda-recipe/conda-builder.py
+
+# WINDOWS:
+# rmdir dist /s /q
+# python setup.py sdist bdist_wheel
+# twine upload dist/cauldron*
+# python conda-recipe\conda-builder.py
 
 MY_DIRECTORY = os.path.dirname(__file__)
 with open(os.path.join(MY_DIRECTORY, 'cauldron', 'settings.json'), 'r+') as f:
