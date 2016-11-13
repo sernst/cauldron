@@ -29,7 +29,14 @@ def save(
         The file write list that was used to save the project to disk
     """
 
-    writes = to_write_list(project) if write_list is None else write_list.copy()
+    try:
+        writes = (
+            to_write_list(project)
+            if write_list is None
+            else write_list.copy()
+        )
+    except Exception as err:
+        raise
 
     environ.systems.remove(project.output_directory)
     os.makedirs(project.output_directory)

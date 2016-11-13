@@ -77,7 +77,7 @@ def get_cached_data(
         return None
 
     file_writes = [
-        file_io.entry_from_dict(**fw)
+        file_io.entry_from_dict(fw)
         for fw in cached_data['file_writes']
     ]
 
