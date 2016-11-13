@@ -23,3 +23,7 @@ def run():
     from cauldron.cli.server import run
 
     run.execute(**run.parse())
+
+
+if __name__ == '__main__':
+    run()

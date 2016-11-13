@@ -25,7 +25,6 @@ def run():
     from cauldron import environ
     from cauldron.cli import batcher
 
-
     parser = ArgumentParser(
         description='Cauldron'
     )
@@ -73,3 +72,7 @@ def run():
         sys.exit(0)
 
     CauldronShell().cmdloop()
+
+
+if __name__ == '__main__':
+    run()
