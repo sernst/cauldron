@@ -49,8 +49,6 @@ function doSelectionUpdate() {
     return;
   }
 
-  console.log('SELECTED:', step);
-
   $('.body-wrapper')
     .find('.cd-project-step')
     .each((index, e) => {
@@ -74,8 +72,6 @@ function updateSelectedStep(step) {
   if (step) {
     selectedStep = step;
   }
-
-  console.log('UPDATING SELECTED:', selectedStep);
 
   if (selectionTimeout) {
     return Promise.resolve(selectedStep);

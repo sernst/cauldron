@@ -45,6 +45,11 @@ def close():
 
 
 def reload_libraries():
+    """
+    Reload the libraries stored in the project's library directory
+    :return:
+    """
+
     project = cauldron.project.internal_project
 
     directory = project.library_directory

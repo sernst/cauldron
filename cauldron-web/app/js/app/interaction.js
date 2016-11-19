@@ -5,23 +5,38 @@ window.CAULDRON = exports;
 
 
 /**
+ * Scrolls the display to the location specified by the step name
  *
- * @param name
+ * @param stepName
+ *  The name of the step to scroll the display to
  * @param location
+ *  The named location where the scroll should be located. Accepted values
+ *  include:
+ *   * 'end' to scroll to show the bottom of the step
+ *   * 'error' to scroll to show the error in the step (if any)
+ *   * null to scroll to show the top of the step (default)
  * @param animationSpeed
+ *  The enumerated animation speed, 'fast' or 'slow'. The default is slow.
  */
-function scrollToAnchor(name, location, animationSpeed) {
+function scrollToAnchor(stepName, location, animationSpeed) {
+  const windowHeight = $(window).height();
   const stepDom = $('.body-wrapper')
-    .find(`.cd-project-step[data-step-name='${name}']`);
+    .find(`.cd-project-step[data-step-name='${stepName}']`);
 
   // Don't use locations if the step dom height is short
-  const isShortDom = stepDom.height() < ($(window).height() - 100);
-  const anchorName = (isShortDom || !location) ? name : `${name}--${location}`;
+  const isShortDom = stepDom.height() < (windowHeight - 100);
+  const anchorName = (location && !isShortDom)
+    ? `${stepName}--${location}`
+    : stepName;
 
   function getOffset() {
+    if (isShortDom) {
+      return 0;
+    }
+
     switch (location) {
       case 'end':
-        return $(window).height() - 100;
+        return windowHeight - 100;
       default:
         return 0;
     }
@@ -30,6 +45,17 @@ function scrollToAnchor(name, location, animationSpeed) {
   const body = $('body');
   const aTag = $(`a[name='${anchorName}']`);
   const scrollTop = (aTag.offset().top - getOffset()) + body.scrollTop();
+
+  // console.log('SCROLLING:', {
+  //   name,
+  //   location,
+  //   animationSpeed,
+  //   scrollTop,
+  //   windowHeight,
+  //   isShortDom,
+  //   anchorName,
+  //   stepHeight: stepDom.height()
+  // });
 
   body
     .stop(true)
