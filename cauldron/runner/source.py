@@ -81,6 +81,8 @@ def run_step(
         return True
 
     step.is_running = True
+    step.progress_message = None
+    step.progress = 0
 
     # Mark the downstream steps as dirty because this one has run
     [x.mark_dirty(True) for x in project.steps[(step.index + 1):]]
@@ -104,6 +106,8 @@ def run_step(
         )
 
     step.is_running = False
+    step.progress = 0
+    step.progress_message = None
     step.dumps()
 
     return result['success']

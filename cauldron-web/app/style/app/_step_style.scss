@@ -1,0 +1,30 @@
+$PROGRESS_COLOR: #769bc7;
+
+.cd-step-status {
+  background-color: #ddebff;
+  margin: 20px;
+  padding: 5px;
+
+  &__header {
+    color: $PROGRESS_COLOR;
+    font-size: 12px;
+    padding: 5px;
+  }
+
+  &__info {
+    color: $PROGRESS_COLOR;
+    padding: 10px;
+  }
+
+  &__progress {
+    height: 15px;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+
+  &__progress-inner {
+    height: 15px;
+    background-color: $PROGRESS_COLOR;
+  }
+}

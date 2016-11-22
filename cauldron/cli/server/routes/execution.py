@@ -138,7 +138,7 @@ def execute(async: bool = False):
                 .update(
                     run_status='running',
                     run_uid=r.thread.uid,
-                    step_changes=server_runner.get_running_step_changes(),
+                    step_changes=server_runner.get_running_step_changes(True),
                     server=server_runner.get_server_data()
                 )
                 .serialize()

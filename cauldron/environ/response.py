@@ -230,7 +230,7 @@ class Response(object):
 
         return '\n'.join(out)
 
-    def consume(self, other: 'Response'):
+    def consume(self, other: typing.Union['Response', 'ResponseMessage']):
         """
 
         :param other:
@@ -244,19 +244,21 @@ class Response(object):
             # Do nothing if there is no other
             return self
 
+        source = other.response if isinstance(other, ResponseMessage) else other
+
         def either(a, b):
             return a if a else b
 
-        self.identifier = either(self.identifier, other.identifier)
-        self.failed = self.failed or other.failed
-        self.ended = self.ended or other.ended
-        self.data.update(other.data)
-        self.messages += other.messages
-        self.errors += other.errors
-        self.warnings += other.warnings
-        self.thread = either(self.thread, other.thread)
+        self.identifier = either(self.identifier, source.identifier)
+        self.failed = self.failed or source.failed
+        self.ended = self.ended or source.ended
+        self.data.update(source.data)
+        self.messages += source.messages
+        self.errors += source.errors
+        self.warnings += source.warnings
+        self.thread = either(self.thread, source.thread)
 
-        other.parent = self
+        source.parent = self
 
         return self
 

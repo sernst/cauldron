@@ -71,7 +71,7 @@ def _assemble_component(
             src='/{}'.format('/'.join(slug))
         )],
         files=[file_io.FILE_WRITE_ENTRY(
-            path=os.path.join(project.output_path, *slug),
+            path=os.path.join(project.output_directory, *slug),
             contents='\n'.join(map(_get_file_contents, source_paths))
         )]
     )

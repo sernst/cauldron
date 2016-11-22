@@ -148,7 +148,7 @@ def serialize(step: 'projects.ProjectStep') -> STEP_DATA:
     """
 
     def disable_caching():
-        return step.last_modified or step.error
+        return step.is_running or step.last_modified or step.error
 
     cached = None if disable_caching() else get_cached_data(step)
     if cached:

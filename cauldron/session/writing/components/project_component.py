@@ -44,7 +44,7 @@ def create(
     return COMPONENT(
         includes=filter(
             lambda web_include: web_include is not None,
-            map(to_web_include, include_paths)
+            map(functools.partial(to_web_include, project), include_paths)
         ),
         files=[file_io.FILE_COPY_ENTRY(
             source=source_path,

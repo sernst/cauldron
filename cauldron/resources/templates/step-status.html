@@ -1,0 +1,36 @@
+<div class="cd-step-status">
+  <a class="step-anchor" name="{{ id }}--status" data-type="--status"></a>
+
+  <div class="cd-step-status__header">Current Run Status:</div>
+
+  {% if progress_message %}
+  <div class="cd-step-status__info">
+      {{ progress_message }}
+  </div>
+  {% endif %}
+
+  {% if progress > 0 %}
+  <div class="cd-step-status__progress">
+    <div
+      class="cd-step-status__progress-inner"
+      style="width:{{ progress }}%"
+    ></div>
+  </div>
+  {% endif %}
+
+  {% if sub_progress_message %}
+  <div class="cd-step-status__header">
+      {{ sub_progress_message }}
+  </div>
+  {% endif %}
+
+  {% if sub_progress > 0 %}
+  <div class="cd-step-status__progress">
+    <div
+      class="cd-step-status__progress-inner"
+      style="width:{{ sub_progress }}%"
+    ></div>
+  </div>
+  {% endif %}
+
+</div>

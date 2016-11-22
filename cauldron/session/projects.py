@@ -52,6 +52,10 @@ class ProjectStep(object):
         self.error = None
         self.is_muted = False
         self.dom = None
+        self.progress_message = None
+        self.sub_progress_message = None
+        self.progress = 0
+        self.sub_progress = 0
 
     @property
     def reference_id(self):
@@ -215,7 +219,12 @@ class ProjectStep(object):
             subtitle=self.report.subtitle,
             summary=self.report.summary,
             error=self.error,
-            index=self.index
+            index=self.index,
+            is_running=self.is_running,
+            progress_message=self.progress_message,
+            progress=int(round(max(0, min(100, 100 * self.progress)))),
+            sub_progress_message=self.sub_progress_message,
+            sub_progress=int(round(max(0, min(100, 100 * self.sub_progress))))
         )
 
         if not self.is_running:

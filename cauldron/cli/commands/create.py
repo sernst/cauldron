@@ -225,7 +225,7 @@ def execute(
             whitespace=1
         ).response
 
-    project_opener.open_project(response, directory, forget=forget)
+    response.consume(project_opener.open_project(directory, forget=forget))
 
     return response
 

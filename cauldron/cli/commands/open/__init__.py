@@ -133,12 +133,11 @@ def execute(
         p = actions.fetch_location(response, path)
         path = p if p else path
 
-    opener.open_project(
-        response=response,
+    response.consume(opener.open_project(
         path=path,
         forget=forget,
         results_path=results_path
-    )
+    ))
 
     if not response.failed and show_in_browser:
         cli.open_in_browser(cauldron.project.internal_project)

@@ -22,10 +22,10 @@ function loadSourceFile(include) {
 
   if (/.*\.css$/.test(filename)) {
     // Load Style sheet files
-    return new Promise(function (resolve) {
-      var link = document.createElement('link');
+    return new Promise((resolve) => {
+      const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.onload = resolve;
+      link.onload = (() => resolve(link));
       link.href = filename + noCache;
       link.id = include.name;
       document.head.appendChild(link);
@@ -34,9 +34,9 @@ function loadSourceFile(include) {
 
   if (/.*\.js$/.test(filename)) {
     // Load Javascript files
-    return new Promise(function (resolve) {
-      var script = document.createElement('script');
-      script.onload = resolve;
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.onload = (() => resolve(script));
       script.src = filename + noCache;
       script.id = include.name;
       document.head.appendChild(script);
@@ -58,11 +58,7 @@ function loadSourceFiles(includes) {
     return Promise.resolve([]);
   }
 
-  var proms = [];
-  includes.forEach(function (include) {
-    proms.push(exports.loadSourceFile(include));
-  });
-
+  const proms = includes.map(include => exports.loadSourceFile(include));
   return Promise.all(proms);
 }
 exports.loadSourceFiles = loadSourceFiles;
@@ -76,14 +72,9 @@ function loadStepIncludes(steps) {
     return Promise.resolve([]);
   }
 
-  var proms = [];
-  steps.forEach(function (step) {
-    if (!step) {
-      return;
-    }
-
-    proms.push(exports.loadSourceFiles(step.includes))
-  });
+  const proms = steps
+    .filter(step => step)
+    .map(step => exports.loadSourceFiles(step.includes));
 
   return Promise.all(proms);
 }

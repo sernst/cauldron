@@ -103,19 +103,19 @@ def write_results(response, project):
 
 
 def open_project(
-        response: Response,
         path: str,
         forget: bool = False,
         results_path: str = None
-) -> bool:
+) -> Response:
     """
 
-    :param response:
     :param path:
     :param forget:
     :param results_path:
     :return:
     """
+
+    response = Response()
 
     try:
         runner.close()
@@ -125,13 +125,22 @@ def open_project(
     path = environ.paths.clean(path)
 
     if not project_exists(response, path):
-        return False
+        return response.fail(
+            code='PROJECT_NOT_FOUND',
+            message='No project found at: "{}"'.format(path)
+        ).console(whitespace=1).response
 
     if not load_project(response, path):
-        return False
+        return response.fail(
+            code='PROJECT_NOT_LOADED',
+            message='Unable to load project data'
+        ).console(whitespace=1).response
 
     if not forget and not update_recent_paths(response, path):
-        return False
+        return response.fail(
+            code='PROJECT_STATUS_FAILURE',
+            message='Unable to update loaded project status'
+        ).console(whitespace=1).response
 
     project = cauldron.project.internal_project
     if results_path:
@@ -142,12 +151,18 @@ def open_project(
     cauldron.shared = cauldron.project.shared
 
     if not initialize_results(response, project):
-        return False
+        return response.fail(
+            code='PROJECT_INIT_FAILURE',
+            message='Unable to initialize loaded project'
+        ).console(whitespace=1).response
 
     if not write_results(response, project):
-        return False
+        return response.fail(
+            code='PROJECT_WRITE_FAILURE',
+            message='Unable to write project notebook data'
+        ).console(whitespace=1).response
 
-    response.update(
+    return response.update(
         project=project.kernel_serialize()
     ).notify(
         kind='SUCCESS',
@@ -160,6 +175,6 @@ def open_project(
         """
         PATH: {path}
          URL: {url}
-        """.format(path=path, url=project.url),
+        """.format(path=path, url=project.baked_url),
         whitespace=1
     )

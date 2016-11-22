@@ -45,7 +45,7 @@ def get_server_data() -> dict:
     return out
 
 
-def get_running_step_changes() -> list:
+def get_running_step_changes(write: bool = False) -> list:
     """
 
     :return:
@@ -53,16 +53,25 @@ def get_running_step_changes() -> list:
 
     project = cd.project.internal_project
 
-    step_changes = []
-    for ps in project.steps:
-        if ps.is_running:
-            step_changes.append(dict(
-                name=ps.definition.name,
-                action='updated',
-                step=writing.step_writer.serialize(ps)._asdict()
-            ))
+    running_steps = list(filter(
+        lambda step: step.is_running,
+        project.steps
+    ))
 
-    return step_changes
+    def get_changes(step):
+        step_data = writing.step_writer.serialize(step)
+
+        if write:
+            writing.save(project, step_data.file_writes)
+
+        return dict(
+            name=step.definition.name,
+            action='updated',
+            step=step_data._asdict(),
+            written=write
+        )
+
+    return [get_changes(step) for step in running_steps]
 
 
 def parse(args=None):

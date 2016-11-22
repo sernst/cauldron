@@ -2,7 +2,7 @@
      id="{{ "project-step" | id }}"
      data-step-name="{{ id }}"
 >
-  <a class="step-anchor" name="{{ id }}"></a>
+  <a class="step-anchor" name="{{ id }}" data-type=""></a>
   <div class="cd-project-step__header cd-project-step__header--standard"
        data-default-modifier="cd-project-step__header--standard"
   >
@@ -89,9 +89,13 @@
   </div>
   {%  endif %}
 
+  {% if is_running and (progress or progress_message) %}
+    {% include "step-status.html" %}
+  {% endif %}
+
   {% if error %}
-    <a class="step-error-anchor" name="{{ id }}--error"></a>
+    <a class="step-anchor" name="{{ id }}--error" data-type="--error"></a>
     {{ error }}
   {% endif %}
-  <a class="step-end-anchor" name="{{ id }}--end"></a>
+  <a class="step-anchor" name="{{ id }}--end" data-type="--end"></a>
 </div>

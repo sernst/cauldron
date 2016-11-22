@@ -3,6 +3,7 @@ import typing
 import cauldron
 from cauldron.session import report
 from cauldron import render
+from cauldron import environ
 from cauldron.render import texts as render_texts
 from cauldron.render import plots as render_plots
 
@@ -336,3 +337,30 @@ def tail(source, count: int = 5):
     """
 
     _get_report().append_body(render_texts.tail(source, count=count))
+
+
+def status(
+        message: str = None,
+        progress: float = None,
+        section_message: str = None,
+        section_progress: float = None,
+):
+    """
+
+    :param message:
+    :param progress:
+    :param section_message:
+    :param section_progress:
+    """
+
+    environ.abort_thread()
+    step = cauldron.project.internal_project.current_step
+
+    if message is not None:
+        step.progress_message = message
+    if progress is not None:
+        step.progress = max(0, min(1.0, progress))
+    if section_message is not None:
+        step.sub_progress_message = section_message
+    if section_progress is not None:
+        step.sub_progress = section_progress
