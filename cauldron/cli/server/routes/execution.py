@@ -205,3 +205,33 @@ def abort():
         .update(project=project_data)
         .serialize()
     )
+
+
+@server_runner.APPLICATION.route('/shutdown', methods=['GET', 'POST'])
+def shutdown():
+    """
+
+    :return:
+    """
+
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        return flask.jsonify(
+            Response().fail(
+                code='NOT_RUNNING_ERROR',
+                message='Unable to shutdown server'
+            )
+        )
+
+    try:
+        func()
+    except Exception as err:
+        return flask.jsonify(
+            Response().fail(
+                code='SHUTDOWN_ERROR',
+                message='Unable to shutdown server',
+                error=err
+            )
+        )
+
+    return flask.jsonify(Response())
