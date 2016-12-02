@@ -308,6 +308,8 @@ def status(
         out.append(templating.render_template(
             'status-variable.template.html',
             name=key,
+            values=values,
+            types=types,
             type=value_type,
             value=value
         ))

@@ -1,7 +1,7 @@
 Cauldron
 ========
 
-The un-notebook notebook: an interactive scientific analysis environment.
+The Unnotebook: A different kind of data analysis environment.
 
 
 .. image:: https://badge.fury.io/py/cauldron-notebook.svg
@@ -22,6 +22,8 @@ The un-notebook notebook: an interactive scientific analysis environment.
 .. image:: https://badges.gitter.im/gitterHQ/gitter.svg
    :target: https://gitter.im/cauldron-notebook/Lobby
 
+More information about Cauldron, including downloads for the desktop
+application please visit: http://www.unnotebook.com
 
 - `About Cauldron`_
 - `Installation`_
@@ -34,7 +36,7 @@ The un-notebook notebook: an interactive scientific analysis environment.
 About Cauldron
 --------------
 
-Cauldron combines the crucial workflow of notebook-style editing:
+Cauldron integrates notebook-style editing:
 
 - **Data Persistence**: Shared variables are stored in memory between
   executions to avoid having to run every step from the beginning each time.
@@ -43,7 +45,7 @@ Cauldron combines the crucial workflow of notebook-style editing:
 - **Segmented Code Execution**: Code is run in distinct steps (just like
   notebook cells), and you control when and which steps are run.
 
-with the best elements of traditional software development workflow:
+into a traditional software development workflow:
 
 - **Your Choice of IDE**: Modern modern IDEs have excellent productivity
   features like extensive customization, real-time error checking,
@@ -332,9 +334,10 @@ command::
 Programming Guide
 -----------------
 
-There are a few key concepts when programming Cauldron notebooks that differ from traditional
-notebooks. The first is the display. Anything that you want to appear in the notebook from
-text to graphs, must be added to the notebook display:
+There are a few key concepts when programming Cauldron notebooks that differ
+from traditional notebooks. The first is the display. Anything that you want
+to appear in the notebook from text to graphs must be added to the notebook
+display:
 
 .. code-block:: python3
 
@@ -342,11 +345,13 @@ text to graphs, must be added to the notebook display:
 
    cd.display.text('Hello World!')
 
-You access the display from the imported cauldron library as shown in the code example above. The one
-exception is that Python's built-in **print** function will also add text to the display in a monospaced
-font that preserves whitespace just like printing to a console.
+You access the display from the imported cauldron library as shown in the code
+example above. The one exception is that Python's built-in **print** function
+will also add text to the display in a monospaced font that preserves
+whitespace just like printing to a console.
 
-The different display functions that can be used for displaying different types of content include:
+The different display functions that can be used for displaying different
+types of content include:
 
 Display Functions
 ~~~~~~~~~~~~~~~~~
@@ -388,25 +393,26 @@ Display Functions
   - path: The fully-qualified path to the template to be rendered.
   - kwargs: Any keyword arguments that will be use as variable replacements within the template
 
-- **json**: Adds the specified data to the output display window with the specified key. This
-  allows you to make available arbitrary JSON-compatible data to the display for runtime use.
+- **json**: Adds the specified data to the the output display window with the
+    specified key. This allows the user to make available arbitrary
+    JSON-compatible data to the display for runtime use.
 
-  - window_key: The key on the global window object to which this data will be assigned.
-  - data: The data to be assigned to the window object. This data must be serializable as
-    JSON data.
+  - kwargs: Each keyword argument is added to the CD.data object with the
+    specified key and value.
 
-- **latex**: Add a mathematical equation in latex math-mode syntax to the display. Instead of the
-  traditional backslash escape character, the @ character is used instead to prevent backslash
-  conflicts with Python strings. For example, \delta would be @delta.
+- **latex**: Add a mathematical equation in latex math-mode syntax to the
+  display. Instead of the traditional backslash escape character, the @
+  character is used instead to prevent backslash conflicts with Python strings.
+  For example, \delta would be @delta.
 
   - source: The string representing the latex equation to be rendered.
 
-- **listing**: An unordered or ordered bulleted list of the specified *source* iterable where
-  each element is converted to a string representation for display.
+- **listing**: An unordered or ordered list of the specified *source* iterable
+  where each element is converted to a string representation for display.
 
   - source: The iterable to display as a list
-  - ordered: Whether or not the list should be ordered. If False, which is the default, an unordered
-    bulleted list is created.
+  - ordered: Whether or not the list should be ordered. If False, which is the
+    default, an unordered bulleted list is created.
 
 - **markdown**: Renders the source string using markdown and adds the resulting HTML to the display
 

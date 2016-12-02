@@ -1,6 +1,6 @@
 import typing
 
-import cauldron
+import cauldron as _cd
 from cauldron.session import report
 from cauldron import render
 from cauldron import environ
@@ -9,12 +9,9 @@ from cauldron.render import plots as render_plots
 
 
 def _get_report() -> 'report.Report':
-    """
+    """ """
 
-    :return:
-    """
-
-    return cauldron.project.internal_project.current_step.report
+    return _cd.project.internal_project.current_step.report
 
 
 def inspect(source: dict):
@@ -40,30 +37,28 @@ def header(header_text: str, level: int = 1):
     :param level:
         The level of the header, which corresponds to the html header
         levels, such as <h1>, <h2>, ...
-    :return:
     """
 
     r = _get_report()
     r.append_body(render.header(header_text, level=level))
 
 
-def text(text: str, preformatted: bool = False):
+def text(value: str, preformatted: bool = False):
     """
     Adds text to the display. If the text is not preformatted, it will be
     displayed in paragraph format. Preformatted text will be displayed
     inside a pre tag with a monospace font.
 
-    :param text:
+    :param value:
         The text to display
     :param preformatted:
         Whether or not to preserve the whitespace display the text
-    :return:
     """
 
     if preformatted:
-        result = render_texts.preformatted_text(text)
+        result = render_texts.preformatted_text(value)
     else:
-        result = render_texts.text(text)
+        result = render_texts.text(value)
 
     r = _get_report()
     r.append_body(result)
@@ -76,7 +71,9 @@ def markdown(source: str, **kwargs):
 
     :param source:
         A markdown formatted string
-    :return:
+    :param kwargs:
+        Any variable replacements to make within the string using Jinja2
+        templating syntax.
     """
 
     r = _get_report()
@@ -96,7 +93,6 @@ def json(**kwargs):
     :param kwargs:
         Each keyword argument is added to the CD.data object with the
         specified key and value.
-    :return:
     """
 
     r = _get_report()
@@ -116,8 +112,6 @@ def plotly(data, layout: dict, scale: float = 0.5):
         of 0.5 constrains the output to a maximum height equal to half the
         height of browser window when viewed. Values below 1.0 are usually
         recommended so the entire output can be viewed without scrolling.
-
-    :return:
     """
 
     r = _get_report()
@@ -163,8 +157,7 @@ def svg(svg_dom: str, filename: str = None):
         The SVG string data to add to the display
     :param filename:
         An optional filename where the SVG data should be saved within
-        the project results folder.
-    :return:
+        the project results folder
     """
 
     r = _get_report()
@@ -181,10 +174,14 @@ def svg(svg_dom: str, filename: str = None):
 
 def jinja(path, **kwargs):
     """
-    Renders the specified jinja template
+    Renders the specified jinja template to HTML and adds the output to the
+    display
+
     :param path:
+        The fully-qualified path to the template to be rendered.
     :param kwargs:
-    :return:
+        Any keyword arguments that will be use as variable replacements within
+        the template
     """
 
     r = _get_report()
@@ -193,9 +190,10 @@ def jinja(path, **kwargs):
 
 def whitespace(lines: float = 1.0):
     """
+    Adds a specified number of lines of whitespace.
 
     :param lines:
-    :return:
+        The number of lines of whitespace to show.
     """
 
     r = _get_report()
@@ -204,27 +202,30 @@ def whitespace(lines: float = 1.0):
 
 def html(dom: str):
     """
+    A string containing an HTML DOM snippet
 
     :param dom:
-    :return:
+        The HTML string to add to the display
     """
 
     r = _get_report()
     r.append_body(render.html(dom))
 
 
-def workspace(values: bool = True, types: bool = True):
+def workspace(show_values: bool = True, show_types: bool = True):
     """
+    Adds a list of the shared variables currently stored in the project
+    workspace.
 
-    :param values:
-    :param types:
-    :return:
+    :param show_values:
+        When true the values for each variable will be shown in addition to
+        their name
+    :param show_types:
+        When true the data types for each shared variable will be shown in
+        addition to their name
     """
 
     r = _get_report()
-
-    if not r.project:
-        return
 
     data = {}
     for key, value in r.project.shared.fetch(None).items():
@@ -232,16 +233,18 @@ def workspace(values: bool = True, types: bool = True):
             continue
         data[key] = value
 
-    r.append_body(render.status(data, values=values, types=types))
+    r.append_body(render.status(data, values=show_values, types=show_types))
 
 
 def pyplot(
-        figure = None,
+        figure=None,
         scale: float = 0.8,
         clear: bool = True,
         aspect_ratio: typing.Union[list, tuple] = None
 ):
     """
+    Creates a matplotlib plot in the display for the specified figure. The size
+    of the plot is determined automatically to best fit the notebook.
 
     :param figure:
         The matplotlib figure to plot. If omitted, the currently active
@@ -263,20 +266,29 @@ def pyplot(
         for the display of text within the figure. If no aspect ratio is
         specified, the currently assigned values to the plot will be used
         instead.
-    :return:
     """
 
     r = _get_report()
-    r.append_body(render_plots.pyplot(figure, scale=scale))
+    r.append_body(render_plots.pyplot(
+        figure,
+        scale=scale,
+        clear=clear,
+        aspect_ratio=aspect_ratio
+    ))
 
 
 def bokeh(model, scale: float = 0.7, responsive: bool = True):
     """
+    Adds a Bokeh plot model/figure
 
     :param model:
+        The model to be added
     :param scale:
+        How tall the plot should be in the notebook as a fraction of screen
+        height. A number between 0.1 and 1.0.
     :param responsive:
-    :return:
+        Whether or not the plot should responsively scale to fill the width
+        of the notebook. The default it True.
     """
 
     r = _get_report()
@@ -293,10 +305,14 @@ def bokeh(model, scale: float = 0.7, responsive: bool = True):
 
 def listing(source: list, ordered: bool = False):
     """
+    An unordered or ordered list of the specified *source* iterable where
+    each element is converted to a string representation for display.
 
     :param source:
+        The iterable to display as a list
     :param ordered:
-    :return:
+        Whether or not the list should be ordered. If False, which is the
+        default, an unordered bulleted list is created.
     """
 
     r = _get_report()
@@ -305,9 +321,13 @@ def listing(source: list, ordered: bool = False):
 
 def latex(source: str):
     """
+    Add a mathematical equation in latex math-mode syntax to the display.
+    Instead of the traditional backslash escape character, the @ character is
+    used instead to prevent backslash conflicts with Python strings. For
+    example, \delta would be @delta.
 
     :param source:
-    :return:
+        The string representing the latex equation to be rendered.
     """
 
     r = _get_report()
@@ -319,10 +339,17 @@ def latex(source: str):
 
 def head(source, count: int = 5):
     """
+    Displays a specified number of elements in a source object of many
+    different possible types.
 
     :param source:
+        DataFrames will show *count* rows of that DataFrame. A list, tuple or
+        other iterable, will show the first *count* rows. Dictionaries will
+        show *count* keys from the dictionary, which will be randomly selected
+        unless you are using an OrderedDict. Strings will show the first
+        *count* characters.
     :param count:
-    :return:
+        The number of elements to show from the source.
     """
 
     _get_report().append_body(render_texts.head(source, count=count))
@@ -330,10 +357,17 @@ def head(source, count: int = 5):
 
 def tail(source, count: int = 5):
     """
+    The opposite of the head function. Displays the last *count* elements of
+    the *source* object.
 
     :param source:
+        DataFrames will show the last *count* rows of that DataFrame. A list,
+        tuple or other iterable, will show the last *count* rows. Dictionaries
+        will show *count* keys from the dictionary, which will be randomly
+        selected unless you are using an OrderedDict. Strings will show the
+        last *count* characters.
     :param count:
-    :return:
+        The number of elements to show from the source.
     """
 
     _get_report().append_body(render_texts.tail(source, count=count))
@@ -346,15 +380,38 @@ def status(
         section_progress: float = None,
 ):
     """
+    Updates the status display, which is only visible while a step is running.
+    This is useful for providing feedback and information during long-running
+    steps.
+
+    A section progress is also available for cases where long running tasks
+    consist of multiple tasks and you want to display sub-progress messages
+    within the context of the larger status.
+
+    Note: this is only supported when running in the Cauldron desktop
+    application.
 
     :param message:
+        The status message you want to display. If left blank the previously
+        set status message will be retained. Should you desire to remove an
+        existing message, specify a blank string for this argument.
     :param progress:
+        A number between zero and one that indicates the overall progress for
+        the current status. If no value is specified, the previously assigned
+        progress will be retained.
     :param section_message:
+        The status message you want to display for a particular task within a
+        long-running step. If left blank the previously set section message
+        will be retained. Should you desire to remove an existing message,
+        specify a blank string for this argument.
     :param section_progress:
+        A number between zero and one that indicates the progress for the
+        current section status. If no value is specified, the previously
+        assigned section progress value will be retained.
     """
 
     environ.abort_thread()
-    step = cauldron.project.internal_project.current_step
+    step = _cd.project.internal_project.current_step
 
     if message is not None:
         step.progress_message = message
