@@ -4,8 +4,8 @@ Cauldron
 The Unnotebook: A different kind of data analysis environment.
 
 
-.. image:: https://badge.fury.io/py/cauldron-notebook.svg
-   :target: https://badge.fury.io/py/cauldron-notebook
+.. image:: https://img.shields.io/pypi/v/cauldron-notebook.svg
+   :target: https://pypi.python.org/pypi/cauldron-notebook
 
 .. image:: https://anaconda.org/sernst/cauldron/badges/version.svg
    :target: https://anaconda.org/sernst/cauldron
@@ -22,8 +22,10 @@ The Unnotebook: A different kind of data analysis environment.
 .. image:: https://badges.gitter.im/gitterHQ/gitter.svg
    :target: https://gitter.im/cauldron-notebook/Lobby
 
-More information about Cauldron, including downloads for the desktop
-application please visit: http://www.unnotebook.com
+
+For more information about Cauldron, including downloads for the desktop
+application, please visit: http://www.unnotebook.com
+
 
 - `About Cauldron`_
 - `Installation`_
@@ -105,6 +107,12 @@ Cauldron.
 
 Getting Started
 ---------------
+
+Cauldron can be used as either through its Command Line Interface (CLI) or with
+the Cauldron desktop application. For more information about the desktop
+application visit http://www.unnotebook.com where you can find the download
+links and documentation. The rest of this README describes using Cauldron
+directly from the command line.
 
 Cauldron is a shell-based program you start from a terminal. For installations
 that support python script installation you can start Cauldron
