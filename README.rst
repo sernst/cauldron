@@ -349,7 +349,7 @@ display:
 
 .. code-block:: python3
 
-   from cauldron import cd
+   import cauldron as cd
 
    cd.display.text('Hello World!')
 

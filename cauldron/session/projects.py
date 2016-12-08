@@ -41,7 +41,7 @@ class ProjectStep(object):
         self.__class__._reference_index += 1
         self._reference_id = '{}'.format(self.__class__._reference_index)
 
-        self.definition = definition
+        self.definition = definition if definition is not None else dict()
         self.project = project
         self.report = Report(self)
 
@@ -94,7 +94,7 @@ class ProjectStep(object):
         return self.project.steps.index(self)
 
     @property
-    def source_path(self) -> str:
+    def source_path(self) -> typing.Union[None, str]:
         if not self.project or not self.report:
             return None
         return os.path.join(self.project.source_directory, self.filename)
@@ -322,50 +322,44 @@ class Project(object):
 
     @property
     def id(self) -> str:
-        if self.settings:
-            return self.settings.fetch('id', 'unknown')
-        return 'unknown'
+        return self.settings.fetch('id', 'unknown')
 
     @property
     def naming_scheme(self) -> str:
-        if self.settings:
-            return self.settings.fetch('naming_scheme', None)
-        return None
+        return self.settings.fetch('naming_scheme', None)
 
     @naming_scheme.setter
-    def naming_scheme(self, value):
-        if self.settings:
-            self.settings.put(naming_scheme=value)
+    def naming_scheme(self, value: typing.Union[str, None]):
+        self.settings.put(naming_scheme=value)
 
     @property
-    def current_step(self) -> ProjectStep:
-        if self._current_step:
-            return self._current_step
-        return self.steps[0] if self.steps else None
+    def current_step(self) -> typing.Union[ProjectStep, None]:
+        if len(self.steps) < 1:
+            return None
+
+        step = self._current_step
+        return step if step else self.steps[0]
 
     @current_step.setter
     def current_step(self, value: typing.Union[Report, None]):
         self._current_step = value
 
     @property
-    def source_path(self) -> str:
-        if not self.source_directory:
-            return None
-        return os.path.join(self.source_directory, 'cauldron.json')
+    def source_path(self) -> typing.Union[None, str]:
+        directory = self.source_directory
+        return os.path.join(directory, 'cauldron.json') if directory else None
 
     @property
     def results_path(self) -> str:
-        if self._results_path:
-            return self._results_path
+        """The path where the project results will be written"""
 
-        if self.settings and self.settings.fetch('path_results'):
-            return self.settings['path_results']
+        def possible_paths():
+            yield self._results_path
+            yield self.settings.fetch('path_results')
+            yield environ.configs.fetch('results_directory')
+            yield environ.paths.results(self.uuid)
 
-        p = environ.configs.fetch('results_directory')
-        if p:
-            return p
-
-        return environ.paths.results(self.uuid)
+        return next(p for p in possible_paths() if p is not None)
 
     @results_path.setter
     def results_path(self, value: str):
@@ -377,9 +371,6 @@ class Project(object):
         Returns the URL that will open this project results file in the browser
         :return:
         """
-
-        if not self.results_path:
-            return None
 
         return 'file://{path}?id={id}'.format(
             path=os.path.join(self.results_path, 'project.html'),
@@ -395,9 +386,6 @@ class Project(object):
         windows
         """
 
-        if not self.results_path:
-            return None
-
         return 'file://{path}'.format(
             path=os.path.join(self.results_path, 'display.html'),
             id=self.uuid
@@ -410,12 +398,7 @@ class Project(object):
         :return:
         """
 
-        if not self.results_path:
-            return None
-
-        return os.path.join(
-            self.results_path, 'reports', self.uuid, 'latest'
-        )
+        return os.path.join(self.results_path, 'reports', self.uuid, 'latest')
 
     @property
     def output_path(self) -> str:
@@ -423,9 +406,6 @@ class Project(object):
         Returns the full path to where the results.js file will be written
         :return:
         """
-
-        if not self.results_path:
-            return None
 
         return os.path.join(self.output_directory, 'results.js')
 
@@ -450,17 +430,18 @@ class Project(object):
         :return:
         """
 
-        if not self.results_path:
-            return None
-
         return os.path.join(self.output_directory, '..', 'snapshots', *args)
 
-    def snapshot_url(self, snapshot_name: str) -> str:
+    def snapshot_url(self, snapshot_name: str) -> typing.Union[None, str]:
         """
 
         :param snapshot_name:
         :return:
         """
+
+        url = self.url
+        if url is None:
+            return None
 
         return '{}&sid={}'.format(self.url, snapshot_name)
 

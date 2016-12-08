@@ -1,11 +1,10 @@
-import sys
-from unittest import mock
 import json
+import sys
 
 import cauldron as cd
+from cauldron.session import projects
 from cauldron.test import support
 from cauldron.test.support import scaffolds
-from cauldron.session import projects
 
 
 class TestRefresh(scaffolds.ResultsTest):
