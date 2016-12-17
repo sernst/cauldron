@@ -1,0 +1,8 @@
+{
+  "id": "step-testing",
+  "naming_scheme": "S{{##}}-{{name}}.{{ext}}",
+  "steps": [
+    "S01-first.py",
+    "S02-second.py"
+  ]
+}

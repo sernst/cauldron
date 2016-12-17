@@ -108,3 +108,5 @@ class Report(object):
 
         if len(contents) > 0:
             self.body.append(render_texts.preformatted_text(contents))
+
+        return contents

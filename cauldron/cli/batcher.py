@@ -34,13 +34,14 @@ def initialize_logging_path(path: str = None) -> str:
 def run_project(
         project_directory: str,
         output_directory: str = None,
-        log_path: str = None
+        log_path: str = None,
+        shared_data: dict = None
 ) -> environ.Response:
     log_path = initialize_logging_path(log_path)
 
     logger.add_output_path(log_path)
 
-    def onComplete(message: str = None) -> environ.Response:
+    def on_complete(message: str = None) -> environ.Response:
         if message:
             logger.log(message)
         logger.remove_output_path(log_path)
@@ -56,17 +57,18 @@ def run_project(
         results_path=output_directory
     )
     if response.failed:
-        return onComplete('[ERROR]: Aborted trying to open project')
+        return on_complete('[ERROR]: Aborted trying to open project')
 
-    output_directory = cauldron.project.internal_project.results_path
+    project = cauldron.project.internal_project
+    project.shared.put(**(shared_data if shared_data is not None else dict()))
 
     commander.preload()
     run_command.execute(parser, response)
     if response.failed:
-        return onComplete('[ERROR]: Aborted trying to run project steps')
+        return on_complete('[ERROR]: Aborted trying to run project steps')
 
     close_command.execute(parser, response)
     if response.failed:
-        return onComplete('[ERROR]: Failed to close project cleanly after run')
+        return on_complete('[ERROR]: Failed to close project cleanly after run')
 
-    return onComplete('Project execution complete')
+    return on_complete('Project execution complete')

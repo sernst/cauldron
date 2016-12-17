@@ -68,7 +68,7 @@ def run(
     # BytesIO buffer. This is needed so that we can safely access the buffer
     # data in a multi-threaded environment to display updates while the buffer
     # is being written to.
-    print_redirect = RedirectBuffer()
+    print_redirect = RedirectBuffer(sys.stdout)
     sys.stdout = print_redirect
     step.report.print_buffer = print_redirect
 
@@ -94,7 +94,7 @@ def run(
 
     # Restore the print buffer
     sys.stdout = sys.__stdout__
-    step.report.flush_prints()
+    print(step.report.flush_prints())
     print_redirect.close()
     step.report.print_buffer = None
 

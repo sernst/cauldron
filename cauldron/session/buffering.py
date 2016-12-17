@@ -6,11 +6,13 @@ from cauldron.cli.threads import abort_thread
 
 class RedirectBuffer(io.TextIOWrapper):
 
-    def __init__(self):
+    def __init__(self, redirection_source):
         self._bytesBuffer = io.BytesIO()
+        self.redirection_source = redirection_source
+
         super(RedirectBuffer, self).__init__(
             buffer=self._bytesBuffer,
-            encoding=sys.stdout.encoding,
+            encoding=redirection_source.encoding,
             write_through=True
         )
 

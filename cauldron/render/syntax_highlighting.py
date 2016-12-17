@@ -5,6 +5,7 @@ from pygments.lexers import get_lexer_for_filename
 from pygments.lexers import get_lexer_for_mimetype
 from pygments.lexers import guess_lexer
 from pygments.lexers import guess_lexer_for_filename
+from pygments.lexers.templates import DjangoLexer
 from pygments.util import ClassNotFound
 from cauldron import environ
 
@@ -27,10 +28,12 @@ def as_html(
     environ.abort_thread()
 
     lexer = fetch_lexer(source, language, filename, mime_type)
-    if not lexer:
-        return '<div>Unrecognized code</div>'
 
-    return highlight(source, lexer, HtmlFormatter(linenos=True))
+    return highlight(
+        code=source,
+        lexer=lexer if lexer else DjangoLexer(),
+        formatter=HtmlFormatter(linenos=True)
+    )
 
 
 def fetch_lexer(

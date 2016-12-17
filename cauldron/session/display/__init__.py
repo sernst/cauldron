@@ -101,10 +101,10 @@ def json(**kwargs):
 
 def plotly(data, layout: dict, scale: float = 0.5):
     """
-    Creates a plotly plot in the display with the specified data and layout
+    Creates a Plotly plot in the display with the specified data and layout
 
     :param data:
-        The plotly trace data to be plotted
+        The Plotly trace data to be plotted
     :param layout:
         The layout data used for the plot
     :param scale:
@@ -172,9 +172,9 @@ def svg(svg_dom: str, filename: str = None):
     r.files[filename] = svg_dom
 
 
-def jinja(path, **kwargs):
+def jinja(path: str, **kwargs):
     """
-    Renders the specified jinja template to HTML and adds the output to the
+    Renders the specified Jinja2 template to HTML and adds the output to the
     display
 
     :param path:
@@ -190,7 +190,7 @@ def jinja(path, **kwargs):
 
 def whitespace(lines: float = 1.0):
     """
-    Adds a specified number of lines of whitespace.
+    Adds the specified number of lines of whitespace.
 
     :param lines:
         The number of lines of whitespace to show.
@@ -202,7 +202,7 @@ def whitespace(lines: float = 1.0):
 
 def html(dom: str):
     """
-    A string containing an HTML DOM snippet
+    A string containing a valid HTML snippet
 
     :param dom:
         The HTML string to add to the display
@@ -279,16 +279,16 @@ def pyplot(
 
 def bokeh(model, scale: float = 0.7, responsive: bool = True):
     """
-    Adds a Bokeh plot model/figure
+    Adds a Bokeh plot object to the notebook display
 
     :param model:
-        The model to be added
+        The plot object to be added to the notebook display
     :param scale:
         How tall the plot should be in the notebook as a fraction of screen
-        height. A number between 0.1 and 1.0.
+        height. A number between 0.1 and 1.0. The default value is 0.7.
     :param responsive:
         Whether or not the plot should responsively scale to fill the width
-        of the notebook. The default it True.
+        of the notebook. The default is True.
     """
 
     r = _get_report()

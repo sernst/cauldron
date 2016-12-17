@@ -121,17 +121,19 @@ exports.collapse = collapse;
  * @param direction
  */
 function changeFontSize(target, direction) {
+  const codeBox = $(target);
+
   function getSize() {
     if (!direction) {
-      return parseFloat(target.attr('data-font-size-default'));
+      return parseFloat(codeBox.attr('data-font-size-default'));
     }
 
-    const current = parseFloat(target.attr('data-font-size'));
+    const current = parseFloat(codeBox.attr('data-font-size'));
     return Math.max(0.1, current + (direction * 0.1));
   }
 
   const size = getSize();
-  $(target)
+  codeBox
     .attr('data-font-size', size)
     .css('font-size', `${size}em`);
 }

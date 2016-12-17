@@ -30,7 +30,7 @@ class ExposedProject(object):
         return self._project
 
     @property
-    def display(self) -> report.Report:
+    def display(self) -> typing.Union[None, report.Report]:
         """
 
         :return:
@@ -41,7 +41,7 @@ class ExposedProject(object):
         return self._project.current_step.report
 
     @property
-    def shared(self) -> SharedCache:
+    def shared(self) -> typing.Union[None, SharedCache]:
         """
 
         :return:
@@ -52,7 +52,7 @@ class ExposedProject(object):
         return self._project.shared
 
     @property
-    def settings(self) -> SharedCache:
+    def settings(self) -> typing.Union[None, SharedCache]:
         """
 
         :return:
@@ -63,7 +63,7 @@ class ExposedProject(object):
         return self._project.settings
 
     @property
-    def title(self) -> str:
+    def title(self) -> typing.Union[None, str]:
         """
 
         :return:
@@ -74,7 +74,7 @@ class ExposedProject(object):
         return self._project.title
 
     @title.setter
-    def title(self, value: str):
+    def title(self, value: typing.Union[None, str]):
         """
 
         :param value:
@@ -102,7 +102,7 @@ class ExposedProject(object):
 
         self._project = None
 
-    def path(self, *args: typing.List[str]) -> str:
+    def path(self, *args: typing.List[str]) -> typing.Union[None, str]:
         """
         Creates an absolute path in the project source directory from the
         relative path components.
@@ -133,7 +133,7 @@ class ExposedStep(object):
     def _step(self):
         """
         Internal access to the source step. Should not be used outside
-        of Cauldron development
+        of Cauldron development.
 
         :return:
         """

@@ -1,0 +1,1 @@
+from cauldron.docgen.parsing import function as parse_function

@@ -35,10 +35,7 @@ def get_environment_info() -> dict:
 
 
 def run_shell():
-    """
-    Starts the cauldron shell environment for console based interaction
-    :return:
-    """
+    """ Starts the cauldron shell environment for console based interaction """
 
     from cauldron.cli.shell import CauldronShell
     CauldronShell().cmdloop()
@@ -50,38 +47,43 @@ def run_server(port=5010, debug=False, **kwargs):
     host
 
     :param port:
-        The port on which to bind the cauldron server
+        The port on which to bind the cauldron server.
     :param debug:
         Whether or not the server should be run in debug mode. If true, the
         server will echo debugging information during operation.
     :param kwargs:
-    :return:
+        Custom properties to alter the way the server runs.
     """
 
-    from cauldron.cli.server import run as server_runner
-    server_runner.execute(port=port, debug=debug, **kwargs)
+    from cauldron.cli.server import run
+    run.execute(port=port, debug=debug, **kwargs)
 
 
 def run_project(
         project_directory: str,
         output_directory: str = None,
-        logging_path: str = None
+        logging_path: str = None,
+        **kwargs
 ) -> _environ.Response:
     """
     Runs a project as a single command directly within the current Python
     interpreter.
 
     :param project_directory:
-        The fully-qualified path to the directory where the Cauldron project is located
+        The fully-qualified path to the directory where the Cauldron project is
+        located
     :param output_directory:
-        The fully-qualified path to the directory where the results will be written. All of the
-        results files will be written within this directory. If the directory does not exist,
-        it will be created.
+        The fully-qualified path to the directory where the results will be
+        written. All of the results files will be written within this
+        directory. If the directory does not exist, it will be created.
     :param logging_path:
-        The fully-qualified path to a file that will be used for logging. If a directory is
-        specified instead of a file, a file will be created using the default filename of
-        cauldron_run.log. If a file already exists at that location it will be removed and a
-        new file created in its place.
+        The fully-qualified path to a file that will be used for logging. If a
+        directory is specified instead of a file, a file will be created using
+        the default filename of cauldron_run.log. If a file already exists at
+        that location it will be removed and a new file created in its place.
+    :param kwargs:
+        Any variables to be available in the cauldron.shared object during
+        execution of the project can be specified here as keyword arguments.
     :return:
         A response object that contains information about the run process
     """
@@ -90,5 +92,6 @@ def run_project(
     return batcher.run_project(
         project_directory=project_directory,
         output_directory=output_directory,
-        log_path=logging_path
+        log_path=logging_path,
+        shared_data=kwargs
     )
