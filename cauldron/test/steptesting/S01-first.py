@@ -22,4 +22,8 @@ def create_unified_column(data_frame: pd.DataFrame) -> pd.Series:
 
 df['d'] = create_unified_column(df)
 
-cd.shared.df = df
+cd.shared.put(
+    df=df,
+    to_strings=to_strings,
+    create_unified_column=create_unified_column
+)
