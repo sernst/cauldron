@@ -9,7 +9,7 @@
     function heightMaker() {
       return Math.min(
           Math.round({{ scale }} * $(window).height()),
-          26 * data.length
+          Math.round(26 * (data.length + 1.5))
       );
     }
 

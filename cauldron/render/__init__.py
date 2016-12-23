@@ -205,7 +205,7 @@ def table(data_frame, scale: float = 0.7) -> str:
     json_data = json_internal.dumps(data, cls=encoding.ComplexJsonEncoder)
 
     return templating.render_template(
-        'table.html.template',
+        'table.html',
         id=table_id,
         scale=min(0.95, max(0.05, scale)),
         data=json_data,

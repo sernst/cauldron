@@ -89,10 +89,8 @@ def bokeh_plot(
 
     try:
         from bokeh import embed
-        from bokeh.model import Model
     except Exception:
         embed = None
-        Model = None
 
     if responsive:
         model.sizing_mode = "scale_width"

@@ -172,10 +172,19 @@ def run_markdown_file(
     with open(step.source_path, 'r+') as f:
         code = f.read()
 
-    cauldron.display.markdown(code, **project.shared.fetch(None))
-    step.last_modified = time.time()
-    environ.log('[{}]: Updated'.format(step.definition.name))
-    step.mark_dirty(False)
+    try:
+        cauldron.display.markdown(code, **project.shared.fetch(None))
+        step.last_modified = time.time()
+        environ.log('[{}]: Updated'.format(step.definition.name))
+        step.mark_dirty(False)
+    except Exception as err:
+        cauldron.display.html(templating.render_template(
+            'markdown-error.html',
+            error=err
+        ))
+        environ.log('[{}]: Errored'.format(step.definition.name))
+        step.mark_dirty(True)
+
     step.dumps()
 
     return True
