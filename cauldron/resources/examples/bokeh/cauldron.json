@@ -1,5 +1,7 @@
 {
+  "id": "bokeh",
   "steps": [
-    "color_scatter.py"
+    "color_scatter.py",
+    "with-figure.py"
   ]
 }
