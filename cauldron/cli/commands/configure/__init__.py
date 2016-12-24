@@ -69,15 +69,26 @@ def populate(
             """)
     )
 
+    parser.add_argument(
+        '-f', '--forget',
+        dest='forget',
+        action='store_true',
+        default=False,
+        help=cli.reformat("""
+            Specifies that the value should not persist beyond this session.
+            """)
+    )
+
 
 def execute(
         parser: ArgumentParser,
+        response: Response = None,
         key: str = None,
         value: typing.List[str] = None,
         list_all: bool = False,
         remove: bool = False,
-        response: Response = None
-):
+        forget: bool = False
+) -> Response:
     """
 
     :return:
@@ -90,14 +101,16 @@ def execute(
             actions.echo_all()
         else:
             parser.print_help()
-        return
+        return response
+
+    persists = (not forget)
 
     if not value:
         if remove:
-            actions.remove_key(key)
+            actions.remove_key(key, persists=persists)
         else:
             actions.echo_key(key)
     else:
-        actions.set_key(key, value)
+        actions.set_key(key, value, persists=persists)
 
-
+    return response

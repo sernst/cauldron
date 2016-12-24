@@ -3,15 +3,16 @@ import typing
 from cauldron import environ
 
 
-def remove_key(key: str):
+def remove_key(key: str, persists: bool = True):
     """
     Removes the specified key from the cauldron configs if the key exists
 
     :param key:
         The key in the cauldron configs object to remove
+    :param persists:
     """
 
-    environ.configs.remove(key)
+    environ.configs.remove(key, include_persists=persists)
     environ.configs.save()
 
     environ.log(
@@ -19,13 +20,14 @@ def remove_key(key: str):
     )
 
 
-def set_key(key: str, value: typing.List[str]):
+def set_key(key: str, value: typing.List[str], persists: bool = True):
     """
     Removes the specified key from the cauldron configs if the key exists
 
     :param key:
         The key in the cauldron configs object to remove
     :param value:
+    :param persists:
     """
 
     if key.endswith('_path') or key.endswith('_paths'):
@@ -35,7 +37,7 @@ def set_key(key: str, value: typing.List[str]):
     if len(value) == 1:
         value = value[0]
 
-    environ.configs.put(**{key:value})
+    environ.configs.put(**{key: value}, persists=persists)
     environ.configs.save()
     environ.log('[SET]: "{}" to "{}"'.format(key, value))
 

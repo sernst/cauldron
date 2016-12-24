@@ -21,7 +21,7 @@ class ComplexJsonEncoder(json.JSONEncoder):
             return value.total_seconds()
         elif isinstance(value, np.ndarray):
             return value.tolist()
-        elif isinstance(value, (np.int32, np.int64)):
+        elif isinstance(value, (np.int8, np.int16, np.int32, np.int64)):
             return int(value)
         elif isinstance(value, (np.float16, np.float32, np.float64)):
             return float(value)

@@ -10,9 +10,18 @@ from cauldron.environ import paths
 class Configuration(object):
     NO_VALUE = namedtuple('NO_VALUE_NT', [])()
 
-    def __init__(self):
+    def __init__(self, source_path: str = None):
         self._session = {}
         self._persistent = None
+        self._source_path = (
+            os.path.expanduser('~/.cauldron/v1/configs.json')
+            if not source_path else
+            source_path
+        )
+
+    @property
+    def path(self) -> str:
+        return self._source_path
 
     @property
     def session(self) -> dict:
@@ -28,7 +37,7 @@ class Configuration(object):
         out.update(**self.session)
         return out
 
-    def load(self):
+    def load(self, source_path: str = None):
         """
 
         :return:
@@ -37,7 +46,7 @@ class Configuration(object):
         if self.persistent is not None:
             return self
 
-        path = os.path.expanduser('~/.cauldron/v1/configs.json')
+        path = source_path if source_path else self._source_path
         if not os.path.exists(path):
             self._persistent = {}
             return self
@@ -143,11 +152,11 @@ class Configuration(object):
         if data is None:
             return self
 
-        path = os.path.expanduser('~/.cauldron/v1/')
-        if not os.path.exists(path):
-            os.makedirs(path)
+        directory = os.path.dirname(self._source_path)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
 
-        path = os.path.join(path, 'configs.json')
+        path = self._source_path
         with open(path, 'w+') as f:
             json.dump(data, f)
 
