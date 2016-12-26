@@ -1,11 +1,19 @@
 import cauldron as cd
 import pandas as pd
 
+is_testing = cd.mode.is_test()
+is_interactive = cd.mode.is_interactive()
+is_single_run = cd.mode.is_single_run()
+
+
 df = pd.DataFrame({
     'a': [1, 2, 3],
     'b': [True, False, True],
-    'c': ['Hello', 'World', 'Foo']
+    'c': ['Hello', 'World', 'Foo'],
+    'd': [3, None, 5]
 })
+
+df = df.fillna(4)
 
 
 def to_strings(values):
@@ -22,8 +30,5 @@ def create_unified_column(data_frame: pd.DataFrame) -> pd.Series:
 
 df['d'] = create_unified_column(df)
 
-cd.shared.put(
-    df=df,
-    to_strings=to_strings,
-    create_unified_column=create_unified_column
-)
+cd.shared.df = df
+

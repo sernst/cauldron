@@ -16,6 +16,7 @@ shared = _session.project.shared  # type: _SharedCache
 
 display = _display
 refresh = _refresh
+mode = _environ.modes.ExposedModes
 spark = _spark
 
 

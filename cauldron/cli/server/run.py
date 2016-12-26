@@ -139,5 +139,6 @@ def execute(
         log = logging.getLogger('werkzeug')
         log.setLevel(logging.ERROR)
 
+    environ.modes.add(environ.modes.INTERACTIVE)
     APPLICATION.run(port=port, debug=debug, host=host)
-
+    environ.modes.remove(environ.modes.INTERACTIVE)

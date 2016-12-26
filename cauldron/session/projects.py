@@ -56,6 +56,7 @@ class ProjectStep(object):
         self.sub_progress_message = None
         self.progress = 0
         self.sub_progress = 0
+        self.test_locals = None  # type: dict
 
     @property
     def reference_id(self):

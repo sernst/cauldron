@@ -106,3 +106,7 @@ class CauldronShell(cmd.Cmd):
         name, raw_args = parse.split_line(line)
         return commander.autocomplete(name, text, line, begin_index, end_index)
 
+    def cmdloop(self, intro=None):
+        environ.modes.add(environ.modes.INTERACTIVE)
+        super(CauldronShell, self).cmdloop(intro=intro)
+        environ.modes.remove(environ.modes.INTERACTIVE)

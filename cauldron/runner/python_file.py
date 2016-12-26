@@ -40,17 +40,16 @@ def run(
     :return:
     """
 
-    step = project.current_step
     module_name = step.definition.name.rsplit('.', 1)[0]
     module = types.ModuleType(module_name)
 
     with open(step.source_path, 'r+') as f:
-        code = f.read()
+        source_code = f.read()
 
     try:
-        code = InspectLoader.source_to_code(code, step.source_path)
+        code = InspectLoader.source_to_code(source_code, step.source_path)
     except SyntaxError as error:
-        return render_syntax_error(project, code, error)
+        return render_syntax_error(project, source_code, error)
 
     setattr(module, '__file__', step.source_path)
     setattr(
@@ -72,11 +71,19 @@ def run(
     sys.stdout = print_redirect
     step.report.print_buffer = print_redirect
 
+    def exec_test():
+        step.test_locals = dict()
+        step.test_locals.update(module.__dict__)
+        exec(code, step.test_locals)
+
     try:
         set_executing(True)
         threads.abort_thread()
 
-        exec(code, module.__dict__)
+        if environ.modes.has(environ.modes.TESTING):
+            exec_test()
+        else:
+            exec(code, module.__dict__)
         out = None
     except threads.ThreadAbortError:
         out = {'success': False}

@@ -22,6 +22,7 @@ class RedirectBuffer(io.TextIOWrapper):
 
     def write(self, s):
         abort_thread()
+        self.redirection_source.write(s)
         return super(RedirectBuffer, self).write(s)
 
     def close(self):
@@ -38,6 +39,7 @@ class RedirectBuffer(io.TextIOWrapper):
 
     def flush(self, *args, **kwargs):
         abort_thread()
+        self.redirection_source.flush()
         return super(RedirectBuffer, self).flush()
 
     def readline(self, limit=-1):

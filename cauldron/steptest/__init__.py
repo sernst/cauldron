@@ -4,8 +4,12 @@ import unittest
 import typing
 import inspect
 
+import cauldron as cd
 from cauldron import environ
+from cauldron.session import projects
+from cauldron.session import exposed
 from cauldron.cli import commander
+from cauldron.session.caching import SharedCache
 
 
 def find_project_directory(subdirectory: str) -> typing.Union[str, None]:
@@ -34,6 +38,26 @@ def find_project_directory(subdirectory: str) -> typing.Union[str, None]:
     return find_project_directory(parent)
 
 
+class StepTestRunResult:
+
+    def __init__(
+            self,
+            step: 'projects.ProjectStep',
+            response: 'environ.Response'
+    ):
+        self._step = step  # type: projects.ProjectStep
+        self._response = response  # type: environ.Response
+        self._locals = SharedCache().put(**step.test_locals)
+
+    @property
+    def local(self) -> SharedCache:
+        return self._locals
+
+    @property
+    def success(self):
+        return not self._response.failed
+
+
 class StepTestCase(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
@@ -48,6 +72,7 @@ class StepTestCase(unittest.TestCase):
         super function so that this initialization happens properly
         """
 
+        environ.modes.add(environ.modes.TESTING)
         super(StepTestCase, self).setUp()
         results_directory = tempfile.mkdtemp(
             prefix='cd-step-test-results-{}--'.format(self.__class__.__name__)
@@ -81,29 +106,48 @@ class StepTestCase(unittest.TestCase):
 
         return os.path.join(project_directory, *args)
 
-    def open_project(self) -> 'environ.Response':
+    def open_project(self) -> 'exposed.ExposedProject':
         """
         Returns the Response object populated by the open project command
         """
 
+        project_path = self.make_project_path()
         res = environ.Response()
         commander.execute(
-            'open', '{} --forget'.format(self.make_project_path()),
+            'open', '{} --forget'.format(project_path),
             res
         )
         res.thread.join()
-        return res
 
-    def run_step(self, step_name: str):
+        if res.failed:
+            self.fail(
+                'Unable to open project at path "{}"'
+                .format(project_path)
+            )
+
+        return cd.project
+
+    def run_step(self, step_name: str) -> StepTestRunResult:
         """ Runs the specified step by name """
 
-        response = commander.execute('run', '{} --force'.format(step_name))
+        project = cd.project.internal_project
+        if not project:
+            self.fail(
+                'No project was open. Unable to run step "{}"'
+                .format(step_name)
+            )
+
+        step = project.get_step(step_name)
+        if not step:
+            self.fail('No step named "{}" was found'.format(step_name))
+
+        response = commander.execute('run', '"{}" --force'.format(step_name))
         response.thread.join()
 
         if response.failed:
             self.fail('Failed to run step "{}"'.format(step_name))
-        else:
-            return response
+
+        return StepTestRunResult(step, response)
 
     def tearDown(self):
         super(StepTestCase, self).tearDown()
@@ -118,6 +162,8 @@ class StepTestCase(unittest.TestCase):
 
         for key, path in self.temp_directories.items():
             environ.systems.remove(path)
+
+        environ.modes.remove(environ.modes.TESTING)
 
     def make_temp_path(self, identifier, *args):
         """

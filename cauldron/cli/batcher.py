@@ -37,11 +37,21 @@ def run_project(
         log_path: str = None,
         shared_data: dict = None
 ) -> environ.Response:
+    """
+
+    :param project_directory:
+    :param output_directory:
+    :param log_path:
+    :param shared_data:
+    :return:
+    """
+
     log_path = initialize_logging_path(log_path)
 
     logger.add_output_path(log_path)
 
     def on_complete(message: str = None) -> environ.Response:
+        environ.modes.remove(environ.modes.SINGLE_RUN)
         if message:
             logger.log(message)
         logger.remove_output_path(log_path)
@@ -49,6 +59,8 @@ def run_project(
 
     response = environ.Response()
     parser = ArgumentParser()
+
+    environ.modes.add(environ.modes.SINGLE_RUN)
 
     open_command.execute(
         parser,
