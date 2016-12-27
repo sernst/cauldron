@@ -10,11 +10,18 @@ from pygments.util import ClassNotFound
 from cauldron import environ
 
 
+class CodeBlockHtmlFormatter(HtmlFormatter):
+
+    def wrap(self, source, outfile):
+        return source
+
+
 def as_html(
         source: str,
         language: str = None,
         filename: str = None,
-        mime_type: str = None
+        mime_type: str = None,
+        is_code_block: bool = False
 ):
     """
 
@@ -22,17 +29,34 @@ def as_html(
     :param language:
     :param filename:
     :param mime_type:
+    :param is_code_block:
     :return:
     """
 
     environ.abort_thread()
 
     lexer = fetch_lexer(source, language, filename, mime_type)
+    Formatter = CodeBlockHtmlFormatter if is_code_block else HtmlFormatter
 
-    return highlight(
+    dom = highlight(
         code=source,
         lexer=lexer if lexer else DjangoLexer(),
-        formatter=HtmlFormatter(linenos=True)
+        formatter=Formatter(linenos=True)
+    )
+
+    if not is_code_block:
+        return dom
+
+    return (
+        dom
+        .replace('<pre>', '')
+        .replace('</pre>', '')
+        .replace('<table', '<div')
+        .replace('</table>', '</div>')
+        .replace('<tr>', '')
+        .replace('</tr>', '')
+        .replace('<td', '<div')
+        .replace('</td>', '</div>')
     )
 
 

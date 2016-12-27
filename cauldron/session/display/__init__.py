@@ -421,3 +421,42 @@ def status(
         step.sub_progress_message = section_message
     if section_progress is not None:
         step.sub_progress = section_progress
+
+
+def code_block(
+        code: str = None,
+        path: str = None,
+        language_id: str = None,
+        title: str = None,
+        caption: str = None
+):
+    """
+    Adds a block of syntax highlighted code to the display from either
+    the supplied code argument, or from the code file specified
+    by the path argument.
+
+    :param code:
+        A string containing the code to be added to the display
+    :param path:
+        A path to a file containing code to be added to the display
+    :param language_id:
+        The language identifier that indicates what language should
+        be used by the syntax highlighter. Valid values are any of the
+        languages supported by the Pygments highlighter.
+    :param title:
+        If specified, the code block will include a title bar with the
+        value of this argument
+    :param caption:
+        If specified, the code block will include a caption box below the code
+        that contains the value of this argument
+    """
+
+    environ.abort_thread()
+
+    _get_report().append_body(render.code_block(
+        block=code,
+        path=path,
+        language=language_id,
+        title=title,
+        caption=caption
+    ))

@@ -50,9 +50,42 @@ class TestRenderTexts(scaffolds.ResultsTest):
         self.assertGreater(len(result), 1)
 
     def test_html(self):
+        """ should render html """
 
         dom = '<div class="test-me">me</div>'
 
         result = render.html(dom)
         self.assertGreater(len(result), 1)
 
+    def test_code_block_from_file(self):
+        """ should render a block of code from the specified path """
+
+        result = render.code_block(
+            path=__file__,
+            title='Render Test',
+            caption=__file__
+        )
+
+        self.assertGreaterEqual(len(result), 1)
+        self.assertTrue(result.find('Render Test') != -1)
+
+    def test_code_block_from_string(self):
+        """ should render block of code from string argument """
+
+        block = '\n'.join([
+            'function add(a, b) {',
+            ' return a + b;',
+            '}',
+            'var test = add(2, 3);',
+            'console.log(test);'
+        ])
+
+        result = render.code_block(
+            block=block,
+            title='Render Test JavaScript',
+            caption='This is a caption',
+            language='js'
+        )
+
+        self.assertGreaterEqual(len(result), 1)
+        self.assertTrue(result.find('caption') != -1)

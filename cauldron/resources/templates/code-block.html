@@ -1,0 +1,14 @@
+<div
+  id="{{ "cd-CodeBlock" | id }}"
+  class="cd-CodeBlock"
+>
+  {% if title %}
+  <div class="cd-CodeBlock__title">{{ title }}</div>
+  {% endif %}
+
+  <div class="cd-CodeBlock__box">{{ code }}</div>
+
+  {% if caption %}
+  <div class="cd-CodeBlock__caption">{{ caption }}</div>
+  {% endif %}
+</div>

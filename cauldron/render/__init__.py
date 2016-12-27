@@ -42,13 +42,15 @@ def inspect(source: dict) -> str:
 def code_file(
         path: str,
         language: str = None,
-        mime_type: str = None
+        mime_type: str = None,
+        is_code_block: bool = False
 ) -> str:
     """
 
     :param path:
     :param language:
     :param mime_type:
+    :param is_code_block:
     :return:
     """
     environ.abort_thread()
@@ -74,7 +76,8 @@ def code_file(
         source=source,
         language=language,
         filename=path,
-        mime_type=mime_type
+        mime_type=mime_type,
+        is_code_block=is_code_block
     )
 
 
@@ -82,7 +85,8 @@ def code(
         source: str,
         language: str = None,
         filename: str = None,
-        mime_type: str = None
+        mime_type: str = None,
+        is_code_block: bool = False
 ) -> str:
     """
 
@@ -90,6 +94,7 @@ def code(
     :param language:
     :param filename:
     :param mime_type:
+    :param is_code_block:
     :return:
     """
     environ.abort_thread()
@@ -101,7 +106,39 @@ def code(
         source=source,
         language=language,
         filename=filename,
-        mime_type=mime_type
+        mime_type=mime_type,
+        is_code_block=is_code_block
+    )
+
+
+def code_block(
+        block: str = None,
+        path: str = None,
+        language: str = None,
+        title: str = None,
+        caption: str = None
+) -> str:
+    """
+
+    :param block:
+    :param path:
+    :param language:
+    :param title:
+    :param caption:
+    :return:
+    """
+
+    code_dom = (
+        code_file(path, language=language, is_code_block=True)
+        if path else
+        code(block, language=language, is_code_block=True)
+    )
+
+    return templating.render_template(
+        'code-block.html',
+        code=code_dom,
+        title=title,
+        caption=caption
     )
 
 

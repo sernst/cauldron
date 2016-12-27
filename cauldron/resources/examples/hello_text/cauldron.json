@@ -3,6 +3,7 @@
     "hello.py",
     "portions.py",
     "variables.py",
-    "equations.py"
+    "equations.py",
+    "code.py"
   ]
 }
