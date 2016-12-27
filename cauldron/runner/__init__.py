@@ -12,6 +12,45 @@ from cauldron.session.projects import ProjectStep
 from cauldron.environ import Response
 
 
+def add_library_path(path: str) -> bool:
+    """
+    Adds the path to the Python system path if not already added and the path
+    exists.
+
+    :param path:
+        The path to add to the system paths
+    :return:
+        Whether or not the path was added. Only returns False if the path was
+        not added because it doesn't exist
+    """
+
+    if not os.path.exists(path):
+        return False
+
+    if path not in sys.path:
+        sys.path.append(path)
+
+    return True
+
+
+def remove_library_path(path: str) -> bool:
+    """
+    Removes the path from the Python system path if it is found in the system
+    paths.
+
+    :param path:
+        The path to remove from the system paths
+    :return:
+        Whether or not the path was removed.
+    """
+
+    if path in sys.path:
+        sys.path.remove(path)
+        return True
+
+    return False
+
+
 def initialize(project: typing.Union[str, Project]):
     """
 
@@ -21,8 +60,6 @@ def initialize(project: typing.Union[str, Project]):
 
     if isinstance(project, str):
         project = Project(source_directory=project)
-
-    sys.path.append(project.library_directory)
 
     cauldron.project.load(project)
     return project
@@ -39,27 +76,47 @@ def close():
     if not project:
         return False
 
-    sys.path.remove(project.library_directory)
+    [remove_library_path(path) for path in project.library_directories]
+
     cauldron.project.unload()
     return True
 
 
 def reload_libraries():
     """
-    Reload the libraries stored in the project's library directory
+    Reload the libraries stored in the project's local and shared library
+    directories
+
     :return:
     """
 
     project = cauldron.project.internal_project
 
-    directory = project.library_directory
-    glob_path = os.path.join(directory, '**', '*.py')
-    for path in glob.glob(glob_path, recursive=True):
-        package = path[len(directory) + 1:-3].replace(os.sep, '.')
-        module = sys.modules.get(package)
-        if module is not None:
-            print('RELOADED:', package)
-            importlib.reload(module)
+    def reload_module(path: str, library_directory: str):
+        path = os.path.dirname(path) if path.endswith('__init__.py') else path
+        start_index = len(library_directory) + 1
+        end_index = -3 if path.endswith('.py') else None
+        package_path = path[start_index:end_index]
+
+        module = sys.modules.get(package_path.replace(os.sep, '.'))
+        return importlib.reload(module) if module is not None else None
+
+    def reload_library(directory: str) -> list:
+        if not add_library_path(directory):
+            return []
+
+        glob_path = os.path.join(directory, '**', '*.py')
+        return [
+            reload_module(path, directory)
+            for path in glob.glob(glob_path, recursive=True)
+        ]
+
+    return [
+        reloaded_module
+        for directory in project.library_directories
+        for reloaded_module in reload_library(directory)
+        if reload_module is not None
+    ]
 
 
 def section(

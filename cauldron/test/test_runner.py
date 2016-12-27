@@ -1,3 +1,6 @@
+import os
+
+import cauldron as cd
 from cauldron import cli
 from cauldron.test import support
 from cauldron.test.support import scaffolds
@@ -41,5 +44,37 @@ class TestRunner(scaffolds.ResultsTest):
 
         support.run_command('close')
 
+    def test_library(self):
+        """ should refresh the local project library with the updated value """
 
+        support.create_project(self, 'jack')
+        project = cd.project.internal_project
 
+        lib_directory = os.path.join(project.source_directory, 'libs', '_jack')
+        os.makedirs(lib_directory)
+
+        with open(os.path.join(lib_directory, '__init__.py'), 'w') as fp:
+            fp.write('TEST_VALUE = 1\n')
+
+        support.add_step(self, contents='\n'.join([
+            'import cauldron as cd',
+            'import _jack',
+            'cd.shared.TEST_VALUE = _jack.TEST_VALUE'
+        ]))
+
+        response = support.run_command('run --force')
+        self.assertFalse(response.failed, support.Message(
+            'RUN-STEP',
+            'should be able to run the step that imports the local library',
+            'without failing',
+            response=response
+        ))
+        self.assertEqual(cd.shared.TEST_VALUE, 1)
+
+        with open(os.path.join(lib_directory, '__init__.py'), 'w') as fp:
+            fp.write('TEST_VALUE = 2\n')
+
+        support.run_command('run --force')
+        self.assertEqual(cd.shared.TEST_VALUE, 2)
+
+        support.run_command('close')

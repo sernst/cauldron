@@ -132,8 +132,7 @@ def execute(
 
     if not step:
         step = []
-    else:
-        step = [s.strip('"') for s in step]
+    step = [s.strip('"') for s in step]
 
     try:
         # Special cases that apply limits

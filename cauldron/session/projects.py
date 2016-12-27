@@ -51,7 +51,7 @@ class ProjectStep(object):
         self._is_dirty = True
         self.error = None
         self.is_muted = False
-        self.dom = None
+        self.dom = None  # type: dict
         self.progress_message = None
         self.sub_progress_message = None
         self.progress = 0
@@ -234,7 +234,7 @@ class ProjectStep(object):
         return dom
 
 
-class Project(object):
+class Project:
     """
 
     """
@@ -287,13 +287,15 @@ class Project(object):
         return hashlib.sha1(self.source_path.encode()).hexdigest()
 
     @property
-    def library_directory(self):
-        """
+    def library_directories(self):
+        def listify(value):
+            return [value] if isinstance(value, str) else list(value)
+        folders = listify(self.settings.fetch('library_folders', ['libs']))
 
-        :return:
-        """
-
-        return os.path.join(self.source_directory, 'libs')
+        return [
+            environ.paths.clean(os.path.join(self.source_directory, folder))
+            for folder in folders
+        ]
 
     @property
     def has_error(self):
