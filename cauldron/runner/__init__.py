@@ -103,6 +103,10 @@ def reload_libraries():
 
     def reload_library(directory: str) -> list:
         if not add_library_path(directory):
+            # If the library wasn't added because it doesn't exist, remove it
+            # in case the directory has recently been deleted and then return
+            # an empty result
+            remove_library_path(directory)
             return []
 
         glob_path = os.path.join(directory, '**', '*.py')
