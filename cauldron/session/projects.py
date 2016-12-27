@@ -470,7 +470,7 @@ class Project:
             naming_scheme=self.naming_scheme
         )
 
-    def refresh(self) -> bool:
+    def refresh(self, force: bool = False) -> bool:
         """
         Loads the cauldron.json configuration file for the project and populates
         the project with the loaded data. Any existing data will be overwritten,
@@ -480,12 +480,15 @@ class Project:
         cauldron.json file, this method will return without making any changes
         to the project.
 
+        :param force:
+            If true the project will be refreshed even if the project file
+            modified timestamp doesn't indicate that it needs to be refreshed.
         :return:
             Whether or not a refresh was needed and carried out
         """
 
         lm = self.last_modified
-        if lm is not None and lm >= os.path.getmtime(self.source_path):
+        if not force and lm is not None and lm >= os.path.getmtime(self.source_path):
             return False
 
         self.settings.clear().put(
