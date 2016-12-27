@@ -1,4 +1,5 @@
 import os
+import time
 
 import cauldron as cd
 from cauldron import cli
@@ -70,6 +71,10 @@ class TestRunner(scaffolds.ResultsTest):
             response=response
         ))
         self.assertEqual(cd.shared.TEST_VALUE, 1)
+
+        # Pause execution to deal with race conditions in modified
+        # times that cause this test to fail on certain systems
+        time.sleep(0.5)
 
         with open(os.path.join(lib_directory, '__init__.py'), 'w') as fp:
             fp.write('TEST_VALUE = 2\n')
