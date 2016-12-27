@@ -74,10 +74,13 @@ class TestRunner(scaffolds.ResultsTest):
 
         # Pause execution to deal with race conditions in modified
         # times that cause this test to fail on certain systems
-        time.sleep(0.5)
+        time.sleep(1)
 
         with open(os.path.join(lib_directory, '__init__.py'), 'w') as fp:
             fp.write('TEST_VALUE = 2\n')
+
+        # TODO: Fix these forced pauses
+        time.sleep(1)
 
         support.run_command('run --force')
         self.assertEqual(cd.shared.TEST_VALUE, 2)
