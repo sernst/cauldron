@@ -4,12 +4,12 @@ import typing
 
 import cauldron
 from cauldron import environ
-from cauldron import templating
 from cauldron.environ import Response
+from cauldron.runner import html_file
+from cauldron.runner import markdown_file
 from cauldron.runner import python_file
 from cauldron.session.projects import Project
 from cauldron.session.projects import ProjectStep
-from cauldron import render
 
 ERROR_STATUS = 'error'
 OK_STATUS = 'ok'
@@ -19,7 +19,7 @@ SKIP_STATUS = 'skip'
 def get_step(
         project: Project,
         step: typing.Union[ProjectStep, str]
-) -> ProjectStep:
+) -> typing.Union[ProjectStep, None]:
     """
 
     :param project:
@@ -30,11 +30,36 @@ def get_step(
     if isinstance(step, ProjectStep):
         return step
 
-    for ps in project.steps:
-        if ps.definition.name == step:
-            return ps
+    matches = [ps for ps in project.steps if ps.definition.name == step]
+    return matches[0] if len(matches) > 0 else None
 
-    return None
+
+def has_extension(file_path: str, *args: typing.Tuple[str]) -> bool:
+    """
+    Checks to see if the given file path ends with any of the specified file
+    extensions. If a file extension does not begin with a '.' it will be added
+    automatically
+
+    :param file_path:
+        The path on which the extensions will be tested for a match
+    :param args:
+        One or more extensions to test for a match with the file_path argument
+    :return:
+        Whether or not the file_path argument ended with one or more of the
+        specified extensions
+    """
+
+    def add_dot(extension):
+        return (
+            extension
+            if extension.startswith('.') else
+            '.{}'.format(extension)
+        )
+
+    return any([
+        file_path.endswith(add_dot(extension))
+        for extension in args
+    ])
 
 
 def run_step(
@@ -69,25 +94,25 @@ def run_step(
     project.current_step = step
     step.report.clear()
     step.dom = None
+    step.is_running = True
+    step.progress_message = None
+    step.progress = 0
 
     # Set the top-level display and cache values to the current project values
     # before running the step for availability within the step scripts
     cauldron.shared = cauldron.project.shared
 
-    if run_markdown_file(project, step):
-        return True
+    if has_extension(step.source_path, 'md'):
+        result = markdown_file.run(project, step)
+    elif has_extension(step.source_path, 'html'):
+        result = html_file.run(project, step)
+    elif has_extension(step.source_path, 'py'):
+        # Mark the downstream steps as dirty because this one has run
+        [x.mark_dirty(True) for x in project.steps[(step.index + 1):]]
+        result = python_file.run(project, step)
+    else:
+        result = {'success': False}
 
-    if run_html_file(project, step):
-        return True
-
-    step.is_running = True
-    step.progress_message = None
-    step.progress = 0
-
-    # Mark the downstream steps as dirty because this one has run
-    [x.mark_dirty(True) for x in project.steps[(step.index + 1):]]
-
-    result = python_file.run(project, step)
     os.chdir(os.path.expanduser('~'))
 
     if result['success']:
@@ -101,9 +126,7 @@ def run_step(
             code='EXECUTION_ERROR',
             project=project.kernel_serialize(),
             step_name=step.definition.name
-        ).console_raw(
-            result['message']
-        )
+        ).console_raw(result['message'])
 
     step.is_running = False
     step.progress = 0
@@ -153,71 +176,3 @@ def check_status(
         return SKIP_STATUS
 
     return OK_STATUS
-
-
-def run_markdown_file(
-        project: Project,
-        step: ProjectStep
-) -> bool:
-    """
-
-    :param project:
-    :param step:
-    :return:
-    """
-
-    if not step.source_path.endswith('.md'):
-        return False
-
-    with open(step.source_path, 'r+') as f:
-        code = f.read()
-
-    try:
-        cauldron.display.markdown(code, **project.shared.fetch(None))
-        step.last_modified = time.time()
-        environ.log('[{}]: Updated'.format(step.definition.name))
-        step.mark_dirty(False)
-    except Exception as err:
-        cauldron.display.html(templating.render_template(
-            'markdown-error.html',
-            error=err
-        ))
-        environ.log('[{}]: Errored'.format(step.definition.name))
-        step.mark_dirty(True)
-
-    step.dumps()
-
-    return True
-
-
-def run_html_file(
-        project: Project,
-        step: ProjectStep
-) -> bool:
-    """
-
-    :param project:
-    :param step:
-    :return:
-    """
-
-    if not step.source_path.endswith('.html'):
-        return False
-
-    with open(step.source_path, 'r+') as f:
-        code = f.read()
-
-
-    step.report.append_body(render.html(templating.render(
-        template=code,
-        **project.shared.fetch(None)
-    )))
-
-    step.last_modified = time.time()
-    environ.log('[{}]: Updated'.format(step.definition.name))
-    step.mark_dirty(False)
-    step.dumps()
-    return True
-
-
-

@@ -79,7 +79,7 @@ once the installation is complete with the ``cauldron`` command::
 
     $ cauldron
 
-or on Windows using the ``cauldron.exe`` command:
+or on Windows using the ``cauldron.exe`` command::
 
     % cauldron.exe
 
@@ -298,21 +298,5 @@ command::
 
    <>: exit
 
-Programming Guide
------------------
-
-There are a few key concepts when programming Cauldron notebooks that differ
-from traditional notebooks. The first is the display. Anything that you want
-to appear in the notebook from text to graphs must be added to the notebook
-display:
-
-.. code-block:: python3
-
-   import cauldron as cd
-
-   cd.display.text('Hello World!')
-
-You access the display from the imported cauldron library as shown in the code
-example above. The one exception is that Python's built-in **print** function
-will also add text to the display in a monospaced font that preserves
-whitespace just like printing to a console.
+See Cauldron's documentation at http://www.unnotebook.com/docs/ for more
+information.
