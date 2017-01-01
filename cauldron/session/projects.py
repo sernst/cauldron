@@ -194,9 +194,7 @@ class ProjectStep(object):
 
         body = self.report.body
         if self.is_running:
-            body_prints = self.report.read_prints()
-            if body_prints:
-                body = body + [body_prints]
+            body.append(self.report.read_stdout())
         body = ''.join(body)
 
         has_body = len(body) > 0 and (
@@ -209,6 +207,12 @@ class ProjectStep(object):
             body.find('<ul') != -1 or
             body.find('<li') != -1
         )
+
+        std_err = (
+            self.report.read_stderr()
+            if self.is_running else
+            self.report.flush_stderr()
+        ).strip('\n').rstrip()
 
         dom = templating.render_template(
             'step-body.html',
@@ -225,12 +229,12 @@ class ProjectStep(object):
             progress_message=self.progress_message,
             progress=int(round(max(0, min(100, 100 * self.progress)))),
             sub_progress_message=self.sub_progress_message,
-            sub_progress=int(round(max(0, min(100, 100 * self.sub_progress))))
+            sub_progress=int(round(max(0, min(100, 100 * self.sub_progress)))),
+            std_err=std_err
         )
 
         if not self.is_running:
             self.dom = dom
-
         return dom
 
 

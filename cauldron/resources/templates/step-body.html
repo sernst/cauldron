@@ -7,12 +7,13 @@
        data-default-modifier="cd-project-step__header--standard"
   >
 
-    <div id="{{ "title-box" | id }}"
-         class="title-box {{ 'clicker opened' if body else '' }}"
-         data-closes="#{{ "body" | id }}|#{{ "code" | id }}"
-         data-opens="#{{ "body" | id }}"
-         data-marks-closed="#{{ "code-toggler" | id }}"
-         onclick="CAULDRON.collapse('{{ "title-box" | id }}')"
+    <div
+      id="{{ "title-box" | id }}"
+      class="title-box {{ 'clicker opened' if body else '' }}"
+      data-closes="#{{ "body" | id }}|#{{ "code" | id }}|#{{ "cd-StdErr__body" | id }}"
+      data-opens="#{{ "body" | id }}"
+      data-marks-closed="#{{ "code-toggler" | id }}|#{{ "cd-StdErr__titleBox" | id }}"
+      onclick="CAULDRON.collapse('{{ "title-box" | id }}')"
     >
       {% if has_body %}
       <i class="material-icons closed-icon">keyboard_arrow_down</i>
@@ -78,14 +79,18 @@
   </div>
   {% endif %}
 
-  {% if body %}
+  {% if body or std_err %}
   <div id="{{ "body" | id }}"
        class="cd-project-step-body"
        {% if not has_body %}
          style="display:none;"
        {% endif %}
   >
-    {{ body }}
+
+      {% if std_err %}
+      {% include "StdErr.html" %}
+      {% endif %}
+      <div class="cd-ProjectStep__bodyInner">{{ body }}</div>
   </div>
   {%  endif %}
 

@@ -15,17 +15,25 @@ def enable(step: 'projects.ProjectStep'):
     :param step:
     """
 
-    print_redirect = RedirectBuffer(sys.stdout)
-    sys.stdout = print_redirect
-    step.report.print_buffer = print_redirect
+    stdout_interceptor = RedirectBuffer(sys.stdout)
+    sys.stdout = stdout_interceptor
+    step.report.stdout_interceptor = stdout_interceptor
+
+    stderr_interceptor = RedirectBuffer(sys.stderr)
+    sys.stderr = stderr_interceptor
+    step.report.stderr_interceptor = stderr_interceptor
 
 
 def disable(step: 'projects.ProjectStep'):
     # Restore the print buffer
 
-    print_redirect = step.report.print_buffer
-
     sys.stdout = sys.__stdout__
-    print(step.report.flush_prints())
-    print_redirect.close()
-    step.report.print_buffer = None
+    sys.stderr = sys.__stderr__
+
+    stdout_interceptor = step.report.stdout_interceptor
+    stdout_interceptor.close()
+    step.report.stdout_interceptor = None
+
+    stderr_interceptor = step.report.stderr_interceptor
+    stderr_interceptor.close()
+    step.report.stderr_interceptor = None

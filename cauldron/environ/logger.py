@@ -9,6 +9,7 @@ from cauldron.environ import paths
 
 _logging_paths = []
 
+
 def add_output_path(path: str) -> str:
     if not path:
         path = paths.clean(os.getcwd())
@@ -198,7 +199,7 @@ def raw(
     if trace:
         print(message)
 
-    file_paths = [p for p in (_logging_paths + [file_path]) if p]
+    file_paths = set([p for p in (_logging_paths + [file_path]) if p])
     for path in file_paths:
         with open(paths.clean(path), 'a+' if append_to_file else 'w+') as f:
             f.write('{}\n'.format(message))

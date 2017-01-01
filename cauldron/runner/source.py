@@ -10,6 +10,7 @@ from cauldron.runner import markdown_file
 from cauldron.runner import python_file
 from cauldron.session.projects import Project
 from cauldron.session.projects import ProjectStep
+from cauldron.runner import redirection
 
 ERROR_STATUS = 'error'
 OK_STATUS = 'ok'
@@ -62,6 +63,22 @@ def has_extension(file_path: str, *args: typing.Tuple[str]) -> bool:
     ])
 
 
+def _execute_step(project: Project, step: ProjectStep) -> dict:
+    if has_extension(step.source_path, 'md'):
+        return markdown_file.run(project, step)
+
+    if has_extension(step.source_path, 'html'):
+        return html_file.run(project, step)
+
+    # Mark the downstream steps as dirty because this one has run
+    [x.mark_dirty(True) for x in project.steps[(step.index + 1):]]
+
+    if has_extension(step.source_path, 'py'):
+        return python_file.run(project, step)
+
+    return {'success': False}
+
+
 def run_step(
         response: Response,
         project: Project,
@@ -102,16 +119,15 @@ def run_step(
     # before running the step for availability within the step scripts
     cauldron.shared = cauldron.project.shared
 
-    if has_extension(step.source_path, 'md'):
-        result = markdown_file.run(project, step)
-    elif has_extension(step.source_path, 'html'):
-        result = html_file.run(project, step)
-    elif has_extension(step.source_path, 'py'):
-        # Mark the downstream steps as dirty because this one has run
-        [x.mark_dirty(True) for x in project.steps[(step.index + 1):]]
-        result = python_file.run(project, step)
-    else:
-        result = {'success': False}
+    redirection.enable(step)
+
+    try:
+        result = _execute_step(project, step)
+    except Exception as err:
+        result = dict(
+            success=False,
+            html_message='<pre>{}</pre>'.format(err)
+        )
 
     os.chdir(os.path.expanduser('~'))
 
@@ -132,6 +148,8 @@ def run_step(
     step.progress = 0
     step.progress_message = None
     step.dumps()
+
+    redirection.disable(step)
 
     return result['success']
 

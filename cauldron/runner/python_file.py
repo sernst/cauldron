@@ -61,8 +61,6 @@ def run(
         )
     )
 
-    redirection.enable(step)
-
     def exec_test():
         step.test_locals = dict()
         step.test_locals.update(module.__dict__)
@@ -90,8 +88,6 @@ def run(
     if out is None:
         step.mark_dirty(False)
         out = {'success': True}
-
-    redirection.disable(step)
 
     return out
 

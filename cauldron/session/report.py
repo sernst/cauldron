@@ -22,7 +22,8 @@ class Report(object):
         self.subtitle = self.definition.get('subtitle')
         self.summary = self.definition.get('summary')
         self.library_includes = []
-        self.print_buffer = None  # type: RedirectBuffer
+        self.stdout_interceptor = None  # type: RedirectBuffer
+        self.stderr_interceptor = None  # type: RedirectBuffer
 
     @property
     def project(self):
@@ -74,10 +75,10 @@ class Report(object):
         :return:
         """
 
-        self.flush_prints()
+        self.flush_stdout()
         self.body.append(dom)
 
-    def read_prints(self):
+    def read_stdout(self):
         """
         Reads the current state of the print buffer (if it exists) and returns
         a body-ready dom object of those contents without adding them to the
@@ -89,20 +90,19 @@ class Report(object):
         """
 
         try:
-            contents = self.print_buffer.read_all()
+            contents = self.stdout_interceptor.read_all()
         except Exception as err:
             contents = ''
 
         return render_texts.preformatted_text(contents)
 
-    def flush_prints(self):
+    def flush_stdout(self):
         """
-
-        :return:
+        Empties
         """
 
         try:
-            contents = self.print_buffer.flush_all()
+            contents = self.stdout_interceptor.flush_all()
         except Exception:
             return
 
@@ -110,3 +110,28 @@ class Report(object):
             self.body.append(render_texts.preformatted_text(contents))
 
         return contents
+
+    def read_stderr(self):
+        """
+        Returns the current state of the stderr redirect buffer This is useful
+        for creating intermediate display values while the step is still
+        executing.
+
+        :return:
+            A string of the current state of the stderr redirect buffer contents
+        """
+
+        try:
+            return self.stderr_interceptor.read_all()
+        except Exception:
+            return ''
+
+    def flush_stderr(self) -> str:
+        """
+        Empties
+        """
+
+        try:
+            return self.stderr_interceptor.flush_all()
+        except Exception:
+            return ''

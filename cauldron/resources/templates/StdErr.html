@@ -1,0 +1,24 @@
+<div class="cd-StdErr">
+  <div class="cd-StdErr__bar">
+    <div
+      id="{{ "cd-StdErr__titleBox" | id }}"
+      class="cd-StdErr__titleBox clicker closed"
+      data-closes="#{{ "cd-StdErr__body" | id }}"
+      data-opens="#{{ "cd-StdErr__body" | id }}"
+      onclick="CAULDRON.collapse('{{ "cd-StdErr__titleBox" | id }}')"
+    >
+      <i class="material-icons closed-icon">keyboard_arrow_down</i>
+      <i class="material-icons opened-icon">keyboard_arrow_up</i>
+      <div class="cd-StdErr__title">Console Error Log</div>
+    </div>
+    <div class="cd-StdErr__spacer"></div>
+    <div class="cd-StdErr__buttonBox"></div>
+  </div>
+  <div
+    id="{{ 'cd-StdErr__body' | id }}"
+    class="cd-StdErr__body"
+    style="display:none"
+  >
+    {{ std_err }}
+  </div>
+</div>

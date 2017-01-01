@@ -1,0 +1,28 @@
+.cd-StdErr {
+  background-color: #ffe7bf;
+  color: #b67b00;
+  border-top: 1px solid rgba(182, 123, 0, 0.2);
+
+  &__bar {
+    padding: 0.25em;
+    align-items: center;
+    display: flex;
+  }
+
+  &__titleBox {
+    font-size: 0.8em;
+    align-items: center;
+    display: flex;
+  }
+
+  &__spacer {
+    flex: 1;
+  }
+
+  &__body {
+    padding: 1em;
+    white-space: pre;
+    overflow: auto;
+    font-family: "Lucida Console", Monaco, "Courier New", Courier, monospace;
+  }
+}
