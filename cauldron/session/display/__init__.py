@@ -125,7 +125,12 @@ def plotly(data, layout: dict, scale: float = 0.5):
     r.append_body(render.plotly(data, layout, scale))
 
 
-def table(data_frame, scale: float = 0.7):
+def table(
+        data_frame,
+        scale: float = 0.7,
+        include_index: bool = False,
+        max_rows: int = 500
+):
     """
     Adds the specified data frame to the display in a nicely formatted
     scrolling table
@@ -137,13 +142,23 @@ def table(data_frame, scale: float = 0.7):
         of 0.5 constrains the output to a maximum height equal to half the
         height of browser window when viewed. Values below 1.0 are usually
         recommended so the entire output can be viewed without scrolling.
-    :return:
+    :param include_index:
+        Whether or not the index column should be included in the displayed
+        output. The index column is not included by default because it is
+        often unnecessary extra information in the display of the data.
+    :param max_rows:
+        This argument exists to prevent accidentally writing very large data
+        frames to a table, which can cause the notebook display to become
+        sluggish or unresponsive. If you want to display large tables, you need
+        only increase the value of this argument.
     """
 
     r = _get_report()
     r.append_body(render.table(
         data_frame=data_frame,
-        scale=scale
+        scale=scale,
+        include_index=include_index,
+        max_rows=max_rows
     ))
 
 

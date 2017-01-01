@@ -217,13 +217,21 @@ def plotly(data: dict, layout: dict, scale: float = 0.5) -> str:
     )
 
 
-def table(data_frame, scale: float = 0.7) -> str:
+def table(
+        data_frame,
+        scale: float = 0.7,
+        include_index: bool = False,
+        max_rows: int = 500
+) -> str:
     """
 
     :param data_frame:
     :param scale:
+    :param include_index:
+    :param max_rows:
     :return:
     """
+
     environ.abort_thread()
 
     table_id = 'table-{}-{}'.format(
@@ -232,12 +240,23 @@ def table(data_frame, scale: float = 0.7) -> str:
     )
 
     column_headers = data_frame.columns.tolist()
+    if include_index:
+        column_headers.insert(0, 'index')
     column_headers = ['"{}"'.format(x) for x in column_headers]
 
     data = []
 
-    for index, row in data_frame.iterrows():
-        data.append(row.tolist())
+    df_source = (
+        data_frame.head(max_rows)
+        if len(data_frame) > max_rows else
+        data_frame
+    )
+
+    for index, row in df_source.iterrows():
+        entry = row.tolist()
+        if include_index:
+            entry.insert(0, index)
+        data.append(entry)
 
     json_data = json_internal.dumps(data, cls=encoding.ComplexJsonEncoder)
 
