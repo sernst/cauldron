@@ -131,6 +131,15 @@ def run_step(
 
     os.chdir(os.path.expanduser('~'))
 
+    step.is_running = False
+    step.progress = 0
+    step.progress_message = None
+    step.dumps()
+
+    # Make sure this is called prior to printing response information to the
+    # console or that will come along for the ride
+    redirection.disable(step)
+
     if result['success']:
         step.last_modified = time.time()
         environ.log('[{}]: Updated'.format(step.definition.name))
@@ -143,13 +152,6 @@ def run_step(
             project=project.kernel_serialize(),
             step_name=step.definition.name
         ).console_raw(result['message'])
-
-    step.is_running = False
-    step.progress = 0
-    step.progress_message = None
-    step.dumps()
-
-    redirection.disable(step)
 
     return result['success']
 

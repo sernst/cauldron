@@ -195,6 +195,8 @@ class ProjectStep(object):
         body = self.report.body
         if self.is_running:
             body.append(self.report.read_stdout())
+        else:
+            self.report.flush_stdout()
         body = ''.join(body)
 
         has_body = len(body) > 0 and (
