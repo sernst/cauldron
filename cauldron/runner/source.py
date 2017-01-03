@@ -131,6 +131,8 @@ def run_step(
 
     os.chdir(os.path.expanduser('~'))
 
+    step.error = result.get('html_message')
+    step.last_modified = time.time() if result['success'] else 0.0
     step.is_running = False
     step.progress = 0
     step.progress_message = None
@@ -141,11 +143,8 @@ def run_step(
     redirection.disable(step)
 
     if result['success']:
-        step.last_modified = time.time()
         environ.log('[{}]: Updated'.format(step.definition.name))
     else:
-        step.last_modified = 0.0
-        step.error = result['html_message']
         response.fail(
             message='Step execution error',
             code='EXECUTION_ERROR',
