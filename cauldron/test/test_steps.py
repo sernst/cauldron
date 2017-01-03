@@ -46,7 +46,15 @@ class TestSteps(scaffolds.ResultsTest):
         """
         """
 
-        support.create_project(self, 'lindsey')
+        response = support.create_project(self, 'lindsey')
+        self.assertFalse(
+            response.failed,
+            Message(
+                'should not have failed to create project',
+                response=response
+            )
+        )
+
         project = cauldron.project.internal_project
         directory = project.source_directory
 

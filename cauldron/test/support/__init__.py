@@ -46,8 +46,6 @@ def create_project(
     if path is None:
         path = tester.get_temp_path('project-{}-'.format(name))
 
-    r = environ.Response()
-
     args = [name, path]
     for key, value in kwargs.items():
         args.append('--{}="{}"'.format(key, value))
@@ -57,7 +55,7 @@ def create_project(
 
     args = ' '.join([a for a in args if a and len(a) > 0])
 
-    commander.execute('create', args, response=r)
+    r = commander.execute('create', args)
     if r.thread:
         r.thread.join()
 
