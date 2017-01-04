@@ -1,12 +1,51 @@
 import string
 
 import cauldron
+from cauldron.cli import commander
 from cauldron.test import support
 from cauldron.test.support import scaffolds
 from cauldron.test.support.messages import Message
 
 
 class TestPrinting(scaffolds.ResultsTest):
+
+    def test_slow_printing(self):
+        """ should not repeat print statements during slow running steps """
+
+        response = support.create_project(self, 'duluth')
+        self.assertFalse(
+            response.failed,
+            Message('should have created project', response=response)
+        )
+
+        code = '\n'.join([
+            'import time',
+            'for letter in "BCFHMNOPRS":',
+            '    print("{}AT".format(letter))',
+            '    time.sleep(0.5)'
+        ])
+
+        support.add_step(self, contents=code)
+        response = commander.execute('run', '-f')
+
+        step = cauldron.project.internal_project.steps[0]
+
+        response.thread.join(1)
+        dom = step.dumps()
+        self.assertEqual(dom.count('BAT'), 1)
+        self.assertEqual(dom.count('SAT'), 0)
+
+        response.thread.join(1)
+        dom = step.dumps()
+        self.assertEqual(dom.count('BAT'), 1)
+        self.assertEqual(dom.count('SAT'), 0)
+
+        response.thread.join()
+        dom = step.dumps()
+        self.assertEqual(dom.count('BAT'), 1)
+        self.assertEqual(dom.count('SAT'), 1)
+
+        support.run_command('close')
 
     def test_print_solo(self):
         """ should properly print in a step that does nothing but print """

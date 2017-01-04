@@ -3,7 +3,7 @@ import typing
 
 from cauldron import cli
 from cauldron.environ import logger
-
+import threading
 
 class ResponseMessage(object):
 
@@ -74,7 +74,7 @@ class ResponseMessage(object):
             trace: bool = True,
             file_path: str = None,
             append_to_file: bool = True
-    ):
+    ) -> 'ResponseMessage':
         """
 
         :param message:
@@ -164,7 +164,7 @@ class Response(object):
         self.warnings = []  # type: typing.List[ResponseMessage]
         self.ended = False
         self.failed = False
-        self.thread = None
+        self.thread = None  # type: threading.Thread
         self.returned = None
 
     @property

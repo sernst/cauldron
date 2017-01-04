@@ -192,7 +192,7 @@ class ProjectStep(object):
             code=render.code_file(code_file_path)
         )
 
-        body = self.report.body
+        body = self.report.body[:]
         if self.is_running:
             body.append(self.report.read_stdout())
         else:

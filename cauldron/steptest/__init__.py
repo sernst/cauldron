@@ -57,6 +57,12 @@ class StepTestRunResult:
     def success(self):
         return not self._response.failed
 
+    def echo_error(self) -> str:
+        if not self._response.errors:
+            return ''
+
+        return '{}'.format(self._response.errors[0].serialize())
+
 
 class StepTestCase(unittest.TestCase):
 
@@ -124,6 +130,8 @@ class StepTestCase(unittest.TestCase):
                 'Unable to open project at path "{}"'
                 .format(project_path)
             )
+
+        os.chdir(cd.project.internal_project.source_directory)
 
         return cd.project
 

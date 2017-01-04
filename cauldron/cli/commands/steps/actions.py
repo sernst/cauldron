@@ -39,10 +39,7 @@ def index_from_location(
             return None if location < 0 else location
         except Exception:
             index = project.index_of_step(location)
-            if index is not None:
-                return index + 1
-            else:
-                return None
+            return None if index is None else (index + 1)
 
     return default
 
