@@ -46,7 +46,7 @@ def load_project(response, path):
 
 def update_recent_paths(response, path):
     """
-
+    :param response:
     :param path:
     :return:
     """
@@ -177,4 +177,4 @@ def open_project(
          URL: {url}
         """.format(path=path, url=project.baked_url),
         whitespace=1
-    )
+    ).response

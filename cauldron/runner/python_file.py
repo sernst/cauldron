@@ -77,7 +77,6 @@ def run(
         out = None
     except threads.ThreadAbortError:
         out = {'success': False}
-        step.mark_dirty(True)
     except UserAbortError:
         out = None
     except Exception as error:
@@ -85,11 +84,7 @@ def run(
 
     set_executing(False)
 
-    if out is None:
-        step.mark_dirty(False)
-        out = {'success': True}
-
-    return out
+    return {'success': True} if out is None else out
 
 
 def render_syntax_error(

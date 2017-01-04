@@ -8,9 +8,23 @@ from cauldron.test.support import scaffolds
 
 
 class TestRunner(scaffolds.ResultsTest):
-    """
+    """ """
 
-    """
+    def test_syntax_error(self):
+        """ should render a syntax error """
+
+        support.create_project(self, 'seattle')
+        support.add_step(self, contents='// Not Python')
+        response = support.run_command('run -f')
+        self.assertTrue(response.failed, 'should have failed')
+
+        project = cd.project.internal_project
+        step = project.steps[0]
+
+        self.assertTrue(step.dom.find('cd-CodeError') > 0)
+        self.assertTrue(step.dom.find('SyntaxError') > 0)
+
+        support.run_command('close')
 
     def test_exception(self):
         """

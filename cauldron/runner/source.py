@@ -131,6 +131,7 @@ def run_step(
 
     os.chdir(os.path.expanduser('~'))
 
+    step.mark_dirty(not result['success'])
     step.error = result.get('html_message')
     step.last_modified = time.time() if result['success'] else 0.0
     step.is_running = False
