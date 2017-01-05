@@ -71,9 +71,11 @@ class TestPrinting(scaffolds.ResultsTest):
         )
 
         project = cauldron.project.internal_project
+        dom = project.steps[0].dom  # type: str
 
-        self.assertTrue(
-            project.steps[0].dom.find(print_string) > 0,
+        self.assertEqual(
+            dom.count(print_string),
+            2,
             'should have printed ascii lowercase'
         )
 
@@ -105,9 +107,11 @@ class TestPrinting(scaffolds.ResultsTest):
         )
 
         project = cauldron.project.internal_project
+        dom = project.steps[0].dom  # type: str
 
-        self.assertTrue(
-            project.steps[0].dom.find(print_string) > 0,
+        self.assertEqual(
+            dom.count(print_string),
+            2,
             'should have printed ascii lowercase'
         )
 
@@ -139,9 +143,11 @@ class TestPrinting(scaffolds.ResultsTest):
         )
 
         project = cauldron.project.internal_project
+        dom = project.steps[0].dom  # type: str
 
-        self.assertTrue(
-            project.steps[0].dom.find(print_string) > 0,
+        self.assertEqual(
+            dom.count(print_string),
+            2,
             'should have printed ascii lowercase'
         )
 
@@ -156,14 +162,13 @@ class TestPrinting(scaffolds.ResultsTest):
             Message('should have created project', response=response)
         )
 
-
         code = '\n'.join([
             'import cauldron as cd',
-            'print("{}")'.format(string.ascii_lowercase),
-            'print("{}")'.format(string.digits),
+            'import string',
+            'print(string.ascii_lowercase)',
             'cd.display.text("Hello World")',
-            'print("{}")'.format(string.ascii_uppercase),
-            'print("{}")'.format(string.hexdigits)
+            'print(string.ascii_uppercase)',
+            'print(string.hexdigits)'
         ])
 
         support.add_step(self, contents=code)
@@ -175,24 +180,23 @@ class TestPrinting(scaffolds.ResultsTest):
         )
 
         project = cauldron.project.internal_project
+        dom = project.steps[0].dom  # type: str
 
-        self.assertTrue(
-            project.steps[0].dom.find(string.ascii_lowercase) > 0,
+        self.assertEqual(
+            dom.count(string.ascii_lowercase),
+            1,
             'should have printed ascii lowercase'
         )
 
-        self.assertTrue(
-            project.steps[0].dom.find(string.ascii_uppercase) > 0,
+        self.assertEqual(
+            dom.count(string.ascii_uppercase),
+            1,
             'should have printed ascii uppercase'
         )
 
-        self.assertTrue(
-            project.steps[0].dom.find(string.digits) > 0,
-            'should have printed digits'
-        )
-
-        self.assertTrue(
-            project.steps[0].dom.find(string.hexdigits) > 0,
+        self.assertEqual(
+            dom.count(string.hexdigits),
+            1,
             'should have printed hex digits'
         )
 

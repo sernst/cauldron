@@ -192,11 +192,22 @@ class ProjectStep(object):
             code=render.code_file(code_file_path)
         )
 
-        body = self.report.body[:]
-        if self.is_running:
-            body.append(self.report.read_stdout())
-        else:
+        if not self.is_running:
+            # If no longer running, make sure to flush the stdout buffer so
+            # any print statements at the end of the step get included in
+            # the body
             self.report.flush_stdout()
+
+        # Create a copy of the body for dumping
+        body = self.report.body[:]
+
+        if self.is_running:
+            # If still running add a temporary copy of anything not flushed
+            # from the stdout buffer to the copy of the body for display. Do
+            # not flush the buffer though until the step is done running or
+            # it gets flushed by another display call.
+            body.append(self.report.read_stdout())
+
         body = ''.join(body)
 
         has_body = len(body) > 0 and (
