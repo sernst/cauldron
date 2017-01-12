@@ -130,12 +130,13 @@ class ExposedStep(object):
     """
 
     @property
-    def _step(self):
+    def _step(self) -> typing.Union[None, 'projects.ProjectStep']:
         """
         Internal access to the source step. Should not be used outside
         of Cauldron development.
 
         :return:
+            The ProjectStep instance that this ExposedStep represents
         """
 
         import cauldron

@@ -39,6 +39,9 @@ def find_project_directory(subdirectory: str) -> typing.Union[str, None]:
 
 
 class StepTestRunResult:
+    """
+    This class contains information returned from running a step during testing.
+    """
 
     def __init__(
             self,
@@ -51,13 +54,33 @@ class StepTestRunResult:
 
     @property
     def local(self) -> SharedCache:
+        """
+        Container object that holds all of the local variables that were
+        defined within the run step
+        """
+
         return self._locals
 
     @property
-    def success(self):
+    def success(self) -> bool:
+        """
+        Whether or not the step was successfully run. This value will be
+        False if there as an uncaught exception during the execution of the
+        step.
+        """
+
         return not self._response.failed
 
     def echo_error(self) -> str:
+        """
+        Creates a string representation of the exception that cause the step
+        to fail if an exception occurred. Otherwise, an empty string is returned.
+
+        :return:
+            The string representation of the exception that caused the running
+            step to fail or a blank string if no exception occurred
+        """
+
         if not self._response.errors:
             return ''
 
@@ -65,6 +88,14 @@ class StepTestRunResult:
 
 
 class StepTestCase(unittest.TestCase):
+    """
+    The base class to use for step "unit" testing. This class overrides
+    the default setup and tearDown methods from the unittest.TestCase to add
+    functionality for loading and unloading the Cauldron notebook settings
+    needed to run and test steps. If you override either of these methods
+    make sure that you call their super methods as well or the functionality
+    will be lost.
+    """
 
     def __init__(self, *args, **kwargs):
         super(StepTestCase, self).__init__(*args, **kwargs)
@@ -136,7 +167,14 @@ class StepTestCase(unittest.TestCase):
         return cd.project
 
     def run_step(self, step_name: str) -> StepTestRunResult:
-        """ Runs the specified step by name """
+        """
+        Runs the specified step by name its complete filename including extension
+
+        :param step_name:
+            The full filename of the step to be run including its extension.
+        :return:
+            A StepTestRunResult instance containing information about the execution of the step.
+        """
 
         project = cd.project.internal_project
         if not project:

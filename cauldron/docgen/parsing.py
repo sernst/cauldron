@@ -1,119 +1,71 @@
 import typing
 import functools
+from cauldron.docgen.params import parse as parse_params
+from cauldron.docgen.function_returns import parse as parse_returns
 import inspect
+import textwrap
 
 
-def get_doc_lines(target: typing.Callable) -> list:
+def get_docstring(target) -> str:
     """
+    Retrieves the documentation string from the target object and returns it
+    after removing insignificant whitespace
 
     :param target:
+        The object for which the doc string should be retrieved
     :return:
+        The cleaned documentation string for the target. If no doc string
+        exists an empty string will be returned instead.
     """
 
     raw = getattr(target, '__doc__')
+
+    if raw is None:
+        return ''
+
+    return textwrap.dedent(raw)
+
+
+def get_doc_entries(target: typing.Callable) -> list:
+    """
+    Gets the lines of documentation from the given target, which are formatted
+    so that each line is a documentation entry.
+
+    :param target:
+    :return:
+        A list of strings containing the documentation block entries
+    """
+
+    raw = get_docstring(target)
 
     if not raw:
         return []
 
     raw_lines = [
         line.strip()
-        for line in raw.strip().replace('\r', '').split('\n')
+        for line in raw.replace('\r', '').split('\n')
     ]
 
     def compactify(compacted: list, entry: str) -> list:
-        if not entry:
+        chars = entry.strip()
+
+        if not chars:
             return compacted
 
-        if len(compacted) < 1 or entry.startswith(':'):
-            compacted.append(entry)
+        if len(compacted) < 1 or chars.startswith(':'):
+            compacted.append(entry.rstrip())
         else:
-            compacted[-1] = '{} {}'.format(compacted[-1], entry)
+            compacted[-1] = '{}\n{}'.format(compacted[-1], entry.rstrip())
 
         return compacted
 
-    return list(functools.reduce(compactify, raw_lines, []))
+    return [
+        textwrap.dedent(block).strip()
+        for block in functools.reduce(compactify, raw_lines, [])
+    ]
 
 
-def parse_params(target, lines: list) -> list:
-    """
-
-    :param target:
-    :param lines:
-    :return:
-    """
-
-    code = target.__code__
-    annotations = getattr(target, '__annotations__', {})
-    has_args = code.co_flags & inspect.CO_VARARGS
-    has_kwargs = code.co_flags & inspect.CO_VARKEYWORDS
-    arg_count = (
-        code.co_argcount +
-        (1 if has_args else 0) +
-        (1 if has_kwargs else 0)
-    )
-    arg_names = list(code.co_varnames[:arg_count])
-
-    if len(arg_names) > 0 and arg_names[0] in ['self', 'cls']:
-        arg_count -= 1
-        arg_names.pop(0)
-
-    def get_optional_data(name):
-        defaults = target.__defaults__
-        try:
-            index = arg_names.index(name)
-            default_index = index - (len(arg_names) - len(defaults))
-        except:
-            default_index = -1
-
-        if default_index < 0:
-            return {'optional': False}
-
-        return {'optional': True, 'default': str(defaults[default_index])}
-
-    def arg_type_to_string(arg_type) -> str:
-        if hasattr(arg_type, '__union_params__'):
-            return ', '.join([
-                arg_type_to_string(item)
-                for item in arg_type.__union_params__
-            ])
-
-        try:
-            return arg_type.__name__
-        except:
-            return arg_type
-
-    def create_empty_argument(name) -> dict:
-        out = dict(
-            name=name,
-            index=arg_names.index(name),
-            description='',
-            type=arg_type_to_string(annotations.get(name, 'Any'))
-        )
-        out.update(get_optional_data(name))
-        return out
-
-    def create_argument(argument_line: str) -> dict:
-        name, docstring = argument_line.split(' ', 1)[-1].split(':', 1)
-        out = create_empty_argument(name)
-        out['description'] = docstring
-        return out
-
-    arg_docs = list(map(
-        create_argument,
-        filter(lambda line: line.startswith(':param'), lines)
-    ))
-
-    def get_arg_data(name: str) -> dict:
-        for doc in arg_docs:
-            if doc['name'] == name:
-                return doc
-
-        return create_empty_argument(name)
-
-    return list([get_arg_data(name) for name in arg_names])
-
-
-def function(target: typing.Callable):
+def function(target: typing.Callable) -> typing.Union[None, dict]:
     """
 
     :param target:
@@ -123,14 +75,48 @@ def function(target: typing.Callable):
     if not hasattr(target, '__code__'):
         return None
 
-    lines = get_doc_lines(target)
-    docs = filter(lambda line: not line.startswith(':'), lines)
+    lines = get_doc_entries(target)
+    docs = ' '.join(filter(lambda line: not line.startswith(':'), lines))
     params = parse_params(target, lines)
+    returns = parse_returns(target, lines)
 
     return dict(
         name=getattr(target, '__name__'),
-        doc=' '.join(docs),
-        params=params
+        doc=docs,
+        params=params,
+        returns=returns
+    )
+
+
+def variable(name: str, target: property) -> typing.Union[None, dict]:
+    """
+    :param name:
+    :param target:
+    :return:
+    """
+
+    if hasattr(target, 'fget'):
+        doc = function(target.fget)
+        doc.update(read_only=bool(target.fset is None))
+        return doc
+
+    if not hasattr(target, '__doc__'):
+        return None
+
+    return dict(
+        name=name,
+        description=get_docstring(target)
+    )
+
+
+def class_doc(target) -> typing.Union[None, dict]:
+
+    if not inspect.isclass(target):
+        return None
+
+    return dict(
+        name=target.__name__,
+        description=get_docstring(target)
     )
 
 
@@ -141,12 +127,33 @@ def container(target) -> dict:
     :return:
     """
 
-    function_names = filter(lambda name: not name.startswith('_'), dir(target))
+    names = list(filter(lambda name: not name.startswith('_'), dir(target)))
+
+    def not_none(data) -> bool:
+        return bool(data is not None)
+
+    def fetch_docs(callback, *skip_names):
+        return [
+            callback(getattr(target, n))
+            for n in names
+            if n not in skip_names
+        ]
+
+    functions = list(filter(not_none, fetch_docs(function)))
+    func_names = [doc['name'] for doc in functions]
+
+    classes = list(filter(not_none, fetch_docs(class_doc, *func_names)))
+    class_names = [doc['name'] for doc in classes]
+
+    variables = list(filter(
+        not_none,
+        fetch_docs(variable, *(func_names + class_names))
+    ))
 
     return dict(
         name=getattr(target, '__name__'),
-        functions=list(filter(
-            lambda data: (data is not None),
-            [function(getattr(target, name)) for name in function_names]
-        ))
+        description=get_docstring(target),
+        functions=functions,
+        variables=variables,
+        classes=classes
     )
