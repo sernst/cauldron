@@ -11,6 +11,7 @@ class TestSessionBuffer(scaffolds.ResultsTest):
     def test_buffer_write(self):
         value = 'This is a test'
         b = buffering.RedirectBuffer(sys.stdout)
+        b.active = True
         sys.stdout = b
         print(value)
         sys.stdout = b.redirection_source

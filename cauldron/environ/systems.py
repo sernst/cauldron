@@ -1,13 +1,12 @@
+import json
 import os
 import shutil
-import sys
-import json
 import site
-import threading
+import sys
+import typing
 
-from cauldron.environ.logger import log
 from cauldron.environ import paths
-from cauldron.cli.threads import CauldronThread
+from cauldron.environ.logger import log
 
 try:
     site_packages = list(site.getsitepackages())
@@ -15,10 +14,17 @@ except Exception:
     site_packages = []
 
 
-def get_system_data() -> dict:
+def get_system_data() -> typing.Union[None, dict]:
     """
+    Returns information about the system in which Cauldron is running.
+    If the information cannot be found, None is returned instead.
 
     :return:
+        Dictionary containing information about the Cauldron system, whic
+        includes:
+         * name
+         * location
+         * version
     """
 
     home_directory = os.path.expanduser('~')

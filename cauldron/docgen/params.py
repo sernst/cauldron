@@ -53,7 +53,11 @@ def get_arg_names(target) -> typing.List[str]:
         Function for which the argument names will be retrieved
     """
 
-    code = target.__code__
+    code = getattr(target, '__code__')
+
+    if code is None:
+        return []
+
     arg_count = code.co_argcount
     kwarg_count = code.co_kwonlyargcount
     args_index = get_args_index(target)

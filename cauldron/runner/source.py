@@ -126,6 +126,7 @@ def run_step(
     except Exception as err:
         result = dict(
             success=False,
+            message='{}'.format(err),
             html_message='<pre>{}</pre>'.format(err)
         )
 

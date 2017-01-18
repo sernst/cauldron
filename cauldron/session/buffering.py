@@ -11,6 +11,7 @@ class RedirectBuffer(io.TextIOWrapper):
     """
 
     def __init__(self, redirection_source):
+        self.active = False
         self.bytes_buffer = io.BytesIO()
         self.redirection_source = redirection_source
 
@@ -62,7 +63,13 @@ class RedirectBuffer(io.TextIOWrapper):
 
     def write_both(self, *args, **kwargs):
         abort_thread()
-        super(RedirectBuffer, self).write(*args, **kwargs)
+
+        if self.active:
+            # Only write to this buffer if redirection is active. This prevents
+            # race conditions from mixing buffers when attaching or removing
+            # the write buffer from its sys output.
+            super(RedirectBuffer, self).write(*args, **kwargs)
+
         return self.redirection_source.write(*args, **kwargs)
 
     def __getattribute__(self, item):

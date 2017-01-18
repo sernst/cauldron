@@ -176,7 +176,7 @@ class ProjectStep(object):
             self.dom = self.dumps()
         return self.dom
 
-    def dumps(self):
+    def dumps(self) -> dict:
         """
 
         :return:

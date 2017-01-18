@@ -1,4 +1,5 @@
 import os
+import sys
 import tempfile
 import unittest
 import json
@@ -22,6 +23,16 @@ class ResultsTest(unittest.TestCase):
         self.results_directory = results_directory
         environ.configs.put(results_directory=results_directory, persists=False)
         self.temp_directories = dict()
+
+    def trace(self, *args):
+        """
+        Traces the results to a temporary buffer that is setup
+        :return:
+        """
+
+        buffer = ' '.join(['{}'.format(arg) for arg in args])
+        sys.__stderr__.write('{}\n'.format(buffer))
+        sys.__stderr__.flush()
 
     def tearDown(self):
         super(ResultsTest, self).tearDown()

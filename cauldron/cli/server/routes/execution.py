@@ -5,6 +5,7 @@ import flask
 from cauldron.cli import commander
 from cauldron.cli.server import run as server_runner
 from cauldron.environ.response import Response
+from cauldron.runner import redirection
 from flask import request
 
 
@@ -198,6 +199,23 @@ def abort():
             pass
 
     project = cd.project.internal_project
+    step = project.current_step
+
+    if step:
+        if step.is_running:
+            step.is_running = False
+            step.progress = 0
+            step.progress_message = None
+            step.dumps()
+
+        # Make sure this is called prior to printing response information to
+        # the console or that will come along for the ride
+        redirection.disable(step)
+
+    # Make sure no print redirection will survive the abort process regardless
+    # of whether an active step was found or not (prevents race conditions)
+    redirection.restore_default_configuration()
+
     project_data = project.kernel_serialize() if project else None
 
     return flask.jsonify(

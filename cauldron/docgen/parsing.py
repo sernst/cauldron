@@ -65,9 +65,10 @@ def get_doc_entries(target: typing.Callable) -> list:
     ]
 
 
-def function(target: typing.Callable) -> typing.Union[None, dict]:
+def function(name: str,  target: typing.Callable) -> typing.Union[None, dict]:
     """
 
+    :param name:
     :param target:
     :return:
     """
@@ -96,9 +97,10 @@ def variable(name: str, target: property) -> typing.Union[None, dict]:
     """
 
     if hasattr(target, 'fget'):
-        doc = function(target.fget)
-        doc.update(read_only=bool(target.fset is None))
-        return doc
+        doc = function(name, target.fget)
+        if doc:
+            doc.update(read_only=bool(target.fset is None))
+            return doc
 
     if not hasattr(target, '__doc__'):
         return None
@@ -109,7 +111,7 @@ def variable(name: str, target: property) -> typing.Union[None, dict]:
     )
 
 
-def class_doc(target) -> typing.Union[None, dict]:
+def class_doc(name: str, target) -> typing.Union[None, dict]:
 
     if not inspect.isclass(target):
         return None
@@ -134,7 +136,7 @@ def container(target) -> dict:
 
     def fetch_docs(callback, *skip_names):
         return [
-            callback(getattr(target, n))
+            callback(n, getattr(target, n))
             for n in names
             if n not in skip_names
         ]

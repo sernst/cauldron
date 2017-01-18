@@ -1,6 +1,7 @@
 import typing
 from cauldron.docgen import conversions
 
+
 def parse(target, lines: typing.List[str]) -> typing.Union[None, dict]:
     """
 
@@ -9,7 +10,8 @@ def parse(target, lines: typing.List[str]) -> typing.Union[None, dict]:
     :return:
     """
 
-    annotations = getattr(target, '__annotations__', {})
+    annotations = getattr(target, '__annotations__')
+    annotations = annotations if annotations is not None else {}
     arg_type = annotations.get('return')
     return_type = None if arg_type is None else conversions.arg_type_to_string(arg_type)
 
