@@ -199,9 +199,9 @@ def abort():
             pass
 
     project = cd.project.internal_project
-    step = project.current_step
 
-    if step:
+    if project and project.current_step:
+        step = project.current_step
         if step.is_running:
             step.is_running = False
             step.progress = 0
