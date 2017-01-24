@@ -1,6 +1,8 @@
 import os
-import sys
+import json
+from unittest.mock import patch
 
+import cauldron as cd
 from cauldron.test import support
 from cauldron.test.support import scaffolds
 from cauldron import environ
@@ -140,3 +142,59 @@ class TestCreate(scaffolds.ResultsTest):
                 items=items
             )
         )
+
+    def test_folders(self):
+        """ should create libs and assets folders in project """
+
+        libs_folder = 'libs_folder'
+        assets_folder = 'assets_folder'
+
+        result = support.create_project(
+            self,
+            'marcus',
+            libs=libs_folder,
+            assets=assets_folder
+        )
+        self.assertFalse(result.failed)
+
+        project = cd.project.internal_project
+
+        items = os.listdir(project.source_directory)
+
+        self.assertIn(libs_folder, items)
+        self.assertIn(assets_folder, items)
+
+        self.assertIn(libs_folder, project.settings.fetch('library_folders'))
+        self.assertIn(assets_folder, project.settings.fetch('asset_folders'))
+
+        with open(project.source_path, 'r+') as f:
+            data = json.load(f)
+
+        self.assertEqual(libs_folder, data['library_folders'][0])
+        self.assertEqual(assets_folder, data['asset_folders'][0])
+
+        support.run_command('close')
+
+    def test_write_fail(self):
+        """ should fail if directory cannot be written """
+
+        target = 'cauldron.cli.commands.create.write_project_data'
+        with patch(target) as func:
+            func.return_value = False
+            result = support.create_project(self, 'aurelius')
+
+        self.assertTrue(result.failed)
+
+        support.run_command('close')
+
+    def test_create_fail(self):
+        """ should fail if directory cannot be created """
+
+        target = 'cauldron.cli.commands.create.create_project_directory'
+        with patch(target) as func:
+            func.return_value = False
+            result = support.create_project(self, 'augustus')
+
+        self.assertTrue(result.failed)
+
+        support.run_command('close')

@@ -105,12 +105,23 @@ def list_asset_writes(
         A list containing the file copy entries for deploying project assets
     """
 
-    source_directory = os.path.join(project.source_directory, 'assets')
-    if not os.path.exists(source_directory):
-        return []
+    def make_asset_copy(directory: str) -> file_io.FILE_COPY_ENTRY:
+        output_directory = os.path.join(
+            project.output_directory,
+            directory[len(project.source_directory):].lstrip(os.sep)
+        )
 
-    output_directory = os.path.join(project.output_directory, 'assets')
-    return [file_io.FILE_COPY_ENTRY(
-        source=source_directory,
-        destination=output_directory
-    )]
+        return file_io.FILE_COPY_ENTRY(
+            source=directory,
+            destination=output_directory
+        )
+
+    copies = [
+        make_asset_copy(asset_directory)
+        for asset_directory in project.asset_directories
+    ]
+
+    return list(filter(
+        lambda fc: os.path.exists(fc.source),
+        copies
+    ))

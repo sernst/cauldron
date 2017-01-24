@@ -315,6 +315,17 @@ class Project:
         ]
 
     @property
+    def asset_directories(self):
+        def listify(value):
+            return [value] if isinstance(value, str) else list(value)
+        folders = listify(self.settings.fetch('asset_folders', ['assets']))
+
+        return [
+            environ.paths.clean(os.path.join(self.source_directory, folder))
+            for folder in folders
+        ]
+
+    @property
     def has_error(self):
         """
 

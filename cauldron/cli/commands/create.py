@@ -12,9 +12,7 @@ from cauldron.session import projects
 from cauldron.environ import Response
 
 NAME = 'create'
-DESCRIPTION = """
-    Create a new Cauldron project
-    """
+DESCRIPTION = 'Create a new Cauldron project'
 
 
 def populate(
@@ -95,6 +93,22 @@ def populate(
         help=cli.reformat('Forget that this project was opened')
     )
 
+    parser.add_argument(
+        '--libs',
+        dest='library_folder',
+        default=None,
+        type=str,
+        help=cli.reformat('The name of the internal library root folder')
+    )
+
+    parser.add_argument(
+        '--assets',
+        dest='assets_folder',
+        default=None,
+        type=str,
+        help=cli.reformat('The name of the internal assets folder')
+    )
+
 
 def create_project_directory(directory):
     """
@@ -138,6 +152,8 @@ def execute(
         author: str = '',
         forget: bool = False,
         no_naming_scheme: bool = False,
+        library_folder: str = None,
+        assets_folder: str = None
 ):
     """
 
@@ -203,6 +219,14 @@ def execute(
         steps=[],
         naming_scheme=None if no_naming_scheme else projects.DEFAULT_SCHEME
     )
+
+    if library_folder:
+        project_data['library_folders'] = [library_folder]
+        create_project_directory(os.path.join(directory, library_folder))
+
+    if assets_folder:
+        project_data['asset_folders'] = [assets_folder]
+        create_project_directory(os.path.join(directory, assets_folder))
 
     if not write_project_data(directory, project_data):
         return response.fail(
