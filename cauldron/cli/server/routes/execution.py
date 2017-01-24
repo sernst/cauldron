@@ -238,7 +238,7 @@ def shutdown():
             Response().fail(
                 code='NOT_RUNNING_ERROR',
                 message='Unable to shutdown server'
-            )
+            ).serialize()
         )
 
     try:
@@ -249,7 +249,7 @@ def shutdown():
                 code='SHUTDOWN_ERROR',
                 message='Unable to shutdown server',
                 error=err
-            )
+            ).serialize()
         )
 
-    return flask.jsonify(Response())
+    return flask.jsonify(Response().serialize())
