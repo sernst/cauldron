@@ -114,6 +114,7 @@ class ProjectStep(object):
             index=self.index,
             source_path=self.source_path,
             last_modified=self.last_modified,
+            last_display_update=self.report.last_update_time,
             is_dirty=self.is_dirty(),
             status=self.status(),
             exploded_name=naming.explode_filename(
@@ -136,6 +137,7 @@ class ProjectStep(object):
             name=self.definition.name,
             muted=self.is_muted,
             last_modified=self.last_modified,
+            last_display_update=self.report.last_update_time,
             dirty=is_dirty,
             is_dirty=is_dirty,
             run=self.last_modified is not None,
@@ -172,9 +174,12 @@ class ProjectStep(object):
         if self.is_running:
             return self.dumps()
 
-        if self.dom is None:
-            self.dom = self.dumps()
-        return self.dom
+        if self.dom is not None:
+            return self.dom
+
+        dom = self.dumps()
+        self.dom = dom
+        return dom
 
     def dumps(self) -> dict:
         """
@@ -229,6 +234,7 @@ class ProjectStep(object):
 
         dom = templating.render_template(
             'step-body.html',
+            last_display_update=self.report.last_update_time,
             code=code,
             body=body,
             has_body=has_body,

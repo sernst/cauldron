@@ -1,7 +1,6 @@
 import cauldron
 import flask
 from cauldron.cli.server import run as server_runner
-from cauldron.environ import logger
 from cauldron.environ.response import Response
 
 
@@ -45,6 +44,37 @@ def project_status():
 
     r.update(server=server_runner.get_server_data())
     return flask.jsonify(r.serialize())
+
+
+@server_runner.APPLICATION.route(
+    '/clean-step/<step_name>',
+    methods=['GET', 'POST']
+)
+def set_step_clean(step_name: str):
+    """ """
+
+    r = Response()
+    project = cauldron.project.internal_project
+
+    if not project:
+        return flask.jsonify(r.fail(
+            code='PROJECT_FETCH_ERROR',
+            message='No project is currently open'
+        ).serialize())
+
+    step = project.get_step(step_name)
+
+    if not step:
+        return flask.jsonify(r.fail(
+            code='STEP_FETCH_ERROR',
+            message='No such step "{}" found'.format(step_name)
+        ).serialize())
+
+    step.mark_dirty(False)
+
+    return flask.jsonify(r.update(
+        project=project.kernel_serialize()
+    ).serialize())
 
 
 @server_runner.APPLICATION.route('/project', methods=['GET', 'POST'])
@@ -101,13 +131,18 @@ def run_status(uid: str):
             )
 
         if r.thread.is_alive():
+            try:
+                step_changes = server_runner.get_running_step_changes(True)
+            except Exception:
+                step_changes = None
+
             return flask.jsonify(
                 Response()
                 .update(
                     run_status='running',
                     run_multiple_updates=True,
                     run_uid=uid,
-                    step_changes=server_runner.get_running_step_changes(True),
+                    step_changes=step_changes,
                     server=server_runner.get_server_data()
                 ).serialize()
             )

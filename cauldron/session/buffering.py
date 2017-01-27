@@ -1,5 +1,5 @@
 import io
-import sys
+import time
 
 from cauldron.cli.threads import abort_thread
 
@@ -14,6 +14,7 @@ class RedirectBuffer(io.TextIOWrapper):
         self.active = False
         self.bytes_buffer = io.BytesIO()
         self.redirection_source = redirection_source
+        self.last_write_time = 0
 
         super(RedirectBuffer, self).__init__(
             buffer=self.bytes_buffer,
@@ -68,6 +69,7 @@ class RedirectBuffer(io.TextIOWrapper):
             # Only write to this buffer if redirection is active. This prevents
             # race conditions from mixing buffers when attaching or removing
             # the write buffer from its sys output.
+            self.last_write_time = time.time()
             super(RedirectBuffer, self).write(*args, **kwargs)
 
         return self.redirection_source.write(*args, **kwargs)

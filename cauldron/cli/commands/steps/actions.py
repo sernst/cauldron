@@ -236,10 +236,6 @@ def modify_step(
         **new_name_parts
     )
 
-    if new_name == name and new_index == old_index:
-        # Do not carry out any modifications if nothing was actually changed
-        return
-
     step_data = {'name': new_name}
     if title is None:
         if old_step.definition.get('title'):

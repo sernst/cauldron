@@ -1,4 +1,5 @@
 import os
+import time
 
 from cauldron.render import texts as render_texts
 from cauldron.session.buffering import RedirectBuffer
@@ -24,6 +25,20 @@ class Report(object):
         self.library_includes = []
         self.stdout_interceptor = None  # type: RedirectBuffer
         self.stderr_interceptor = None  # type: RedirectBuffer
+
+        self._last_update_time = 0
+
+    @property
+    def last_update_time(self) -> float:
+        """ The last time at which the report was modified """
+        stdout = self.stdout_interceptor
+        stderr = self.stderr_interceptor
+
+        return max([
+            self._last_update_time,
+            stdout.last_write_time if stdout else 0,
+            stderr.last_write_time if stderr else 0,
+        ])
 
     @property
     def project(self):
@@ -66,6 +81,7 @@ class Report(object):
         self.body = []
         self.data = SharedCache()
         self.files = SharedCache()
+        self._last_update_time = time.time()
         return self
 
     def append_body(self, dom: str):
@@ -77,6 +93,7 @@ class Report(object):
 
         self.flush_stdout()
         self.body.append(dom)
+        self._last_update_time = time.time()
 
     def read_stdout(self):
         """
@@ -108,6 +125,7 @@ class Report(object):
 
         if len(contents) > 0:
             self.body.append(render_texts.preformatted_text(contents))
+            self._last_update_time = time.time()
 
         return contents
 
