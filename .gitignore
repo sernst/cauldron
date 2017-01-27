@@ -174,3 +174,4 @@ jspm_packages
 /results/
 /build
 /dist
+release-settings.json
