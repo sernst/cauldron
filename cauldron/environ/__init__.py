@@ -23,6 +23,7 @@ configs = Configuration()
 package_settings = systems.get_package_data()
 
 version = package_settings.get('version', '0.0.0')
+notebook_version = package_settings.get('notebookVersion', 'v0')
 
 version_info = VersionInfo(*[int(x) for x in version.split('.')])
 

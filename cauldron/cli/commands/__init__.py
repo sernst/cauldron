@@ -16,6 +16,7 @@ from cauldron.cli.commands import export
 from cauldron.cli.commands import purge
 from cauldron.cli.commands import refresh
 from cauldron.cli.commands import reload
+from cauldron.cli.commands import save
 from cauldron.cli.commands import show
 from cauldron.cli.commands import status
 from cauldron.cli.commands import version
