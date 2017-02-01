@@ -35,22 +35,23 @@ function getDataDirectory() {
     return window.PROJECT_DIRECTORY;
   }
 
+  if (exports.PARAMS.data_root) {
+    return exports.PARAMS.data_root;
+  }
+
   const id = exports.PARAMS.id || window.PROJECT_ID;
   const sid = exports.PARAMS.sid;
-  const dataDirectory = ['reports'];
 
-  if (id) {
-    dataDirectory.push(id);
-  }
+  const dataDirectory = [
+    'reports',
+    id || '',
+    sid ? 'snapshots' : 'latest',
+    sid || ''
+  ];
 
-  if (sid) {
-    dataDirectory.push('snapshots');
-    dataDirectory.push(sid);
-  } else {
-    dataDirectory.push('latest');
-  }
-
-  return dataDirectory.join('/');
+  return dataDirectory
+    .filter(folder => folder.length > 0)
+    .join('/');
 }
 
 
