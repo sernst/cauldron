@@ -303,7 +303,7 @@ def svg(svg_data: str) -> str:
 
     return templating.render(
         '<div class="svg-box">{{ svg }}</div>',
-        svg=svg
+        svg=svg_data
     )
 
 

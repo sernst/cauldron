@@ -5,7 +5,7 @@ from cauldron import render
 from cauldron.test.support import scaffolds
 
 
-class TestRenderTexts(scaffolds.ResultsTest):
+class TestRender(scaffolds.ResultsTest):
     """
 
     """
@@ -89,3 +89,11 @@ class TestRenderTexts(scaffolds.ResultsTest):
 
         self.assertGreaterEqual(len(result), 1)
         self.assertTrue(result.find('caption') != -1)
+
+    def test_svg(self):
+        """ should properly insert arbitrary svg string """
+
+        source = '<svg><circle r="1" cx="1" cy="1"></circle></svg>'
+
+        dom = render.svg(source)
+        self.assertGreater(dom.find(source), 0)
