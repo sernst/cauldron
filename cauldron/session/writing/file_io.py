@@ -1,6 +1,7 @@
 import os
 import shutil
 import typing
+import time
 from collections import namedtuple
 
 from cauldron import environ
@@ -76,7 +77,13 @@ def copy(copy_entry: FILE_COPY_ENTRY):
     copier = shutil.copy2 if os.path.isfile(source_path) else shutil.copytree
 
     make_output_directory(output_path)
-    copier(source_path, output_path)
+
+    for i in range(3):
+        try:
+            copier(source_path, output_path)
+            return
+        except Exception:
+            time.sleep(0.5)
 
 
 def write(write_entry: FILE_WRITE_ENTRY):
