@@ -42,7 +42,9 @@ class TestSnapshot(scaffolds.ResultsTest):
         """
         """
 
-        support.create_project(self, 'gerald')
+        r = support.create_project(self, 'gerald')
+        self.assertFalse(r.failed)
+        self.assertIsNotNone(cauldron.project.internal_project)
 
         r = support.run_command('snapshot add fake --no-show')
         self.assertFalse(r.failed, Message(
