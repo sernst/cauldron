@@ -363,7 +363,7 @@ class Response(object):
         self.failed = True
 
         stack = logger.get_error_stack() if error else None
-        error = str(error) if error else None
+        error = '{}'.format(error) if error else None
 
         return self.notify(
             kind='ERROR',

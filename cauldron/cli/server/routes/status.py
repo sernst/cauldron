@@ -60,7 +60,7 @@ def set_step_clean(step_name: str):
         return flask.jsonify(r.fail(
             code='PROJECT_FETCH_ERROR',
             message='No project is currently open'
-        ).serialize())
+        ).response.serialize())
 
     step = project.get_step(step_name)
 
@@ -68,13 +68,13 @@ def set_step_clean(step_name: str):
         return flask.jsonify(r.fail(
             code='STEP_FETCH_ERROR',
             message='No such step "{}" found'.format(step_name)
-        ).serialize())
+        ).response.serialize())
 
     step.mark_dirty(False)
 
     return flask.jsonify(r.update(
         project=project.kernel_serialize()
-    ).serialize())
+    ).response.serialize())
 
 
 @server_runner.APPLICATION.route('/project', methods=['GET', 'POST'])
@@ -148,19 +148,21 @@ def run_status(uid: str):
             )
 
         del server_runner.active_execution_responses[uid]
-        r.update(
-            run_status='complete',
-            run_multiple_updates=True,
-            run_uid=r.thread.uid
+
+        return flask.jsonify(
+            r.update(
+                run_status='complete',
+                run_multiple_updates=True,
+                run_uid=r.thread.uid
+            ).serialize()
         )
-        return flask.jsonify(r.serialize())
 
     except Exception as err:
         return flask.jsonify(
             Response().fail(
-                code='COMMAND_STATUS_FAILURE',
+                code='COMMAND_RUN_STATUS_FAILURE',
                 message='Unable to check command execution status',
-                uid=uid,
-                error=err
-            ).serialize()
+                error=err,
+                run_uid=uid
+            ).response.serialize()
         )
