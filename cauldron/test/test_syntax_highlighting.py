@@ -37,16 +37,16 @@ class TestSyntaxHighlighting(TestCase):
         self.assertIsInstance(lexer, PythonLexer)
 
     def test_unknown_language(self):
-        """ should not retrieve a lexer for an unknown language """
+        """ should retrieve a default lexer for an unknown language """
         lexer = syntax_highlighting.fetch_lexer('', 'lkjasdlkjsad')
-        self.assertIsNone(lexer)
+        self.assertIsNotNone(lexer)
 
     def test_unknown_everything(self):
-        """ should not retrieve a lexer for an unknown language """
+        """ should retrieve a default lexer for an unknown language """
         lexer = syntax_highlighting.fetch_lexer(
             source='asdlkasdj',
             language='lkjasdlkjsad',
             filename='test.qweoihwq',
             mime_type='fictional/lasdlkjad'
         )
-        self.assertIsNone(lexer)
+        self.assertIsNotNone(lexer)

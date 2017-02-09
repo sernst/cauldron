@@ -1,5 +1,7 @@
 from pygments import highlight
+from pygments.lexer import Lexer
 from pygments.formatters import HtmlFormatter
+from pygments.lexers.special import TextLexer
 from pygments.lexers import get_lexer_by_name
 from pygments.lexers import get_lexer_for_filename
 from pygments.lexers import get_lexer_for_mimetype
@@ -65,7 +67,7 @@ def fetch_lexer(
         language: str = None,
         filename: str = None,
         mime_type: str = None
-):
+) -> Lexer:
     """
 
     :param source:
@@ -103,4 +105,4 @@ def fetch_lexer(
     try:
         return guess_lexer(source, stripall=True)
     except ClassNotFound:
-        return None
+        return TextLexer()
