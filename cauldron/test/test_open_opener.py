@@ -53,7 +53,7 @@ class TestOpenOpener(scaffolds.ResultsTest):
     def test_bad_initialize_results(self, *args):
         """ should fail opening when initialization fails """
 
-        response = support.create_project(self, 'minnesota')
+        response = support.create_project(self, 'minnesota', confirm=False)
         self.assertTrue(response.failed)
         support.run_command('close')
 
@@ -61,7 +61,7 @@ class TestOpenOpener(scaffolds.ResultsTest):
     def test_bad_write_results(self, *args):
         """ should fail opening when writing initial results fails """
 
-        response = support.create_project(self, 'iowa')
+        response = support.create_project(self, 'iowa', confirm=False)
         self.assertTrue(response.failed)
         support.run_command('close')
 

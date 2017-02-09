@@ -17,14 +17,14 @@ class TestCreate(scaffolds.ResultsTest):
         """
         """
 
-        r = support.create_project(self, '', '')
+        r = support.create_project(self, '', '', confirm=False)
         self.assertTrue(r.failed, 'should have failed')
 
     def test_create_no_path(self):
         """
         """
 
-        r = support.create_project(self, 'test_create', '')
+        r = support.create_project(self, 'test_create', '', confirm=False)
         self.assertTrue(r.failed, 'should have failed')
 
     def test_create_simple_success(self):
@@ -60,7 +60,7 @@ class TestCreate(scaffolds.ResultsTest):
         r1 = support.create_project(self, 'test_create')
         r1.identifier = 'First {}'.format(r1.identifier)
 
-        r2 = support.create_project(self, 'test_create')
+        r2 = support.create_project(self, 'test_create', confirm=False)
         r2.identifier = 'Second {}'.format(r2.identifier)
 
         self.assertTrue(
@@ -181,7 +181,7 @@ class TestCreate(scaffolds.ResultsTest):
         target = 'cauldron.cli.commands.create.write_project_data'
         with patch(target) as func:
             func.return_value = False
-            result = support.create_project(self, 'aurelius')
+            result = support.create_project(self, 'aurelius', confirm=False)
 
         self.assertTrue(result.failed)
 
@@ -193,7 +193,7 @@ class TestCreate(scaffolds.ResultsTest):
         target = 'cauldron.cli.commands.create.create_project_directory'
         with patch(target) as func:
             func.return_value = False
-            result = support.create_project(self, 'augustus')
+            result = support.create_project(self, 'augustus', confirm=False)
 
         self.assertTrue(result.failed)
 

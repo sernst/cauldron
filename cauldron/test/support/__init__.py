@@ -1,7 +1,7 @@
-import os
 import re
 from unittest.mock import patch
 
+import cauldron
 from cauldron import environ
 from cauldron.cli import commander
 from cauldron.cli.shell import CauldronShell
@@ -31,6 +31,7 @@ def create_project(
         name: str,
         path: str = None,
         forget: bool = True,
+        confirm: bool = True,
         **kwargs
 ) -> 'environ.Response':
     """
@@ -58,6 +59,14 @@ def create_project(
     r = commander.execute('create', args)
     if r.thread:
         r.thread.join()
+
+    if confirm:
+        tester.assertFalse(r.failed, Message(
+            'support.create_project',
+            'project should have been created',
+            response=r
+        ))
+        tester.assertIsNotNone(cauldron.project.internal_project)
 
     return r
 
