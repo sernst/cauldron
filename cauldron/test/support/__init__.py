@@ -1,3 +1,4 @@
+import sys
 import re
 from unittest.mock import patch
 
@@ -44,8 +45,10 @@ def create_project(
     :return:
     """
 
+    version = ''.join(['{}'.format(s) for s in sys.version_info])
+
     if path is None:
-        path = tester.get_temp_path('project-{}-'.format(name))
+        path = tester.get_temp_path('project-{}-{}-'.format(name, version))
 
     args = [name, path]
     for key, value in kwargs.items():

@@ -30,7 +30,7 @@ def populate(
     parser.add_argument(
         'path',
         type=str,
-        default=None,
+        default='',
         help=cli.reformat(
             """
             The path where the single html file will be exported
@@ -92,7 +92,9 @@ def execute(
     :return:
     """
 
-    if path is None:
+    path = (path if path else '').strip('"')
+
+    if not path:
         return response.fail(
             code='MISSING_PATH_ARG',
             message='Missing export path argument'
@@ -100,7 +102,6 @@ def execute(
             whitespace=1
         ).response
 
-    path = path.strip('"')
     directory_name = directory_name.strip('"') if directory_name else None
 
     project = cauldron.project.internal_project

@@ -93,4 +93,3 @@ class TestOpen(scaffolds.ResultsTest):
 
         result = support.autocomplete('open @ex')
         self.assertIn('examples:', result)
-

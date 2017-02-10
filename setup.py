@@ -44,7 +44,7 @@ def populate_extra_files():
 setup(
     name='cauldron-notebook',
     version=settings['version'],
-    description='The Un-Notebook Notebook: Scientific Analysis Environment',
+    description='The Unnotebook: Scientific Analysis Environment',
     url='https://github.com/sernst/cauldron',
     author='Scott Ernst',
     author_email='swernst@gmail.com',
