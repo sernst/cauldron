@@ -28,7 +28,8 @@ def populate(
         dest='force',
         default=False,
         action='store_true',
-        help=cli.reformat("""
+        help=cli.reformat(
+            """
             When this option is included, the purge operation will happen
             without an interactive confirmation step
             """
@@ -50,10 +51,10 @@ def execute(
     """
 
     path = environ.configs.fetch('results_directory')
-    if not path:
-        path = environ.paths.user('results')
+    path = path if path else environ.paths.user('results')
 
-    environ.log("""
+    environ.log(
+        """
         ==============
         REMOVE RESULTS
         ==============
@@ -61,7 +62,9 @@ def execute(
         This command will remove all existing results stored in the directory:
 
         {path}
-        """.format(path=path), whitespace_bottom=1)
+        """.format(path=path),
+        whitespace_bottom=1
+    )
 
     do_it = force
     if not force:

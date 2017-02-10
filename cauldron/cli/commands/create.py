@@ -164,9 +164,7 @@ def execute(
         title = project_name.replace('_', ' ').replace('-', ' ').capitalize()
 
     location = open_actions.fetch_location(response, directory)
-    if location:
-        directory = location
-
+    directory = location if location else directory
     directory = environ.paths.clean(directory).rstrip(os.sep)
     if not directory.endswith(project_name):
         directory = os.path.join(directory, project_name)

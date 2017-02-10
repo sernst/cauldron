@@ -1,16 +1,17 @@
-from argparse import ArgumentParser
 import typing
+from argparse import ArgumentParser
 
 import cauldron
-from cauldron import environ
 from cauldron import session
 from cauldron.environ import Response
 
 NAME = 'refresh'
-DESCRIPTION = """
+DESCRIPTION = (
+    """
     Rewrites the current state of the project to the results directory for
     viewing. Useful when you want to update support files.
     """
+)
 
 
 def populate(
@@ -30,31 +31,36 @@ def populate(
 
 def execute(
         parser: ArgumentParser,
-        response: Response = None
-):
-    """
+        response: Response
+) -> Response:
+    """ """
 
-    :return:
-    """
-
-    project = cauldron.project
-    if project:
-        project = project.internal_project
-
+    project = cauldron.project.internal_project
     if not project:
-        environ.log(
+        return response.fail(
+            code='NO_OPEN_PROJECT',
+            message='No project is open. Unable to refresh'
+        ).console(
             '[ABORTED]: No project is open. Unable to refresh.',
             whitespace=1
-        )
-        return
+        ).response
 
-    session.initialize_results_path(project.results_path)
-    project.write()
+    try:
+        session.initialize_results_path(project.results_path)
+        project.write()
+    except Exception as err:
+        return response.fail(
+            code='REFRESH_ERROR',
+            message='Unable to refresh project',
+            error=err
+        ).console(
+            whitespace=1
+        ).response
 
-    environ.log(
-        '[COMPLETE]: Project display refreshed',
+    return response.notify(
+        kind='SUCCESS',
+        code='PROJECT_REFRESHED',
+        message='Project notebook display has been refreshed'
+    ).console(
         whitespace=1
-    )
-
-
-
+    ).response

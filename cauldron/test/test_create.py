@@ -3,19 +3,17 @@ import json
 from unittest.mock import patch
 
 import cauldron as cd
+from cauldron.cli.commands import create
 from cauldron.test import support
 from cauldron.test.support import scaffolds
 from cauldron import environ
 
 
 class TestCreate(scaffolds.ResultsTest):
-    """
-
-    """
+    """ """
 
     def test_create_no_args(self):
-        """
-        """
+        """ should fail with no args """
 
         r = support.create_project(self, '', '', confirm=False)
         self.assertTrue(r.failed, 'should have failed')
@@ -198,3 +196,42 @@ class TestCreate(scaffolds.ResultsTest):
         self.assertTrue(result.failed)
 
         support.run_command('close')
+
+    def test_autocomplete_absolute_path(self):
+        """ should properly autocomplete an alias """
+
+        directory = os.path.dirname(os.path.realpath(__file__))
+        result = support.autocomplete('create fake "{}"'.format(directory))
+        self.assertIsNotNone(result)
+
+    def test_autocomplete_empty(self):
+        """ should properly autocomplete an alias """
+
+        result = support.autocomplete('create')
+        self.assertEqual(len(result), 0)
+
+    def test_incomplete_alias(self):
+        """ should properly autocomplete an incomplete alias """
+
+        result = support.autocomplete('create fake @ho')
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0], 'home:')
+
+    def test_create_project_directory(self):
+        """ should abort if directory already exists """
+
+        path = self.get_temp_path('test-create', 'project-directory-1')
+        os.makedirs(path)
+
+        result = create.create_project_directory(path)
+        self.assertTrue(result)
+
+    def test_create_project_directory_fail(self):
+        """ should fail if directory cannot be created """
+
+        path = self.get_temp_path('test-create', 'project-directory-2')
+
+        with patch('os.makedirs') as make_dirs:
+            make_dirs.side_effect = IOError('Fake Error')
+            result = create.create_project_directory(path)
+        self.assertFalse(result)

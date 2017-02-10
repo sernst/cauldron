@@ -30,9 +30,11 @@ def populate(
         'command',
         type=str,
         default=None,
-        help=cli.reformat("""
+        help=cli.reformat(
+            """
             The specific alias command to execute. One of: add, remove or list.
-            """)
+            """
+        )
     )
 
     parser.add_argument(
@@ -40,10 +42,12 @@ def populate(
         type=str,
         nargs='?',
         default=None,
-        help=cli.reformat("""
+        help=cli.reformat(
+            """
             The name of the alias on which to act if needed by the specific
             command.
-            """)
+            """
+        )
     )
 
     parser.add_argument(
@@ -51,9 +55,11 @@ def populate(
         type=str,
         nargs='?',
         default=None,
-        help=cli.reformat("""
+        help=cli.reformat(
+            """
             The path for the alias when using the add command
-            """)
+            """
+        )
     )
 
     parser.add_argument(
@@ -61,10 +67,12 @@ def populate(
         dest='temporary',
         default=False,
         action='store_true',
-        help=cli.reformat("""
+        help=cli.reformat(
+            """
             When this option is included, the alias will only remain for this
             cauldron session. It will not be remembered for future sessions.
-            """)
+            """
+        )
     )
 
 

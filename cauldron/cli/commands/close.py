@@ -1,6 +1,5 @@
 from argparse import ArgumentParser
 
-from cauldron import environ
 from cauldron import runner
 from cauldron.environ import Response
 
