@@ -16,7 +16,7 @@ def run(
         A run response dictionary containing
     """
 
-    with open(step.source_path, 'r+') as f:
+    with open(step.source_path, 'r') as f:
         code = f.read()
 
     try:

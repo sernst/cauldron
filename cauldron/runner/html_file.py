@@ -14,7 +14,7 @@ def run(
     :return:
     """
 
-    with open(step.source_path, 'r+') as f:
+    with open(step.source_path, 'r') as f:
         code = f.read()
 
     step.report.append_body(render.html(templating.render(

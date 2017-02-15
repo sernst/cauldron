@@ -38,7 +38,8 @@ def get_server_data() -> dict:
     """
 
     out = dict(
-        uptime=environ.run_time().total_seconds()
+        uptime=environ.run_time().total_seconds(),
+        cauldron_settings=environ.package_settings
     )
     out.update(server_data)
     out.update(environ.systems.get_system_data())

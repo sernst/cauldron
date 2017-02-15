@@ -131,7 +131,7 @@ def execute(
         shutil.copytree(results_path, out_path)
 
     html_path = os.path.join(out_path, 'project.html')
-    with open(html_path, 'r+') as f:
+    with open(html_path, 'r') as f:
         dom = f.read()
 
     dom = dom.replace(

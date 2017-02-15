@@ -185,7 +185,7 @@ class TestSteps(scaffolds.ResultsTest):
         r = support.run_command('steps list')
         step = r.data['steps'][0]
 
-        with open(step['source_path'], 'r+') as f:
+        with open(step['source_path'], 'r') as f:
             contents = f.read()
 
         self.assertEqual(contents.strip(), '#S2', Message(

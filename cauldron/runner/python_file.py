@@ -43,7 +43,7 @@ def run(
     module_name = step.definition.name.rsplit('.', 1)[0]
     module = types.ModuleType(module_name)
 
-    with open(step.source_path, 'r+') as f:
+    with open(step.source_path, 'r') as f:
         source_code = f.read()
 
     try:

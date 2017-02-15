@@ -84,5 +84,5 @@ def _get_file_contents(source_path: str) -> str:
     :return:
     """
 
-    with open(source_path, 'r+') as fp:
+    with open(source_path, 'r') as fp:
         return fp.read()

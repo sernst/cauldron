@@ -709,7 +709,7 @@ def load_project_settings(path: str) -> dict:
     if not os.path.exists(path):
         raise FileNotFoundError('No project file found at: {}'.format(path))
 
-    with open(path, 'r+') as f:
+    with open(path, 'r') as f:
         out = json.load(f)
 
     project_folder = os.path.split(os.path.dirname(path))[-1]

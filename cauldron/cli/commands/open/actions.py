@@ -1,10 +1,8 @@
+import typing
 import glob
 import os
 
-import cauldron
 from cauldron import environ
-from cauldron import runner
-from cauldron import session
 from cauldron.cli.interaction import query
 from cauldron.environ import Response
 
@@ -128,11 +126,8 @@ def fetch_location(response: Response, path: str) -> str:
     return None
 
 
-def fetch_last(response: Response) -> str:
-    """
-
-    :return:
-    """
+def fetch_last(response: Response) -> typing.Union[str, None]:
+    """ Returns the last opened project path if such a path exists """
 
     recent_paths = environ.configs.fetch('recent_paths', [])
 

@@ -28,7 +28,7 @@ def create(
     """
 
     template_path = environ.paths.resources('web', 'project.html')
-    with open(template_path, 'r+') as f:
+    with open(template_path, 'r') as f:
         dom = f.read()
 
     dom = dom.replace(

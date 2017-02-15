@@ -8,7 +8,7 @@ from cauldron.cli import commander
 from cauldron.cli import parse
 
 
-with open(environ.paths.package('settings.json'), 'r+') as f:
+with open(environ.paths.package('settings.json'), 'r') as f:
     package_data = json.load(f)
 
 

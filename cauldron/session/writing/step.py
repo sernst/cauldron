@@ -71,7 +71,7 @@ def get_cached_data(
     out = create_data(step)
 
     try:
-        with open(cache_path, 'r+') as f:
+        with open(cache_path, 'r') as f:
             cached_data = json.load(f)
     except Exception:
         return None

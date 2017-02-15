@@ -11,7 +11,7 @@ CAULDRON_ROOT = os.path.realpath(os.path.join(
 ))
 
 settings_path = os.path.join(CAULDRON_ROOT, 'cauldron', 'settings.json')
-with open(settings_path, 'r+') as f:
+with open(settings_path, 'r') as f:
     settings = json.load(f)
 
 temp_directory = tempfile.mkdtemp(prefix='cauldron-build-')
@@ -32,7 +32,7 @@ for item in os.listdir(CAULDRON_ROOT):
         shutil.copy2(item_path, os.path.join(temp_directory, item))
 
 meta_path = os.path.join(CAULDRON_ROOT, 'conda-recipe', 'meta.yaml.template')
-with open(meta_path, 'r+') as f:
+with open(meta_path, 'r') as f:
     meta_template = f.read()
 
 meta_target_path = os.path.join(temp_directory, 'conda-recipe', 'meta.yaml')

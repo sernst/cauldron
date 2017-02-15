@@ -136,7 +136,7 @@ def render_file(path: str, **kwargs):
         The rendered template string
     """
 
-    with open(path, 'r+') as f:
+    with open(path, 'r') as f:
         contents = f.read()
 
     return get_environment().from_string(contents).render(

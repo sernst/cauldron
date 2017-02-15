@@ -165,7 +165,7 @@ class TestCreate(scaffolds.ResultsTest):
         self.assertIn(libs_folder, project.settings.fetch('library_folders'))
         self.assertIn(assets_folder, project.settings.fetch('asset_folders'))
 
-        with open(project.source_path, 'r+') as f:
+        with open(project.source_path, 'r') as f:
             data = json.load(f)
 
         self.assertEqual(libs_folder, data['library_folders'][0])

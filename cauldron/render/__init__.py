@@ -63,7 +63,7 @@ def code_file(
     source = None
     for encoding in ['utf-8', 'mac_roman', 'cp1250']:
         try:
-            with open(path, 'r+', encoding=encoding) as f:
+            with open(path, 'r', encoding=encoding) as f:
                 source = f.read()
         except Exception:
             print('Failed with encoding:', encoding)

@@ -52,7 +52,7 @@ class Configuration(object):
             return self
 
         try:
-            with open(path, 'r+') as f:
+            with open(path, 'r') as f:
                 contents = f.read()
             if contents:
                 self._persistent = json.loads(contents)

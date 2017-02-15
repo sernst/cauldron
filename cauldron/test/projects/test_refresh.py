@@ -20,7 +20,7 @@ class TestRefresh(scaffolds.ResultsTest):
 
         target_project = project if project else cd.project.internal_project
 
-        with open(target_project.source_path, 'r+') as f:
+        with open(target_project.source_path, 'r') as f:
             return json.load(f)
 
     @classmethod
