@@ -8,10 +8,68 @@ import typing
 from cauldron.environ import paths
 from cauldron.environ.logger import log
 
-try:
-    site_packages = list(site.getsitepackages())
-except Exception:
-    site_packages = []
+
+def get_site_packages() -> list:
+    try:
+        return list(site.getsitepackages())
+    except Exception:
+        return []
+
+
+def simplify_path(path: str, path_prefixes: list = None) -> str:
+    """
+    Simplifies package paths by replacing path prefixes with values specified
+    in the replacements list
+
+    :param path:
+    :param path_prefixes:
+    :return:
+    """
+
+    test_path = '{}'.format(path if path else '')
+    replacements = (path_prefixes if path_prefixes else []).copy()
+    replacements.append(('~', os.path.expanduser('~')))
+
+    for key, value in replacements:
+        if test_path.startswith(value):
+            return '{}{}'.format(key, test_path[len(value):])
+
+    return test_path
+
+
+def module_to_package_data(
+        name: str,
+        entry,
+        path_prefixes: list = None
+) -> typing.Union[dict, None]:
+    """
+    Converts a module entry into a package data dictionary with information
+    about the module. including version and location on disk
+
+    :param name:
+    :param entry:
+    :param path_prefixes:
+    :return:
+    """
+
+    if name.find('.') > -1:
+        # Not interested in sub-packages, only root ones
+        return None
+
+    version = getattr(entry, '__version__', None)
+    version = version if not hasattr(version, 'version') else version.version
+    location = getattr(entry, '__file__', sys.exec_prefix)
+
+    if version is None or location.startswith(sys.exec_prefix):
+        # Not interested in core packages. They obviously are standard and
+        # don't need to be included in an output.
+        return None
+
+    return dict(
+        name=name,
+        version=version,
+        location=simplify_path(location, path_prefixes)
+    )
 
 
 def get_system_data() -> typing.Union[None, dict]:
@@ -27,66 +85,25 @@ def get_system_data() -> typing.Union[None, dict]:
          * version
     """
 
-    home_directory = os.path.expanduser('~')
+    site_packages = get_site_packages()
     path_prefixes = [('[SP]', p) for p in site_packages]
     path_prefixes.append(('[CORE]', sys.exec_prefix))
 
-    def simplify(path: str, replacements: list = None) -> str:
-        reps = (replacements if replacements else []).copy()
-        reps.append(('~', home_directory))
-
-        if not path or not path.startswith(home_directory):
-            return path
-
-        for key, value in reps:
-            if path.startswith(value):
-                return '{}{}'.format(key, path[len(value):])
-
-        return path
-
-    def module_entry(entry):
-        if entry[0].find('.') > -1:
-            return None
-
-        mod = entry[-1]
-        version = getattr(mod, '__version__', None)
-
-        try:
-            version = version.version
-        except Exception:
-            pass
-
-        location = getattr(mod, '__file__', None)
-
-        if version is None or location is None:
-            return None
-
-        location = simplify(location, path_prefixes)
-
-        if location.startswith('[CORE]'):
-            return None
-
-        return dict(
-            name=entry[0],
-            version=version,
-            location=location
-        )
-
     packages = [
-        x for x in map(module_entry, list(sys.modules.items()))
-        if x is not None
+        module_to_package_data(name, entry, path_prefixes)
+        for name, entry in list(sys.modules.items())
     ]
 
     python_data = dict(
         version=list(sys.version_info),
-        executable=simplify(sys.executable),
-        directory=simplify(sys.exec_prefix),
-        site_packages=[simplify(sp) for sp in site_packages]
+        executable=simplify_path(sys.executable),
+        directory=simplify_path(sys.exec_prefix),
+        site_packages=[simplify_path(sp) for sp in site_packages]
     )
 
     return dict(
         python=python_data,
-        packages=packages
+        packages=[p for p in packages if p is not None]
     )
 
 
@@ -115,21 +132,13 @@ def remove(path: str):
     if not os.path.exists(path):
         return True
 
-    if os.path.isfile(path):
-        for attempt in range(3):
-            try:
-                os.remove(path)
-                return True
-            except Exception as err:
-                pass
-
-        return False
+    remover = os.remove if os.path.isfile(path) else shutil.rmtree
 
     for attempt in range(3):
         try:
-            shutil.rmtree(path)
+            remover(path)
             return True
-        except Exception as err:
+        except Exception:
             pass
 
     return False

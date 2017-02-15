@@ -97,8 +97,8 @@ class TestSteps(scaffolds.ResultsTest):
         support.create_project(self, 'bellatrix')
         results = [support.run_command('steps add') for i in range(STEP_COUNT)]
 
-        if any([r.failed for r in results]):
-            self.fail('Failed to add step')
+        has_failure = any([r.failed for r in results])
+        self.assertFalse(has_failure, 'Failed to add step')
 
         r = support.run_command('steps remove S02.py')
         self.assertFalse(r.failed, 'Removal should have succeeded')

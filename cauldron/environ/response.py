@@ -1,9 +1,9 @@
-import functools
+import threading
 import typing
 
 from cauldron import cli
 from cauldron.environ import logger
-import threading
+
 
 class ResponseMessage(object):
 
@@ -230,31 +230,6 @@ class Response(object):
             print_data('MESSAGE DATA', m.data)
 
         return '\n'.join(out)
-
-    def pipe(self, function, *args, **kwargs):
-        """
-
-        :param function:
-        :param args:
-        :param kwargs:
-        :return:
-        """
-
-        return function(self, *args, **kwargs)
-
-    def chain(self, function, *args, **kwargs):
-        """
-
-        :param function:
-        :param args:
-        :param kwargs:
-        :return:
-        """
-
-        return functools.partial(
-            self.chain,
-            self.pipe(function, *args, **kwargs)
-        )
 
     def consume(self, other: typing.Union['Response', 'ResponseMessage']):
         """

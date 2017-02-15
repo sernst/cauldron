@@ -16,7 +16,8 @@ def reformat(source: str) -> str:
         The string to reformat
     """
 
-    return dedent(source.strip('\n')).strip()
+    value = source if source else ''
+    return dedent(value.strip('\n')).strip()
 
 
 def as_single_line(source: str) -> str:

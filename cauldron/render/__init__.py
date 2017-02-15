@@ -204,7 +204,10 @@ def plotly(data: dict, layout: dict, scale: float = 0.5) -> str:
         plotly_lib = None
 
     if plotly_lib is None:
-        raise ImportError('Unable to import Plotly library')
+        return templating.render_template(
+            template_name='import-error.html',
+            library_name='Plotly'
+        )
 
     dom = plotly_lib.offline.plot(
         {'data': data, 'layout': layout},
@@ -327,22 +330,11 @@ def status(
 
     for key in keys:
         value = data[key]
-        value_type = None
-        try:
-            value_type = value.__class__.__name__
-        except Exception:
-            pass
-
-        try:
-            if value_type is None:
-                value_type = value.__name__
-        except Exception:
-            pass
-
-        try:
-            value_type = type(value).__name__
-        except Exception:
-            pass
+        value_type = getattr(
+            value,
+            '__class__',
+            {'__name__': 'Unknown'}
+        ).__name__
 
         if hasattr(value, 'head'):
             try:

@@ -1,5 +1,6 @@
 import os
 
+import cauldron
 from cauldron.test import support
 from cauldron.test.support import scaffolds
 
@@ -101,9 +102,12 @@ class TestSessionDisplay(scaffolds.ResultsTest):
 
         support.create_project(self, 'starbuck')
 
-        jinja_path = self.get_temp_path('starbuck', 'template.html')
-        if not os.path.exists(os.path.dirname(jinja_path)):
-            os.makedirs(jinja_path)
+        project = cauldron.project.internal_project
+
+        jinja_path = os.path.join(
+            project.source_directory,
+            'template.html'
+        )
 
         with open(jinja_path, 'w') as fp:
             fp.write('<div>Hello {{ name }}</div>')

@@ -2,7 +2,6 @@ import os
 import typing
 import warnings
 
-from cauldron import environ
 from cauldron.session import projects
 
 
@@ -27,6 +26,8 @@ class FileDefinition(object):
         self.project_folder = project_folder
         if isinstance(data, str):
             self.data = {'name': data}
+        elif data is None:
+            self.data = {}
         else:
             self.data = data
 
@@ -53,7 +54,7 @@ class FileDefinition(object):
         self.data['name'] = value
 
     @property
-    def folder(self) -> str:
+    def folder(self) -> typing.Union[str, None]:
         """
         The folder, relative to the project source_directory, where the file
         resides
@@ -80,7 +81,7 @@ class FileDefinition(object):
 
     @property
     def title(self) -> str:
-        return self.data.get('title', self.data.get('name'))
+        return self.data.get('title', self.name)
 
     @title.setter
     def title(self, value: str):
