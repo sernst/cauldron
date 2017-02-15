@@ -1,4 +1,5 @@
 import os
+import site
 
 from unittest import mock
 from unittest.mock import patch
@@ -131,6 +132,13 @@ class TestSystems(scaffolds.ResultsTest):
 
     def test_get_site_packages_success(self):
         """ should get site packages """
+
+        def get_site_packages_mock():
+            return []
+
+        if not hasattr(site, 'getsitepackages'):
+            setattr(site, 'getsitepackages', get_site_packages_mock)
+
         data = [1, 2, 3]
         with patch('site.getsitepackages') as get_site_packages:
             get_site_packages.return_value = data
@@ -140,6 +148,12 @@ class TestSystems(scaffolds.ResultsTest):
 
     def test_get_site_packages_failed(self):
         """ should return an empty list if unable to get site packages """
+
+        def get_site_packages_mock():
+            return []
+
+        if not hasattr(site, 'getsitepackages'):
+            setattr(site, 'getsitepackages', get_site_packages_mock)
 
         with patch('site.getsitepackages') as get_site_packages:
             get_site_packages.side_effect = ValueError('FAKE ERROR')
