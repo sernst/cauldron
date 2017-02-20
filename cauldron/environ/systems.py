@@ -119,7 +119,7 @@ def get_package_data() -> dict:
         return json.load(f)
 
 
-def remove(path: str):
+def remove(path: str) -> bool:
     """
 
     :param path:

@@ -4,8 +4,10 @@ import tempfile
 import unittest
 import json
 
+import cauldron
 from cauldron import environ
 from cauldron.cli import commander
+from cauldron.test.support.messages import Message
 
 
 class ResultsTest(unittest.TestCase):
@@ -38,7 +40,8 @@ class ResultsTest(unittest.TestCase):
         super(ResultsTest, self).tearDown()
 
         # Close any open project so that it doesn't persist to the next test
-        commander.execute('close', '')
+        if cauldron.project.internal_project is not None:
+            commander.execute('close', '')
 
         environ.configs.remove('results_directory', include_persists=False)
 
@@ -65,6 +68,34 @@ class ResultsTest(unittest.TestCase):
             os.path.join(self.temp_directories[identifier], *args)
         )
 
+    def assert_has_error_code(self, response, code: str):
+        """
+
+        :param response:
+        :param code:
+        :return:
+        """
+
+        self.assertTrue(response.failed, Message(
+            'Did not Fail',
+            'Response should have failed if expecting an error',
+            response=response
+        ))
+
+        self.assertGreater(len(response.errors), 0, Message(
+            'No Errors Found',
+            'There should have been an error in the response',
+            response=response
+        ))
+
+        codes = [error.code for error in response.errors]
+
+        self.assertIn(code, codes, Message(
+            'Error Code Not Found',
+            'The error code "{}" was not found in the response errors',
+            response=response
+        ))
+
     @classmethod
     def read_flask_response(cls, response):
         """
@@ -74,5 +105,3 @@ class ResultsTest(unittest.TestCase):
         """
 
         return json.loads(response.data.decode('utf-8', 'ignore'))
-
-

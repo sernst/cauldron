@@ -13,7 +13,7 @@ from cauldron.session.projects import Project
 def index_from_location(
         response: Response,
         project: Project,
-        location: str = None,
+        location: typing.Union[str, int] = None,
         default: int = None
 ) -> int:
     """
@@ -39,7 +39,7 @@ def index_from_location(
             return None if location < 0 else location
         except Exception:
             index = project.index_of_step(location)
-            return None if index is None else (index + 1)
+            return default if index is None else (index + 1)
 
     return default
 
@@ -239,7 +239,7 @@ def modify_step(
     step_data = {'name': new_name}
     if title is None:
         if old_step.definition.get('title'):
-            step_data['title'] = old_step.definition['title']
+            step_data['title'] = old_step.definition.title
     else:
         step_data['title'] = title.strip('"')
 
@@ -292,7 +292,7 @@ def toggle_muting(
         response: Response,
         step_name: str,
         value: bool = None
-):
+) -> Response:
     """
 
     :param response:
@@ -310,7 +310,7 @@ def toggle_muting(
             message='No step found with name: "{}"'.format(step_name)
         ).kernel(
             name=step_name
-        ).console()
+        ).console().response
 
     step = project.steps[index]
     if value is None:
