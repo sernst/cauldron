@@ -128,7 +128,8 @@ def section(
         project: typing.Union[Project, None],
         starting: ProjectStep = None,
         limit: int = 1,
-        force: bool = False
+        force: bool = False,
+        skips: typing.List[ProjectStep] = None
 ) -> list:
     """
 
@@ -137,6 +138,8 @@ def section(
     :param starting:
     :param limit:
     :param force:
+    :param skips:
+        Steps that should be skipped while running this section
     :return:
     """
 
@@ -157,6 +160,9 @@ def section(
             break
 
         if ps.index < starting_index:
+            continue
+
+        if skips and ps in skips:
             continue
 
         if not force and count == 0 and not ps.is_dirty():

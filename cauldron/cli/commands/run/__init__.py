@@ -1,6 +1,7 @@
 import re
 import typing
 from argparse import ArgumentParser
+from collections import OrderedDict
 
 import cauldron
 from cauldron import cli
@@ -126,41 +127,43 @@ def execute(
 
     project = run_actions.get_project(response)
     if not project:
-        return response
+        return response.fail(
+            code='NO_OPEN_PROJECT',
+            message='No project is open. Unable to execute run command.'
+        ).console(
+            whitespace=1
+        ).response
 
     run_actions.preload_project(response, project)
 
-    if not step:
-        step = []
-    step = [s.strip('"') for s in step]
+    steps = list(step) if step else []
+    steps = list(OrderedDict.fromkeys([s.strip('"') for s in steps]).keys())
 
     try:
         # Special cases that apply limits
-        if re.match(r'[0-9]+$', step[-1]):
-            limit = int(step[-1])
-            step.pop()
-        elif re.match(r'[\.]+', step[-1]):
-            limit = len(step[-1])
-            step.pop()
+        if re.match(r'[0-9]+$', steps[-1]):
+            limit = int(steps[-1])
+            steps.pop()
+        elif re.match(r'[\.]+$', steps[-1]):
+            limit = len(steps[-1])
+            steps.pop()
     except Exception:
         pass
 
-    project_steps = []
-    for s in project.steps:
-        if s.definition.name in step:
-            project_steps.append(s)
+    project_steps = [project.get_step(name) for name in steps]
 
-    for ps in project_steps:
-        step.remove(ps.definition.name)
-
-    if len(step) > 0:
-        message = ['  * "{}"'.format(x) for x in step]
+    if None in project_steps:
+        missing_steps = [
+            steps[index] for index, value in enumerate(project_steps)
+            if value is None
+        ]
+        message = ['  * "{}"'.format(x) for x in missing_steps]
         message.insert(0, '[ABORTED]: Unable to locate the following step(s):')
         return response.fail(
             code='MISSING_STEP',
             message='Unable to locate steps'
         ).kernel(
-            steps=[x for x in step]
+            steps=[x for x in steps]
         ).console(
             message,
             whitespace=1
@@ -201,15 +204,13 @@ def execute(
         )
     else:
         for ps in project_steps:
-            if ps in steps_run:
-                continue
-
             steps_run += runner.section(
                 response=response,
                 project=project,
                 starting=ps,
                 limit=max(1, limit),
-                force=force or (limit < 1 and len(project_steps) < 2)
+                force=force or (limit < 1 and len(project_steps) < 2),
+                skips=steps_run + []
             )
 
     project.write()
@@ -240,6 +241,9 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
     :return:
     """
 
+    if len(parts) < 1:
+        return []
+
     if parts[-1].startswith('-'):
         return autocompletion.match_flags(
             segment=segment,
@@ -247,9 +251,6 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
             shorts=['f', 'c', 's', 'l'],
             longs=['force', 'continue', 'step', 'limit']
         )
-
-    if len(parts) < 1:
-        return []
 
     value = parts[-1]
     project = cauldron.project.internal_project
