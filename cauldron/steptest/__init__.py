@@ -25,7 +25,6 @@ def find_project_directory(subdirectory: str) -> typing.Union[str, None]:
         if no project directory was found.
     """
 
-    print('Subdirectory:', subdirectory)
     if os.path.exists(os.path.join(subdirectory, 'cauldron.json')):
         return subdirectory
 
@@ -166,14 +165,25 @@ class StepTestCase(unittest.TestCase):
 
         return cd.project
 
-    def run_step(self, step_name: str) -> StepTestRunResult:
+    def run_step(
+            self,
+            step_name: str,
+            allow_failure: bool = False
+    ) -> StepTestRunResult:
         """
         Runs the specified step by name its complete filename including extension
 
         :param step_name:
             The full filename of the step to be run including its extension.
+        :param allow_failure:
+            Whether or not to allow a failed result to be returned. If False,
+            a failed attempt to run a step will cause the current test to
+            fail immediately before returning a value from this function call.
+            Override this with a True value to have the step failure data
+            passed back for inspection.
         :return:
-            A StepTestRunResult instance containing information about the execution of the step.
+            A StepTestRunResult instance containing information about the
+            execution of the step.
         """
 
         project = cd.project.internal_project
@@ -190,7 +200,7 @@ class StepTestCase(unittest.TestCase):
         response = commander.execute('run', '"{}" --force'.format(step_name))
         response.thread.join()
 
-        if response.failed:
+        if not allow_failure and response.failed:
             self.fail('Failed to run step "{}"'.format(step_name))
 
         return StepTestRunResult(step, response)
