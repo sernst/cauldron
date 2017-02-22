@@ -315,6 +315,7 @@ class Response(object):
         """
 
         return dict(
+            id=self.identifier,
             data=self.data,
             errors=[x.serialize() for x in self.errors],
             warnings=[x.serialize() for x in self.warnings],
@@ -382,3 +383,25 @@ class Response(object):
 
         self.ended = True
         return self
+
+    @staticmethod
+    def deserialize(serial_data: dict) -> 'Response':
+        """ Converts a serialized dictionary response to a Response object """
+
+        r = Response(serial_data.get('id'))
+        r.data.update(serial_data.get('data', {}))
+        r.ended = serial_data.get('ended', False)
+        r.failed = not serial_data.get('success', True)
+
+        def load_messages(message_type: str):
+            messages = getattr(r, message_type) + [
+                ResponseMessage(**data)
+                for data in serial_data.get(message_type, [])
+            ]
+            setattr(r, message_type, messages)
+
+        load_messages('errors')
+        load_messages('warnings')
+        load_messages('messages')
+
+        return r

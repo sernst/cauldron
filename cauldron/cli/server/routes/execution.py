@@ -22,7 +22,7 @@ def execute_deprecated_route():
     return execute(True)
 
 
-@server_runner.APPLICATION.route('/command-sync', methods=['POST'])
+@server_runner.APPLICATION.route('/command-sync', methods=['GET', 'POST'])
 def execute_sync():
     """
     Execution method for synchronous commands. Command thread
@@ -35,7 +35,7 @@ def execute_sync():
     return execute(False)
 
 
-@server_runner.APPLICATION.route('/command-async', methods=['POST'])
+@server_runner.APPLICATION.route('/command-async', methods=['GET', 'POST'])
 def execute_async():
     """
     Execution method for synchronous commands. Command threads
@@ -235,21 +235,27 @@ def shutdown():
     func = request.environ.get('werkzeug.server.shutdown')
     if func is None:
         return flask.jsonify(
-            Response().fail(
+            Response()
+            .fail(
                 code='NOT_RUNNING_ERROR',
                 message='Unable to shutdown server'
-            ).response.serialize()
+            )
+            .response
+            .serialize()
         )
 
     try:
         func()
     except Exception as err:
         return flask.jsonify(
-            Response().fail(
+            Response()
+            .fail(
                 code='SHUTDOWN_ERROR',
                 message='Unable to shutdown server',
                 error=err
-            ).response.serialize()
+            )
+            .response
+            .serialize()
         )
 
     return flask.jsonify(Response().serialize())

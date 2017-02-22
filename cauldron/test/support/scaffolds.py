@@ -97,7 +97,7 @@ class ResultsTest(unittest.TestCase):
         ))
 
     @classmethod
-    def read_flask_response(cls, response):
+    def read_flask_response(cls, response) -> dict:
         """
 
         :param response:
