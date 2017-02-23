@@ -52,6 +52,12 @@ class CauldronShell(cmd.Cmd):
             return commander.show_help().ended
 
         result = commander.execute(name, raw_args)
+        result = (
+            result.response
+            if hasattr(result, 'response') else
+            environ.Response(failed=result)
+        )
+
         if result.thread:
             result.thread.join()
 
@@ -62,15 +68,8 @@ class CauldronShell(cmd.Cmd):
             name = cauldron.project.internal_project.id[:20]
 
         self.prompt = '<{}>: '.format(name)
-        if hasattr(result, 'ended'):
-            self.last_response = result
-            return result.ended
-        elif hasattr(result, 'response'):
-            self.last_response = result.response
-            return result.response.ended
-        else:
-            self.last_response = None
-            return result
+        self.last_response = result
+        return result.ended
 
     def do_help(self, arg):
         """

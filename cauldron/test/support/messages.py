@@ -1,14 +1,42 @@
 import typing
+
 from cauldron.environ import Response
 
 
+def pretty_print_data(key, value, level: int = 0) -> list:
+    whitespace = '  ' * (level + 1)
+    prefix = '{}* {}:'.format(whitespace, key)
+    out = [prefix]
+
+    if level < 5 and isinstance(value, dict):
+        out += [
+            entry
+            for k, v in value.items()
+            for entry in pretty_print_data(k, v, level + 1)
+        ]
+    elif level < 5 and isinstance(value, (list, tuple)):
+        out += [
+            entry
+            for i, v in enumerate(value)
+            for entry in pretty_print_data(i, v, level + 1)
+        ]
+    else:
+        out[0] = '{} {}'.format(out[0], value)
+
+    return out
+
+
 class Message(object):
+    """
+    Represents a failed unit test message that contains a Cauldron Response
+    that should be included with the failure output
+    """
 
     def __init__(
             self,
             name: str,
             *args: typing.List[str],
-            response: typing.Union[Response, typing.List[Response]] = None,
+            response: Response = None,
             **kwargs
     ):
         self.name = name
@@ -16,35 +44,16 @@ class Message(object):
         self.response = response
         self.data = kwargs
 
+    def echo(self) -> str:
+        out = [
+            '[FAILED]: {}'.format(self.name),
+            '{}'.format(self.text.strip() if self.text else '')
+        ]
+
+        out += pretty_print_data('DATA', self.data)
+        out.append(self.response.echo() if self.response else '')
+
+        return '\n'.join([entry for entry in out if entry]).strip()
+
     def __str__(self):
-        out = ['[FAILED]: {}'.format(self.name)]
-
-        def print_data(key, value, level = 0):
-            if level < 5 and isinstance(value, dict):
-                for k, v in value.items():
-                    print_data(k, v, level + 1)
-                return
-
-            if level < 5 and isinstance(value, (list, tuple)):
-                for i, v in enumerate(value):
-                    print_data(i, v, level + 1)
-                return
-
-            prefix = '  ' * (level + 1)
-            out.append('{}* {}: {}'.format(prefix, key, value))
-
-        if self.text:
-            out.append('{}'.format(self.text.strip()))
-
-        print_data('DATA', self.data)
-
-        if self.response:
-            if not hasattr(self.response, 'echo'):
-                out += [r.echo() for r in self.response]
-            else:
-                out.append(self.response.echo())
-
-        return '\n'.join(out)
-
-    def __unicode__(self):
-        return self.__str__()
+        return self.echo()

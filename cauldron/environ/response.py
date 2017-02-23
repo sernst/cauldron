@@ -151,10 +151,8 @@ class Response(object):
 
     """
 
-    def __init__(self, identifier: str = None):
-        """
-
-        """
+    def __init__(self, identifier: str = None, failed=False):
+        """ """
 
         self.identifier = identifier
         self.data = dict()
@@ -163,7 +161,7 @@ class Response(object):
         self.errors = []  # type: typing.List[ResponseMessage]
         self.warnings = []  # type: typing.List[ResponseMessage]
         self.ended = False
-        self.failed = False
+        self.failed = bool(failed)
         self.thread = None  # type: threading.Thread
         self.returned = None
 

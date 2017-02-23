@@ -41,6 +41,7 @@ def create_project(
     :param name:
     :param path:
     :param forget:
+    :param confirm:
     :param kwargs:
     :return:
     """
