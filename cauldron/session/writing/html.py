@@ -40,13 +40,13 @@ def create(
         )
     )
 
-    if not destination_filename:
-        destination_filename = '{}.html'.format(project.uuid)
-
-    html_out_path = os.path.join(
-        destination_directory,
+    filename = (
         destination_filename
+        if destination_filename else
+        '{}.html'.format(project.uuid)
     )
+
+    html_out_path = os.path.join(destination_directory, filename)
 
     return file_io.FILE_WRITE_ENTRY(
         path=html_out_path,

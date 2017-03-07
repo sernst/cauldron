@@ -28,7 +28,7 @@ def inspect(source: dict):
     r.append_body(render.inspect(source))
 
 
-def header(header_text: str, level: int = 1):
+def header(header_text: str, level: int = 1, expand_full: bool = False):
     """
     Adds a text header to the display with the specified level.
 
@@ -37,10 +37,18 @@ def header(header_text: str, level: int = 1):
     :param level:
         The level of the header, which corresponds to the html header
         levels, such as <h1>, <h2>, ...
+    :param expand_full:
+        Whether or not the header will expand to fill the width of the entire
+        notebook page, or be constrained by automatic maximum page width. The
+        default value of False lines the header up with text displays.
     """
 
     r = _get_report()
-    r.append_body(render.header(header_text, level=level))
+    r.append_body(render.header(
+        header_text,
+        level=level,
+        expand_full=expand_full
+    ))
 
 
 def text(value: str, preformatted: bool = False):
@@ -99,7 +107,12 @@ def json(**kwargs):
     r.append_body(render.json(**kwargs))
 
 
-def plotly(data, layout: dict, scale: float = 0.5):
+def plotly(
+        data: typing.Union[dict, list] = None,
+        layout: dict = None,
+        scale: float = 0.5,
+        figure: dict = None
+):
     """
     Creates a Plotly plot in the display with the specified data and layout
 
@@ -112,17 +125,21 @@ def plotly(data, layout: dict, scale: float = 0.5):
         of 0.5 constrains the output to a maximum height equal to half the
         height of browser window when viewed. Values below 1.0 are usually
         recommended so the entire output can be viewed without scrolling.
+    :param figure:
+        In cases where you need to create a figure instead of separate data
+        and layout information, you can pass the figure here and leave the
+        data and layout values as None.
     """
 
     r = _get_report()
 
-    if not isinstance(data, (list, tuple)):
+    if not figure and not isinstance(data, (list, tuple)):
         data = [data]
 
     if 'plotly' not in r.library_includes:
         r.library_includes.append('plotly')
 
-    r.append_body(render.plotly(data, layout, scale))
+    r.append_body(render.plotly(data, layout, scale, figure=figure))
 
 
 def table(
@@ -318,7 +335,7 @@ def bokeh(model, scale: float = 0.7, responsive: bool = True):
     ))
 
 
-def listing(source: list, ordered: bool = False):
+def listing(source: list, ordered: bool = False, expand_full: bool = False):
     """
     An unordered or ordered list of the specified *source* iterable where
     each element is converted to a string representation for display.
@@ -331,7 +348,7 @@ def listing(source: list, ordered: bool = False):
     """
 
     r = _get_report()
-    r.append_body(render.listing(source, ordered))
+    r.append_body(render.listing(source, ordered, expand_full=expand_full))
 
 
 def latex(source: str):

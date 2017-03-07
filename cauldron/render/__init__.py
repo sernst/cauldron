@@ -1,6 +1,7 @@
 import json as json_internal
 import os
 import random
+import textwrap
 from datetime import datetime
 
 from cauldron import environ
@@ -11,11 +12,16 @@ from cauldron.render import syntax_highlighting
 from cauldron.render import utils as render_utils
 
 
-def listing(source: list, ordered: bool = False) -> str:
+def listing(
+        source: list,
+        ordered: bool = False,
+        expand_full: bool = False
+) -> str:
     """
 
     :param source:
     :param ordered:
+    :param expand_full:
     :return:
     """
     environ.abort_thread()
@@ -23,7 +29,8 @@ def listing(source: list, ordered: bool = False) -> str:
     return templating.render_template(
         'listing.html',
         type='ol' if ordered else 'ul',
-        items=['{}'.format(x) for x in source]
+        items=['{}'.format(x) for x in source],
+        css_modifier='full' if expand_full else 'limited'
     )
 
 
@@ -102,8 +109,10 @@ def code(
     if not source:
         return ''
 
+    cleaned = textwrap.dedent(source.strip('\n'))
+
     return syntax_highlighting.as_html(
-        source=source,
+        source=cleaned,
         language=language,
         filename=filename,
         mime_type=mime_type,
@@ -142,21 +151,28 @@ def code_block(
     )
 
 
-def header(contents: str, level: int = 1) -> str:
+def header(contents: str, level: int = 1, expand_full: bool = False) -> str:
     """
 
     :param level:
     :param contents:
+    :param expand_full:
     :return:
     """
     environ.abort_thread()
 
+    classes = [
+        'cd-Header',
+        'cd-Header--{}'.format('full' if expand_full else 'limited')
+    ]
+
     return templating.render(
         """
-        <h{{ level }}>{{ contents }}</h{{ level }}>
+        <h{{ level }} class="{{ classes }}">{{ contents }}</h{{ level }}>
         """,
         level=level,
-        contents=contents
+        contents=contents,
+        classes=' '.join(classes)
     )
 
 
@@ -188,7 +204,12 @@ def html(content) -> str:
     )
 
 
-def plotly(data: dict, layout: dict, scale: float = 0.5) -> str:
+def plotly(
+        data: dict = None,
+        layout: dict = None,
+        scale: float = 0.5,
+        figure: dict = None
+) -> str:
     """
 
     :param data:
@@ -209,8 +230,9 @@ def plotly(data: dict, layout: dict, scale: float = 0.5) -> str:
             library_name='Plotly'
         )
 
+    source = figure if figure else {'data': data, 'layout': layout}
     dom = plotly_lib.offline.plot(
-        {'data': data, 'layout': layout},
+        source,
         output_type='div',
         include_plotlyjs=False
     )

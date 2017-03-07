@@ -106,22 +106,19 @@ class ProjectStep(object):
         :return:
         """
 
-        return dict(
-            uuid=self.uuid,
-            reference_id=self.reference_id,
-            name=self.definition.name,
+        status = self.status()
+        out = dict(
             slug=self.definition.slug,
             index=self.index,
             source_path=self.source_path,
-            last_modified=self.last_modified,
-            last_display_update=self.report.last_update_time,
-            is_dirty=self.is_dirty(),
-            status=self.status(),
+            status=status,
             exploded_name=naming.explode_filename(
                 self.definition.name,
                 self.project.naming_scheme
             )
         )
+        out.update(status)
+        return out
 
     def status(self):
         """
@@ -159,14 +156,18 @@ class ProjectStep(object):
             return False
         return os.path.getmtime(p) >= self.last_modified
 
-    def mark_dirty(self, value):
+    def mark_dirty(self, value: bool, force: bool = False):
         """
 
         :param value:
+        :param force:
         :return:
         """
 
         self._is_dirty = bool(value)
+
+        time_adjust = 0 if value else time.time()
+        self.last_modified = time_adjust if force else self.last_modified
 
     def get_dom(self) -> dict:
         """ Retrieves the current value of the DOM for the step """

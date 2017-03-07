@@ -1,0 +1,12 @@
+.cd-Header {
+  margin: 0 auto;
+
+  &--full {
+    width: 100%;
+  }
+
+  &--limited {
+    max-width: $max_page_width;
+    min-width: 100px;
+  }
+}

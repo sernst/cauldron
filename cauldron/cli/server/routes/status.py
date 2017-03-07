@@ -50,7 +50,7 @@ def project_status():
     '/clean-step/<step_name>',
     methods=['GET', 'POST']
 )
-def set_step_clean(step_name: str):
+def clean_step(step_name: str):
     """ """
 
     r = Response()
@@ -70,7 +70,7 @@ def set_step_clean(step_name: str):
             message='No such step "{}" found'.format(step_name)
         ).response.serialize())
 
-    step.mark_dirty(False)
+    step.mark_dirty(False, force=True)
 
     return flask.jsonify(r.update(
         project=project.kernel_serialize()
