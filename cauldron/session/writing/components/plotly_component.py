@@ -17,12 +17,7 @@ PLOTLY_WARNING = cli.reformat(
 )
 
 
-def create(project: 'projects.Project') -> COMPONENT:
-    """
-    :param project:
-    :return:
-    """
-
+def get_version_one_path():
     try:
         from plotly.offline import offline as plotly_offline
     except Exception:
@@ -32,10 +27,38 @@ def create(project: 'projects.Project') -> COMPONENT:
         environ.log(PLOTLY_WARNING)
         return COMPONENT([], [])
 
-    source_path = os.path.join(
+    return os.path.join(
         environ.paths.clean(os.path.dirname(plotly_offline.__file__)),
         'plotly.min.js'
     )
+
+
+def get_version_two_path():
+    try:
+        import plotly
+    except Exception:
+        plotly = None
+
+    if plotly is None:
+        environ.log(PLOTLY_WARNING)
+        return COMPONENT([], [])
+
+    return os.path.join(
+        environ.paths.clean(os.path.dirname(plotly.__file__)),
+        'package_data',
+        'plotly.min.js'
+    )
+
+
+def create(project: 'projects.Project') -> COMPONENT:
+    """
+    :param project:
+    :return:
+    """
+
+    source_path = get_version_one_path()
+    if not os.path.exists(source_path):
+        source_path = get_version_two_path()
 
     output_slug = 'components/plotly/plotly.min.js'
     output_path = os.path.join(project.output_directory, output_slug)
