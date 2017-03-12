@@ -4,6 +4,9 @@ import typing
 from cauldron import cli
 from cauldron.environ import logger
 
+ERROR_KIND = 'ERROR'
+WARNING_KIND = 'WARNING'
+
 
 class ResponseMessage(object):
 
@@ -20,6 +23,7 @@ class ResponseMessage(object):
         self.message = message
         self.data = kwargs
         self.response = response
+        self.log = ''
 
     def serialize(self) -> dict:
         """
@@ -56,7 +60,7 @@ class ResponseMessage(object):
             indent_by: int = 0
     ) -> 'ResponseMessage':
 
-        logger.header(
+        self.log += logger.header(
             text=text,
             whitespace=whitespace,
             whitespace_top=whitespace_top,
@@ -90,6 +94,8 @@ class ResponseMessage(object):
             file_path=file_path,
             append_to_file=append_to_file
         )
+
+        self.log += message
         return self
 
     def console(
@@ -124,7 +130,7 @@ class ResponseMessage(object):
                 cli.reformat(self.message)
             )
 
-        logger.log(
+        self.log += logger.log(
             message=message,
             whitespace=whitespace,
             whitespace_top=whitespace_top,
@@ -205,27 +211,25 @@ class Response(object):
 
         print_data('DATA', self.data)
 
-        for e in self.errors:
-            out.append('--- ERROR [{code}] ---\n{message}'.format(
-                code=e.code,
-                message=e.message
-            ))
-            print_data('ERROR DATA', e.data)
+        def print_item(kind: str, item: 'ResponseMessage'):
+            print_data('{} DATA'.format(kind), item.data)
+            return '--- {kind} [{code}] ---\n{message}'.format(
+                code=item.code,
+                message=item.message,
+                kind=item.kind
+            )
 
-        for w in self.warnings:
-            out.append('--- WARNING [{code}] ---\n{message}'.format(
-                code=w.code,
-                message=w.message
-            ))
-            print_data('WARNING DATA', w.data)
+        notifications = dict(
+            ERROR=self.errors,
+            WARNING=self.warnings,
+            MESSAGE=self.messages
+        )
 
-        for m in self.messages:
-            out.append('--- Message [{kind}: {code}] ---\n{message}'.format(
-                kind=m.kind,
-                code=m.code,
-                message=m.message
-            ))
-            print_data('MESSAGE DATA', m.data)
+        out += [
+            print_item(kind, item)
+            for kind, items in notifications.items()
+            for item in items
+        ]
 
         return '\n'.join(out)
 

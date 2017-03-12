@@ -123,11 +123,11 @@ def run_step(
 
     try:
         result = _execute_step(project, step)
-    except Exception as err:
+    except Exception as error:
         result = dict(
             success=False,
-            message='{}'.format(err),
-            html_message='<pre>{}</pre>'.format(err)
+            message='{}'.format(error),
+            html_message='<pre>{}</pre>'.format(error)
         )
 
     os.chdir(os.path.expanduser('~'))

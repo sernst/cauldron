@@ -76,7 +76,8 @@ setup(
         'markdown',
         'pygments',
         'beautifulsoup4',
-        'flask'
+        'flask',
+        'requests'
     ],
     extras_require={
         'plotly': ['plotly'],

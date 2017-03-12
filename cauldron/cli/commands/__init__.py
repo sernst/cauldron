@@ -20,3 +20,4 @@ from cauldron.cli.commands import save
 from cauldron.cli.commands import show
 from cauldron.cli.commands import status
 from cauldron.cli.commands import version
+from cauldron.cli.commands import connect

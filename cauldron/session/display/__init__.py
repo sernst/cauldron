@@ -111,7 +111,8 @@ def plotly(
         data: typing.Union[dict, list] = None,
         layout: dict = None,
         scale: float = 0.5,
-        figure: dict = None
+        figure: dict = None,
+        static: bool = False
 ):
     """
     Creates a Plotly plot in the display with the specified data and layout
@@ -129,6 +130,9 @@ def plotly(
         In cases where you need to create a figure instead of separate data
         and layout information, you can pass the figure here and leave the
         data and layout values as None.
+    :param static:
+        If true, the plot will be created without interactivity.
+        This is useful if you have a lot of plots in your notebook.
     """
 
     r = _get_report()
@@ -139,7 +143,13 @@ def plotly(
     if 'plotly' not in r.library_includes:
         r.library_includes.append('plotly')
 
-    r.append_body(render.plotly(data, layout, scale, figure=figure))
+    r.append_body(render.plotly(
+        data=data,
+        layout=layout,
+        scale=scale,
+        figure=figure,
+        static=static
+    ))
 
 
 def table(

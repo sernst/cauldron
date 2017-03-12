@@ -205,16 +205,19 @@ def html(content) -> str:
 
 
 def plotly(
-        data: dict = None,
+        data: list = None,
         layout: dict = None,
         scale: float = 0.5,
-        figure: dict = None
+        figure: dict = None,
+        static: bool = False
 ) -> str:
     """
 
     :param data:
     :param layout:
     :param scale:
+    :param figure:
+    :param static:
     :return:
     """
     environ.abort_thread()
@@ -231,11 +234,19 @@ def plotly(
         )
 
     source = figure if figure else {'data': data, 'layout': layout}
+
     dom = plotly_lib.offline.plot(
-        source,
+        figure_or_data=source,
         output_type='div',
         include_plotlyjs=False
     )
+
+    insert_index = dom.index('"showLink":')
+    dom = ''.join([
+        dom[:insert_index],
+        '"staticPlot": {}, '.format('true' if static else 'false'),
+        dom[insert_index:]
+    ])
 
     return '<div class="cd-plotly-box" style="min-height:{}vh">{}</div>'.format(
         round(100.0 * scale), dom

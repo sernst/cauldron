@@ -118,9 +118,21 @@ class TestRender(scaffolds.ResultsTest):
 
         with patch('builtins.__import__') as import_func:
             import_func.side_effect = fake_import
-            result = render.plotly({}, {})
+            result = render.plotly([], {})
 
         self.assertGreater(result.find('cd-ImportError'), 0)
+
+    def test_plotly_static(self):
+        """ should create a static Plotly plot """
+
+        trace = dict(
+            type='scatter',
+            x=[1,2,3,4,5],
+            y=[1,2,3,4,5]
+        )
+
+        result = render.plotly([trace], {}, static=True)
+        self.assertLess(0, result.index('"staticPlot": true'))
 
     def test_status(self):
         """ should display status of specified data """
