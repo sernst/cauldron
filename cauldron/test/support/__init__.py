@@ -126,17 +126,24 @@ def autocomplete(command: str):
 def add_step(
         tester: 'scaffolds.ResultsTest',
         name: str = '',
-        contents: str = ''
+        contents: str = '',
+        position: str = None
 ):
     """
 
     :param tester:
     :param name:
     :param contents:
+    :param position:
     :return:
     """
 
-    r = run_command('steps add "{}"'.format(name))
+    cmd = [
+        'steps add "{}"'.format(name),
+        '--position="{}"'.format(position) if position else None
+    ]
+
+    r = run_command(' '.join([c for c in cmd if c]))
     step_path = r.data['step_path']
 
     with open(step_path, 'w+') as f:

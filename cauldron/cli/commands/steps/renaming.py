@@ -26,7 +26,7 @@ def create_rename_entry(
         step: 'projects.ProjectStep',
         insertion_index: int = None,
         stash_path: str = None
-) -> STEP_RENAME:
+) -> typing.Union[None, STEP_RENAME]:
     """
     Creates a STEP_RENAME for the given ProjectStep instance
 
@@ -151,7 +151,7 @@ def unstash_source(step_rename: STEP_RENAME) -> STEP_RENAME:
 def update_steps(
         project: 'projects.Project',
         step_renames: typing.List[STEP_RENAME]
-) -> typing.List[dict]:
+) -> dict:
     """
 
     :param project:
