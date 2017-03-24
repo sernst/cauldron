@@ -8,11 +8,52 @@ from cauldron.cli import commander
 from cauldron.cli.shell import CauldronShell
 from cauldron.test.support import scaffolds
 from cauldron.test.support.messages import Message
+from cauldron.cli import parse
+from cauldron.test.support import server
 
 try:
   import readline
 except ImportError:
   import pyreadline as readline
+
+
+def run_remote_command(command: str) -> 'environ.Response':
+    """ """
+
+    name, args = parse.split_line(command)
+    remote_connection = environ.RemoteConnection(
+        url='fake-run-remote.command',
+        active=True
+    )
+
+    app = server.create_test_app()
+
+    def mock_send_request(
+            endpoint: str,
+            data: dict = None,
+            method: str = None,
+            **kwargs
+    ):
+        http_method = method.lower() if method else None
+        func = server.post if data or http_method == 'post' else server.get
+        result = func(
+            app=app,
+            endpoint=endpoint,
+            data=data
+        )
+        return result.response
+
+    with patch(
+            'cauldron.cli.sync.comm.send_request',
+            side_effect=mock_send_request
+    ):
+        response = commander.execute(
+            name=name,
+            raw_args=args,
+            remote_connection=remote_connection
+        )
+        response.thread.join()
+        return response
 
 
 def run_command(command: str) -> 'environ.Response':
@@ -93,11 +134,7 @@ def open_project(
 
 
 def autocomplete(command: str):
-    """
-
-    :param command:
-    :return:
-    """
+    """ """
 
     # On Linux/OSX the completer delims are retrieved from the readline module,
     # but the delims are different on Windows. So for testing consistency we

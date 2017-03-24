@@ -81,13 +81,12 @@ def populate(
 
 
 def execute(
-        parser: ArgumentParser,
-        response: Response = None,
+        context: cli.CommandContext,
         key: str = None,
         value: typing.List[str] = None,
         list_all: bool = False,
         remove: bool = False,
-        forget: bool = False
+        forget: bool = False,
 ) -> Response:
     """
 
@@ -100,8 +99,8 @@ def execute(
         if list_all:
             actions.echo_all()
         else:
-            parser.print_help()
-        return response
+            context.parser.print_help()
+        return context.response
 
     persists = (not forget)
 

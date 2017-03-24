@@ -1,5 +1,7 @@
 import threading
 import typing
+import flask
+from requests import Response as HttpResponse
 
 from cauldron import cli
 from cauldron.environ import logger
@@ -16,14 +18,17 @@ class ResponseMessage(object):
             code: str = None,
             message: str = None,
             response: 'Response' = None,
-            **kwargs
+            index: int = 0,
+            log: str = '',
+            data: dict = None
     ):
+        self.index = index
         self.kind = kind
         self.code = code
         self.message = message
-        self.data = kwargs
+        self.data = data if data else {}
         self.response = response
-        self.log = ''
+        self.log = log
 
     def serialize(self) -> dict:
         """
@@ -34,7 +39,9 @@ class ResponseMessage(object):
             kind=self.kind,
             code=self.code,
             message=self.message,
-            data=self.data
+            data=self.data,
+            index=self.index,
+            log=self.log
         )
 
     def kernel(self, **kwargs) -> 'ResponseMessage':
@@ -62,6 +69,7 @@ class ResponseMessage(object):
 
         self.log += logger.header(
             text=text,
+            level=level,
             whitespace=whitespace,
             whitespace_top=whitespace_top,
             whitespace_bottom=whitespace_bottom,
@@ -153,9 +161,7 @@ class ResponseMessage(object):
 
 
 class Response(object):
-    """
-
-    """
+    """ """
 
     def __init__(self, identifier: str = None, failed=False):
         """ """
@@ -170,6 +176,11 @@ class Response(object):
         self.failed = bool(failed)
         self.thread = None  # type: threading.Thread
         self.returned = None
+        self.http_response = None  # type: HttpResponse
+
+    @property
+    def success(self) -> bool:
+        return not self.failed
 
     @property
     def response(self):
@@ -180,10 +191,8 @@ class Response(object):
         return self
 
     def echo(self) -> str:
-        """
+        """ """
 
-        :return:
-        """
         if self.parent:
             return self.parent.echo()
 
@@ -233,7 +242,10 @@ class Response(object):
 
         return '\n'.join(out)
 
-    def consume(self, other: typing.Union['Response', 'ResponseMessage']):
+    def consume(
+            self,
+            other: typing.Union['Response', 'ResponseMessage']
+    ) -> 'Response':
         """
 
         :param other:
@@ -247,7 +259,7 @@ class Response(object):
             # Do nothing if there is no other
             return self
 
-        source = other.response if isinstance(other, ResponseMessage) else other
+        source = other.response
 
         def either(a, b):
             return a if a else b
@@ -285,21 +297,20 @@ class Response(object):
             code: str = None,
             **kwargs
     ) -> ResponseMessage:
-        """
-
-        :return:
-        """
+        """ """
 
         if self.parent:
             return self.parent.notify(kind, message, code, **kwargs)
 
         message_kind = (kind if kind else 'INFO').upper()
+        index = sum([len(self.messages), len(self.errors), len(self.warnings)])
         rm = ResponseMessage(
             kind=message_kind,
             message=message,
             code=code,
             response=self,
-            **kwargs
+            index=index,
+            data=kwargs
         )
 
         if kind == 'ERROR':
@@ -311,10 +322,7 @@ class Response(object):
         return rm
 
     def serialize(self) -> dict:
-        """
-
-        :return:
-        """
+        """ """
 
         return dict(
             id=self.identifier,
@@ -323,8 +331,13 @@ class Response(object):
             warnings=[x.serialize() for x in self.warnings],
             messages=[x.serialize() for x in self.messages],
             ended=self.ended,
-            success=not self.failed
+            success=self.success
         )
+
+    def flask_serialize(self):
+        """ Serializes the response into a flask JSON response """
+
+        return flask.jsonify(self.serialize())
 
     def fail(
             self,
@@ -333,10 +346,7 @@ class Response(object):
             error: Exception = None,
             **kwargs
     ) -> ResponseMessage:
-        """
-
-        :return:
-        """
+        """ """
 
         self.failed = True
 
@@ -375,16 +385,42 @@ class Response(object):
         )
 
     def end(self) -> 'Response':
-        """
-
-        :return:
-        """
+        """ """
 
         if self.parent:
             return self.parent.end()
 
         self.ended = True
         return self
+
+    def get_notification_log(self, start_index: int = 0) -> str:
+        """ """
+
+        notifications = sorted(
+            self.messages + self.warnings + self.errors,
+            key=lambda x: x.index
+        )
+
+        logs = [x.log for x in notifications if x.index >= start_index]
+        return '\n'.join(logs)
+
+    def log_notifications(
+            self,
+            start_index: int = 0,
+            trace: bool = True,
+            file_path: str = None,
+            append_to_file: bool = True
+    ) -> str:
+        """ """
+
+        message = self.get_notification_log(start_index)
+        logger.raw(
+            message=message,
+            trace=trace,
+            file_path=file_path,
+            append_to_file=append_to_file
+        )
+        return message
 
     @staticmethod
     def deserialize(serial_data: dict) -> 'Response':
@@ -396,11 +432,11 @@ class Response(object):
         r.failed = not serial_data.get('success', True)
 
         def load_messages(message_type: str):
-            messages = getattr(r, message_type) + [
+            messages = [
                 ResponseMessage(**data)
                 for data in serial_data.get(message_type, [])
             ]
-            setattr(r, message_type, messages)
+            setattr(r, message_type, getattr(r, message_type) + messages)
 
         load_messages('errors')
         load_messages('warnings')

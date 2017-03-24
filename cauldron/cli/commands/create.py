@@ -9,7 +9,6 @@ from cauldron.cli.commands.open import actions as open_actions
 from cauldron.cli.commands.open import opener as project_opener
 from cauldron.cli.interaction import autocompletion
 from cauldron.session import projects
-from cauldron.environ import Response
 
 NAME = 'create'
 DESCRIPTION = 'Create a new Cauldron project'
@@ -143,8 +142,7 @@ def write_project_data(project_directory, data):
 
 
 def execute(
-        parser: ArgumentParser,
-        response: Response,
+        context: cli.CommandContext,
         project_name: str,
         directory: str,
         title: str = '',
@@ -159,6 +157,8 @@ def execute(
 
     :return:
     """
+
+    response = context.response
 
     if not title:
         title = project_name.replace('_', ' ').replace('-', ' ').capitalize()

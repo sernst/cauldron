@@ -50,3 +50,11 @@ class TestReload(scaffolds.ResultsTest):
         self.assertEqual(r.errors[0].code, 'PROJECT_INIT_FAILURE')
 
         support.run_command('close')
+
+    def test_reload_remote(self):
+        """ should reload the currently opened project """
+
+        support.run_command('open @examples:hello_cauldron')
+        r = support.run_remote_command('reload')
+        self.assertFalse(r.failed, 'should not have failed')
+        support.run_command('close')

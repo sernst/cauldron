@@ -59,18 +59,16 @@ def populate(
 
 
 def execute(
-        parser: ArgumentParser,
+        context: cli.CommandContext,
         action: str,
         arguments: list,
-        response: Response,
         no_show: bool = False
 ) -> Response:
     """
 
-    :param parser:
+    :param context:
     :param action:
     :param arguments:
-    :param response:
     :param no_show:
     :return:
     """
@@ -78,7 +76,7 @@ def execute(
     show = not no_show
 
     if not action:
-        return response.fail(
+        return context.response.fail(
             code='NO_ACTION_ARG',
             message='An action is required for the snapshot command'
         ).console(
@@ -89,7 +87,7 @@ def execute(
     project = cauldron.project.internal_project
 
     if not project:
-        return response.fail(
+        return context.response.fail(
             code='NO_OPEN_PROJECT',
             message='No open project'
         ).console(
@@ -110,7 +108,7 @@ def execute(
         result = actions.open_snapshot(project, name)
         if result is None:
             environ.log('[ERROR]: No snapshot found named "{}"'.format(name))
-            return
+            return context.response
 
         environ.log_header('SNAPSHOT: {}'.format(name))
         environ.log(

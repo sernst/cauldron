@@ -103,3 +103,28 @@ class TestResponse(scaffolds.ResultsTest):
 
         child.end()
         self.assertTrue(parent.ended)
+
+    def test_logging(self):
+        """ should log messages to the log """
+
+        r = Response()
+        r.notify(
+            kind='TEST',
+            code='TEST_MESSAGE',
+            message='This is a test',
+        ).console_header(
+            'Harold'
+        ).console(
+            'Holly'
+        ).console_raw(
+            'Handy'
+        )
+
+        out = r.get_notification_log()
+        self.assertGreater(out.find('Harold'), -1)
+        self.assertGreater(out.find('Holly'), -1)
+        self.assertGreater(out.find('Handy'), -1)
+
+        r = Response.deserialize(r.serialize())
+        compare = r.get_notification_log()
+        self.assertEqual(out, compare)

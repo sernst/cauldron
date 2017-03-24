@@ -122,8 +122,7 @@ def populate(
 
 
 def execute(
-        parser: ArgumentParser,
-        response: Response,
+        context: cli.CommandContext,
         action: str = None,
         step_name: str = None,
         position: str = None,
@@ -135,6 +134,8 @@ def execute(
 
     :return:
     """
+
+    response = context.response
 
     if not cauldron.project or not cauldron.project.internal_project:
         return response.fail(

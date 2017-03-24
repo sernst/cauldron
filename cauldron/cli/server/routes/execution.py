@@ -3,6 +3,7 @@ import typing
 import cauldron as cd
 import flask
 from cauldron.cli import commander
+from cauldron.cli.server import arguments
 from cauldron.cli.server import run as server_runner
 from cauldron.environ.response import Response
 from cauldron.runner import redirection
@@ -65,13 +66,9 @@ def parse_command_args(response: 'Response') -> typing.Tuple[str, str]:
     parts = None
     name = None
     args = None
-    request_args = None
+    request_args = arguments.from_request()
 
     try:
-        request_args = request.get_json(silent=True)
-        if not request_args:
-            request_args = request.values
-
         cmd = request_args.get('command', '')
         parts = [x.strip() for x in cmd.split(' ', 1)]
         name = parts[0].lower()

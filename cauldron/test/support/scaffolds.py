@@ -2,7 +2,6 @@ import os
 import sys
 import tempfile
 import unittest
-import json
 
 import cauldron
 from cauldron import environ
@@ -51,6 +50,9 @@ class ResultsTest(unittest.TestCase):
         for key, path in self.temp_directories.items():
             environ.systems.remove(path)
 
+        if cauldron.environ.remote_connection.active:
+            commander.execute('disconnect', '')
+
     def get_temp_path(self, identifier, *args):
         """
 
@@ -96,12 +98,32 @@ class ResultsTest(unittest.TestCase):
             response=response
         ))
 
-    @classmethod
-    def read_flask_response(cls, response) -> dict:
+    def assert_no_errors(self, response: environ.Response):
+        """ asserts that the response object contains no errors """
+
+        self.assertEqual(0, len(response.errors), Message(
+            'Errors found',
+            'should not have had errors',
+            response=response
+        ))
+
+    def assert_has_success_code(self, response, code: str):
         """
 
         :param response:
-        :return:
+        :param code:
         """
 
-        return json.loads(response.data.decode('utf-8', 'ignore'))
+        self.assertGreater(len(response.messages), 0, Message(
+            'No Messages Found',
+            'There should have been a message in the response',
+            response=response
+        ))
+
+        codes = [message.code for message in response.messages]
+
+        self.assertIn(code, codes, Message(
+            'Notification Code Not Found',
+            'The code "{}" was not found in the response messages',
+            response=response
+        ))

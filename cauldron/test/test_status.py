@@ -62,3 +62,13 @@ class TestStatus(scaffolds.ResultsTest):
 
         self.assertEqual(result.find('SKIP ME'), -1)
         self.assertGreater(result.find('HELLO'), 0)
+
+    def test_status_remote(self):
+        """ """
+
+        support.run_command('open @examples:seaborn')
+        r = support.run_remote_command('status')
+        self.assertFalse(r.failed, 'should not have failed')
+        self.assertEqual(r.messages[0].code, 'STATUS_CREATED')
+
+        support.run_command('close')

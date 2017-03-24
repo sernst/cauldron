@@ -2,29 +2,30 @@ import typing
 from collections import namedtuple
 from unittest.mock import patch
 
-from flask import Response as FlaskResponse
-
-from cauldron.cli import server
 from cauldron.cli.server import run as server_runner
 from cauldron.environ.response import Response
-from cauldron.test.support import scaffolds
+from cauldron.test.support import flask_scaffolds
 
 FakeThread = namedtuple('FakeThread_NT', ['is_alive', 'uid'])
 
 
-class TestServerRunStatus(scaffolds.ResultsTest):
+class TestServerRunStatus(flask_scaffolds.FlaskResultsTest):
     """ """
 
     def setUp(self):
         super(TestServerRunStatus, self).setUp()
-        self.app = server.server_run.APPLICATION.test_client()
-        self.active_responses = {} # type: typing.Dict[str, Response]
+        self.active_responses = {}  # type: typing.Dict[str, Response]
 
     def activate_execution(
             self,
             uid: str,
             is_alive: bool = True
     ) -> Response:
+        """
+        Adds a fake running command execution to the run status list for use
+        in testing
+        """
+
         r = Response(identifier=uid)
 
         def is_thread_alive():
@@ -41,6 +42,11 @@ class TestServerRunStatus(scaffolds.ResultsTest):
         return r
 
     def deactivate_execution(self, uid: str) -> Response:
+        """
+        Removes a fake running command execution from the run status list for
+        tearing down a test
+        """
+
         response = server_runner.active_execution_responses.get(uid)
         if response:
             del server_runner.active_execution_responses[uid]
@@ -51,14 +57,14 @@ class TestServerRunStatus(scaffolds.ResultsTest):
         return response
 
     def test_no_uid(self):
-        """ """
+        """ should do nothing if the run uid is unknown """
 
-        response = self.app.get('/run-status/test-1')  # type: FlaskResponse
-        self.assertEqual(response.status_code, 200)
+        run_status = self.get('/run-status/test-1')
+        self.assertEqual(run_status.flask.status_code, 200)
 
-        payload = self.read_flask_response(response)
-        self.assertTrue(payload['success'])
-        self.assertEqual(payload['data']['run_status'], 'unknown')
+        response = run_status.response
+        self.assertFalse(response.failed)
+        self.assertEqual(response.data['run_status'], 'unknown')
 
     @patch('cauldron.cli.server.run.get_running_step_changes')
     def test_failed_step_changes(self, get_running_step_changes):
@@ -68,15 +74,15 @@ class TestServerRunStatus(scaffolds.ResultsTest):
 
         active_response = self.activate_execution('failed-step-changes')
 
-        response = self.app.get('/run-status/{}'.format(
+        run_status = self.get('/run-status/{}'.format(
             active_response.identifier
-        ))  # type: FlaskResponse
-        self.assertEqual(response.status_code, 200)
+        ))
+        self.assertEqual(run_status.flask.status_code, 200)
 
-        payload = self.read_flask_response(response)
-        self.assertTrue(payload['success'])
-        self.assertEqual(payload['data']['run_status'], 'running')
-        self.assertIsNone(payload['data']['step_changes'])
+        response = run_status.response
+        self.assertFalse(response.failed)
+        self.assertEqual(response.data['run_status'], 'running')
+        self.assertIsNone(response.data['step_changes'])
 
         self.deactivate_execution(active_response.identifier)
 
@@ -87,15 +93,15 @@ class TestServerRunStatus(scaffolds.ResultsTest):
         get_running_step_changes.return_value = None
         active_response = self.activate_execution('no-step-changes')
 
-        response = self.app.get('/run-status/{}'.format(
+        run_status = self.get('/run-status/{}'.format(
             active_response.identifier
-        ))  # type: FlaskResponse
-        self.assertEqual(response.status_code, 200)
+        ))
+        self.assertEqual(run_status.flask.status_code, 200)
 
-        payload = self.read_flask_response(response)
-        self.assertTrue(payload['success'])
-        self.assertEqual(payload['data']['run_status'], 'running')
-        self.assertIsNone(payload['data']['step_changes'])
+        response = run_status.response
+        self.assertFalse(response.failed)
+        self.assertEqual(response.data['run_status'], 'running')
+        self.assertIsNone(response.data['step_changes'])
 
         self.deactivate_execution(active_response.identifier)
 
@@ -104,14 +110,14 @@ class TestServerRunStatus(scaffolds.ResultsTest):
 
         active_response = self.activate_execution('no-step-running', False)
 
-        response = self.app.get('/run-status/{}'.format(
+        run_status = self.get('/run-status/{}'.format(
             active_response.identifier
-        ))  # type: FlaskResponse
-        self.assertEqual(response.status_code, 200)
+        ))
+        self.assertEqual(run_status.flask.status_code, 200)
 
-        payload = self.read_flask_response(response)
-        self.assertTrue(payload['success'])
-        self.assertEqual(payload['data']['run_status'], 'complete')
+        response = run_status.response
+        self.assertFalse(response.failed)
+        self.assertEqual(response.data['run_status'], 'complete')
 
         self.assertNotIn(
             active_response.identifier,
@@ -126,12 +132,9 @@ class TestServerRunStatus(scaffolds.ResultsTest):
 
         get_server_data.side_effect = ValueError('Fake Error')
 
-        response = self.app.get('/run-status/test-error')  # type: FlaskResponse
-        self.assertEqual(response.status_code, 200)
+        run_status = self.get('/run-status/test-error')
+        self.assertEqual(run_status.flask.status_code, 200)
 
-        payload = self.read_flask_response(response)
-        self.assertFalse(payload['success'])
-        self.assertEqual(
-            payload['errors'][0]['code'],
-            'COMMAND_RUN_STATUS_FAILURE'
-        )
+        response = run_status.response
+        self.assertTrue(response.failed)
+        self.assert_has_error_code(response, 'COMMAND_RUN_STATUS_FAILURE')

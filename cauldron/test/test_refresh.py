@@ -40,3 +40,11 @@ class TestRefresh(scaffolds.ResultsTest):
 
         support.run_command('close')
 
+    def test_refresh_remote(self):
+        """ should refresh """
+
+        support.run_command('open @examples:hello_cauldron')
+        r = support.run_remote_command('refresh')
+        self.assertFalse(r.failed, 'should not have failed')
+        self.assert_has_success_code(r, 'PROJECT_REFRESHED')
+        support.run_command('close')

@@ -289,6 +289,7 @@ class Project:
         self._results_path = results_path  # type: str
         self._current_step = None  # type: ProjectStep
         self.last_modified = None
+        self.remote_source_directory = None  # type: str
 
         def as_shared_cache(source):
             if source is None:
@@ -523,7 +524,8 @@ class Project:
         """
 
         lm = self.last_modified
-        if not force and lm is not None and lm >= os.path.getmtime(self.source_path):
+        is_newer = lm is not None and lm >= os.path.getmtime(self.source_path)
+        if not force and is_newer:
             return False
 
         self.settings.clear().put(
@@ -553,7 +555,7 @@ class Project:
         self.last_modified = time.time()
         return True
 
-    def get_step(self, name: str) -> ProjectStep:
+    def get_step(self, name: str) -> typing.Union[ProjectStep, None]:
         """
 
         :param name:
@@ -566,7 +568,10 @@ class Project:
 
         return None
 
-    def get_step_by_reference_id(self, reference_id: str) -> ProjectStep:
+    def get_step_by_reference_id(
+            self,
+            reference_id: str
+    ) -> typing.Union[ProjectStep, None]:
         """
 
         :param reference_id:
@@ -579,7 +584,7 @@ class Project:
 
         return None
 
-    def index_of_step(self, name) -> int:
+    def index_of_step(self, name) -> typing.Union[int, None]:
         """
 
         :param name:
@@ -598,7 +603,7 @@ class Project:
             self,
             step_data: typing.Union[str, dict],
             index: int = None
-    ) -> ProjectStep:
+    ) -> typing.Union[ProjectStep, None]:
         """
 
         :param step_data:
@@ -635,7 +640,7 @@ class Project:
         self.last_modified = time.time()
         return ps
 
-    def remove_step(self, name) -> 'ProjectStep':
+    def remove_step(self, name) -> typing.Union[ProjectStep, None]:
         """
 
         :param name:

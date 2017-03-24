@@ -30,6 +30,10 @@ server_data = dict(
     pid=os.getpid()
 )
 
+authorization = dict(
+    code=''
+)
+
 
 def get_server_data() -> dict:
     """
@@ -105,6 +109,13 @@ def parse(args=None):
         action='store_true'
     )
 
+    parser.add_argument(
+        '-c', '--code',
+        dest='authentication_code',
+        type=str,
+        default=''
+    )
+
     return vars(parser.parse_args(args=args))
 
 
@@ -113,6 +124,7 @@ def execute(
         debug: bool = False,
         public: bool = False,
         host=None,
+        authentication_code: str = '',
         **kwargs
 ):
     """
@@ -121,6 +133,7 @@ def execute(
     :param debug:
     :param public:
     :param host:
+    :param authentication_code:
     :return:
     """
 
@@ -135,6 +148,8 @@ def execute(
     server_data['port'] = port
     server_data['debug'] = debug
     server_data['id'] = environ.start_time.isoformat()
+
+    authorization['code'] = authentication_code if authentication_code else ''
 
     if not debug:
         log = logging.getLogger('werkzeug')

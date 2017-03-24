@@ -1,7 +1,7 @@
 import os
-from argparse import ArgumentParser
 
 import cauldron
+from cauldron import cli
 from cauldron import environ
 from cauldron.cli import commander
 from cauldron.cli.commands import close as close_command
@@ -57,15 +57,11 @@ def run_project(
         logger.remove_output_path(log_path)
         return response
 
-    response = environ.Response()
-    parser = ArgumentParser()
-
     environ.modes.add(environ.modes.SINGLE_RUN)
 
-    open_command.execute(
-        parser,
-        response,
-        project_directory,
+    response = open_command.execute(
+        context=cli.make_command_context(open_command.NAME),
+        path=project_directory,
         results_path=output_directory
     )
     if response.failed:
@@ -75,11 +71,15 @@ def run_project(
     project.shared.put(**(shared_data if shared_data is not None else dict()))
 
     commander.preload()
-    run_command.execute(parser, response)
+    response = run_command.execute(
+        context=cli.make_command_context(run_command.NAME)
+    )
     if response.failed:
         return on_complete('[ERROR]: Aborted trying to run project steps')
 
-    close_command.execute(parser, response)
+    response = close_command.execute(
+        context=cli.make_command_context(close_command.NAME)
+    )
     if response.failed:
         return on_complete('[ERROR]: Failed to close project cleanly after run')
 

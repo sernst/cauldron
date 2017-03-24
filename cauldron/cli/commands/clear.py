@@ -1,7 +1,7 @@
-from argparse import ArgumentParser
-
 import cauldron
+from cauldron import cli
 from cauldron.environ import Response
+from cauldron.cli import sync
 
 NAME = 'clear'
 DESCRIPTION = """
@@ -10,7 +10,23 @@ DESCRIPTION = """
     """
 
 
-def execute(parser: ArgumentParser, response: Response) -> Response:
+def execute_remote(context: cli.CommandContext) -> Response:
+    """ """
+
+    thread = sync.send_remote_command(
+        command=context.name,
+        raw_args=context.raw_args,
+        asynchronous=False
+    )
+
+    thread.join()
+
+    response = thread.responses[0]
+    response.log_notifications()
+    return context.response.consume(response)
+
+
+def execute(context: cli.CommandContext) -> Response:
     """
 
     :return:
@@ -19,7 +35,7 @@ def execute(parser: ArgumentParser, response: Response) -> Response:
     project = cauldron.project.internal_project
 
     if not project:
-        return response.fail(
+        return context.response.fail(
             code='NO_OPEN_PROJECT',
             message='No open project on which to clear data'
         ).console(
@@ -31,7 +47,7 @@ def execute(parser: ArgumentParser, response: Response) -> Response:
     for ps in project.steps:
         ps.mark_dirty(True)
 
-    return response.update(
+    return context.response.update(
         project=project.kernel_serialize()
     ).notify(
         kind='SUCCESS',

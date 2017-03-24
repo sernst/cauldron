@@ -1,5 +1,6 @@
 import cauldron
 from cauldron import environ
+from cauldron import cli
 from cauldron.cli import commander
 from cauldron.cli.commands import run
 from cauldron.test.support import scaffolds
@@ -102,7 +103,10 @@ class TestRun(scaffolds.ResultsTest):
         """ should abort if no project is open """
 
         r = environ.Response()
-        run.execute(None, r)
+        run.execute(context=cli.make_command_context(
+            name=run.NAME,
+            response=r
+        ))
 
         self.assert_has_error_code(r, 'NO_OPEN_PROJECT')
 
@@ -117,8 +121,10 @@ class TestRun(scaffolds.ResultsTest):
         project = cauldron.project.internal_project
         step_names = [s.filename for s in project.steps[:-1]]
 
-        r = environ.Response()
-        run.execute(None, r, step=step_names)
+        r = run.execute(
+            context=cli.make_command_context(name=run.NAME),
+            step=step_names
+        )
 
         self.assertFalse(r.failed)
         self.assertFalse(project.steps[0].is_dirty())
@@ -137,16 +143,20 @@ class TestRun(scaffolds.ResultsTest):
 
         project = cauldron.project.internal_project
 
-        r = environ.Response()
-        run.execute(None, r, single_step=True)
+        r = run.execute(
+            context=cli.make_command_context(name=run.NAME),
+            single_step=True
+        )
 
         self.assertFalse(r.failed)
         self.assertFalse(project.steps[0].is_dirty())
         self.assertTrue(project.steps[1].is_dirty())
         self.assertTrue(project.steps[2].is_dirty())
 
-        r = environ.Response()
-        run.execute(None, r, single_step=True)
+        r = run.execute(
+            context=cli.make_command_context(name=run.NAME),
+            single_step=True
+        )
 
         self.assertFalse(r.failed)
         self.assertFalse(project.steps[0].is_dirty())
@@ -165,8 +175,10 @@ class TestRun(scaffolds.ResultsTest):
 
         project = cauldron.project.internal_project
 
-        r = environ.Response()
-        run.execute(None, r, step=['2'])
+        r = run.execute(
+            context=cli.make_command_context(name=run.NAME),
+            step=['2']
+        )
 
         self.assertFalse(r.failed)
         self.assertFalse(project.steps[0].is_dirty())
@@ -186,8 +198,10 @@ class TestRun(scaffolds.ResultsTest):
         step_names = [s.filename for s in project.steps[:-1]]
         step_names.append(project.steps[0].filename)
 
-        r = environ.Response()
-        run.execute(None, r, step=step_names)
+        r = run.execute(
+            context=cli.make_command_context(name=run.NAME),
+            step=step_names
+        )
 
         self.assertFalse(r.failed)
         self.assertFalse(project.steps[0].is_dirty())
@@ -211,8 +225,10 @@ class TestRun(scaffolds.ResultsTest):
             '..'
         ]
 
-        r = environ.Response()
-        run.execute(None, r, step=step_names)
+        r = run.execute(
+            context=cli.make_command_context(name=run.NAME),
+            step=step_names
+        )
 
         self.assertFalse(r.failed)
         self.assertFalse(project.steps[0].is_dirty())
@@ -232,8 +248,10 @@ class TestRun(scaffolds.ResultsTest):
         step_names = [s.filename for s in project.steps]
         step_names.append('FAKE-STEP')
 
-        r = environ.Response()
-        run.execute(None, r, step=step_names)
+        r = run.execute(
+            context=cli.make_command_context(name=run.NAME),
+            step=step_names
+        )
 
         self.assert_has_error_code(r, 'MISSING_STEP')
 

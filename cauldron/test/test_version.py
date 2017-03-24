@@ -33,3 +33,9 @@ class TestVersion(scaffolds.ResultsTest):
         self.assertGreater(result.find('hello'), 0)
         self.assertGreater(result.find('two'), 0)
         self.assertGreater(result.find('tester'), 0)
+
+    def test_version_remote(self):
+        """ should retrieve version info """
+
+        r = support.run_remote_command('version')
+        self.assertFalse(r.failed, 'should not have failed')

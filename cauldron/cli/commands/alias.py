@@ -77,8 +77,7 @@ def populate(
 
 
 def execute(
-        parser: ArgumentParser,
-        response: Response,
+        context: cli.CommandContext,
         command: str = None,
         name: str = None,
         path: str = None,
@@ -88,6 +87,8 @@ def execute(
 
     :return:
     """
+
+    response = context.response
 
     if name:
         name = name.replace(' ', '_').strip('"').strip()

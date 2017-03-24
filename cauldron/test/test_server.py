@@ -1,93 +1,53 @@
-import json
 from unittest import mock
 
 from cauldron import cli
-from cauldron.cli import server
 from cauldron.cli.server import run as server_run
-from cauldron.test.support import scaffolds
 from cauldron.test import support
+from cauldron.test.support.flask_scaffolds import FlaskResultsTest
 
 
-class TestServer(scaffolds.ResultsTest):
-    """
-
-    """
-
-    def setUp(self):
-        super(TestServer, self).setUp()
-        self.app = server.server_run.APPLICATION.test_client()
+class TestServer(FlaskResultsTest):
+    """ """
 
     def test_execute(self):
-        """
-        """
+        """ should execute the command """
 
-        response = self.app.post(
-            '/',
-            data=json.dumps(dict(
-                command='open',
-                args=''
-            )),
-            content_type='application/json'
-        )
-
-        self.assertIsNotNone(response)
+        posted = self.post('/', {'command': 'open', 'args': ''})
+        self.assertEqual(posted.flask.status_code, 200)
 
     def test_execute_invalid_command(self):
-        """
-        """
+        """ should fail if command does not exist """
 
-        response = self.app.post(
-            '/',
-            data=json.dumps(dict(
-                command='fake-command',
-                args=''
-            )),
-            content_type='application/json'
-        )
-
-        self.assertIsNotNone(response)
+        posted = self.post('/', {'command': 'fake-command', 'args': ''})
+        self.assertEqual(posted.flask.status_code, 200)
+        self.assert_has_error_code(posted.response, 'NO_SUCH_COMMAND')
 
     def test_execute_fail(self):
-        """
-        """
+        """ should fail with improper arguments """
 
-        response = self.app.post(
-            '/',
-            data=json.dumps(dict(
-                command='open',
-                args=1234
-            )),
-            content_type='application/json'
-        )
-
-        self.assertIsNotNone(response)
+        posted = self.post('/', {'command': 'open', 'args': [1234]})
+        self.assertEqual(posted.flask.status_code, 200)
+        self.assert_has_error_code(posted.response, 'INVALID_COMMAND')
 
     def test_ping(self):
-        """
+        """ should successfully ping backend """
 
-        :return:
-        """
-
-        response = self.app.post('/ping')
-        self.assertIsNotNone(response)
+        posted = self.post('/ping')
+        self.assertEqual(posted.flask.status_code, 200)
 
     def test_status(self):
-        """
+        """ should successfully check status of opened project """
 
-        :return:
-        """
+        opened = self.post('/', dict(
+            command='open',
+            args='@examples:hello_cauldron'
+        ))
+        self.assertEqual(opened.flask.status_code, 200)
+        self.assert_no_errors(opened.response)
 
-        self.app.post(
-            '/',
-            data=json.dumps(dict(
-                command='open',
-                args='@examples:hello_cauldron'
-            )),
-            content_type='application/json'
-        )
-
-        response = self.app.post('/status')
-        self.assertIsNotNone(response)
+        status = self.post('/status')
+        self.assertEqual(status.flask.status_code, 200)
+        self.assert_no_errors(status.response)
 
     def test_project(self):
         """
@@ -95,49 +55,31 @@ class TestServer(scaffolds.ResultsTest):
         :return:
         """
 
-        self.app.post(
-            '/',
-            data=json.dumps(dict(
-                command='open',
-                args='@examples:hello_cauldron'
-            )),
-            content_type='application/json'
-        )
+        opened = self.post('/', dict(
+            command='open',
+            args='@examples:hello_cauldron'
+        ))
+        self.assert_no_errors(opened.response)
 
-        response = self.app.post('/project')
-        self.assertIsNotNone(response)
+        project_status = self.post('/project')
+        self.assert_no_errors(project_status.response)
 
     def test_run_status(self):
-        """
+        """ should return unknown run status for invalid run uid """
 
-        :return:
-        """
-
-        response = self.app.post(
-            '/run-status/fake-uid',
-            content_type='application/json'
-        )
-
-        self.assertIsNotNone(response)
+        run_status = self.get('/run-status/fake-uid')
+        response = run_status.response
+        self.assert_no_errors(response)
+        self.assertEqual(response.data['run_status'], 'unknown')
 
     def test_abort_invalid(self):
-        """
+        """ should cancel abort if nothing to abort """
 
-        :return:
-        """
-
-        response = self.app.post(
-            '/abort/fake-uid',
-            content_type='application/json'
-        )
-
-        self.assertIsNotNone(response)
+        aborted = self.get('/abort')
+        self.assert_no_errors(aborted.response)
 
     def test_start_server(self):
-        """
-
-        :return:
-        """
+        """ should start server with specified settings """
 
         kwargs = dict(
             port=9999,
@@ -150,10 +92,7 @@ class TestServer(scaffolds.ResultsTest):
             func.assert_called_once_with(**kwargs)
 
     def test_start_server_version(self):
-        """
-
-        :return:
-        """
+        """ should return server version without starting the server """
 
         with mock.patch('cauldron.cli.server.run.APPLICATION.run') as func:
             try:
@@ -163,74 +102,60 @@ class TestServer(scaffolds.ResultsTest):
             func.assert_not_called()
 
     def test_parse(self):
-        """
-
-        :return:
-        """
+        """ should properly parse server args """
 
         args = server_run.parse(['--port=9999', '--version', '--debug'])
         self.assertTrue(args.get('version'))
         self.assertTrue(args.get('debug'))
         self.assertEqual(args.get('port'), 9999)
 
-    def test_abort_nothing(self):
-        response = self.app.get('/abort')
-        self.assertIsNotNone(response)
-
     def test_abort_running(self):
+        """ should abort long running step """
+
         support.create_project(self, 'walter')
-        support.add_step(
-            self,
-            contents=cli.reformat(
-                """
-                import time
-                time.sleep(10)
-                """
-            )
-        )
-
-        response = self.read_flask_response(self.app.post(
-            '/command-async',
-            data=json.dumps(dict(
-                command='run',
-                args=''
-            )),
-            content_type='application/json'
+        support.add_step(self, contents=cli.reformat(
+            """
+            import time
+            time.sleep(10)
+            """
         ))
-        self.assertIsNotNone(response)
 
-        run_uid = response['data']['run_uid']
-        self.app.get('/run-status/{}'.format(run_uid))
-        response = self.app.get('/abort')
-        self.assertIsNotNone(response)
+        running = self.post('/command-async', dict(
+            command='run',
+            args=''
+        ))
+        run_uid = running.response.data['run_uid']
+
+        run_status = self.get('/run-status/{}'.format(run_uid))
+        self.assert_no_errors(run_status.response)
+
+        aborted = self.get('/abort')
+        self.assert_no_errors(aborted.response)
 
         support.run_command('close')
 
     def test_long_running_print_buffering(self):
         support.create_project(self, 'walter2')
-        support.add_step(
-            self,
-            contents=cli.reformat(
-                """
-                import time
-                print('Printing to step print buffer...')
-                for i in range(100):
-                    print(i)
-                    time.sleep(0.25)
-                """
-            )
-        )
-
-        response = self.read_flask_response(self.app.post(
-            '/command-async',
-            data=json.dumps(dict(
-                command='run',
-                args=''
-            )),
-            content_type='application/json'
+        support.add_step(self, contents=cli.reformat(
+            """
+            import time
+            print('Printing to step print buffer...')
+            for i in range(100):
+                print(i)
+                time.sleep(0.25)
+            """
         ))
-        run_uid = response['data']['run_uid']
-        self.app.get('/run-status/{}'.format(run_uid))
-        self.app.get('/abort')
+
+        running = self.post('/command-async', dict(
+            command='run',
+            args=''
+        ))
+        run_uid = running.response.data['run_uid']
+
+        run_status = self.get('/run-status/{}'.format(run_uid))
+        self.assert_no_errors(run_status.response)
+
+        aborted = self.get('/abort')
+        self.assert_no_errors(aborted.response)
 
         support.run_command('close')

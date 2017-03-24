@@ -201,7 +201,7 @@ def raw(
 
     file_paths = list(set([p for p in (_logging_paths + [file_path]) if p]))
     for path in file_paths:
-        with open(paths.clean(path), 'a+' if append_to_file else 'w+') as f:
+        with open(paths.clean(path), 'a' if append_to_file else 'w') as f:
             f.write('{}\n'.format(message))
 
 

@@ -3,6 +3,7 @@ from argparse import ArgumentParser
 
 import requests
 from cauldron import cli
+from cauldron import environ
 from cauldron.environ import Response
 from requests import exceptions as request_exceptions
 
@@ -34,28 +35,44 @@ def populate(
         )
     )
 
-
-def execute(
-        parser: ArgumentParser,
-        response: Response,
-        url: str = None,
-) -> Response:
-    """
-
-    :return:
-    """
-
-    url_clean = '{}{}'.format(
-        '' if url.startswith('http') else 'http://',
-        url.strip().rstrip('/')
+    parser.add_argument(
+        '-f', '--force',
+        dest='force',
+        default=False,
+        action='store_true',
+        help=cli.reformat(
+            """
+            When this option is included, the connection will be established
+            without communicating with the remote cauldron instead to validate
+            the connection. This should only be used in cases where you are
+            absolutely confident that the connection is valid and accessible.
+            """
+        )
     )
 
-    ping = '{}/ping'.format(url_clean)
 
-    print('CONNECTING TO: {}'.format(url_clean))
+def check_connection(url: str, force: bool) -> Response:
+    """ """
+
+    response = Response()
+    if force:
+        return response
+
+    ping = '{}/ping'.format(url)
+
+    response.notify(
+        kind='STARTING',
+        code='CONNECTING',
+        message='Establishing connection to: {}'.format(url)
+    ).console(
+        whitespace=1
+    )
 
     try:
         result = requests.get(ping)
+
+        if result.status_code != 200:
+            raise request_exceptions.ConnectionError()
     except request_exceptions.InvalidURL as error:
         return response.fail(
             code='INVALID_URL',
@@ -81,7 +98,29 @@ def execute(
             whitespace=1
         ).response
 
-    return response.update(
+
+def execute(
+        context: cli.CommandContext,
+        url: str = None,
+        force: bool = False
+) -> Response:
+    """ """
+
+    url_clean = '{}{}'.format(
+        '' if url.startswith('http') else 'http://',
+        url.strip().rstrip('/')
+    )
+
+    context.response.consume(check_connection(url_clean, force))
+    if context.response.failed:
+        return context.response
+
+    environ.remote_connection = environ.RemoteConnection(
+        active=True,
+        url=url_clean
+    )
+
+    return context.response.update(
         url=url_clean
     ).notify(
         kind='SUCCESS',

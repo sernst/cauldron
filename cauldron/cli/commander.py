@@ -60,10 +60,28 @@ def fetch(reload: bool = False) -> dict:
     return dict(COMMANDS.items())
 
 
+def get_command_from_module(
+        module,
+        remote_connection: environ.RemoteConnection
+):
+    """
+    Returns the execution command to use for the specified module, which may
+    be different depending upon remote connection
+
+    :param module:
+    :param remote_connection:
+    :return:
+    """
+
+    use_remote = remote_connection.active and hasattr(module, 'execute_remote')
+    return module.execute_remote if use_remote else module.execute
+
+
 def execute(
         name: str,
         raw_args: str,
-        response: Response = None
+        response: Response = None,
+        remote_connection: 'environ.RemoteConnection' = None
 ) -> Response:
     """
 
@@ -102,11 +120,21 @@ def execute(
 
     del args.args['show_help']
 
+    context = cli.make_command_context(
+        name=name,
+        args=args.args,
+        raw_args=raw_args,
+        parser=args.parser,
+        response=response,
+        remote_connection=remote_connection
+    )
+
     if name == 'run':
         preload()
 
     t = CauldronThread()
-    t.command = module.execute
+    t.command = get_command_from_module(module, context.remote_connection)
+    t.context = context
     t.parser = args.parser
     t.kwargs = args.args
     t.response = response

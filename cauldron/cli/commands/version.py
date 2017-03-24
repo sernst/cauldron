@@ -1,11 +1,12 @@
-from argparse import ArgumentParser
 import json
+import typing
+from argparse import ArgumentParser
 from collections import OrderedDict
 
-from cauldron import environ
 from cauldron import cli
+from cauldron.cli import sync
+from cauldron import environ
 from cauldron.environ import Response
-import typing
 
 NAME = 'version'
 DESCRIPTION = 'Displays Cauldron\'s version information'
@@ -92,9 +93,24 @@ def pretty_print(source: dict, depth: int = 0) -> str:
     return '\n'.join(out)
 
 
+def execute_remote(context: cli.CommandContext, **kwargs) -> Response:
+    """ """
+
+    thread = sync.send_remote_command(
+        command=context.name,
+        raw_args=context.raw_args,
+        asynchronous=False
+    )
+
+    thread.join()
+
+    response = thread.responses[0]
+    response.log_notifications()
+    return context.response.consume(response)
+
+
 def execute(
-        parser: ArgumentParser,
-        response: Response,
+        context: cli.CommandContext,
         verbose: bool = False,
         as_json: bool = False
 ) -> Response:
@@ -103,6 +119,7 @@ def execute(
     :return:
     """
 
+    response = context.response
     settings = environ.package_settings
 
     if verbose:

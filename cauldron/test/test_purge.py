@@ -33,3 +33,9 @@ class TestPurge(scaffolds.ResultsTest):
         r = support.run_command('purge')
         self.assertFalse(r.failed)
         self.assertEqual(r.messages[0].code, 'NO_PURGE')
+
+    def test_purge_remote(self):
+        """ should purge current results directory """
+
+        r = support.run_remote_command('purge --force')
+        self.assertFalse(r.failed, 'should not have failed')

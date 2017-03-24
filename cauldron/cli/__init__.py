@@ -1,6 +1,45 @@
-from textwrap import dedent
 import webbrowser
-import sys
+from textwrap import dedent
+from typing import NamedTuple
+from argparse import ArgumentParser
+
+from cauldron import environ
+from cauldron.environ.response import Response
+
+CommandContext = NamedTuple('COMMAND_CONTEXT', [
+    ('name', str),
+    ('raw_args', str),
+    ('args', list),
+    ('parser', ArgumentParser),
+    ('response', Response),
+    ('remote_connection', 'environ.RemoteConnection')
+])
+
+
+def make_command_context(
+        name: str = None,
+        raw_args: str = None,
+        args: list = None,
+        parser: ArgumentParser = None,
+        response: Response = None,
+        remote_connection: 'environ.RemoteConnection' = None
+) -> CommandContext:
+    """ """
+
+    remote = (
+        remote_connection
+        if remote_connection else
+        environ.remote_connection
+    )
+
+    return CommandContext(
+        name=name,
+        raw_args=raw_args,
+        args=args if args is not None else [],
+        parser=parser if parser else ArgumentParser(),
+        response=response if response else Response(),
+        remote_connection=remote
+    )
 
 
 def open_in_browser(project):

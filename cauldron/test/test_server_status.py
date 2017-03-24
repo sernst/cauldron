@@ -1,30 +1,22 @@
 from unittest.mock import patch
 
 import cauldron
-from cauldron.cli import server
 from cauldron.test import support
-from cauldron.test.support import scaffolds
-from flask import Response as FlaskResponse
+from cauldron.test.support import flask_scaffolds
 
 
-class TestServerStatus(scaffolds.ResultsTest):
+class TestServerStatus(flask_scaffolds.FlaskResultsTest):
     """ """
 
-    def setUp(self):
-        super(TestServerStatus, self).setUp()
-        self.app = server.server_run.APPLICATION.test_client()
-
     def test_status_no_project(self):
-        """
-        """
+        """ """
 
-        response = self.app.get('/status')  # type: FlaskResponse
-        self.assertIsNotNone(response)
-        self.assertEqual(response.status_code, 200)
+        status = self.get('/status')
+        self.assertEqual(status.flask.status_code, 200)
 
-        payload = self.read_flask_response(response)
-        self.assertTrue(payload['success'])
-        self.assertIsNone(payload['data']['project'])
+        response = status.response
+        self.assertFalse(response.failed)
+        self.assertIsNone(response.data['project'])
 
     @patch('cauldron.session.projects.Project.status')
     def test_failed_status(self, project_status):
@@ -34,36 +26,36 @@ class TestServerStatus(scaffolds.ResultsTest):
 
         project_status.side_effect = ValueError('Fake Error')
 
-        response = self.app.get('/status')  # type: FlaskResponse
-        self.assertEqual(response.status_code, 200)
+        status = self.get('/status')
+        self.assertEqual(status.flask.status_code, 200)
 
-        payload = self.read_flask_response(response)
-        self.assertFalse(payload['success'])
-        self.assertEqual(payload['errors'][0]['code'], 'PROJECT_STATUS_ERROR')
+        response = status.response
+        self.assertTrue(response.failed)
+        self.assert_has_error_code(response, 'PROJECT_STATUS_ERROR')
 
         support.run_command('close')
 
     def test_clean_step_no_project(self):
         """ should fail when no project is open """
 
-        response = self.app.get('/clean-step/fake')  # type: FlaskResponse
-        self.assertEqual(response.status_code, 200)
+        cleaned = self.get('/clean-step/fake')
+        self.assertEqual(cleaned.flask.status_code, 200)
 
-        payload = self.read_flask_response(response)
-        self.assertFalse(payload['success'])
-        self.assertEqual(payload['errors'][0]['code'], 'PROJECT_FETCH_ERROR')
+        response = cleaned.response
+        self.assertFalse(response.success)
+        self.assert_has_error_code(response, 'PROJECT_FETCH_ERROR')
 
     def test_clean_step_no_step(self):
         """ should fail when no such step exists """
 
         support.create_project(self, 'luigi')
 
-        response = self.app.get('/clean-step/fake')  # type: FlaskResponse
-        self.assertEqual(response.status_code, 200)
+        cleaned = self.get('/clean-step/fake')
+        self.assertEqual(cleaned.flask.status_code, 200)
 
-        payload = self.read_flask_response(response)
-        self.assertFalse(payload['success'])
-        self.assertEqual(payload['errors'][0]['code'], 'STEP_FETCH_ERROR')
+        response = cleaned.response
+        self.assertFalse(response.success)
+        self.assert_has_error_code(response, 'STEP_FETCH_ERROR')
 
         support.run_command('close')
 
@@ -75,27 +67,25 @@ class TestServerStatus(scaffolds.ResultsTest):
 
         step = cauldron.project.internal_project.steps[0]
 
-        response = self.app.get(
-            '/clean-step/{}'.format(step.filename)
-        )  # type: FlaskResponse
-        self.assertEqual(response.status_code, 200)
+        cleaned = self.get('/clean-step/{}'.format(step.filename))
+        self.assertEqual(cleaned.flask.status_code, 200)
 
-        payload = self.read_flask_response(response)
-        self.assertTrue(payload['success'])
-        self.assertIsNotNone(payload['data']['project'])
+        response = cleaned.response
+        self.assertTrue(response.success)
+        self.assertIsNotNone(response.data['project'])
 
         support.run_command('close')
 
     def test_no_project(self):
         """ """
 
-        response = self.app.get('/project')  # type: FlaskResponse
-        self.assertIsNotNone(response)
-        self.assertEqual(response.status_code, 200)
+        project_status = self.get('/project')
+        self.assertIsNotNone(project_status)
+        self.assertEqual(project_status.flask.status_code, 200)
 
-        payload = self.read_flask_response(response)
-        self.assertTrue(payload['success'])
-        self.assertIsNone(payload['data']['project'])
+        response = project_status.response
+        self.assertTrue(response.success)
+        self.assertIsNone(response.data['project'])
 
     @patch('cauldron.session.projects.Project.kernel_serialize')
     def test_project_error(self, kernel_serialize):
@@ -105,10 +95,10 @@ class TestServerStatus(scaffolds.ResultsTest):
 
         support.create_project(self, 'toadie')
 
-        response = self.app.get('/project')  # type: FlaskResponse
-        self.assertIsNotNone(response)
-        self.assertEqual(response.status_code, 200)
+        project_status = self.get('/project')
+        self.assertIsNotNone(project_status)
+        self.assertEqual(project_status.flask.status_code, 200)
 
-        payload = self.read_flask_response(response)
-        self.assertFalse(payload['success'])
-        self.assertEqual(payload['errors'][0]['code'], 'PROJECT_FETCH_ERROR')
+        response = project_status.response
+        self.assertFalse(response.success)
+        self.assert_has_error_code(response, 'PROJECT_FETCH_ERROR')

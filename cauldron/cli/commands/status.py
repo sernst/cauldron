@@ -1,6 +1,6 @@
-from argparse import ArgumentParser
-
 import cauldron
+from cauldron import cli
+from cauldron.cli import sync
 from cauldron.environ import Response
 
 NAME = 'status'
@@ -41,11 +41,24 @@ def to_console_formatted_string(data: dict) -> str:
     return '\n'.join(lines)
 
 
-def execute(
-        parser: ArgumentParser,
-        response: Response
-) -> Response:
+def execute_remote(context: cli.CommandContext) -> Response:
+    """ """
 
+    thread = sync.send_remote_command(
+        command=context.name,
+        raw_args=context.raw_args,
+        asynchronous=False
+    )
+
+    thread.join()
+
+    response = thread.responses[0]
+    response.log_notifications()
+    return context.response.consume(response)
+
+
+def execute(context: cli.CommandContext) -> Response:
+    response = context.response
     project = cauldron.project.internal_project
 
     if not project:

@@ -1,12 +1,14 @@
 import os
 import typing
 from argparse import ArgumentParser
+import requests
 
 import cauldron
 from cauldron import cli
 from cauldron import environ
 from cauldron.cli.commands.open import actions
 from cauldron.cli.commands.open import opener
+from cauldron.cli.commands.open import remote as remote_opener
 from cauldron.cli.interaction import autocompletion
 from cauldron.environ import Response
 
@@ -97,8 +99,7 @@ def populate(
 
 
 def execute(
-        parser: ArgumentParser,
-        response: Response,
+        context: cli.CommandContext,
         path: str = None,
         last_opened_project: bool = False,
         a_recent_project: bool = False,
@@ -112,6 +113,7 @@ def execute(
     :return:
     """
 
+    response = context.response
     path = path.strip('"') if path else None
 
     if list_available:
@@ -133,14 +135,22 @@ def execute(
         p = actions.fetch_location(response, path)
         path = p if p else path
 
-    response.consume(opener.open_project(
-        path=path,
-        forget=forget,
-        results_path=results_path
-    ))
+    if environ.remote_connection.active:
+        response.consume(remote_opener.sync_open(
+            context=context,
+            path=path
+        ))
+    else:
+        response.consume(opener.open_project(
+            path=path,
+            forget=forget,
+            results_path=results_path
+        ))
 
     if not response.failed and show_in_browser:
         cli.open_in_browser(cauldron.project.internal_project)
+
+    return response
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):
@@ -203,4 +213,3 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
             return autocompletion.matches(segment, value, matches)
 
         return autocompletion.match_path(segment, value)
-

@@ -9,11 +9,11 @@ class ThreadAbortError(Exception):
 class CauldronThread(threading.Thread):
 
     def __init__(self, *args, **kwargs):
-        """
-        """
+        """ """
 
         super(CauldronThread, self).__init__(*args, **kwargs)
         self.abort = False
+        self.context = None
         self.daemon = True
         self.uid = str(uuid.uuid4())
         self.command = None
@@ -25,13 +25,11 @@ class CauldronThread(threading.Thread):
         self.exception = None
 
     def run(self):
-        """
-        """
+        """ """
 
         try:
             self.result = self.command(
-                parser=self.parser,
-                response=self.response,
+                context=self.context,
                 **self.kwargs
             )
         except Exception as err:

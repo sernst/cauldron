@@ -21,3 +21,5 @@ from cauldron.cli.commands import show
 from cauldron.cli.commands import status
 from cauldron.cli.commands import version
 from cauldron.cli.commands import connect
+from cauldron.cli.commands import disconnect
+from cauldron.cli.commands import sync

@@ -1,5 +1,4 @@
-from argparse import ArgumentParser
-
+from cauldron import cli
 from cauldron import environ
 from cauldron.environ import Response
 
@@ -7,13 +6,11 @@ NAME = 'exit'
 DESCRIPTION = 'Exit the cauldron shell'
 
 
-def execute(parser: ArgumentParser, response: Response) -> Response:
+def execute(context: cli.CommandContext) -> Response:
     """
 
-    :param parser:
-    :param response:
-    :return:
+    :param context:
     """
 
     environ.configs.save()
-    return response.end()
+    return context.response.end()

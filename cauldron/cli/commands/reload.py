@@ -1,8 +1,8 @@
 import os
-import typing
-from argparse import ArgumentParser
 
 import cauldron
+from cauldron import cli
+from cauldron.cli import sync
 from cauldron import runner
 from cauldron import session
 from cauldron.environ import Response
@@ -16,26 +16,26 @@ DESCRIPTION = (
 )
 
 
-def populate(
-        parser: ArgumentParser,
-        raw_args: typing.List[str],
-        assigned_args: dict
-):
-    """
+def execute_remote(context: cli.CommandContext) -> Response:
+    """ """
 
-    :param parser:
-    :param raw_args:
-    :param assigned_args:
-    :return:
-    """
-    pass
+    thread = sync.send_remote_command(
+        command=context.name,
+        raw_args=context.raw_args,
+        asynchronous=False
+    )
+
+    thread.join()
+
+    response = thread.responses[0]
+    response.log_notifications()
+    return context.response.consume(response)
 
 
-def execute(
-        parser: ArgumentParser,
-        response: Response
-) -> Response:
+def execute(context: cli.CommandContext) -> Response:
+    """ """
 
+    response = context.response
     project_before = cauldron.project.internal_project
 
     if not project_before:

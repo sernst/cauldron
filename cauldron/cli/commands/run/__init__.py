@@ -11,6 +11,7 @@ from cauldron.cli.commands.run import actions as run_actions
 from cauldron.cli.interaction import autocompletion
 from cauldron.session import writing
 from cauldron.environ import Response
+from cauldron.session import projects
 
 NAME = 'run'
 DESCRIPTION = cli.reformat(
@@ -103,8 +104,7 @@ def populate(
 
 
 def execute(
-        parser: ArgumentParser,
-        response: Response,
+        context: cli.CommandContext,
         step: list = None,
         force: bool = False,
         continue_after: bool = False,
@@ -114,8 +114,7 @@ def execute(
 ) -> Response:
     """
 
-    :param parser:
-    :param response:
+    :param context:
     :param step:
     :param force:
     :param continue_after:
@@ -125,16 +124,16 @@ def execute(
     :return:
     """
 
-    project = run_actions.get_project(response)
+    project = run_actions.get_project(context.response)
     if not project:
-        return response.fail(
+        return context.response.fail(
             code='NO_OPEN_PROJECT',
             message='No project is open. Unable to execute run command.'
         ).console(
             whitespace=1
         ).response
 
-    run_actions.preload_project(response, project)
+    run_actions.preload_project(context.response, project)
 
     steps = list(step) if step else []
     steps = list(OrderedDict.fromkeys([s.strip('"') for s in steps]).keys())
@@ -159,7 +158,7 @@ def execute(
         ]
         message = ['  * "{}"'.format(x) for x in missing_steps]
         message.insert(0, '[ABORTED]: Unable to locate the following step(s):')
-        return response.fail(
+        return context.response.fail(
             code='MISSING_STEP',
             message='Unable to locate steps'
         ).kernel(
@@ -168,6 +167,42 @@ def execute(
             message,
             whitespace=1
         ).response
+
+    return run_local(
+        context=context,
+        project=project,
+        project_steps=project_steps,
+        force=force,
+        continue_after=continue_after,
+        single_step=single_step,
+        limit=limit,
+        print_status=print_status
+    )
+
+
+def run_local(
+        context: cli.CommandContext,
+        project: projects.Project,
+        project_steps: typing.List[projects.ProjectStep],
+        force: bool,
+        continue_after: bool,
+        single_step: bool,
+        limit: int,
+        print_status: bool
+) -> environ.Response:
+    """
+    Execute the run command locally within this cauldron environment
+
+    :param context:
+    :param project:
+    :param project_steps:
+    :param force:
+    :param continue_after:
+    :param single_step:
+    :param limit:
+    :param print_status:
+    :return:
+    """
 
     runner.reload_libraries()
 
@@ -182,7 +217,7 @@ def execute(
         ps = project_steps[0] if len(project_steps) > 0 else None
         force = force or (single_step and bool(ps is not None))
         steps_run = runner.section(
-            response=response,
+            response=context.response,
             project=project,
             starting=ps,
             limit=1,
@@ -196,7 +231,7 @@ def execute(
 
         ps = project_steps[0] if len(project_steps) > 0 else None
         steps_run = runner.complete(
-            response,
+            context.response,
             project,
             ps,
             force=force,
@@ -205,7 +240,7 @@ def execute(
     else:
         for ps in project_steps:
             steps_run += runner.section(
-                response=response,
+                response=context.response,
                 project=project,
                 starting=ps,
                 limit=max(1, limit),
@@ -224,12 +259,12 @@ def execute(
             step=writing.step_writer.serialize(ps)._asdict()
         ))
 
-    response.update(step_changes=step_changes)
+    context.response.update(step_changes=step_changes)
 
-    if print_status or response.failed:
-        response.update(project=project.kernel_serialize())
+    if print_status or context.response.failed:
+        context.response.update(project=project.kernel_serialize())
 
-    return response
+    return context.response
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):

@@ -74,8 +74,7 @@ def populate(
 
 
 def execute(
-        parser: ArgumentParser,
-        response: Response,
+        context: cli.CommandContext,
         path: str,
         directory_name: str = None,
         force: bool = False,
@@ -83,14 +82,15 @@ def execute(
 ) -> Response:
     """
 
-    :param parser:
-    :param response:
+    :param context:
     :param path:
     :param directory_name:
     :param force:
     :param append:
     :return:
     """
+
+    response = context.response
 
     path = (path if path else '').strip('"')
 

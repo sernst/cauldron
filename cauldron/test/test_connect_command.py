@@ -1,9 +1,14 @@
+from collections import namedtuple
 from unittest.mock import patch
 from unittest.mock import MagicMock
 from requests import exceptions as request_exceptions
 
+from cauldron import environ
 from cauldron.test import support
 from cauldron.test.support import scaffolds
+
+
+MockResponse = namedtuple('MockResponse', ['status_code'])
 
 
 class TestConnectCommand(scaffolds.ResultsTest):
@@ -47,10 +52,19 @@ class TestConnectCommand(scaffolds.ResultsTest):
         self.assert_has_error_code(r, 'CONNECT_COMMAND_ERROR')
 
     @patch('requests.get')
+    def test_bad_status_code(self, requests_get: MagicMock):
+        """ should fail if the get request does not have a 200 status code """
+
+        requests_get.return_value = MockResponse(status_code=500)
+
+        r = support.run_command('connect http://some.url')
+        self.assert_has_error_code(r, 'CONNECTION_ERROR')
+
+    @patch('requests.get')
     def test_valid(self, requests_get: MagicMock):
         """ should succeed to get ping data from remove cauldron kernel """
 
-        requests_get.return_value = None
+        requests_get.return_value = MockResponse(200)
         url_raw = 'something.com'
         r = support.run_command('connect {}'.format(url_raw))
         self.assertFalse(r.failed, support.Message('Failed', response=r))
@@ -65,6 +79,11 @@ class TestConnectCommand(scaffolds.ResultsTest):
             url_clean.index(url_raw),
             support.Message('Modified Url', response=r)
         )
+
+        self.assertTrue(environ.remote_connection.active)
+        self.assertEqual(environ.remote_connection.url, url_clean)
+
+        support.run_command('disconnect')
 
     def test_autocomplete(self):
         """ should return empty options for autocomplete """

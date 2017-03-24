@@ -2,6 +2,7 @@ import os
 from argparse import ArgumentParser
 
 import cauldron
+from cauldron import cli
 from cauldron.environ.response import Response
 from cauldron.test import support
 from cauldron.test.support import scaffolds
@@ -87,9 +88,10 @@ class TestExport(scaffolds.ResultsTest):
 
         support.create_project(self, 'mercury')
 
-        parser = ArgumentParser()
-        r = Response()
-        export.execute(parser, r, '')
+        r = export.execute(
+            context=cli.make_command_context(export.NAME),
+            path=''
+        )
         self.assertTrue(r.failed)
         self.assertEqual(r.errors[0].code, 'MISSING_PATH_ARG')
 

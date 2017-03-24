@@ -1,46 +1,32 @@
-from cauldron.cli import server
 from cauldron.test import support
-from cauldron.test.support import scaffolds
-from flask import Response as FlaskResponse
+from cauldron.test.support import flask_scaffolds
 
 
-class TestServerDisplay(scaffolds.ResultsTest):
-    """
-
-    """
-
-    def setUp(self):
-        super(TestServerDisplay, self).setUp()
-        self.app = server.server_run.APPLICATION.test_client()
+class TestServerDisplay(flask_scaffolds.FlaskResultsTest):
+    """ """
 
     def test_view_no_project(self):
-        """
-        """
+        """ should fail if no project is open for viewing """
 
-        response = self.app.get('/view/fake-file.html')  # type: FlaskResponse
-        self.assertIsNotNone(response)
-        self.assertEqual(response.status_code, 204)
+        viewed = self.get('/view/fake-file.html')
+        self.assertEqual(viewed.flask.status_code, 204)
 
-    def test_view_no_file(self):
-        """
-        """
+    def test_view(self):
+        """ should return file data if file exists """
 
         support.create_project(self, 'renee')
 
-        response = self.app.get('/view/project.html')  # type: FlaskResponse
-        self.assertIsNotNone(response)
-        self.assertEqual(response.status_code, 200)
+        viewed = self.get('/view/project.html')
+        self.assertEqual(viewed.flask.status_code, 200)
 
         support.run_command('close')
 
-    def test_view(self):
-        """
-        """
+    def test_view_no_file(self):
+        """ should fail if the file does not exist """
 
         support.create_project(self, 'reginald')
 
-        response = self.app.get('/view/fake-file.html')  # type: FlaskResponse
-        self.assertIsNotNone(response)
-        self.assertEqual(response.status_code, 204)
+        viewed = self.get('/view/fake-file.html')
+        self.assertEqual(viewed.flask.status_code, 204)
 
         support.run_command('close')

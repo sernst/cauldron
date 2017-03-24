@@ -14,6 +14,9 @@ from cauldron.environ.logger import raw as log_raw
 from cauldron.environ.response import Response
 
 VersionInfo = namedtuple('VersionInfo', ['major', 'minor', 'micro'])
+RemoteConnection = namedtuple('RemoteConnection', ['active', 'url'])
+
+remote_connection = RemoteConnection(False, None)
 
 start_time = datetime.utcnow()
 

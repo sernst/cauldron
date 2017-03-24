@@ -104,44 +104,36 @@ def write_file(project: 'projects.Project', path: str) -> str:
     return save_path
 
 
-def execute(parser: ArgumentParser, response: Response, path: str) -> Response:
-
+def execute(context: cli.CommandContext, path: str) -> Response:
+    response = context.response
     project = cauldron.project.internal_project
 
     if not project:
-        return (
-            response
-            .fail(
-                code='NO_PROJECT',
-                message='No project is open. Nothing to save'
-            )
-            .console(whitespace=1)
-            .response
-        )
+        return response.fail(
+            code='NO_PROJECT',
+            message='No project is open. Nothing to save'
+        ).console(
+            whitespace=1
+        ).response
 
     try:
         saved_path = write_file(project, path)
     except Exception as err:
         print(err)
-        return (
-            response
-            .fail(
-                code='WRITE_SAVE_ERROR',
-                message='Unable to write the cdf file output',
-                error=err
-            )
-            .console(whitespace=1)
-            .response
-        )
+        return response.fail(
+            code='WRITE_SAVE_ERROR',
+            message='Unable to write the cdf file output',
+            error=err
+        ).console(
+            whitespace=1
+        ).response
 
-    return (
-        response
-        .update(path=saved_path)
-        .notify(
-            kind='SUCCESS',
-            code='SAVED',
-            message='The project has been saved to: {}'.format(saved_path)
-        )
-        .console(whitespace=1)
-        .response
-    )
+    return response.update(
+        path=saved_path
+    ).notify(
+        kind='SUCCESS',
+        code='SAVED',
+        message='The project has been saved to: {}'.format(saved_path)
+    ).console(
+        whitespace=1
+    ).response
