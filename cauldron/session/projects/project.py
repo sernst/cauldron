@@ -1,267 +1,23 @@
 import functools
+import hashlib
 import json
 import os
-import sys
 import time
 import typing
-import hashlib
 
 from cauldron import environ
-from cauldron import render
-from cauldron import templating
-from cauldron.session import definitions
+from cauldron.session import definitions as file_definitions
 from cauldron.session import writing
 from cauldron.session.caching import SharedCache
+from cauldron.session.projects import definitions
+from cauldron.session.projects import steps
 from cauldron.session.report import Report
-from cauldron.session import naming
 
 DEFAULT_SCHEME = 'S{{##}}-{{name}}.{{ext}}'
 
 
-class ProjectStep(object):
-    """
-    A computational step within the project, which contains data and
-    functionality related specifically to that step as well as a reference to
-    the project itself.
-    """
-
-    _reference_index = 0
-
-    def __init__(
-            self,
-            project: 'Project' = None,
-            definition: definitions.FileDefinition = None
-    ):
-        """
-
-        :param project:
-        :param definition:
-        """
-
-        self.__class__._reference_index += 1
-        self._reference_id = '{}'.format(self.__class__._reference_index)
-
-        self.definition = definition if definition is not None else dict()
-        self.project = project
-        self.report = Report(self)
-
-        self.last_modified = None
-        self.code = None
-        self.is_running = False
-        self._is_dirty = True
-        self.error = None
-        self.is_muted = False
-        self.dom = None  # type: dict
-        self.progress_message = None
-        self.sub_progress_message = None
-        self.progress = 0
-        self.sub_progress = 0
-        self.test_locals = None  # type: dict
-
-    @property
-    def reference_id(self):
-        return self._reference_id
-
-    @property
-    def uuid(self):
-        """
-
-        :return:
-        """
-
-        return hashlib.sha1(self.source_path.encode()).hexdigest()
-
-    @property
-    def filename(self) -> str:
-        return self.definition.slug
-
-    @property
-    def web_includes(self) -> list:
-        if not self.project:
-            return []
-
-        out = []
-        for fn in self.definition.get('web_includes', []):
-            out.append(os.path.join(
-                self.definition.get('folder', ''),
-                fn.replace('/', os.sep)
-            ))
-        return out
-
-    @property
-    def index(self) -> int:
-        if not self.project:
-            return -1
-        return self.project.steps.index(self)
-
-    @property
-    def source_path(self) -> typing.Union[None, str]:
-        if not self.project or not self.report:
-            return None
-        return os.path.join(self.project.source_directory, self.filename)
-
-    def kernel_serialize(self):
-        """
-
-        :return:
-        """
-
-        status = self.status()
-        out = dict(
-            slug=self.definition.slug,
-            index=self.index,
-            source_path=self.source_path,
-            status=status,
-            exploded_name=naming.explode_filename(
-                self.definition.name,
-                self.project.naming_scheme
-            )
-        )
-        out.update(status)
-        return out
-
-    def status(self):
-        """
-
-        :return:
-        """
-
-        is_dirty = self.is_dirty()
-
-        return dict(
-            uuid=self.uuid,
-            reference_id=self.reference_id,
-            name=self.definition.name,
-            muted=self.is_muted,
-            last_modified=self.last_modified,
-            last_display_update=self.report.last_update_time,
-            dirty=is_dirty,
-            is_dirty=is_dirty,
-            run=self.last_modified is not None,
-            error=self.error is not None
-        )
-
-    def is_dirty(self):
-        """
-
-        :return:
-        """
-        if self._is_dirty:
-            return self._is_dirty
-
-        if self.last_modified is None:
-            return True
-        p = self.source_path
-        if not p:
-            return False
-        return os.path.getmtime(p) >= self.last_modified
-
-    def mark_dirty(self, value: bool, force: bool = False):
-        """
-
-        :param value:
-        :param force:
-        :return:
-        """
-
-        self._is_dirty = bool(value)
-
-        time_adjust = 0 if value else time.time()
-        self.last_modified = time_adjust if force else self.last_modified
-
-    def get_dom(self) -> dict:
-        """ Retrieves the current value of the DOM for the step """
-
-        if self.is_running:
-            return self.dumps()
-
-        if self.dom is not None:
-            return self.dom
-
-        dom = self.dumps()
-        self.dom = dom
-        return dom
-
-    def dumps(self) -> dict:
-        """
-
-        :return:
-        """
-
-        code_file_path = os.path.join(
-            self.project.source_directory,
-            self.filename
-        )
-        code = dict(
-            filename=self.filename,
-            path=code_file_path,
-            code=render.code_file(code_file_path)
-        )
-
-        if not self.is_running:
-            # If no longer running, make sure to flush the stdout buffer so
-            # any print statements at the end of the step get included in
-            # the body
-            self.report.flush_stdout()
-
-        # Create a copy of the body for dumping
-        body = self.report.body[:]
-
-        if self.is_running:
-            # If still running add a temporary copy of anything not flushed
-            # from the stdout buffer to the copy of the body for display. Do
-            # not flush the buffer though until the step is done running or
-            # it gets flushed by another display call.
-            body.append(self.report.read_stdout())
-
-        body = ''.join(body)
-
-        has_body = len(body) > 0 and (
-            body.find('<div') != -1 or
-            body.find('<span') != -1 or
-            body.find('<p') != -1 or
-            body.find('<pre') != -1 or
-            body.find('<h') != -1 or
-            body.find('<ol') != -1 or
-            body.find('<ul') != -1 or
-            body.find('<li') != -1
-        )
-
-        std_err = (
-            self.report.read_stderr()
-            if self.is_running else
-            self.report.flush_stderr()
-        ).strip('\n').rstrip()
-
-        dom = templating.render_template(
-            'step-body.html',
-            last_display_update=self.report.last_update_time,
-            code=code,
-            body=body,
-            has_body=has_body,
-            id=self.definition.name,
-            title=self.report.title,
-            subtitle=self.report.subtitle,
-            summary=self.report.summary,
-            error=self.error,
-            index=self.index,
-            is_running=self.is_running,
-            progress_message=self.progress_message,
-            progress=int(round(max(0, min(100, 100 * self.progress)))),
-            sub_progress_message=self.sub_progress_message,
-            sub_progress=int(round(max(0, min(100, 100 * self.sub_progress)))),
-            std_err=std_err
-        )
-
-        if not self.is_running:
-            self.dom = dom
-        return dom
-
-
 class Project:
-    """
-
-    """
+    """ """
 
     def __init__(
             self,
@@ -285,9 +41,9 @@ class Project:
             source_directory = os.path.dirname(source_directory)
         self.source_directory = source_directory
 
-        self.steps = []  # type: typing.List[ProjectStep]
+        self.steps = []  # type: typing.List[steps.ProjectStep]
         self._results_path = results_path  # type: str
-        self._current_step = None  # type: ProjectStep
+        self._current_step = None  # type: steps.ProjectStep
         self.last_modified = None
         self.remote_source_directory = None  # type: str
 
@@ -303,16 +59,22 @@ class Project:
         self.refresh()
 
     @property
-    def uuid(self):
+    def uuid(self) -> str:
         """
-
-        :return:
+        The unique identifier for the project among all other projects, which
+        is based on a hashing of the project's source path to prevent naming
+        collisions when storing project information from multiple projects in
+        the same directory (e.g. common results directory).
         """
 
         return hashlib.sha1(self.source_path.encode()).hexdigest()
 
     @property
-    def library_directories(self):
+    def library_directories(self) -> typing.List[str]:
+        """
+        The list of directories to all of the library locations
+        """
+
         def listify(value):
             return [value] if isinstance(value, str) else list(value)
         folders = listify(self.settings.fetch('library_folders', ['libs']))
@@ -324,6 +86,8 @@ class Project:
 
     @property
     def asset_directories(self):
+        """ """
+
         def listify(value):
             return [value] if isinstance(value, str) else list(value)
         folders = listify(self.settings.fetch('asset_folders', ['assets']))
@@ -335,10 +99,7 @@ class Project:
 
     @property
     def has_error(self):
-        """
-
-        :return:
-        """
+        """ """
 
         for s in self.steps:
             if s.error:
@@ -372,7 +133,7 @@ class Project:
         self.settings.put(naming_scheme=value)
 
     @property
-    def current_step(self) -> typing.Union[ProjectStep, None]:
+    def current_step(self) -> typing.Union['steps.ProjectStep', None]:
         if len(self.steps) < 1:
             return None
 
@@ -434,7 +195,6 @@ class Project:
     def output_directory(self) -> str:
         """
         Returns the directory where the project results files will be written
-        :return:
         """
 
         return os.path.join(self.results_path, 'reports', self.uuid, 'latest')
@@ -452,7 +212,6 @@ class Project:
         """
 
         :param host:
-        :return:
         """
 
         if host:
@@ -466,7 +225,6 @@ class Project:
         """
 
         :param args:
-        :return:
         """
 
         return os.path.join(self.output_directory, '..', 'snapshots', *args)
@@ -485,10 +243,7 @@ class Project:
         return '{}&sid={}'.format(self.url, snapshot_name)
 
     def kernel_serialize(self):
-        """
-
-        :return:
-        """
+        """ """
 
         return dict(
             uuid=self.uuid,
@@ -508,9 +263,9 @@ class Project:
 
     def refresh(self, force: bool = False) -> bool:
         """
-        Loads the cauldron.json configuration file for the project and populates
+        Loads the cauldron.json definition file for the project and populates
         the project with the loaded data. Any existing data will be overwritten,
-        including previously stored ProjectSteps.
+        if the new definition file differs from the previous one.
 
         If the project has already loaded with the most recent version of the
         cauldron.json file, this method will return without making any changes
@@ -528,34 +283,37 @@ class Project:
         if not force and is_newer:
             return False
 
-        self.settings.clear().put(
-            **load_project_settings(self.source_directory)
+        old_definition = self.settings.fetch(None)
+        new_definition = definitions.load_project_definition(
+            self.source_directory
         )
 
-        path = self.settings.fetch('results_path')
-        if path:
-            self.results_path = environ.paths.clean(
-                os.path.join(self.source_directory, path)
-            )
+        if not force and old_definition == new_definition:
+            return False
 
-        python_paths = self.settings.fetch('python_paths', [])
-        if isinstance(python_paths, str):
-            python_paths = [python_paths]
-        for path in python_paths:
-            path = environ.paths.clean(
-                os.path.join(self.source_directory, path)
-            )
-            if path not in sys.path:
-                sys.path.append(path)
+        self.settings.clear().put(**new_definition)
 
+        old_step_definitions = old_definition.get('steps', [])
+        new_step_definitions = new_definition.get('steps', [])
+
+        if not force and old_step_definitions == new_step_definitions:
+            return True
+
+        old_steps = self.steps
         self.steps = []
-        for step_data in self.settings.fetch('steps', []):
-            self.add_step(step_data)
+
+        for step_data in new_step_definitions:
+            matches = [s for s in old_step_definitions if s == step_data]
+            if len(matches) > 0:
+                index = old_step_definitions.index(matches[0])
+                self.steps.append(old_steps[index])
+            else:
+                self.add_step(step_data)
 
         self.last_modified = time.time()
         return True
 
-    def get_step(self, name: str) -> typing.Union[ProjectStep, None]:
+    def get_step(self, name: str) -> typing.Union['steps.ProjectStep', None]:
         """
 
         :param name:
@@ -571,7 +329,7 @@ class Project:
     def get_step_by_reference_id(
             self,
             reference_id: str
-    ) -> typing.Union[ProjectStep, None]:
+    ) -> typing.Union['steps.ProjectStep', None]:
         """
 
         :param reference_id:
@@ -603,7 +361,7 @@ class Project:
             self,
             step_data: typing.Union[str, dict],
             index: int = None
-    ) -> typing.Union[ProjectStep, None]:
+    ) -> typing.Union['steps.ProjectStep', None]:
         """
 
         :param step_data:
@@ -611,7 +369,7 @@ class Project:
         :return:
         """
 
-        fd = definitions.FileDefinition(
+        fd = file_definitions.FileDefinition(
             data=step_data,
             project=self,
             project_folder=functools.partial(
@@ -624,7 +382,7 @@ class Project:
             self.last_modified = 0
             return None
 
-        ps = ProjectStep(self, fd)
+        ps = steps.ProjectStep(self, fd)
 
         if index is None:
             self.steps.append(ps)
@@ -640,7 +398,7 @@ class Project:
         self.last_modified = time.time()
         return ps
 
-    def remove_step(self, name) -> typing.Union[ProjectStep, None]:
+    def remove_step(self, name) -> typing.Union['steps.ProjectStep', None]:
         """
 
         :param name:
@@ -685,10 +443,7 @@ class Project:
         self.last_modified = time.time()
 
     def write(self) -> str:
-        """
-
-        :return:
-        """
+        """ """
 
         writing.save(self)
         return self.url
@@ -701,26 +456,3 @@ class Project:
             last_modified=self.last_modified,
             remote_slug=self.make_remote_url()
         )
-
-
-def load_project_settings(path: str) -> dict:
-    """
-
-    :param path:
-    :return:
-    """
-
-    path = environ.paths.clean(path)
-    if os.path.isdir(path):
-        path = os.path.join(path, 'cauldron.json')
-    if not os.path.exists(path):
-        raise FileNotFoundError('No project file found at: {}'.format(path))
-
-    with open(path, 'r') as f:
-        out = json.load(f)
-
-    project_folder = os.path.split(os.path.dirname(path))[-1]
-    if 'id' not in out or not out['id']:
-        out['id'] = project_folder
-
-    return out

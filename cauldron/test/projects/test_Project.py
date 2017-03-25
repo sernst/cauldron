@@ -5,7 +5,8 @@ from cauldron import environ
 from cauldron.session import projects
 from cauldron.test.support import scaffolds
 from cauldron.test import support
-
+from cauldron.session.caching import SharedCache
+from cauldron.session.projects import definitions
 
 class TestProject(scaffolds.ResultsTest):
     """
@@ -33,7 +34,7 @@ class TestProject(scaffolds.ResultsTest):
         shared_data = {'a': 1, 'b': True}
         p = projects.Project(project.source_directory, shared=shared_data)
 
-        self.assertIsInstance(p.shared, projects.SharedCache)
+        self.assertIsInstance(p.shared, SharedCache)
 
         for key, value in shared_data.items():
             self.assertEqual(p.shared.fetch(key), value)
@@ -132,6 +133,6 @@ class TestProject(scaffolds.ResultsTest):
         """Error when no project settings file exists"""
 
         with self.assertRaises(FileNotFoundError):
-            projects.load_project_settings(
+            definitions.load_project_definition(
                 os.path.dirname(os.path.realpath(__file__))
             )

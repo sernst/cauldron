@@ -105,7 +105,6 @@ def execute_remote(context: cli.CommandContext, **kwargs) -> Response:
     thread.join()
 
     response = thread.responses[0]
-    response.log_notifications()
     return context.response.consume(response)
 
 

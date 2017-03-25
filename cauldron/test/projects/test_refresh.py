@@ -1,5 +1,4 @@
 import json
-import sys
 
 import cauldron as cd
 from cauldron.session import projects
@@ -8,9 +7,7 @@ from cauldron.test.support import scaffolds
 
 
 class TestRefresh(scaffolds.ResultsTest):
-    """
-
-    """
+    """ """
 
     @classmethod
     def read_project_file(cls, project: projects.Project = None) -> dict:
@@ -42,18 +39,18 @@ class TestRefresh(scaffolds.ResultsTest):
         file is modified by external means
         """
 
-        STEP_NAME = 'S01-FAKE.py'
+        step_name = 'S01-FAKE.py'
 
         support.create_project(self, 'draco')
 
         project_data = self.read_project_file()
-        project_data['steps'].append(STEP_NAME)
+        project_data['steps'].append(step_name)
         self.write_project_file(project_data)
 
         project = cd.project.internal_project
         self.assertTrue(project.refresh(force=True), 'should have refreshed')
         self.assertEqual(len(project.steps), 1)
-        self.assertEqual(project.steps[0].definition.name, STEP_NAME)
+        self.assertEqual(project.steps[0].definition.name, step_name)
 
         support.run_command('close')
 
@@ -67,7 +64,7 @@ class TestRefresh(scaffolds.ResultsTest):
 
         project = cd.project.internal_project
         project_data = self.read_project_file()
-        project_data['results_path'] = project.source_directory
+        project_data['path_results'] = project.source_directory
         self.write_project_file(project_data)
 
         self.assertTrue(project.refresh(force=True), 'should have refreshed')
@@ -75,21 +72,33 @@ class TestRefresh(scaffolds.ResultsTest):
 
         support.run_command('close')
 
-    def test_add_python_path(self):
+    def test_modified_same_steps(self):
         """
-        Project should recognize the additional python path
+        The project should refresh without error after the cauldron project
+        file is modified by external means
         """
 
-        support.create_project(self, 'cassie')
+        support.create_project(self, 'dracon')
 
-        project = cd.project.internal_project
         project_data = self.read_project_file()
-        project_data['python_paths'] = project.source_directory
+        project_data['change'] = True
         self.write_project_file(project_data)
 
+        project = cd.project.internal_project
         self.assertTrue(project.refresh(force=True), 'should have refreshed')
-        self.assertIn(project.source_directory, sys.path)
+        self.assertEqual(len(project.steps), 0)
 
-        sys.path.remove(project.source_directory)
+        support.run_command('close')
+
+    def test_update_not_modified(self):
+        """ should abort refresh if updated file is identical to previous """
+
+        support.create_project(self, 'dracon')
+
+        project_data = self.read_project_file()
+        self.write_project_file(project_data)
+
+        project = cd.project.internal_project
+        self.assertFalse(project.refresh(), 'should not have refreshed')
 
         support.run_command('close')

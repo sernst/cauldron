@@ -36,18 +36,4 @@ def preload_project(response: Response, project: Project):
     :return:
     """
 
-    was_loaded = bool(project.last_modified is not None)
-    if project.refresh() and was_loaded:
-        response.notify(
-            kind='WARNING',
-            code='PROJECT_RELOADED',
-            message="""
-                The project was reloaded due to changes detected in
-                the cauldron.json settings file. Shared data was reset as a
-                result.
-                """
-        ).console(
-            whitespace=1
-        )
-
     session.initialize_results_path(project.results_path)

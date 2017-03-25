@@ -78,7 +78,6 @@ def remote_purge(context: cli.CommandContext) -> Response:
     thread.join()
 
     response = thread.responses[0]
-    response.log_notifications()
     return context.response.consume(response)
 
 
