@@ -1,7 +1,7 @@
 import webbrowser
+from argparse import ArgumentParser
 from textwrap import dedent
 from typing import NamedTuple
-from argparse import ArgumentParser
 
 from cauldron import environ
 from cauldron.environ.response import Response
@@ -42,8 +42,11 @@ def make_command_context(
     )
 
 
-def open_in_browser(project):
-    webbrowser.open(project.baked_url)
+def open_in_browser(project_or_url):
+    """ """
+
+    url = getattr(project_or_url, 'baked_url', project_or_url)
+    webbrowser.open(url)
 
 
 def reformat(source: str) -> str:

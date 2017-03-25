@@ -128,11 +128,15 @@ def execute(
             kind='SUCCESS',
             code='RESULTS_PURGED',
             message='All results have been removed'
+        ).console(
+            whitespace=1
         )
     else:
         response.fail(
             code='PURGE_FAILURE',
             message='Failed to remove results'
+        ).console(
+            whitespace=1
         )
 
-    return response.console(whitespace=1).response
+    return response

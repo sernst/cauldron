@@ -1,3 +1,4 @@
+import asyncio
 import threading
 import uuid
 
@@ -23,17 +24,51 @@ class CauldronThread(threading.Thread):
         self.response = None
         self.is_executing = False
         self.exception = None
+        self.logs = []
+        self._loop = None
 
     def run(self):
         """ """
 
+        def run_command():
+            try:
+                self.result = self.command(
+                    context=self.context,
+                    **self.kwargs
+                )
+            except Exception as err:
+                self.exception = err
+                self.context.response.fail(
+                    code='COMMAND_EXECUTION_ERROR',
+                    message='Failed to execute command due to internal error',
+                    error=err
+                ).console(
+                    whitespace=1
+                )
+            self._loop.stop()
+
+        self._loop = asyncio.new_event_loop()
+        self._loop.call_soon(run_command)
+        self._loop.run_forever()
+        self._loop.close()
+        self._loop = None
+
+    def abort_running(self) -> bool:
+        """
+        Executes a hard abort by shutting down the event loop in this thread
+        in which the running command was operating. This is carried out using
+        the asyncio library to prevent the stopped execution from destabilizing
+        the Python environment.
+        """
+
+        if not self._loop:
+            return False
+
         try:
-            self.result = self.command(
-                context=self.context,
-                **self.kwargs
-            )
-        except Exception as err:
-            self.exception = err
+            self._loop.stop()
+            return True
+        except Exception:
+            return False
 
 
 def abort_thread():

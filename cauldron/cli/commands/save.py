@@ -118,12 +118,11 @@ def execute(context: cli.CommandContext, path: str) -> Response:
 
     try:
         saved_path = write_file(project, path)
-    except Exception as err:
-        print(err)
+    except Exception as error:
         return response.fail(
             code='WRITE_SAVE_ERROR',
             message='Unable to write the cdf file output',
-            error=err
+            error=error
         ).console(
             whitespace=1
         ).response

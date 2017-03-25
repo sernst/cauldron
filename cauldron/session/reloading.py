@@ -66,7 +66,6 @@ def do_reload(module: types.ModuleType, newer_than: int) -> bool:
 
     try:
         importlib.reload(module)
-        print('RELOADED:', get_module_name(module))
         return True
     except ImportError:
         return False

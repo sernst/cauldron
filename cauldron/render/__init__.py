@@ -72,9 +72,9 @@ def code_file(
         try:
             with open(path, 'r', encoding=encoding) as f:
                 source = f.read()
+            break
         except Exception:
-            print('Failed with encoding:', encoding)
-            continue
+            pass
 
     if source is None:
         return ''

@@ -1,9 +1,7 @@
-import os
 import sys
 
-from cauldron.test import support
-from cauldron.test.support import scaffolds
 from cauldron.session import buffering
+from cauldron.test.support import scaffolds
 
 
 class TestSessionBuffer(scaffolds.ResultsTest):
@@ -13,7 +11,10 @@ class TestSessionBuffer(scaffolds.ResultsTest):
         b = buffering.RedirectBuffer(sys.stdout)
         b.active = True
         sys.stdout = b
+
+        # This print statement is needed for this test
         print(value)
+
         sys.stdout = b.redirection_source
 
         contents = b.flush_all().strip()

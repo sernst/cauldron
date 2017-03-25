@@ -1,9 +1,33 @@
 import cauldron
 from cauldron import cli
+from cauldron.cli import sync
 from cauldron.environ import Response
 
 NAME = 'show'
 DESCRIPTION = 'Opens the current project display in the default browser'
+
+
+def execute_remote(context: cli.CommandContext) -> Response:
+    """ """
+
+    response = sync.comm.send_request(
+        endpoint='/status',
+        remote_connection=context.remote_connection
+    )
+
+    remote_slug = response.data.get('project', {}).get('remote_slug')
+    if response.failed or not remote_slug:
+        response.log_notifications()
+        return context.response.consume(response)
+
+    url = ''.join([
+        context.remote_connection.url.rstrip('/'),
+        '/',
+        remote_slug.lstrip('/')
+    ])
+
+    cli.open_in_browser(url)
+    return context.response.consume(response)
 
 
 def execute(context: cli.CommandContext) -> Response:

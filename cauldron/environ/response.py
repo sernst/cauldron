@@ -4,6 +4,7 @@ import flask
 from requests import Response as HttpResponse
 
 from cauldron import cli
+from cauldron.cli import threads
 from cauldron.environ import logger
 
 ERROR_KIND = 'ERROR'
@@ -174,7 +175,7 @@ class Response(object):
         self.warnings = []  # type: typing.List[ResponseMessage]
         self.ended = False
         self.failed = bool(failed)
-        self.thread = None  # type: threading.Thread
+        self.thread = None  # type: threads.CauldronThread
         self.returned = None
         self.http_response = None  # type: HttpResponse
 
@@ -321,10 +322,16 @@ class Response(object):
             self.messages.append(rm)
         return rm
 
+    def get_thread_log(self) -> typing.List[str]:
+        """ """
+
+        return getattr(self.thread, 'logs', []) + []
+
     def serialize(self) -> dict:
         """ """
 
         return dict(
+            logs=self.get_thread_log(),
             id=self.identifier,
             data=self.data,
             errors=[x.serialize() for x in self.errors],

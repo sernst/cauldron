@@ -65,7 +65,7 @@ def check_connection(url: str, force: bool) -> Response:
         code='CONNECTING',
         message='Establishing connection to: {}'.format(url)
     ).console(
-        whitespace=1
+        whitespace_top=1
     )
 
     try:
@@ -127,7 +127,7 @@ def execute(
         code='CONNECTED',
         message='Connected to "{}"'.format(url_clean)
     ).console(
-        whitespace=1
+        whitespace_bottom=1
     ).response
 
 

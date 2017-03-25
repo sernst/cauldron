@@ -24,7 +24,7 @@ def synchronize_file(
     environ.log('[SYNCING]: {}'.format(relative_path))
 
     for index, chunk in enumerate(sync.io.read_file_chunks(file_path)):
-        response = sync.send_request(
+        response = sync.comm.send_request(
             endpoint='/sync-file',
             remote_connection=context.remote_connection,
             data=dict(
@@ -67,7 +67,7 @@ def do_synchronize(
 def execute(context: cli.CommandContext) -> Response:
     """ """
 
-    if not environ.remote_connection.active:
+    if not context.remote_connection.active:
         return context.response.fail(
             code='NO_REMOTE_CONNECTION',
             message='No active remote connection is available. Nothing to sync.'
@@ -75,7 +75,7 @@ def execute(context: cli.CommandContext) -> Response:
             whitespace=1
         ).response
 
-    response = sync.send_request(
+    response = sync.comm.send_request(
         endpoint='/sync-status',
         method='GET',
         remote_connection=context.remote_connection

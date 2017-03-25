@@ -5,6 +5,7 @@ from collections import OrderedDict
 
 import cauldron
 from cauldron import cli
+from cauldron.cli import sync
 from cauldron import environ
 from cauldron import runner
 from cauldron.cli.commands.run import actions as run_actions
@@ -101,6 +102,22 @@ def populate(
             """
         )
     )
+
+
+def execute_remote(context: cli.CommandContext, **kwargs) -> Response:
+    """ """
+
+    thread = sync.send_remote_command(
+        command=context.name,
+        raw_args=context.raw_args,
+        asynchronous=True,
+        show_logs=True
+    )
+
+    thread.join()
+
+    response = thread.responses[-1]
+    return context.response.consume(response)
 
 
 def execute(

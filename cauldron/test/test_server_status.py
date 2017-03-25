@@ -87,15 +87,16 @@ class TestServerStatus(flask_scaffolds.FlaskResultsTest):
         self.assertTrue(response.success)
         self.assertIsNone(response.data['project'])
 
-    @patch('cauldron.session.projects.Project.kernel_serialize')
-    def test_project_error(self, kernel_serialize):
+    def test_project_error(self):
         """ """
-
-        kernel_serialize.side_effect = ValueError('Fake Error')
 
         support.create_project(self, 'toadie')
 
-        project_status = self.get('/project')
+        package = 'cauldron.session.projects.Project.kernel_serialize'
+        with patch(package) as func:
+            func.side_effect = ValueError('Fake Error')
+            project_status = self.get('/project')
+
         self.assertIsNotNone(project_status)
         self.assertEqual(project_status.flask.status_code, 200)
 

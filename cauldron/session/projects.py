@@ -698,7 +698,8 @@ class Project:
         return dict(
             id=self.id,
             steps=[s.status() for s in self.steps],
-            last_modified=self.last_modified
+            last_modified=self.last_modified,
+            remote_slug=self.make_remote_url()
         )
 
 

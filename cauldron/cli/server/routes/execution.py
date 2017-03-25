@@ -100,7 +100,6 @@ def execute(async: bool = False):
         Whether or not to allow asynchronous command execution that returns
         before the command is complete with a run_uid that can be used to
         track the continued execution of the command until completion.
-    :return:
     """
 
     r = Response()
@@ -134,6 +133,7 @@ def execute(async: bool = False):
             return flask.jsonify(
                 Response()
                 .update(
+                    run_log=r.get_thread_log(),
                     run_status='running',
                     run_uid=r.thread.uid,
                     step_changes=server_runner.get_running_step_changes(True),
@@ -144,6 +144,7 @@ def execute(async: bool = False):
 
         del server_runner.active_execution_responses[r.thread.uid]
         r.update(
+            run_log=r.get_thread_log(),
             run_status='complete',
             run_multiple_updates=False,
             run_uid=r.thread.uid
@@ -191,7 +192,7 @@ def abort():
         try:
             # Force stop the thread explicitly
             if response.thread.is_alive():
-                response.thread._Thread_stop()
+                response.thread.abort_running()
         except Exception:
             pass
 

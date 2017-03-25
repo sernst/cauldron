@@ -1,17 +1,20 @@
 from cauldron.test import support
+from cauldron.test.support.messages import Message
 from cauldron.test.support import scaffolds
 
 
 class TestConfigure(scaffolds.ResultsTest):
-    """
-
-    """
+    """ """
 
     def test_list_all(self):
         """ should list configurations """
 
-        r = support.run_command('configure --list')
-        self.assertFalse(r.failed, 'should not have failed')
+        response = support.run_command('configure --list')
+        self.assertFalse(response.failed, Message(
+            'Failed To List Configurations'
+            'should not have failed',
+            response=response
+        ))
 
     def test_print_help(self):
         """ should print configure help """

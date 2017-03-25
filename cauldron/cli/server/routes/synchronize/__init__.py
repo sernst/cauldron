@@ -2,8 +2,6 @@ import json
 import os
 import tempfile
 
-from flask import request
-
 import cauldron as cd
 from cauldron.cli import sync
 from cauldron.cli.commands.open import opener as project_opener
@@ -87,7 +85,7 @@ def sync_source_file():
     """ """
 
     r = Response()
-    args = request.get_json(silent=True)
+    args = arguments.from_request()
     relative_path = args.get('relative_path')
     chunk = args.get('chunk')
     file_type = args.get('type')
@@ -100,6 +98,12 @@ def sync_source_file():
         ).response.flask_serialize()
 
     project = cd.project.internal_project
+
+    if not project:
+        return r.fail(
+            code='NO_OPEN_PROJECT',
+            message='No project is open. Unable to sync'
+        ).response.flask_serialize()
 
     parts = relative_path.replace('\\', '/').strip('/').split('/')
 

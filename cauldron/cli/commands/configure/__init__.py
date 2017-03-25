@@ -112,4 +112,4 @@ def execute(
     else:
         actions.set_key(key, value, persists=persists)
 
-    return response
+    return context.response

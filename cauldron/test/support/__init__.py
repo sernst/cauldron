@@ -17,16 +17,22 @@ except ImportError:
   import pyreadline as readline
 
 
-def run_remote_command(command: str) -> 'environ.Response':
+def run_remote_command(
+        command: str,
+        app=None,
+        remote_connection: 'environ.RemoteConnection' = None
+) -> 'environ.Response':
     """ """
 
     name, args = parse.split_line(command)
-    remote_connection = environ.RemoteConnection(
-        url='fake-run-remote.command',
-        active=True
-    )
 
-    app = server.create_test_app()
+    if not remote_connection:
+        remote_connection = environ.RemoteConnection(
+            url='fake-run-remote.command',
+            active=True
+        )
+
+    app = app if app else server.create_test_app()
 
     def mock_send_request(
             endpoint: str,

@@ -1,3 +1,4 @@
+import threading
 import sys
 import os
 import typing
@@ -198,6 +199,13 @@ def raw(
 
     if trace:
         print(message)
+
+    # Store the logged information as an entry in the current thread if the
+    # thread has as logs variable for such storage. These logs are used to
+    # store logs in CauldronThreads, which are then transmitted from kernels
+    # to Cauldron interfaces for display feedback
+    if hasattr(threading.current_thread(), 'logs'):
+        threading.current_thread().logs.append(message)
 
     file_paths = list(set([p for p in (_logging_paths + [file_path]) if p]))
     for path in file_paths:

@@ -9,6 +9,7 @@ from cauldron.session import writing
 from cauldron import environ
 from cauldron.render.encoding import ComplexJsonEncoder
 from flask import Flask
+import typing
 
 APPLICATION = Flask('Cauldron')
 APPLICATION.json_encoder = ComplexJsonEncoder
@@ -20,7 +21,7 @@ try:
 except Exception:
     site_packages = []
 
-active_execution_responses = dict()
+active_execution_responses = dict()  # type: typing.Dict[str, environ.Response]
 
 
 server_data = dict(
@@ -138,7 +139,7 @@ def execute(
     """
 
     if kwargs.get('version'):
-        print('VERSION: {}'.format(environ.version))
+        environ.log('VERSION: {}'.format(environ.version))
         sys.exit(0)
 
     if host is None and public:

@@ -1,10 +1,9 @@
 import os
 from unittest.mock import patch
-from unittest.mock import MagicMock
 
 import cauldron as cd
-from cauldron.steptest import StepTestCase
 from cauldron import steptest
+from cauldron.steptest import StepTestCase
 
 
 class StepTest(StepTestCase):
@@ -28,6 +27,16 @@ class StepTest(StepTestCase):
 
         error_echo = step.echo_error()
         self.assertGreater(len(error_echo), 0)
+
+    def test_second_step_strict(self):
+        """ should fail because of an exception raised in the source """
+
+        self.assertRaises(
+            AssertionError,
+            self.run_step,
+            'S02-errors.py',
+            allow_failure=False
+        )
 
     def test_to_strings(self):
         """ should convert list of integers to a list of strings """
@@ -80,3 +89,22 @@ class StepTest(StepTestCase):
             result = steptest.find_project_directory(subdirectory)
             func.assert_called_once_with(subdirectory)
         self.assertIsNone(result)
+
+    def test_make_temp_path(self):
+        """ should make a temp path for testing """
+
+        temp_path = self.make_temp_path('some-id', 'a', 'b.test')
+        self.assertTrue(temp_path.endswith('b.test'))
+
+    def test_no_such_step(self):
+        """ should fail if no such step exists """
+
+        self.assertRaises(AssertionError, self.run_step, 'FAKE-STEP.no-exists')
+
+    def test_no_such_project(self):
+        """ should fail if no project exists """
+
+        project = cd.project.internal_project
+        cd.project.load(None)
+        self.assertRaises(AssertionError, self.run_step, 'FAKE')
+        cd.project.load(project)

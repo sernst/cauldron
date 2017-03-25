@@ -135,7 +135,7 @@ def execute(
         p = actions.fetch_location(response, path)
         path = p if p else path
 
-    if environ.remote_connection.active:
+    if context.remote_connection.active:
         response.consume(remote_opener.sync_open(
             context=context,
             path=path

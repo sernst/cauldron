@@ -120,6 +120,7 @@ def run_status(uid: str):
         if not r:
             return flask.jsonify(
                 Response().update(
+                    run_log=[],
                     run_active_uids=list(
                         server_runner.active_execution_responses.keys()
                     ),
@@ -139,6 +140,7 @@ def run_status(uid: str):
             return flask.jsonify(
                 Response()
                 .update(
+                    run_log=r.get_thread_log(),
                     run_status='running',
                     run_multiple_updates=True,
                     run_uid=uid,
@@ -151,6 +153,7 @@ def run_status(uid: str):
 
         return flask.jsonify(
             r.update(
+                run_log=r.get_thread_log(),
                 run_status='complete',
                 run_multiple_updates=True,
                 run_uid=r.thread.uid

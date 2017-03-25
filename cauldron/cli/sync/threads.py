@@ -12,7 +12,8 @@ def send_remote_command(
         command: str,
         raw_args: str = '',
         asynchronous: bool = True,
-        remote_connection: 'environ.RemoteConnection' = None
+        remote_connection: 'environ.RemoteConnection' = None,
+        show_logs: bool = True
 ) -> 'AsyncCommandThread':
     """ """
 
@@ -20,7 +21,8 @@ def send_remote_command(
         command=command,
         arguments=raw_args,
         is_async=asynchronous,
-        remote_connection=remote_connection
+        remote_connection=remote_connection,
+        is_logging=show_logs
     )
 
     thread.start()
@@ -35,6 +37,7 @@ class AsyncCommandThread(threading.Thread):
             arguments: str = '',
             is_async: bool = True,
             remote_connection: 'environ.RemoteConnection' = None,
+            is_logging: bool = True,
             **kwargs
     ):
         super(AsyncCommandThread, self).__init__(**kwargs)
@@ -47,6 +50,7 @@ class AsyncCommandThread(threading.Thread):
         self.command = command
         self.args = arguments
         self.is_async = is_async
+        self.is_logging = is_logging
 
         self._remote_connection = remote_connection
 
@@ -82,6 +86,26 @@ class AsyncCommandThread(threading.Thread):
             method='GET'
         )
 
+    def add_response(self, response: Response) -> Response:
+        """ """
+
+        run_log = response.data.get('run_log', [])
+        previous = self.responses + []
+
+        self.responses.append(response)
+
+        if not self.is_logging:
+            return response
+
+        log_lengths = [len(r.data.get('run_log', [])) for r in previous]
+        start_index = max(log_lengths + [0])
+        new_log = run_log[start_index:]
+
+        for message in new_log:
+            environ.log_raw(message)
+
+        return response
+
     def run(self):
         """ """
 
@@ -89,7 +113,7 @@ class AsyncCommandThread(threading.Thread):
         endpoint = '/command-async' if self.is_async else '/command-sync'
 
         try:
-            self.responses.append(comm.send_request(
+            self.add_response(comm.send_request(
                 endpoint=endpoint,
                 remote_connection=self.remote_connection,
                 data=dict(
@@ -99,7 +123,7 @@ class AsyncCommandThread(threading.Thread):
             ))
         except Exception as error:
             self.exception = error
-            self.responses.append(Response().fail(
+            self.add_response(Response().fail(
                 code='COMM_EXECUTION_ERROR',
                 error=error,
                 message='Communication execution error'
@@ -107,6 +131,6 @@ class AsyncCommandThread(threading.Thread):
 
         while not self.is_finished:
             time.sleep(1)
-            self.responses.append(self.check_status())
+            self.add_response(self.check_status())
 
         self.is_executing = False

@@ -129,7 +129,7 @@ def execute(
         remote_connection=remote_connection
     )
 
-    if name == 'run':
+    if not context.remote_connection.active and name == 'run':
         preload()
 
     t = CauldronThread()
@@ -248,6 +248,9 @@ def autocomplete(
             if out is not None:
                 return out
     except Exception as err:
-        print(err)
+        environ.log(
+            message='[ERROR] Autocomplete Failed: "{}"'.format(err),
+            whitespace=1
+        )
 
     return []

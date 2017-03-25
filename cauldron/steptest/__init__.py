@@ -221,7 +221,7 @@ class StepTestCase(unittest.TestCase):
 
         environ.modes.remove(environ.modes.TESTING)
 
-    def make_temp_path(self, identifier, *args):
+    def make_temp_path(self, identifier, *args) -> str:
         """
 
         :param identifier:

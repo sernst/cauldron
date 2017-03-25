@@ -2,17 +2,22 @@ from unittest.mock import patch
 from unittest.mock import MagicMock
 
 from cauldron.test import support
+from cauldron.test.support.messages import Message
 from cauldron.test.support import scaffolds
 
 
 class TestPurge(scaffolds.ResultsTest):
     """ """
 
-    def test_purge(self):
+    def test_purge_all(self):
         """ should purge current results directory """
 
-        r = support.run_command('purge --force')
-        self.assertFalse(r.failed, 'should not have failed')
+        response = support.run_command('purge --force --all')
+        self.assertFalse(response.failed, Message(
+            'FAILED PURGE ALL',
+            'should not have failed to purge all in results directory',
+            response=response
+        ))
 
     @patch('cauldron.environ.systems.remove')
     def test_failed_purge(self, remove: MagicMock):

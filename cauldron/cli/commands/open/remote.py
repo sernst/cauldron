@@ -19,7 +19,7 @@ def sync_open(
     with open(source_path, 'r') as f:
         definition = json.load(f)
 
-    response = sync.send_request(
+    response = sync.comm.send_request(
         endpoint='/sync-open',
         remote_connection=context.remote_connection,
         data=dict(

@@ -4,7 +4,6 @@ from argparse import ArgumentParser
 
 from cauldron import cli
 from cauldron import environ
-from cauldron.environ import Response
 from cauldron.cli.interaction import autocompletion
 
 NAME = 'alias'

@@ -1,8 +1,7 @@
 import cauldron
-from cauldron import environ
 from cauldron import session
-from cauldron.session.projects import Project
 from cauldron.environ import Response
+from cauldron.session.projects import Project
 
 
 def get_project(response: Response):
