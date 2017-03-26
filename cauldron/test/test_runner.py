@@ -71,6 +71,9 @@ class TestRunner(scaffolds.ResultsTest):
         with open(os.path.join(lib_directory, '__init__.py'), 'w') as fp:
             fp.write('TEST_VALUE = 1\n')
 
+        # TODO: Fix these forced pauses
+        time.sleep(1)
+
         support.add_step(self, contents='\n'.join([
             'import cauldron as cd',
             'import _jack',
