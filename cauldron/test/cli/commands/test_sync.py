@@ -1,5 +1,7 @@
 import os
+
 import cauldron
+from cauldron.environ.response import Response
 from cauldron.test import support
 from cauldron.test.support import scaffolds
 
@@ -28,3 +30,31 @@ class TestSync(scaffolds.ResultsTest):
 
         response = support.run_command('sync')
         self.assert_has_error_code(response, 'NO_REMOTE_CONNECTION')
+
+    def test_failed_status(self):
+        """ should fail if unable to get remote sync status """
+
+        def mock_send_request(*args, **kwargs):
+            return Response().fail(code='FAKE-ERROR').response
+
+        response = support.run_remote_command(
+            command='sync',
+            mock_send_request=mock_send_request
+        )
+        self.assertTrue(response.failed)
+        self.assert_has_error_code(response, 'FAKE-ERROR')
+
+    def test_no_such_project(self):
+        """ should fail if unable to get remote sync status """
+
+        def mock_send_request(*args, **kwargs):
+            return Response().update(
+                remote_source_directory=directory
+            ).response
+
+        directory = os.path.dirname(os.path.realpath(__file__))
+        response = support.run_remote_command(
+            command='sync',
+            mock_send_request=mock_send_request
+        )
+        self.assert_has_error_code(response, 'NO_PROJECT')

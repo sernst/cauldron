@@ -16,17 +16,15 @@ def execute_remote(context: cli.CommandContext) -> Response:
     )
 
     remote_slug = response.data.get('project', {}).get('remote_slug')
-    if response.failed or not remote_slug:
-        response.log_notifications()
-        return context.response.consume(response)
+    if response.success:
+        url = ''.join([
+            context.remote_connection.url.rstrip('/'),
+            '/',
+            remote_slug.lstrip('/')
+        ])
 
-    url = ''.join([
-        context.remote_connection.url.rstrip('/'),
-        '/',
-        remote_slug.lstrip('/')
-    ])
+        cli.open_in_browser(url)
 
-    cli.open_in_browser(url)
     return context.response.consume(response)
 
 

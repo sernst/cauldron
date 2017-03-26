@@ -20,7 +20,8 @@ except ImportError:
 def run_remote_command(
         command: str,
         app=None,
-        remote_connection: 'environ.RemoteConnection' = None
+        remote_connection: 'environ.RemoteConnection' = None,
+        mock_send_request=None
 ) -> 'environ.Response':
     """ """
 
@@ -34,7 +35,7 @@ def run_remote_command(
 
     app = app if app else server.create_test_app()
 
-    def mock_send_request(
+    def default_mock_send_request(
             endpoint: str,
             data: dict = None,
             method: str = None,
@@ -49,9 +50,15 @@ def run_remote_command(
         )
         return result.response
 
+    side_effect = (
+        mock_send_request
+        if mock_send_request else
+        default_mock_send_request
+    )
+
     with patch(
             'cauldron.cli.sync.comm.send_request',
-            side_effect=mock_send_request
+            side_effect=side_effect
     ):
         response = commander.execute(
             name=name,

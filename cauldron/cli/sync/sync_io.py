@@ -4,6 +4,10 @@ import os
 import zlib
 
 
+# Default Chunks are 1MB in size
+DEFAULT_CHUNK_SIZE = 1048576  # type: int
+
+
 def pack_chunk(source_data: bytes) -> str:
     """
     Packs the specified binary source data by compressing it with the Zlib
@@ -32,7 +36,34 @@ def unpack_chunk(chunk_data: str) -> bytes:
     return zlib.decompress(chunk_compressed)
 
 
-def read_file_chunks(file_path: str, chunk_size: int = 1000000) -> str:
+def get_file_chunk_count(
+        file_path: str,
+        chunk_size: int = DEFAULT_CHUNK_SIZE
+) -> int:
+    """
+    Determines the number of chunks necessary to send the file for the given
+    chunk size
+
+    :param file_path:
+        The absolute path to the file that will be synchronized in chunks
+    :param chunk_size:
+        The maximum size of each chunk in bytes
+    :return
+        The number of chunks necessary to send the entire contents of the
+        specified file for the given chunk size
+    """
+
+    if not os.path.exists(file_path):
+        return 0
+
+    file_size = os.path.getsize(file_path)
+    return max(1, math.ceil(file_size / chunk_size))
+
+
+def read_file_chunks(
+        file_path: str,
+        chunk_size: int = DEFAULT_CHUNK_SIZE
+) -> str:
     """
     Reads the specified file in chunks and returns a generator where
     each returned chunk is a compressed base64 encoded string for sync
@@ -45,11 +76,10 @@ def read_file_chunks(file_path: str, chunk_size: int = 1000000) -> str:
         or equal to this size as the remainder.
     """
 
-    if not os.path.exists(file_path):
-        return ''
+    chunk_count = get_file_chunk_count(file_path, chunk_size)
 
-    file_size = os.path.getsize(file_path)
-    chunk_count = max(1, math.ceil(file_size / chunk_size))
+    if chunk_count < 1:
+        return ''
 
     with open(file_path, mode='rb') as fp:
         for chunk_index in range(chunk_count):

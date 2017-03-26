@@ -44,7 +44,7 @@ class ProjectStep(object):
         self._is_dirty = True
         self.error = None
         self.is_muted = False
-        self.dom = None  # type: dict
+        self.dom = None  # type: str
         self.progress_message = None
         self.sub_progress_message = None
         self.progress = 0

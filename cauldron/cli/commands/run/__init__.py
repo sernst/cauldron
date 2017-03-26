@@ -9,6 +9,7 @@ from cauldron.cli import sync
 from cauldron import environ
 from cauldron import runner
 from cauldron.cli.commands.run import actions as run_actions
+from cauldron.cli.commands import sync as sync_command
 from cauldron.cli.interaction import autocompletion
 from cauldron.session import writing
 from cauldron.environ import Response
@@ -106,6 +107,17 @@ def populate(
 
 def execute_remote(context: cli.CommandContext, **kwargs) -> Response:
     """ """
+
+    sync_response = sync_command.execute(cli.make_command_context(
+        name=sync_command.NAME,
+        remote_connection=context.remote_connection
+    ))
+    context.response.consume(sync_response)
+
+    if sync_response.failed:
+        return context.response
+
+    environ.log('[STARTED]: Remote run execution', whitespace=1)
 
     thread = sync.send_remote_command(
         command=context.name,

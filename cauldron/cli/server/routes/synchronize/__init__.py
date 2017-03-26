@@ -11,6 +11,12 @@ from cauldron.cli.server.routes.synchronize import status
 from cauldron.environ.response import Response
 
 
+sync_status = dict(
+    time=-1,
+    project=None
+)
+
+
 @server_runner.APPLICATION.route('/sync-status', methods=['GET', 'POST'])
 def fetch_synchronize_status():
     """
@@ -29,6 +35,7 @@ def fetch_synchronize_status():
     else:
         result = status.of_project(project)
         r.update(
+            sync_time=sync_status.get('time', 0),
             source_directory=project.source_directory,
             remote_source_directory=project.remote_source_directory,
             status=result
@@ -52,24 +59,32 @@ def sync_open_project():
             message='Invalid arguments. Unable to open project'
         ).response.flask_serialize()
 
-    def remove_value(key: str):
-        try:
-            del definition[key]
-        except KeyError:
-            pass
+    # Remove any shared library folders from the library list. These will be
+    # stored using the single shared library folder instead
+    definition['library_folders'] = [
+        lf
+        for lf in definition.get('library_folders', ['libs'])
+        if lf and not lf.startswith('..')
+    ]
+    definition['library_folders'] += ['../shared_libs']
 
-    # Remove these values as libraries will be stored in the default directory
-    remove_value('library_folders')
-    remove_value('asset_folders')
+    container_folder = tempfile.mkdtemp(prefix='cd-remote-project-')
+    os.makedirs(os.path.join(container_folder, 'shared_libs'))
 
-    project_folder = tempfile.mkdtemp(prefix='cd-remote-project-')
+    project_folder = os.path.join(container_folder, 'project')
+    os.makedirs(project_folder)
+
     definition_path = os.path.join(project_folder, 'cauldron.json')
     with open(definition_path, 'w') as f:
         json.dump(definition, f)
 
+    sync_status.update(time=-1, project=None)
+
     open_response = project_opener.open_project(project_folder)
     project = cd.project.internal_project
     project.remote_source_directory = source_directory
+
+    sync_status.update(time=-1, project=project)
 
     return r.consume(open_response).update(
         source_directory=project.source_directory
@@ -90,6 +105,7 @@ def sync_source_file():
     chunk = args.get('chunk')
     file_type = args.get('type')
     index = args.get('index', 0)
+    sync_time = args.get('sync_time', 0)
 
     if None in [relative_path, chunk]:
         return r.fail(
@@ -109,8 +125,6 @@ def sync_source_file():
 
     if file_type == 'lib':
         root_directory = project.library_directories[0]
-    elif file_type == 'asset':
-        root_directory = project.asset_directories[0]
     else:
         root_directory = project.source_directory
 
@@ -121,6 +135,8 @@ def sync_source_file():
         os.makedirs(parent_directory)
 
     sync.io.write_file_chunk(file_path, chunk, append=index > 0)
+
+    sync_status.update(time=sync_time)
 
     return r.notify(
         kind='SUCCESS',

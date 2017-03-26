@@ -1,10 +1,10 @@
 import os
-import glob
 
 from cauldron import cli
-from cauldron.cli import sync
 from cauldron import environ
-from cauldron.environ import Response
+from cauldron.cli import sync
+from cauldron.environ.response import Response
+from cauldron.environ.response import ResponseMessage
 
 NAME = 'sync'
 DESCRIPTION = """
@@ -13,55 +13,47 @@ DESCRIPTION = """
     """
 
 
-def synchronize_file(
-        context: 'cli.CommandContext',
-        file_path: str,
-        relative_path: str,
-        file_kind: str = ''
-) -> Response:
-    """ """
-
-    environ.log('[SYNCING]: {}'.format(relative_path))
-
-    for index, chunk in enumerate(sync.io.read_file_chunks(file_path)):
-        response = sync.comm.send_request(
-            endpoint='/sync-file',
-            remote_connection=context.remote_connection,
-            data=dict(
-                relative_path=relative_path,
-                chunk=chunk,
-                type=file_kind,
-                index=index
-            )
-        )
-
-        if response.failed:
-            return response
-
-    return Response()
-
-
 def do_synchronize(
-        context: 'cli.CommandContext',
-        project_directory: str
+        context: cli.CommandContext,
+        source_directory: str,
+        newer_than: float
 ) -> Response:
     """ """
 
-    glob_path = os.path.join(project_directory, '**', '*')
+    synchronized = []
 
-    for file_path in glob.iglob(glob_path, recursive=True):
-        relative_path = file_path[len(project_directory):].lstrip(os.sep)
-        response = synchronize_file(
-            context=context,
-            file_path=file_path,
-            relative_path=relative_path,
-            file_kind=''
-        )
+    def on_progress(message: ResponseMessage):
+        if message.kind == 'SKIP':
+            return
 
-        if response.failed:
-            return response
+        if len(synchronized) < 1:
+            environ.log_header(
+                text='SYNCHRONIZING',
+                level=2,
+                whitespace=1
+            )
 
-    return Response()
+        if message.code == 'STARTED':
+            synchronized.append(message)
+
+        chunk_count = message.data.get('chunk_count', 0)
+
+        if message.code == 'DONE' and chunk_count < 2:
+            return
+
+        message.console()
+
+    sync_response = sync.files.send_all_in(
+        directory=source_directory,
+        remote_connection=context.remote_connection,
+        newer_than=newer_than,
+        progress_callback=on_progress
+    )
+
+    if len(synchronized) > 0:
+        environ.log('Synchronization Complete', whitespace=1)
+
+    return sync_response
 
 
 def execute(context: cli.CommandContext) -> Response:
@@ -75,20 +67,20 @@ def execute(context: cli.CommandContext) -> Response:
             whitespace=1
         ).response
 
-    response = sync.comm.send_request(
+    status_response = sync.comm.send_request(
         endpoint='/sync-status',
         method='GET',
         remote_connection=context.remote_connection
     )
-    source_directory = response.data.get('remote_source_directory')
+    source_directory = status_response.data.get('remote_source_directory')
     source_path = os.path.join(
         source_directory if source_directory else '',
         'cauldron.json'
     )
 
-    if response.failed or not source_directory:
-        response.log_notifications()
-        return context.response.consume(response)
+    if status_response.failed or not source_directory:
+        status_response.log_notifications()
+        return context.response.consume(status_response)
 
     directory_exists = os.path.exists(source_directory)
     definition_exists = os.path.exists(source_path)
@@ -101,11 +93,10 @@ def execute(context: cli.CommandContext) -> Response:
             whitespace=1
         ).response
 
-    environ.log_header(
-        text='SYNCHRONIZING',
-        level=3,
-        whitespace=1
+    sync_response = do_synchronize(
+        context=context,
+        source_directory=source_directory,
+        newer_than=status_response.data.get('sync_time', 0)
     )
 
-    response = do_synchronize(context, source_directory)
-    return context.response.consume(response)
+    return context.response.consume(sync_response)

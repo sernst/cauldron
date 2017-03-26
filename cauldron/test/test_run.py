@@ -1,5 +1,9 @@
+from unittest.mock import patch
+from unittest.mock import MagicMock
+
 import cauldron
 from cauldron import environ
+from cauldron.environ.response import Response
 from cauldron import cli
 from cauldron.cli import commander
 from cauldron.cli.commands import run
@@ -256,3 +260,38 @@ class TestRun(scaffolds.ResultsTest):
         self.assert_has_error_code(r, 'MISSING_STEP')
 
         support.run_command('close')
+
+    def test_run_remote(self):
+        """ should successfully run remote project """
+
+        support.create_project(self, 'rhino')
+        support.add_step(self, contents='print("hello!")')
+
+        source_directory = cauldron.project.internal_project.source_directory
+
+        opened_response = support.run_remote_command(
+            'open "{}"'.format(source_directory)
+        )
+        self.assertTrue(opened_response.success)
+
+        run_response = support.run_remote_command('run')
+        self.assertTrue(run_response.success)
+
+    @patch('cauldron.cli.commands.sync.execute')
+    def test_run_remote_sync_fail(self, sync_execute: MagicMock):
+        """ should fail if the remote sync was not successful """
+
+        sync_execute.return_value = Response().fail().response
+
+        support.create_project(self, 'pig')
+        support.add_step(self, contents='print("hello!")')
+
+        source_directory = cauldron.project.internal_project.source_directory
+
+        opened_response = support.run_remote_command(
+            'open "{}"'.format(source_directory)
+        )
+        self.assertTrue(opened_response.success)
+
+        run_response = support.run_remote_command('run')
+        self.assertTrue(run_response.failed)
