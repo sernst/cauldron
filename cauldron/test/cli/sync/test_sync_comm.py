@@ -1,11 +1,13 @@
-from unittest.mock import patch
+import os
 from unittest.mock import MagicMock
+from unittest.mock import patch
+
 from requests import Response as HttpResponse
 
-from cauldron.test import support
-from cauldron.test.support import scaffolds
 from cauldron import environ
 from cauldron.cli.sync import comm
+from cauldron.test import support
+from cauldron.test.support import scaffolds
 
 
 class TestSyncComm(scaffolds.ResultsTest):
@@ -97,3 +99,51 @@ class TestSyncComm(scaffolds.ResultsTest):
         response = comm.parse_http_response(http_response)
         self.assert_has_error_code(response, 'INVALID_REMOTE_RESPONSE')
         self.assertEqual(http_response, response.http_response)
+
+    @patch('requests.get')
+    def test_failed_download(self, requests_get: MagicMock):
+        """ should fail to download if the GET request raises an exception """
+
+        requests_get.side_effect = IOError('FAKE ERROR')
+
+        path = self.get_temp_path('failed_download', 'fake.filename')
+        response = comm.download_file('fake.filename', path)
+
+        self.assert_has_error_code(response, 'CONNECTION_ERROR')
+        self.assertFalse(os.path.exists(path))
+
+    @patch('requests.get')
+    def test_failed_download_write(self, requests_get: MagicMock):
+        """ should fail to download if the GET request raises an exception """
+
+        requests_get.return_value = dict()
+        path = self.get_temp_path('failed_download', 'fake.filename')
+
+        with patch('builtins.open') as open_func:
+            open_func.side_effect = IOError('Fake Error')
+            response = comm.download_file('fake.filename', path)
+
+        self.assert_has_error_code(response, 'WRITE_ERROR')
+        self.assertFalse(os.path.exists(path))
+
+    @patch('requests.get')
+    def test_download(self, requests_get: MagicMock):
+        """ should successfully download saved cdf file """
+
+        def mock_iter_content(*args, **kwargs):
+            yield from [b'a', b'b', b'', None, b'c']
+
+        http_response = HttpResponse()
+        http_response.iter_content = mock_iter_content
+        requests_get.return_value = http_response
+
+        path = self.get_temp_path('failed_download', 'fake.filename')
+        response = comm.download_file('fake.filename', path)
+
+        self.assertTrue(response.success)
+        self.assertTrue(os.path.exists(path))
+
+        with open(path, 'rb') as f:
+            contents = f.read()
+        self.assertEqual(contents, b'abc')
+

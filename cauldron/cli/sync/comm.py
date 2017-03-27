@@ -98,3 +98,43 @@ def send_request(
         ).response
 
     return parse_http_response(http_response)
+
+
+def download_file(
+        filename: str,
+        save_path: str,
+        remote_connection: 'environ.RemoteConnection' = None
+) -> 'environ.Response':
+    """ """
+
+    url = assemble_url(
+        '/download/{}'.format(filename),
+        remote_connection=remote_connection
+    )
+
+    try:
+        http_response = requests.get(url, stream=True)
+    except Exception as error:
+        return environ.Response().fail(
+            code='CONNECTION_ERROR',
+            error=error,
+            message='Unable to communicate with the remote download connection'
+        ).console(
+            whitespace=1
+        ).response
+
+    try:
+        with open(save_path, 'wb') as f:
+            for chunk in http_response.iter_content(2048):
+                if chunk:
+                    f.write(chunk)
+    except Exception as error:
+        return environ.Response().fail(
+            code='WRITE_ERROR',
+            error=error,
+            message='Unable to write data to "{}"'.format(save_path)
+        ).console(
+            whitespace=1
+        ).response
+
+    return environ.Response()

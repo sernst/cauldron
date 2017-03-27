@@ -1,6 +1,8 @@
 import json
 import os
 import tempfile
+import flask
+import mimetypes
 
 import cauldron as cd
 from cauldron.cli import sync
@@ -70,6 +72,7 @@ def sync_open_project():
 
     container_folder = tempfile.mkdtemp(prefix='cd-remote-project-')
     os.makedirs(os.path.join(container_folder, 'shared_libs'))
+    os.makedirs(os.path.join(container_folder, 'downloads'))
 
     project_folder = os.path.join(container_folder, 'project')
     os.makedirs(project_folder)
@@ -80,7 +83,7 @@ def sync_open_project():
 
     sync_status.update(time=-1, project=None)
 
-    open_response = project_opener.open_project(project_folder)
+    open_response = project_opener.open_project(project_folder, forget=True)
     project = cd.project.internal_project
     project.remote_source_directory = source_directory
 
@@ -123,11 +126,7 @@ def sync_source_file():
 
     parts = relative_path.replace('\\', '/').strip('/').split('/')
 
-    if file_type == 'lib':
-        root_directory = project.library_directories[0]
-    else:
-        root_directory = project.source_directory
-
+    root_directory = project.source_directory
     file_path = os.path.join(root_directory, *parts)
     parent_directory = os.path.dirname(file_path)
 
@@ -143,3 +142,30 @@ def sync_source_file():
         code='SAVED_CHUNK',
         message='Saved file chunk'
     ).response.flask_serialize()
+
+
+@server_runner.APPLICATION.route(
+    '/download/<filename>',
+    methods=['GET', 'POST']
+)
+def download_file(filename: str):
+    """ downloads the specified project file if it exists """
+
+    project = cd.project.internal_project
+    source_directory = project.source_directory if project else None
+
+    if not filename or not project or not source_directory:
+        return '', 204
+
+    path = os.path.realpath(os.path.join(
+        source_directory,
+        '..',
+        'downloads',
+        filename
+    ))
+
+    if not os.path.exists(path):
+        return '', 204
+
+    return flask.send_file(path, mimetype=mimetypes.guess_type(path)[0])
+

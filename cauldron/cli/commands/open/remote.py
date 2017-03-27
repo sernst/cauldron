@@ -5,6 +5,7 @@ from cauldron import cli
 from cauldron import environ
 from cauldron.cli import sync
 from cauldron.environ.response import Response
+from cauldron.cli.commands.open import opener as local_opener
 
 
 def sync_open(
@@ -28,5 +29,7 @@ def sync_open(
         )
     )
     response.log_notifications()
+
+    local_opener.update_recent_paths(response, source_directory)
 
     return response

@@ -8,6 +8,7 @@ from datetime import datetime
 
 import cauldron
 from cauldron import cli
+from cauldron.cli import sync
 from cauldron import environ
 from cauldron.environ import Response
 from cauldron.session import projects
@@ -35,6 +36,7 @@ def populate(
     parser.add_argument(
         'path',
         default=None,
+        nargs='?',
         help=cli.reformat("""
             The file path to the cdf file to be saved. If the cdf file
             extension is missing it will be appended to the end of the path's
@@ -45,11 +47,29 @@ def populate(
     )
 
 
-def clean_path(project: 'projects.Project', path: str) -> str:
+def get_default_path() -> str:
+    """ """
+
+    project = cauldron.project.internal_project
+
+    if not project or not project.remote_source_directory:
+        return os.path.abspath(os.path.expanduser('~'))
+
+    downloads_directory = os.path.realpath(os.path.join(
+        project.source_directory,
+        '..',
+        'downloads'
+    ))
+
+    count = len(os.listdir(downloads_directory))
+    return os.path.join(downloads_directory, '{}.cdf'.format(count))
+
+
+def clean_path(project_title: str, path: str) -> str:
     cleaned = environ.paths.clean(path)
 
     if os.path.isdir(cleaned):
-        return os.path.join(cleaned, '{}.cdf'.format(project.title))
+        return os.path.join(cleaned, '{}.cdf'.format(project_title))
 
     if not cleaned.endswith('.cdf'):
         return '{}.cdf'.format(cleaned)
@@ -71,6 +91,14 @@ def create_settings(project: 'projects.Project') -> dict:
     )
 
 
+def make_directory(path: str):
+    """ """
+
+    save_directory = os.path.dirname(path)
+    if not os.path.exists(save_directory):
+        os.makedirs(save_directory)
+
+
 def write_file(project: 'projects.Project', path: str) -> str:
     """
 
@@ -79,10 +107,9 @@ def write_file(project: 'projects.Project', path: str) -> str:
     :return:
     """
 
-    save_path = clean_path(project, path)
-    save_directory = os.path.dirname(save_path)
-    if not os.path.exists(save_directory):
-        os.makedirs(save_directory)
+    save_path = path if path else get_default_path()
+    save_path = clean_path(project.title, save_path)
+    make_directory(save_path)
 
     z = zipfile.ZipFile(save_path, 'w', allowZip64=True)
     root_folder = project.output_directory
@@ -104,7 +131,48 @@ def write_file(project: 'projects.Project', path: str) -> str:
     return save_path
 
 
-def execute(context: cli.CommandContext, path: str) -> Response:
+def execute_remote(context: cli.CommandContext, path: str = None) -> Response:
+    """ """
+
+    thread = sync.send_remote_command(
+        command='save',
+        remote_connection=context.remote_connection,
+        show_logs=False,
+        asynchronous=False
+    )
+    thread.join()
+    save_response = thread.responses[-1]
+
+    if save_response.failed:
+        save_response.log_notifications()
+        return context.response.consume(save_response)
+
+    filename = os.path.basename(save_response.data.get('path'))
+    project_title = save_response.data.get('project_title', 'Project')
+
+    save_path = clean_path(
+        project_title,
+        path if path else get_default_path()
+    )
+    make_directory(save_path)
+
+    download_response = sync.comm.download_file(
+        filename=filename,
+        save_path=save_path,
+        remote_connection=context.remote_connection
+    )
+
+    if download_response.success:
+        download_response.notify(
+            kind='SAVED',
+            code='DOWNLOAD_SAVED',
+            message='Project has been saved to: {}'.format(save_path)
+        )
+
+    return context.response.consume(download_response)
+
+
+def execute(context: cli.CommandContext, path: str = None) -> Response:
     response = context.response
     project = cauldron.project.internal_project
 
@@ -128,7 +196,8 @@ def execute(context: cli.CommandContext, path: str) -> Response:
         ).response
 
     return response.update(
-        path=saved_path
+        path=saved_path,
+        project_title=project.title
     ).notify(
         kind='SUCCESS',
         code='SAVED',
