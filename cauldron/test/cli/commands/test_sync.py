@@ -22,6 +22,8 @@ class TestSync(scaffolds.ResultsTest):
 
         self.assertEqual(remote_files, local_files)
 
+        support.run_command('close')
+
     def test_sync_project_again(self):
         """ should synchronize files only when needed """
 
@@ -33,6 +35,8 @@ class TestSync(scaffolds.ResultsTest):
 
         response = support.run_remote_command('sync')
         self.assertEqual(response.data['synchronized_count'], 0)
+
+        support.run_command('close')
 
     def test_sync_no_connection(self):
         """ should fail if no remote connection is active """

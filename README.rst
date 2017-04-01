@@ -14,6 +14,9 @@ engineering in one data analysis environment
 .. image:: https://travis-ci.org/sernst/cauldron.svg?branch=master
    :target: https://travis-ci.org/sernst/cauldron
 
+.. image:: https://coveralls.io/repos/github/sernst/cauldron/badge.svg
+   :target: https://coveralls.io/github/sernst/cauldron
+
 .. image:: https://codecov.io/gh/sernst/cauldron/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/sernst/cauldron
 
