@@ -1,0 +1,5 @@
+[run]
+omit =
+    cauldron/scripts/*.py
+    /setup.py
+    /release.py
