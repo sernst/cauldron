@@ -1,9 +1,8 @@
 import os
-import sys
 
+from cauldron import environ
 from cauldron.test import support
 from cauldron.test.support import scaffolds
-from cauldron import environ
 
 
 class TestOpen(scaffolds.ResultsTest):

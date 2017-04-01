@@ -5,8 +5,10 @@ import flask
 import mimetypes
 
 import cauldron as cd
+from cauldron import cli
 from cauldron.cli import sync
 from cauldron.cli.commands.open import opener as project_opener
+from cauldron.cli.commands import create as create_command
 from cauldron.cli.server import arguments
 from cauldron.cli.server import run as server_runner
 from cauldron.cli.server.routes.synchronize import status
@@ -35,12 +37,16 @@ def fetch_synchronize_status():
             message='No open project on which to retrieve status'
         )
     else:
+        with open(project.source_path, 'r') as f:
+            definition = json.load(f)
+
         result = status.of_project(project)
         r.update(
             sync_time=sync_status.get('time', 0),
             source_directory=project.source_directory,
             remote_source_directory=project.remote_source_directory,
-            status=result
+            status=result,
+            definition=definition
         )
 
     return r.flask_serialize()
@@ -71,10 +77,10 @@ def sync_open_project():
     definition['library_folders'] += ['../shared_libs']
 
     container_folder = tempfile.mkdtemp(prefix='cd-remote-project-')
-    os.makedirs(os.path.join(container_folder, 'shared_libs'))
-    os.makedirs(os.path.join(container_folder, 'downloads'))
+    os.makedirs(os.path.join(container_folder, '__cauldron_shared_libs'))
+    os.makedirs(os.path.join(container_folder, '__cauldron_downloads'))
 
-    project_folder = os.path.join(container_folder, 'project')
+    project_folder = os.path.join(container_folder, definition['name'])
     os.makedirs(project_folder)
 
     definition_path = os.path.join(project_folder, 'cauldron.json')
@@ -90,7 +96,8 @@ def sync_open_project():
     sync_status.update(time=-1, project=project)
 
     return r.consume(open_response).update(
-        source_directory=project.source_directory
+        source_directory=project.source_directory,
+        project=project.kernel_serialize()
     ).notify(
         kind='SUCCESS',
         code='PROJECT_OPENED',
@@ -106,9 +113,8 @@ def sync_source_file():
     args = arguments.from_request()
     relative_path = args.get('relative_path')
     chunk = args.get('chunk')
-    file_type = args.get('type')
     index = args.get('index', 0)
-    sync_time = args.get('sync_time', 0)
+    sync_time = args.get('sync_time', -1)
 
     if None in [relative_path, chunk]:
         return r.fail(
@@ -160,7 +166,7 @@ def download_file(filename: str):
     path = os.path.realpath(os.path.join(
         source_directory,
         '..',
-        'downloads',
+        '__cauldron_downloads',
         filename
     ))
 
@@ -169,3 +175,79 @@ def download_file(filename: str):
 
     return flask.send_file(path, mimetype=mimetypes.guess_type(path)[0])
 
+
+@server_runner.APPLICATION.route(
+    '/project-download/<path:filename>',
+    methods=['GET', 'POST']
+)
+def download_project_file(filename: str):
+    """ downloads the specified project file if it exists """
+
+    project = cd.project.internal_project
+    source_directory = project.source_directory if project else None
+
+    if not filename or not project or not source_directory:
+        return '', 204
+
+    path = os.path.realpath(os.path.join(
+        source_directory,
+        filename
+    ))
+
+    if not os.path.exists(path):
+        return '', 204
+
+    return flask.send_file(path, mimetype=mimetypes.guess_type(path)[0])
+
+
+@server_runner.APPLICATION.route('/sync-create', methods=['POST'])
+def sync_create_project():
+    """ """
+
+    r = Response()
+    args = arguments.from_request()
+
+    name = args.get('name')
+    remote_source_directory = args.get('source_directory')
+    optional_args = args.get('args', {})
+
+    if None in [name, remote_source_directory]:
+        return r.fail(
+            code='INVALID_ARGS',
+            message='Invalid arguments. Unable to create project'
+        ).response.flask_serialize()
+
+    container_folder = tempfile.mkdtemp(prefix='cd-remote-project-')
+    os.makedirs(os.path.join(container_folder, '__cauldron_shared_libs'))
+    os.makedirs(os.path.join(container_folder, '__cauldron_downloads'))
+
+    r.consume(create_command.execute(
+        cli.make_command_context('create'),
+        project_name=name,
+        directory=container_folder,
+        forget=True,
+        **optional_args
+    ))
+    if r.failed:
+        return r.flask_serialize()
+
+    sync_status.update(time=-1, project=None)
+
+    project = cd.project.internal_project
+    project.remote_source_directory = remote_source_directory
+
+    with open(project.source_path, 'r') as f:
+        definition = json.load(f)
+
+    sync_status.update(time=-1, project=project)
+
+    return r.update(
+        source_directory=project.source_directory,
+        remote_source_directory=remote_source_directory,
+        definition=definition,
+        project=project.kernel_serialize()
+    ).notify(
+        kind='SUCCESS',
+        code='PROJECT_CREATED',
+        message='Project created'
+    ).response.flask_serialize()

@@ -121,7 +121,8 @@ def execute(
     )
 
     return context.response.update(
-        url=url_clean
+        url=url_clean,
+        remote_connection=environ.remote_connection
     ).notify(
         kind='SUCCESS',
         code='CONNECTED',

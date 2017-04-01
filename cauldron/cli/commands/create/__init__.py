@@ -1,14 +1,13 @@
-import json
 import os
 import typing
 from argparse import ArgumentParser
 
 from cauldron import cli
 from cauldron import environ
-from cauldron.cli.commands.open import actions as open_actions
+from cauldron.cli.commands.create import actions as create_actions
 from cauldron.cli.commands.open import opener as project_opener
+from cauldron.cli.commands.open import remote as remote_project_opener
 from cauldron.cli.interaction import autocompletion
-from cauldron.session import projects
 
 NAME = 'create'
 DESCRIPTION = 'Create a new Cauldron project'
@@ -109,38 +108,6 @@ def populate(
     )
 
 
-def create_project_directory(directory):
-    """
-
-    :param directory:
-    :return:
-    """
-
-    if os.path.exists(directory):
-        return True
-
-    try:
-        os.makedirs(directory)
-        return os.path.exists(directory)
-    except Exception as err:
-        return False
-
-
-def write_project_data(project_directory, data):
-    """
-
-    :param project_directory:
-    :param data:
-    :return:
-    """
-
-    project_path = os.path.join(project_directory, 'cauldron.json')
-    with open(project_path, 'w+') as f:
-        json.dump(data, f, indent=2, sort_keys=True)
-
-    return True
-
-
 def execute(
         context: cli.CommandContext,
         project_name: str,
@@ -160,96 +127,47 @@ def execute(
 
     response = context.response
 
-    if not title:
-        title = project_name.replace('_', ' ').replace('-', ' ').capitalize()
+    response.consume(create_actions.create_project_directories(
+        project_name,
+        directory,
+        assets_folder=assets_folder,
+        library_folder=library_folder
+    ))
+    if response.failed:
+        return response
 
-    location = open_actions.fetch_location(response, directory)
-    directory = location if location else directory
-    directory = environ.paths.clean(directory).rstrip(os.sep)
-    if not directory.endswith(project_name):
-        directory = os.path.join(directory, project_name)
-
-    project_file_path = os.path.join(directory, 'cauldron.json')
-    if os.path.exists(project_file_path):
-        return response.fail(
-            code='ALREADY_EXISTS',
-            message='A Cauldron project already exists in this directory'
-        ).kernel(
-            directory=directory
-        ).console(
-            """
-            [ABORTED]: Directory already exists and contains a cauldron
-                project file.
-
-                {}
-            """.format(directory),
-            whitespace=1
-        ).response
-
-    if not create_project_directory(directory):
-        return response.fail(
-            message=(
-                """
-                Unable to create project folder in the specified directory.
-                Do you have the necessary write permissions for this
-                location?
-                """
-            ),
-            code='DIRECTORY_CREATE_FAILED',
-            directory=directory
-        ).console(
-            """
-            [ERROR]: Unable to create project folder. Do you have the necessary
-                write permissions to the path:
-
-                "{}"
-            """.format(directory),
-            whitespace=1
-        ).response
-
-    response.update(source_directory=directory)
-
-    project_data = dict(
+    definition = create_actions.create_definition(
         name=project_name,
         title=title,
         summary=summary,
         author=author,
-        steps=[],
-        naming_scheme=None if no_naming_scheme else projects.DEFAULT_SCHEME
+        no_naming_scheme=no_naming_scheme,
+        library_folder=library_folder,
+        assets_folder=assets_folder
     )
 
-    if library_folder:
-        project_data['library_folders'] = [library_folder]
-        create_project_directory(os.path.join(directory, library_folder))
+    source_directory = response.data['source_directory']
+    response.consume(create_actions.write_project_data(
+        source_directory,
+        definition
+    ))
 
-    if assets_folder:
-        project_data['asset_folders'] = [assets_folder]
-        create_project_directory(os.path.join(directory, assets_folder))
+    response.consume(create_actions.write_project_data(
+        source_directory,
+        definition
+    ))
+    if response.failed:
+        return response
 
-    if not write_project_data(directory, project_data):
-        return response.fail(
-            message=(
-                """
-                Unable to write to the specified project directory.
-                Do you have the necessary write permissions for this
-                location?
-                """
-            ),
-            code='PROJECT_CREATE_FAILED',
-            directory=directory
-        ).console(
-            """
-            [ERROR]: Unable to write project data. Do you have the necessary
-                write permissions in the path:
+    if context.remote_connection.active:
+        opened = remote_project_opener.sync_open(context, source_directory)
+    else:
+        opened = project_opener.open_project(
+            source_directory,
+            forget=forget
+        )
 
-                "{}"
-            """.format(directory),
-            whitespace=1
-        ).response
-
-    response.consume(project_opener.open_project(directory, forget=forget))
-
-    return response
+    return response.consume(opened)
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):

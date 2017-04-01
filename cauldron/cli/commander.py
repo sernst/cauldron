@@ -128,6 +128,7 @@ def execute(
         response=response,
         remote_connection=remote_connection
     )
+    response.update(remote_connection=remote_connection)
 
     if not context.remote_connection.active and name == 'run':
         preload()

@@ -52,6 +52,7 @@ def remove_step(
 
     step_changes = [dict(
         name=removed_name,
+        filename=step.filename,
         action='removed'
     )]
 

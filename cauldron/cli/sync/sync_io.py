@@ -18,6 +18,9 @@ def pack_chunk(source_data: bytes) -> str:
         The data to be converted to a compressed, base64 string
     """
 
+    if not source_data:
+        return ''
+
     chunk_compressed = zlib.compress(source_data)
     return binascii.b2a_base64(chunk_compressed).decode('utf-8')
 
@@ -31,6 +34,9 @@ def unpack_chunk(chunk_data: str) -> bytes:
         The compressed, base64 encoded string to convert back to the
         source bytes object.
     """
+
+    if not chunk_data:
+        return b''
 
     chunk_compressed = binascii.a2b_base64(chunk_data.encode('utf-8'))
     return zlib.decompress(chunk_compressed)

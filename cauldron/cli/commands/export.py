@@ -11,7 +11,7 @@ from cauldron.cli.interaction import autocompletion
 from cauldron.environ import Response
 
 NAME = 'export'
-DESCRIPTION = 'Export the current project\'s results html file'
+DESCRIPTION = 'Export the current project\'s results html files'
 
 
 def populate(
@@ -33,7 +33,7 @@ def populate(
         default='',
         help=cli.reformat(
             """
-            The path where the single html file will be exported
+            The path where the html files will be exported
             """
         )
     )

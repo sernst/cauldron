@@ -1,4 +1,5 @@
 {
+  "name": "hello_cauldron",
   "steps":[
     "S01-create-data.py",
     "S02-plot-data.py"

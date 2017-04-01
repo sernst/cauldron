@@ -1,4 +1,5 @@
 {
+  "name": "seaborn",
   "steps": [
     "facets.py"
   ]

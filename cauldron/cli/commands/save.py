@@ -58,7 +58,7 @@ def get_default_path() -> str:
     downloads_directory = os.path.realpath(os.path.join(
         project.source_directory,
         '..',
-        'downloads'
+        '__cauldron_downloads'
     ))
 
     count = len(os.listdir(downloads_directory))

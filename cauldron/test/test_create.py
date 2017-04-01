@@ -1,12 +1,13 @@
-import os
+from unittest.mock import MagicMock
 import json
+import os
 from unittest.mock import patch
 
 import cauldron as cd
-from cauldron.cli.commands import create
+from cauldron import environ
+from cauldron.cli.commands.create import actions as create_actions
 from cauldron.test import support
 from cauldron.test.support import scaffolds
-from cauldron import environ
 
 
 class TestCreate(scaffolds.ResultsTest):
@@ -52,8 +53,7 @@ class TestCreate(scaffolds.ResultsTest):
         )
 
     def test_create_twice(self):
-        """
-        """
+        """ """
 
         r1 = support.create_project(self, 'test_create')
         r1.identifier = 'First {}'.format(r1.identifier)
@@ -67,7 +67,7 @@ class TestCreate(scaffolds.ResultsTest):
                 'No second project',
                 'It should not be possible to create a second project in the',
                 'same location',
-                response=[r1, r2]
+                response=r2
             )
         )
 
@@ -176,7 +176,7 @@ class TestCreate(scaffolds.ResultsTest):
     def test_write_fail(self):
         """ should fail if directory cannot be written """
 
-        target = 'cauldron.cli.commands.create.write_project_data'
+        target = 'cauldron.cli.commands.create.actions.write_project_data'
         with patch(target) as func:
             func.return_value = False
             result = support.create_project(self, 'aurelius', confirm=False)
@@ -188,7 +188,10 @@ class TestCreate(scaffolds.ResultsTest):
     def test_create_fail(self):
         """ should fail if directory cannot be created """
 
-        target = 'cauldron.cli.commands.create.create_project_directory'
+        target = '.'.join([
+            'cauldron.cli.commands.create',
+            'actions.create_project_directories'
+        ])
         with patch(target) as func:
             func.return_value = False
             result = support.create_project(self, 'augustus', confirm=False)
@@ -223,8 +226,8 @@ class TestCreate(scaffolds.ResultsTest):
         path = self.get_temp_path('test-create', 'project-directory-1')
         os.makedirs(path)
 
-        result = create.create_project_directory(path)
-        self.assertTrue(result)
+        response = create_actions.create_project_directories('some-name', path)
+        self.assertTrue(response.success)
 
     def test_create_project_directory_fail(self):
         """ should fail if directory cannot be created """
@@ -233,5 +236,33 @@ class TestCreate(scaffolds.ResultsTest):
 
         with patch('os.makedirs') as make_dirs:
             make_dirs.side_effect = IOError('Fake Error')
-            result = create.create_project_directory(path)
-        self.assertFalse(result)
+            response = create_actions.create_project_directories(
+                'some-name',
+                path
+            )
+        self.assertFalse(response.success)
+
+    @patch('cauldron.cli.commands.open.remote.sync_open')
+    def test_remote(self, sync_open: MagicMock):
+        """ should successfully open project remotely """
+
+        sync_open.return_value = environ.Response()
+
+        response = support.create_project(
+            self,
+            'tester',
+            confirm=False,
+            remote_connection=environ.RemoteConnection(True, 'something.url')
+        )
+
+        self.assertTrue(response.success)
+        self.assertGreater(sync_open.call_count, 0)
+
+    def test_write_project_data_failure(self):
+        """ should fail when unable to write definition file """
+
+        with patch('builtins.open') as func:
+            func.side_effect = IOError('FAKE ERROR')
+            response = create_actions.write_project_data('abc', {})
+
+        self.assert_has_error_code(response, 'PROJECT_CREATE_FAILED')

@@ -36,12 +36,13 @@ class CauldronThread(threading.Thread):
                     context=self.context,
                     **self.kwargs
                 )
-            except Exception as err:
-                self.exception = err
+            except Exception as error:
+                self.exception = error
+                print(error)
                 self.context.response.fail(
                     code='COMMAND_EXECUTION_ERROR',
                     message='Failed to execute command due to internal error',
-                    error=err
+                    error=error
                 ).console(
                     whitespace=1
                 )

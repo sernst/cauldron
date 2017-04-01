@@ -1,4 +1,5 @@
 {
+  "name": "pyplot",
   "steps":[
     "histogram.py"
   ]

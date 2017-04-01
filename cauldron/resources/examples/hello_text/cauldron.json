@@ -1,4 +1,5 @@
 {
+  "name": "hello_text",
   "steps": [
     "hello.py",
     "portions.py",

@@ -249,6 +249,7 @@ class Project:
             uuid=self.uuid,
             serial_time=time.time(),
             last_modified=self.last_modified,
+            remote_source_directory=self.remote_source_directory,
             source_directory=self.source_directory,
             source_path=self.source_path,
             output_directory=self.output_directory,

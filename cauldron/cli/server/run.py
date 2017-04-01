@@ -117,6 +117,13 @@ def parse(args=None):
         default=''
     )
 
+    parser.add_argument(
+        '-n', '--name',
+        dest='host',
+        type=str,
+        default=None
+    )
+
     return vars(parser.parse_args(args=args))
 
 

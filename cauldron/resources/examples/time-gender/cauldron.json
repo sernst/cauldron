@@ -1,5 +1,6 @@
 {
   "id": "time-gender",
+  "name": "time-gender",
   "web_includes": ["_styles.css"],
   "naming_scheme": "S{{##}}-{{name}}.{{ext}}",
   "steps": [

@@ -1,3 +1,4 @@
+from cauldron import cli
 import sys
 import re
 from unittest.mock import patch
@@ -87,6 +88,7 @@ def create_project(
         path: str = None,
         forget: bool = True,
         confirm: bool = True,
+        remote_connection: cli.CommandContext = None,
         **kwargs
 ) -> 'environ.Response':
     """
@@ -96,6 +98,7 @@ def create_project(
     :param path:
     :param forget:
     :param confirm:
+    :param remote_connection:
     :param kwargs:
     :return:
     """
@@ -114,7 +117,7 @@ def create_project(
 
     args = ' '.join([a for a in args if a and len(a) > 0])
 
-    r = commander.execute('create', args)
+    r = commander.execute('create', args, remote_connection=remote_connection)
     if r.thread:
         r.thread.join()
 

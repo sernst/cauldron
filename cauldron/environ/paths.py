@@ -2,6 +2,12 @@ import os
 import typing
 
 
+def join(*args: typing.List[str]) -> str:
+    """ Creates an absolute and cleaned path from the arguments """
+
+    return clean(os.path.join(*args))
+
+
 def clean(path: str) -> str:
     """
     Cleans the specified path by expanding shorthand elements, redirecting to
