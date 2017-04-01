@@ -7,9 +7,11 @@ python:
 install:
   - "pip install -r requirements.txt"
   - pip install codecov
+  - pip install coveralls
 
 # command to run tests
 script: xvfb-run --server-args="-screen 0 1024x768x24" nosetests --with-coverage
 
 after_success:
-    codecov
+    - codecov
+    - coveralls
