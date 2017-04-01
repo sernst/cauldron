@@ -4,6 +4,9 @@ import os
 import zlib
 
 
+from cauldron import writer
+
+
 # Default Chunks are 1MB in size
 DEFAULT_CHUNK_SIZE = 1048576  # type: int
 
@@ -111,5 +114,5 @@ def write_file_chunk(file_path: str, chunk_data: str, append: bool = True):
     """
 
     mode = 'ab' if append else 'wb'
-    with open(file_path, mode=mode) as f:
-        f.write(unpack_chunk(chunk_data))
+    contents = unpack_chunk(chunk_data)
+    writer.write_file(file_path, contents, mode=mode)

@@ -13,6 +13,7 @@ from cauldron.cli.server import arguments
 from cauldron.cli.server import run as server_runner
 from cauldron.cli.server.routes.synchronize import status
 from cauldron.environ.response import Response
+from cauldron import writer
 
 
 sync_status = dict(
@@ -104,8 +105,7 @@ def sync_open_project():
     os.makedirs(project_folder)
 
     definition_path = os.path.join(project_folder, 'cauldron.json')
-    with open(definition_path, 'w') as f:
-        json.dump(definition, f)
+    writer.write_json_file(definition_path, definition)
 
     sync_status.update(time=-1, project=None)
 
