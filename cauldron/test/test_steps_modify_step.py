@@ -25,8 +25,9 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
 
         r = Response()
         result = step_actions.modify_step(
-            r,
-            project.steps[0].filename,
+            response=r,
+            project=project,
+            name=project.steps[0].filename,
             position='3'
         )
 
@@ -49,7 +50,7 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
 
         with patch.object(project, 'remove_step') as remove_step:
             remove_step.return_value = None
-            result = step_actions.modify_step(r, step.filename)
+            result = step_actions.modify_step(r, project, step.filename)
 
         self.assertFalse(result)
         self.assert_has_error_code(r, 'NO_SUCH_STEP')
@@ -73,6 +74,7 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
 
         result = step_actions.modify_step(
             response=r,
+            project=project,
             name=step.filename,
             new_name='solo',
             title='Only Step'
@@ -101,7 +103,13 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
                 index=1,
                 name=''
             )
-            step_actions.modify_step(r, project.steps[0].filename, '', 2)
+            step_actions.modify_step(
+                response=r,
+                project=project,
+                name=project.steps[0].filename,
+                new_name='',
+                position=2
+            )
 
         self.assertFalse(r.failed)
 
@@ -116,16 +124,31 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
         project = cauldron.project.internal_project
 
         r = Response()
-        step_actions.modify_step(r, project.steps[0].filename, title='a')
+        step_actions.modify_step(
+            response=r,
+            project=project,
+            name=project.steps[0].filename,
+            title='a'
+        )
         self.assertFalse(r.failed)
         self.assertEqual(project.steps[0].definition.title, 'a')
 
         r = Response()
-        step_actions.modify_step(r, project.steps[0].filename, title='b')
+        step_actions.modify_step(
+            response=r,
+            project=project,
+            name=project.steps[0].filename,
+            title='b'
+        )
         self.assertFalse(r.failed)
         self.assertEqual(project.steps[0].definition.title, 'b')
 
         r = Response()
-        step_actions.modify_step(r, project.steps[0].filename, new_name='first')
+        step_actions.modify_step(
+            response=r,
+            project=project,
+            name=project.steps[0].filename,
+            new_name='first'
+        )
         self.assertFalse(r.failed)
         self.assertEqual(project.steps[0].definition.title, 'b')

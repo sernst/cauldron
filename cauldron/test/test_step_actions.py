@@ -58,9 +58,10 @@ class TestStepActions(scaffolds.ResultsTest):
         """ should fail to mute a step that does not exist """
 
         support.create_project(self, 'lewis')
+        project = cauldron.project.internal_project
 
         r = Response()
-        step_actions.toggle_muting(r, 'not-a-step')
+        step_actions.toggle_muting(r, project, 'not-a-step')
 
         self.assertTrue(r.failed)
         self.assertEqual(r.errors[0].code, 'NO_SUCH_STEP')
@@ -73,15 +74,16 @@ class TestStepActions(scaffolds.ResultsTest):
         support.create_project(self, 'carrol')
         support.add_step(self)
 
-        step = cauldron.project.internal_project.steps[0]
+        project = cauldron.project.internal_project
+        step = project.steps[0]
         self.assertFalse(step.is_muted)
 
         r = Response()
-        step_actions.toggle_muting(r, step.filename)
+        step_actions.toggle_muting(r, project, step.filename)
         self.assertTrue(step.is_muted)
 
         r = Response()
-        step_actions.toggle_muting(r, step.filename)
+        step_actions.toggle_muting(r, project, step.filename)
         self.assertFalse(step.is_muted)
 
         support.run_command('close')

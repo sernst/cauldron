@@ -128,3 +128,9 @@ class TestResponse(scaffolds.ResultsTest):
         r = Response.deserialize(r.serialize())
         compare = r.get_notification_log()
         self.assertEqual(out, compare)
+
+    def test_self_consumption(self):
+        """ should not consume itself and cause regression error """
+
+        r = Response()
+        r.consume(r)

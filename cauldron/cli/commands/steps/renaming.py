@@ -1,11 +1,10 @@
-import typing
 import functools
 import os
 import tempfile
-from collections import namedtuple
+import typing
 import zipfile
+from collections import namedtuple
 
-import cauldron
 from cauldron.environ import Response
 from cauldron.session import naming
 from cauldron.session import projects
@@ -171,16 +170,17 @@ def update_steps(
     return result
 
 
-def synchronize_step_names(insert_index: int = None) -> Response:
+def synchronize_step_names(
+        project: 'projects.Project',
+        insert_index: int = None
+) -> Response:
     """
+    :param project:
     :param insert_index:
-    :return:F
     """
 
     response = Response()
     response.returned = dict()
-
-    project = cauldron.project.internal_project
 
     if not project.naming_scheme:
         return response

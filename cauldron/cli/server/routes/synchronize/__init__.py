@@ -21,6 +21,26 @@ sync_status = dict(
 )
 
 
+@server_runner.APPLICATION.route('/sync-touch', methods=['GET', 'POST'])
+def touch_project():
+    """
+    Touches the project to trigger refreshing its cauldron.json state
+    """
+
+    r = Response()
+    project = cd.project.internal_project
+
+    if project:
+        project.refresh()
+    else:
+        r.fail(
+            code='NO_PROJECT',
+            message='No open project to refresh'
+        )
+
+    return r.flask_serialize()
+
+
 @server_runner.APPLICATION.route('/sync-status', methods=['GET', 'POST'])
 def fetch_synchronize_status():
     """

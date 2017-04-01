@@ -194,3 +194,24 @@ class TestSteps(scaffolds.ResultsTest):
         ))
 
         support.run_command('close')
+
+    def test_remote(self):
+        """ should function remotely """
+
+        support.create_project(self, 'nails')
+        project = cauldron.project.internal_project
+
+        support.run_remote_command('open "{}" --forget'.format(
+            project.source_directory
+        ))
+        project = cauldron.project.internal_project
+
+        added_response = support.run_remote_command('steps add')
+        self.assertTrue(added_response.success, Message(
+            'Add Step Failed',
+            response=added_response
+        ))
+
+        self.assertEqual(len(project.steps), 1)
+
+        support.run_command('close')

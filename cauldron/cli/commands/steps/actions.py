@@ -2,7 +2,6 @@ import os
 import shutil
 import typing
 
-import cauldron
 from cauldron.cli.commands.steps import renaming as step_support
 from cauldron.environ import Response
 from cauldron.session import naming
@@ -44,13 +43,12 @@ def index_from_location(
     return default
 
 
-def echo_steps(response: Response):
+def echo_steps(response: Response, project: Project):
     """
     :param response:
+    :param project:
     :return:
     """
-
-    project = cauldron.project.internal_project
 
     if len(project.steps) < 1:
         response.update(
@@ -89,6 +87,7 @@ def echo_steps(response: Response):
 
 def create_step(
         response: Response,
+        project: Project,
         name: str,
         position: typing.Union[str, int],
         title: str = None
@@ -96,6 +95,7 @@ def create_step(
     """
 
     :param response:
+    :param project:
     :param name:
     :param position:
     :param title:
@@ -104,8 +104,6 @@ def create_step(
 
     name = name.strip('"')
     title = title.strip('"') if title else title
-
-    project = cauldron.project.internal_project
     index = index_from_location(response, project, position)
     if index is None:
         index = len(project.steps)
@@ -123,7 +121,7 @@ def create_step(
         **name_parts
     )
 
-    res = step_support.synchronize_step_names(index)
+    res = step_support.synchronize_step_names(project, index)
     response.consume(res)
     if response.failed:
         return response
@@ -176,6 +174,7 @@ def create_step(
 
 def modify_step(
         response: Response,
+        project: Project,
         name: str,
         new_name: str = None,
         position: typing.Union[str, int] = None,
@@ -184,6 +183,7 @@ def modify_step(
     """
 
     :param response:
+    :param project:
     :param name:
     :param new_name:
     :param position:
@@ -192,7 +192,6 @@ def modify_step(
     """
 
     new_name = new_name if new_name else name
-    project = cauldron.project.internal_project
     old_index = project.index_of_step(name)
     new_index = index_from_location(response, project, position, old_index)
 
@@ -220,7 +219,7 @@ def modify_step(
     else:
         temp_path = None
 
-    res = step_support.synchronize_step_names(new_index)
+    res = step_support.synchronize_step_names(project, new_index)
     response.consume(res)
     step_renames = res.returned
 
@@ -292,18 +291,18 @@ def modify_step(
 
 def toggle_muting(
         response: Response,
+        project: Project,
         step_name: str,
         value: bool = None
 ) -> Response:
     """
 
     :param response:
+    :param project:
     :param step_name:
     :param value:
     :return:
     """
-
-    project = cauldron.project.internal_project
 
     index = project.index_of_step(step_name)
     if index is None:

@@ -1,25 +1,26 @@
 import os
 import uuid
 
-import cauldron
 from cauldron.cli.commands.steps import renaming as step_support
 from cauldron.environ import Response
+from cauldron.session import projects
 
 
 def remove_step(
         response: Response,
+        project: 'projects.Project',
         name: str,
         keep_file: bool = False
 ) -> Response:
     """
 
     :param response:
+    :param project:
     :param name:
     :param keep_file:
     :return:
     """
 
-    project = cauldron.project.internal_project
     step = project.remove_step(name)
     if not step:
         return response.fail(
@@ -37,7 +38,7 @@ def remove_step(
     if not keep_file:
         os.remove(step.source_path)
 
-    res = step_support.synchronize_step_names()
+    res = step_support.synchronize_step_names(project)
     response.consume(res)
     if response.failed:
         return response

@@ -49,11 +49,24 @@ def do_synchronize(
         newer_than=newer_than,
         progress_callback=on_progress
     )
+    context.response.consume(sync_response)
 
-    if len(synchronized) > 0:
+    context.response.update(synchronized_count=len(synchronized))
+
+    if len(synchronized) < 1:
+        return context.response
+
+    touch_response = sync.comm.send_request(
+        endpoint='/sync-touch',
+        method='GET',
+        remote_connection=context.remote_connection
+    )
+    context.response.consume(touch_response)
+
+    if not context.response.failed:
         environ.log('Synchronization Complete', whitespace=1)
 
-    return sync_response
+    return context.response
 
 
 def execute(context: cli.CommandContext) -> Response:

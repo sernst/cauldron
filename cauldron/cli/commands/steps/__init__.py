@@ -7,6 +7,11 @@ from cauldron.cli.commands.steps import actions
 from cauldron.cli.commands.steps import removal
 from cauldron.cli.interaction import autocompletion
 from cauldron.environ import Response
+from cauldron.session import projects
+from cauldron.cli import sync
+from cauldron.cli.commands.open import opener as project_opener
+from cauldron.cli.commands import sync as sync_command
+
 
 NAME = 'steps'
 DESCRIPTION = """
@@ -121,6 +126,53 @@ def populate(
         )
 
 
+def execute_remote(
+        context: cli.CommandContext,
+        action: str = None,
+        step_name: str = None,
+        position: str = None,
+        title: str = None,
+        new_name: str = None,
+        keep: bool = False,
+) -> Response:
+
+    status_response = sync.comm.send_request(
+        endpoint='/sync-status',
+        remote_connection=context.remote_connection
+    )
+    if status_response.failed:
+        return context.response.consume(status_response)
+
+    source_directory = status_response.data['remote_source_directory']
+    if not project_opener.project_exists(context.response, source_directory):
+        return context.response
+
+    context.response.consume(execute(
+        context=context,
+        action=action,
+        step_name=step_name,
+        position=position,
+        title=title,
+        new_name=new_name,
+        keep=keep,
+        project=projects.Project(source_directory)
+    ))
+    if context.response.failed:
+        return context.response
+
+    sync_response = sync_command.do_synchronize(
+        context=cli.make_command_context(
+            name='sync',
+            response=context.response,
+            remote_connection=context.remote_connection
+        ),
+        source_directory=source_directory,
+        newer_than=status_response.data.get('sync_time', 0)
+    )
+
+    return context.response.consume(sync_response)
+
+
 def execute(
         context: cli.CommandContext,
         action: str = None,
@@ -128,7 +180,8 @@ def execute(
         position: str = None,
         title: str = None,
         new_name: str = None,
-        keep: bool = False
+        keep: bool = False,
+        project: 'projects.Project' = None
 ) -> Response:
     """
 
@@ -137,7 +190,13 @@ def execute(
 
     response = context.response
 
-    if not cauldron.project or not cauldron.project.internal_project:
+    project = (
+        project
+        if project else
+        cauldron.project.internal_project
+    )
+
+    if not project:
         return response.fail(
             code='NO_OPEN_PROJECT',
             message='No project is open. Step commands require an open project'
@@ -146,7 +205,7 @@ def execute(
         ).response
 
     if not action or action == 'list':
-        actions.echo_steps(response)
+        actions.echo_steps(response, project)
         return response
 
     if action == 'add' and not step_name:
@@ -164,6 +223,7 @@ def execute(
     if action == 'add':
         return actions.create_step(
             response=response,
+            project=project,
             name=step_name,
             position=position,
             title=title.strip('"') if title else title
@@ -172,6 +232,7 @@ def execute(
     if action == 'modify':
         actions.modify_step(
             response=response,
+            project=project,
             name=step_name,
             new_name=new_name,
             title=title,
@@ -182,6 +243,7 @@ def execute(
     if action == 'remove':
         return removal.remove_step(
             response=response,
+            project=project,
             name=step_name,
             keep_file=keep
         )
@@ -189,6 +251,7 @@ def execute(
     if action == 'unmute':
         actions.toggle_muting(
             response=response,
+            project=project,
             step_name=step_name,
             value=False
         )
@@ -197,6 +260,7 @@ def execute(
     if action == 'mute':
         actions.toggle_muting(
             response=response,
+            project=project,
             step_name=step_name,
             value=True
         )

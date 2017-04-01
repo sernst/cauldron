@@ -17,13 +17,22 @@ class TestSync(scaffolds.ResultsTest):
         self.assertTrue(response.success)
 
         project = cauldron.project.internal_project
-        self.trace(project.remote_source_directory)
-        self.trace(project.source_directory)
-
         remote_files = sorted(os.listdir(project.remote_source_directory))
         local_files = sorted(os.listdir(project.source_directory))
 
         self.assertEqual(remote_files, local_files)
+
+    def test_sync_project_again(self):
+        """ should synchronize files only when needed """
+
+        support.run_remote_command('open @examples:hello_cauldron')
+        response = support.run_remote_command('sync')
+        self.assertTrue(response.success)
+
+        self.assertGreater(response.data['synchronized_count'], 0)
+
+        response = support.run_remote_command('sync')
+        self.assertEqual(response.data['synchronized_count'], 0)
 
     def test_sync_no_connection(self):
         """ should fail if no remote connection is active """

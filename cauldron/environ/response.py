@@ -1,5 +1,5 @@
-import threading
 import typing
+
 import flask
 from requests import Response as HttpResponse
 
@@ -252,6 +252,9 @@ class Response(object):
         :param other:
         :return:
         """
+
+        if other == self:
+            return self
 
         if self.parent:
             return self.parent.consume(other)

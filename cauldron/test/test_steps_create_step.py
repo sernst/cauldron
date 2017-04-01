@@ -19,7 +19,7 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
         project.naming_scheme = None
 
         r = Response()
-        step_actions.create_step(r, '', '', 'This is my step')
+        step_actions.create_step(r, project, '', '', 'This is my step')
 
         self.assertFalse(r.failed)
 
@@ -36,9 +36,10 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
         synchronize_step_names.return_value = failedResponse
 
         support.create_project(self, 'st-paul')
+        project = cauldron.project.internal_project
 
         r = Response()
-        step_actions.create_step(r, '', '', 'This is my step')
+        step_actions.create_step(r, project, '', '', 'This is my step')
 
         self.assertTrue(r.failed)
         self.assertEqual(r.errors[0], failedResponse.errors[0])
