@@ -10,7 +10,7 @@ install:
   - pip install coveralls
 
 # command to run tests
-script: xvfb-run --server-args="-screen 0 1024x768x24" nosetests --with-coverage
+script: xvfb-run --server-args="-screen 0 1024x768x24" nosetests --with-coverage --cover-package=cauldron
 
 after_success:
     - codecov
