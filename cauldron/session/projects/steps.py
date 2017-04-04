@@ -153,7 +153,7 @@ class ProjectStep(object):
         time_adjust = 0 if value else time.time()
         self.last_modified = time_adjust if force else self.last_modified
 
-    def get_dom(self) -> dict:
+    def get_dom(self) -> str:
         """ Retrieves the current value of the DOM for the step """
 
         if self.is_running:
@@ -166,7 +166,7 @@ class ProjectStep(object):
         self.dom = dom
         return dom
 
-    def dumps(self) -> dict:
+    def dumps(self) -> str:
         """
 
         :return:

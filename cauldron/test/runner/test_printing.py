@@ -1,3 +1,4 @@
+import time
 import string
 
 import cauldron
@@ -41,6 +42,7 @@ class TestPrinting(scaffolds.ResultsTest):
         self.assertEqual(dom.count('SAT'), 0)
 
         response.thread.join()
+        time.sleep(1)
         dom = step.dumps()
         self.assertEqual(dom.count('BAT'), 1)
         self.assertEqual(dom.count('SAT'), 1)
