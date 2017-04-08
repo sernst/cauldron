@@ -5,6 +5,8 @@ window.CAULDRON = exports;
 
 let selectedStep;
 let selectionTimeout;
+let processingPromise;
+
 
 /**
  *
@@ -122,69 +124,78 @@ function prepareStepBody(step) {
 exports.prepareStepBody = prepareStepBody;
 
 
+function onReadyToProcess(updates) {
+  // Add the body for each step to the page body
+  const body = $('.body-wrapper');
+  let before;
+
+  updates.forEach((update) => {
+    const existing = $(`[data-step-name="${update.name}"]`);
+
+    if (update.action === 'removed') {
+      existing.remove();
+      return;
+    }
+
+    let stepDom = exports.prepareStepBody(update.step);
+    if (selectedStep && update.name === selectedStep.name) {
+      setSelected(stepDom);
+    }
+
+    if (update.action === 'updated') {
+      existing.replaceWith(stepDom);
+      return;
+    }
+
+    if (update.action === 'modified') {
+      stepDom = body.find(`[data-step-name="${update.name}"]`);
+      stepDom.find('.cd-step-title').html(update.title || update.name);
+      stepDom.detach();
+    }
+
+    // Modified or added steps get inserted into the dom
+    if (update.after) {
+      before = body.find(`[data-step-name="${update.after}"]`);
+    } else {
+      before = body.find('.cd-body-header').after(stepDom);
+    }
+
+    if (before && before.length > 0) {
+      before.after(stepDom);
+    } else if (update.after) {
+      body.append(stepDom);
+    } else {
+      body.prepend(stepDom);
+    }
+  });
+
+  $(window).trigger('resize');
+
+  exports.updateSelectedStep();
+}
+
+
 /**
  *
  */
 function processStepUpdates(updates, stepToSelect) {
   if (!updates) {
-    return null;
+    return Promise.resolve();
+  }
+
+  if (!processingPromise) {
+    processingPromise = window.CD.on.ready;
   }
 
   if (stepToSelect) {
     selectedStep = stepToSelect;
   }
 
-  const steps = updates.map((update) => update.step);
+  const steps = updates.map(update => update.step);
 
-  return exports.loadStepIncludes(steps)
-    .then(() => {
-      // Add the body for each step to the page body
-      const body = $('.body-wrapper');
-      let before;
-
-      updates.forEach((update) => {
-        const existing = $(`[data-step-name="${update.name}"]`);
-
-        if (update.action === 'removed') {
-          existing.remove();
-          return;
-        }
-
-        let stepDom = exports.prepareStepBody(update.step);
-        if (selectedStep && update.name === selectedStep.name) {
-          setSelected(stepDom);
-        }
-
-        if (update.action === 'updated') {
-          existing.replaceWith(stepDom);
-          return;
-        }
-
-        if (update.action === 'modified') {
-          stepDom = body.find(`[data-step-name="${update.name}"]`);
-          stepDom.find('.cd-step-title').html(update.title || update.name);
-          stepDom.detach();
-        }
-
-        // Modified or added steps get inserted into the dom
-        if (update.after) {
-          before = body.find(`[data-step-name="${update.after}"]`);
-        } else {
-          before = body.find('.cd-body-header').after(stepDom);
-        }
-
-        if (before && before.length > 0) {
-          before.after(stepDom);
-        } else if (update.after) {
-          body.append(stepDom);
-        } else {
-          body.prepend(stepDom);
-        }
-      });
-
-      $(window).trigger('resize');
-
-      exports.updateSelectedStep();
-    });
+  processingPromise = processingPromise
+    .then(() => exports.loadStepIncludes(steps))
+    .then(() => onReadyToProcess(updates));
+  return processingPromise;
 }
 exports.processStepUpdates = processStepUpdates;

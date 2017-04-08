@@ -3,7 +3,15 @@
 const exports = window.CAULDRON || {};
 window.CAULDRON = exports;
 
+let processingPromise;
 
+
+/**
+ *
+ * @param body
+ * @param renames
+ * @param oldName
+ */
 function addRenameAttribute(body, renames, oldName) {
   const data = renames[oldName];
   const stepBody = body.find(`[data-step-name="${oldName}"]`);
@@ -28,6 +36,24 @@ function renameStep(element) {
 
 
 /**
+ *
+ * @param renames
+ * @returns {Promise.<T>}
+ */
+function onProcessingReady(renames) {
+  const body = $('.body-wrapper');
+
+  Object.keys(renames).forEach(
+    (oldName) => addRenameAttribute(body, renames, oldName)
+  );
+
+  body.find('[data-step-rename]').each((i, element) => renameStep(element));
+
+  return Promise.resolve(renames);
+}
+
+
+/**
  * Renames steps. This is carried out in a two-step process to prevent
  * collisions between shared old names and new names among different steps.
  *
@@ -38,14 +64,12 @@ function processStepRenames(renames) {
     return Promise.resolve(renames);
   }
 
-  const body = $('.body-wrapper');
+  if (!processingPromise) {
+    processingPromise = window.CD.on.ready;
+  }
 
-  Object.keys(renames).forEach(
-    (oldName) => addRenameAttribute(body, renames, oldName)
-  );
-
-  body.find('[data-step-rename]').each((i, element) => renameStep(element));
-
-  return Promise.resolve(renames);
+  processingPromise = processingPromise
+    .then(() => onProcessingReady(renames));
+  return processingPromise;
 }
 exports.processStepRenames = processStepRenames;
