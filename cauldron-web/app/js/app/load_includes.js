@@ -20,12 +20,16 @@ function loadSourceFile(include) {
     return Promise.resolve();
   }
 
+  function onLoaded(resolve, element) {
+    setTimeout(() => resolve(element), 250);
+  }
+
   if (/.*\.css$/.test(filename)) {
     // Load Style sheet files
     return new Promise((resolve) => {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.onload = (() => resolve(link));
+      link.onload = onLoaded.bind(null, resolve, link);
       link.href = filename + noCache;
       link.id = include.name;
       document.head.appendChild(link);
@@ -36,7 +40,7 @@ function loadSourceFile(include) {
     // Load Javascript files
     return new Promise((resolve) => {
       const script = document.createElement('script');
-      script.onload = (() => resolve(script));
+      script.onload = onLoaded.bind(null, resolve, script);
       script.src = filename + noCache;
       script.id = include.name;
       document.head.appendChild(script);

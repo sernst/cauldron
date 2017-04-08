@@ -4,6 +4,9 @@
   "author": "Scott Ernst",
   "description": "Web resources for Cauldron notebooks",
   "license": "MIT",
+  "scripts": {
+    "sync": "npm install && npm update && bower install --allow-root && bower update --allow-root"
+  },
   "dependencies": {
     "babel-cli": "latest",
     "babel-polyfill": "latest",

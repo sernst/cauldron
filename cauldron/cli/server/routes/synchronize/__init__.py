@@ -39,7 +39,9 @@ def touch_project():
             message='No open project to refresh'
         )
 
-    return r.flask_serialize()
+    return r.update(
+        sync_time=sync_status.get('time', 0)
+    ).flask_serialize()
 
 
 @server_runner.APPLICATION.route('/sync-status', methods=['GET', 'POST'])
