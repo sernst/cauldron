@@ -12,10 +12,11 @@ const rename = require('gulp-rename');
 const sass = require('gulp-sass');
 const sourcemaps = require('gulp-sourcemaps');
 const uglify = require('gulp-uglify');
+const args = require('yargs').argv;
 
-const isDevelop = process.argv.develop;
+const isDevelop = args.develop;
 const isProduction = !isDevelop;
-
+console.log(isDevelop, isProduction);
 
 /**
  * Creates a relative path to the a location within the root destination
@@ -66,8 +67,8 @@ function javascript() {
     .pipe(babel({ presets: ['es2015'] }))
     .pipe(gulpif(isProduction, uglify()))
     .pipe(iife())
-    .pipe(gulpif(isDevelop, sourcemaps.write()))
     .pipe(concat('app.js', { newLine: '\n' }))
+    .pipe(gulpif(isDevelop, sourcemaps.write()))
     .pipe(getStreamOutput('js'));
 }
 exports.javascript = javascript;

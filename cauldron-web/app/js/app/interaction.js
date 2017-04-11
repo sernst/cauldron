@@ -43,17 +43,18 @@ function scrollToAnchor(stepName, location, animationSpeed) {
   }
 
   const body = $('body');
-  const aTag = $(`a[name='${anchorName}']`);
-  const scrollTop = (aTag.offset().top - getOffset()) + body.scrollTop();
+  const aTag = stepDom.find(`a[name='${anchorName}']`);
+  const scrollTop = (aTag.offset().top - getOffset()); // + body.scrollTop();
 
   // console.log('SCROLLING:', {
-  //   name,
   //   location,
   //   animationSpeed,
   //   scrollTop,
   //   windowHeight,
   //   isShortDom,
   //   anchorName,
+  //   bodyScrollTop: body.scrollTop(),
+  //   aTagOffset: aTag.offset().top,
   //   stepHeight: stepDom.height()
   // });
 
