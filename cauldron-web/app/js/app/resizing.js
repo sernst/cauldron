@@ -5,12 +5,13 @@ const exports = window.CAULDRON || {};
 window.CAULDRON = exports;
 
 let previousWidth = -100;
+let resizePaused = false;
 
 /**
  * Function called when
  */
 function onWindowResize() {
-  if (!exports.RUNNING) {
+  if (!exports.RUNNING || resizePaused) {
     // Don't start resizing until everything has finished loading to prevent
     // race conditions during the load process of external libraries
     return;
@@ -52,3 +53,22 @@ function resizePlotly() {
   });
 }
 exports.resizePlotly = resizePlotly;
+
+
+/**
+ *
+ */
+function pauseResizing() {
+  resizePaused = true;
+}
+exports.pauseResizing = pauseResizing;
+
+
+/**
+ *
+ */
+function resumeResizing() {
+  resizePaused = false;
+  setTimeout(onWindowResize, 100);
+}
+exports.resumeResizing = resumeResizing;

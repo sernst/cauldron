@@ -111,7 +111,10 @@ function collapse(buttonId) {
     }
   });
 
-  $(window).resize();
+  setTimeout(
+    () => $(window).resize(),
+    100
+  );
 }
 exports.collapse = collapse;
 
