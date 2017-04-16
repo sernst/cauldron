@@ -32,6 +32,28 @@ window.onresize = onWindowResize;
 
 /**
  *
+ * @param target
+ */
+function resizePlotlyBox(target) {
+  const e = $(target);
+  const parent = e.parent();
+  const skip = e.parents('.cd-project-step-body').hasClass('closed');
+
+  if (skip || resizePaused) {
+    // Do not resize plotly objects that are currently invisible
+    return;
+  }
+
+  window.Plotly.relayout(e[0], {
+    width: parent.width(),
+    height: parent.height()
+  });
+}
+exports.resizePlotlyBox = resizePlotlyBox;
+
+
+/**
+ *
  */
 function resizePlotly() {
   if (!window.Plotly) {
@@ -39,17 +61,8 @@ function resizePlotly() {
   }
 
   $('.cd-plotly-box').each((index, element) => {
-    const e = $(element);
-    const skip = e.parents('.cd-project-step-body').hasClass('closed');
-    if (skip) {
-      // Do not resize plotly objects that are currently invisible
-      return;
-    }
-
-    window.Plotly.relayout(e.find('.plotly-graph-div')[0], {
-      width: e.width(),
-      height: e.height()
-    });
+    const e = $(element).find('.plotly-graph-div');
+    exports.resizePlotlyBox(e);
   });
 }
 exports.resizePlotly = resizePlotly;

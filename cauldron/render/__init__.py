@@ -1,4 +1,5 @@
 import json as json_internal
+import re
 import os
 import random
 import textwrap
@@ -241,6 +242,9 @@ def plotly(
         include_plotlyjs=False
     )
 
+    found = re.search(r'id="(?P<id>[^"]+)"', dom)
+    dom_id = found.group('id')
+
     insert_index = dom.index('"showLink":')
     dom = ''.join([
         dom[:insert_index],
@@ -248,8 +252,11 @@ def plotly(
         dom[insert_index:]
     ])
 
-    return '<div class="cd-plotly-box" style="min-height:{}vh">{}</div>'.format(
-        round(100.0 * scale), dom
+    return templating.render_template(
+        'plotly-component.html',
+        dom=dom,
+        min_height=round(100.0 * scale),
+        id=dom_id
     )
 
 
