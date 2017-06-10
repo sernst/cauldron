@@ -85,6 +85,6 @@ setup(
         'bokeh': ['bokeh'],
         'seaborn': ['seaborn']
     },
-    test_suite='nose.collector',
-    tests_require=['nose', 'nose-cover3']
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest', 'pytest-cov']
 )

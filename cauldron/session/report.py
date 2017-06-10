@@ -107,7 +107,7 @@ class Report(object):
         """
 
         try:
-            contents = self.stdout_interceptor.read_all(encoding='utf-8')
+            contents = self.stdout_interceptor.read_all()
         except Exception as err:
             contents = ''
 
@@ -119,7 +119,7 @@ class Report(object):
         """
 
         try:
-            contents = self.stdout_interceptor.flush_all(encoding='utf-8')
+            contents = self.stdout_interceptor.flush_all()
         except Exception:
             return
 
@@ -140,7 +140,7 @@ class Report(object):
         """
 
         try:
-            return self.stderr_interceptor.read_all(encoding='utf-8')
+            return self.stderr_interceptor.read_all()
         except Exception:
             return ''
 
@@ -150,6 +150,6 @@ class Report(object):
         """
 
         try:
-            return self.stderr_interceptor.flush_all(encoding='utf-8')
+            return self.stderr_interceptor.flush_all()
         except Exception:
             return ''

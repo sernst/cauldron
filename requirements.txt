@@ -1,5 +1,3 @@
-nose
-nose-cover3
 pandas
 numpy
 jinja2
