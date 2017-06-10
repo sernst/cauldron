@@ -37,7 +37,7 @@ class TestSave(scaffolds.ResultsTest):
         support.run_command('close')
 
     def test_save_directory_success(self):
-        """ should write a cdf file """
+        """ should write a cauldron file """
 
         support.create_project(self, 'triceratops')
         path = self.get_temp_path('save-success-1')
@@ -46,12 +46,14 @@ class TestSave(scaffolds.ResultsTest):
         self.assertTrue(os.path.exists(r.data['path']))
 
         project = cauldron.project.internal_project
-        self.assertTrue(r.data['path'].endswith('{}.cdf'.format(project.title)))
+        self.assertTrue(
+            r.data['path'].endswith('{}.cauldron'.format(project.title))
+        )
 
         support.run_command('close')
 
     def test_save_file_no_extension_success(self):
-        """ should write a cdf file """
+        """ should write a cauldron file """
 
         support.create_project(self, 'tyrannosaurus')
         path = self.get_temp_path('save-success-2', 'project')
@@ -59,19 +61,23 @@ class TestSave(scaffolds.ResultsTest):
         self.assertFalse(r.failed)
         self.assertTrue(os.path.exists(r.data['path']))
         self.trace('PATH:', r.data['path'])
-        self.assertTrue(r.data['path'].endswith('project.cdf'))
+        self.assertTrue(r.data['path'].endswith('project.cauldron'))
 
         support.run_command('close')
 
     def test_save_file_success(self):
-        """ should write a cdf file """
+        """ should write a cauldron file """
 
         support.create_project(self, 'apatosaurus')
-        path = self.get_temp_path('save-success-3', 'folder', 'project.cdf')
+        path = self.get_temp_path(
+            'save-success-3',
+            'folder',
+            'project.cauldron'
+        )
         r = support.run_command('save "{}"'.format(path))
         self.assertFalse(r.failed)
         self.assertTrue(os.path.exists(r.data['path']))
-        self.assertTrue(r.data['path'].endswith('project.cdf'))
+        self.assertTrue(r.data['path'].endswith('project.cauldron'))
 
         support.run_command('close')
 

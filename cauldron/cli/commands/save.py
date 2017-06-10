@@ -15,7 +15,7 @@ from cauldron.session import projects
 
 NAME = 'save'
 DESCRIPTION = """
-    Saves the current project's notebook as a Cauldron Document File (CDF)
+    Saves the current project's notebook as a Cauldron Display File (CAULDRON)
     for viewing in the Cauldron reader application.
     """
 
@@ -38,11 +38,11 @@ def populate(
         default=None,
         nargs='?',
         help=cli.reformat("""
-            The file path to the cdf file to be saved. If the cdf file
+            The file path to the Cauldron file to be saved. If the file
             extension is missing it will be appended to the end of the path's
-            filename. If a directory is specified instead of a file, the cdf
-            file will saved into that directory using the name of the project
-            as the filename.
+            filename. If a directory is specified instead of a file, the 
+            Cauldron file will saved into that directory using the name of the 
+            project as the filename.
             """)
     )
 
@@ -62,17 +62,17 @@ def get_default_path() -> str:
     ))
 
     count = len(os.listdir(downloads_directory))
-    return os.path.join(downloads_directory, '{}.cdf'.format(count))
+    return os.path.join(downloads_directory, '{}.cauldron'.format(count))
 
 
 def clean_path(project_title: str, path: str) -> str:
     cleaned = environ.paths.clean(path)
 
     if os.path.isdir(cleaned):
-        return os.path.join(cleaned, '{}.cdf'.format(project_title))
+        return os.path.join(cleaned, '{}.cauldron'.format(project_title))
 
-    if not cleaned.endswith('.cdf'):
-        return '{}.cdf'.format(cleaned)
+    if not cleaned.endswith('.cauldron'):
+        return '{}.cauldron'.format(cleaned)
 
     return cleaned
 
@@ -189,7 +189,7 @@ def execute(context: cli.CommandContext, path: str = None) -> Response:
     except Exception as error:
         return response.fail(
             code='WRITE_SAVE_ERROR',
-            message='Unable to write the cdf file output',
+            message='Unable to write the Cauldron file output',
             error=error
         ).console(
             whitespace=1

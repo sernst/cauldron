@@ -128,7 +128,7 @@ class TestSyncComm(scaffolds.ResultsTest):
 
     @patch('requests.get')
     def test_download(self, requests_get: MagicMock):
-        """ should successfully download saved cdf file """
+        """ should successfully download saved cauldron file """
 
         def mock_iter_content(*args, **kwargs):
             yield from [b'a', b'b', b'', None, b'c']
