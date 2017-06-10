@@ -157,7 +157,12 @@ class StepTestCase(unittest.TestCase):
         res.thread.join()
 
         # Prevent threading race conditions
+        check_count = 0
         while res.success and not cd.project.internal_project:
+            if check_count > 100:
+                break
+
+            check_count += 1
             time.sleep(0.25)
 
         if res.failed:

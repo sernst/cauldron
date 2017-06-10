@@ -123,7 +123,12 @@ def create_project(
         r.thread.join()
 
     # Prevent threading race conditions
-    while r.success and not cauldron.project.internal_project:
+    check_count = 0
+    while confirm and r.success and not cauldron.project.internal_project:
+        if check_count > 100:
+            break
+
+        check_count += 1
         time.sleep(0.25)
 
     if confirm:
