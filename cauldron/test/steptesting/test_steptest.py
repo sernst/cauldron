@@ -106,5 +106,8 @@ class StepTest(StepTestCase):
 
         project = cd.project.internal_project
         cd.project.load(None)
-        self.assertRaises(AssertionError, self.run_step, 'FAKE')
+
+        with self.assertRaises(Exception):
+            self.run_step('FAKE')
+
         cd.project.load(project)
