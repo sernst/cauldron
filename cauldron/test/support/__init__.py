@@ -1,6 +1,7 @@
 from cauldron import cli
 import sys
 import re
+import time
 from unittest.mock import patch
 
 import cauldron
@@ -121,10 +122,13 @@ def create_project(
     if r.thread:
         r.thread.join()
 
+    # Prevent threading race conditions
+    time.sleep(0.25)
+
     if confirm:
         tester.assertFalse(r.failed, Message(
             'support.create_project',
-            'project should have been created',
+            ['project should have been created'],
             response=r
         ))
         tester.assertIsNotNone(cauldron.project.internal_project)
