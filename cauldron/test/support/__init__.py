@@ -123,7 +123,8 @@ def create_project(
         r.thread.join()
 
     # Prevent threading race conditions
-    time.sleep(0.25)
+    while r.success and not cauldron.project.internal_project:
+        time.sleep(0.25)
 
     if confirm:
         tester.assertFalse(r.failed, Message(

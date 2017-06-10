@@ -3,6 +3,7 @@ import tempfile
 import unittest
 import typing
 import inspect
+import time
 
 import cauldron as cd
 from cauldron import environ
@@ -154,6 +155,10 @@ class StepTestCase(unittest.TestCase):
             res
         )
         res.thread.join()
+
+        # Prevent threading race conditions
+        while res.success and not cd.project.internal_project:
+            time.sleep(0.25)
 
         if res.failed:
             self.fail(
