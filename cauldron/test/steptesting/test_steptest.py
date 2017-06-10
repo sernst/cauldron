@@ -20,7 +20,10 @@ class StepTest(StepTestCase):
         self.assertEqual(error_echo, '')
 
     def test_second_step(self):
-        """ should fail because of an exception raised in the source """
+        """ 
+        should fail without exception because of an exception raised in the 
+        source but failure is allowed
+        """
 
         step = self.run_step('S02-errors.py', allow_failure=True)
         self.assertFalse(step.success)
@@ -29,14 +32,13 @@ class StepTest(StepTestCase):
         self.assertGreater(len(error_echo), 0)
 
     def test_second_step_strict(self):
-        """ should fail because of an exception raised in the source """
+        """ 
+        should fail because of an exception raised in the source when strict
+        failure is enforced
+        """
 
-        self.assertRaises(
-            AssertionError,
-            self.run_step,
-            'S02-errors.py',
-            allow_failure=False
-        )
+        with self.assertRaises(Exception):
+            self.run_step('S02-errors.py', allow_failure=False)
 
     def test_to_strings(self):
         """ should convert list of integers to a list of strings """
@@ -99,7 +101,8 @@ class StepTest(StepTestCase):
     def test_no_such_step(self):
         """ should fail if no such step exists """
 
-        self.assertRaises(AssertionError, self.run_step, 'FAKE-STEP.no-exists')
+        with self.assertRaises(Exception):
+            self.run_step('FAKE-STEP.no-exists')
 
     def test_no_such_project(self):
         """ should fail if no project exists """
