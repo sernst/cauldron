@@ -165,7 +165,7 @@ class StepTestCase(unittest.TestCase):
             check_count += 1
             time.sleep(0.25)
 
-        if res.failed:
+        if res.failed or not cd.project.internal_project:
             self.fail(
                 'Unable to open project at path "{}"'
                 .format(project_path)

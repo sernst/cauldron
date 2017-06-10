@@ -30,7 +30,7 @@ class CauldronThread(threading.Thread):
     def run(self):
         """ """
 
-        def run_command():
+        async def run_command():
             try:
                 self.result = self.command(
                     context=self.context,
@@ -46,11 +46,12 @@ class CauldronThread(threading.Thread):
                 ).console(
                     whitespace=1
                 )
-            self._loop.stop()
+            # self._loop.stop()
 
         self._loop = asyncio.new_event_loop()
-        self._loop.call_soon(run_command)
-        self._loop.run_forever()
+        # self._loop.call_soon(run_command)
+        # self._loop.run_forever()
+        self._loop.run_until_complete(run_command())
         self._loop.close()
         self._loop = None
 
