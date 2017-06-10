@@ -3,6 +3,7 @@ import sys
 import threading
 import traceback
 import types
+import codecs
 from importlib.abc import InspectLoader
 
 from cauldron import environ
@@ -29,6 +30,18 @@ def set_executing(on: bool):
         my_thread.is_executing = on
 
 
+def get_file_contents(source_path: str) -> str:
+    """ """
+
+    try:
+        with codecs.open(source_path, encoding='utf-8') as f:
+            return f.read()
+    except Exception:
+        pass
+
+    with open(source_path, 'r') as f:
+        return f.read()
+
 def run(
         project: 'projects.Project',
         step: 'projects.ProjectStep',
@@ -43,8 +56,7 @@ def run(
     module_name = step.definition.name.rsplit('.', 1)[0]
     module = types.ModuleType(module_name)
 
-    with open(step.source_path, 'r') as f:
-        source_code = f.read()
+    source_code = get_file_contents(step.source_path)
 
     try:
         code = InspectLoader.source_to_code(source_code, step.source_path)

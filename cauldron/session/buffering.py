@@ -26,9 +26,9 @@ class RedirectBuffer(io.TextIOWrapper):
     def source_encoding(self):
         if self.redirection_source.encoding:
             return self.redirection_source.encoding
-        return 'utf8'
+        return 'utf-8'
 
-    def read_all(self) -> str:
+    def read_all(self, encoding: str = None) -> str:
         """
         Reads the current state of the buffer and returns a string those
         contents
@@ -42,11 +42,11 @@ class RedirectBuffer(io.TextIOWrapper):
             if buffered_bytes is None:
                 return ''
 
-            return buffered_bytes.decode(self.source_encoding)
+            return buffered_bytes.decode(encoding or self.source_encoding)
         except Exception as err:
             return 'Redirect Buffer Error: {}'.format(err)
 
-    def flush_all(self) -> str:
+    def flush_all(self, encoding: str = None) -> str:
         """
 
         :return:
@@ -60,7 +60,7 @@ class RedirectBuffer(io.TextIOWrapper):
         if contents is None:
             return ''
 
-        return contents.decode(self.source_encoding)
+        return contents.decode(encoding or self.source_encoding)
 
     def write_both(self, *args, **kwargs):
         abort_thread()
