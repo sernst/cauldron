@@ -219,7 +219,8 @@ class StepTestCase(unittest.TestCase):
         super(StepTestCase, self).tearDown()
 
         # Close any open project so that it doesn't persist to the next test
-        commander.execute('close', '')
+        closed = commander.execute('close', '')
+        closed.thread.join()
 
         environ.configs.remove('results_directory', include_persists=False)
 

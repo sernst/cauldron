@@ -40,7 +40,8 @@ class ResultsTest(unittest.TestCase):
 
         # Close any open project so that it doesn't persist to the next test
         if cauldron.project.internal_project is not None:
-            commander.execute('close', '')
+            closed = commander.execute('close', '')
+            closed.thread.join()
 
         environ.configs.remove('results_directory', include_persists=False)
 
