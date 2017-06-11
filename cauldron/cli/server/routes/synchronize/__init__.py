@@ -1,20 +1,20 @@
 import json
+import mimetypes
 import os
 import tempfile
-import flask
-import mimetypes
 
 import cauldron as cd
+import flask
 from cauldron import cli
+from cauldron import writer
 from cauldron.cli import sync
-from cauldron.cli.commands.open import opener as project_opener
 from cauldron.cli.commands import create as create_command
+from cauldron.cli.commands.open import opener as project_opener
 from cauldron.cli.server import arguments
+from cauldron.cli.server import authorization
 from cauldron.cli.server import run as server_runner
 from cauldron.cli.server.routes.synchronize import status
 from cauldron.environ.response import Response
-from cauldron import writer
-
 
 sync_status = dict(
     time=-1,
@@ -23,6 +23,7 @@ sync_status = dict(
 
 
 @server_runner.APPLICATION.route('/sync-touch', methods=['GET', 'POST'])
+@authorization.gatekeeper
 def touch_project():
     """
     Touches the project to trigger refreshing its cauldron.json state
@@ -45,6 +46,7 @@ def touch_project():
 
 
 @server_runner.APPLICATION.route('/sync-status', methods=['GET', 'POST'])
+@authorization.gatekeeper
 def fetch_synchronize_status():
     """
     Returns the synchronization status information for the currently opened
@@ -76,6 +78,7 @@ def fetch_synchronize_status():
 
 
 @server_runner.APPLICATION.route('/sync-open', methods=['POST'])
+@authorization.gatekeeper
 def sync_open_project():
     """ """
 
@@ -109,13 +112,13 @@ def sync_open_project():
     definition_path = os.path.join(project_folder, 'cauldron.json')
     writer.write_json_file(definition_path, definition)
 
-    sync_status.update(time=-1, project=None)
+    sync_status.update({}, time=-1, project=None)
 
     open_response = project_opener.open_project(project_folder, forget=True)
     project = cd.project.internal_project
     project.remote_source_directory = source_directory
 
-    sync_status.update(time=-1, project=project)
+    sync_status.update({}, time=-1, project=project)
 
     return r.consume(open_response).update(
         source_directory=project.source_directory,
@@ -128,6 +131,7 @@ def sync_open_project():
 
 
 @server_runner.APPLICATION.route('/sync-file', methods=['POST'])
+@authorization.gatekeeper
 def sync_source_file():
     """ """
 
@@ -163,7 +167,7 @@ def sync_source_file():
 
     sync.io.write_file_chunk(file_path, chunk, append=index > 0)
 
-    sync_status.update(time=sync_time)
+    sync_status.update({}, time=sync_time)
 
     return r.notify(
         kind='SUCCESS',
@@ -176,6 +180,7 @@ def sync_source_file():
     '/download/<filename>',
     methods=['GET', 'POST']
 )
+@authorization.gatekeeper
 def download_file(filename: str):
     """ downloads the specified project file if it exists """
 
@@ -202,6 +207,7 @@ def download_file(filename: str):
     '/project-download/<path:filename>',
     methods=['GET', 'POST']
 )
+@authorization.gatekeeper
 def download_project_file(filename: str):
     """ downloads the specified project file if it exists """
 
@@ -223,6 +229,7 @@ def download_project_file(filename: str):
 
 
 @server_runner.APPLICATION.route('/sync-create', methods=['POST'])
+@authorization.gatekeeper
 def sync_create_project():
     """ """
 
@@ -253,7 +260,7 @@ def sync_create_project():
     if r.failed:
         return r.flask_serialize()
 
-    sync_status.update(time=-1, project=None)
+    sync_status.update({}, time=-1, project=None)
 
     project = cd.project.internal_project
     project.remote_source_directory = remote_source_directory
@@ -261,7 +268,7 @@ def sync_create_project():
     with open(project.source_path, 'r') as f:
         definition = json.load(f)
 
-    sync_status.update(time=-1, project=project)
+    sync_status.update({}, time=-1, project=project)
 
     return r.update(
         source_directory=project.source_directory,

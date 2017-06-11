@@ -8,9 +8,11 @@ from cauldron.cli.server import run as server_runner
 from cauldron.environ.response import Response
 from cauldron.runner import redirection
 from flask import request
+from cauldron.cli.server import authorization
 
 
 @server_runner.APPLICATION.route('/', methods=['GET', 'POST'])
+@authorization.gatekeeper
 def execute_deprecated_route():
     """
     This exists for backward compatibility. It has been replaced
@@ -24,6 +26,7 @@ def execute_deprecated_route():
 
 
 @server_runner.APPLICATION.route('/command-sync', methods=['GET', 'POST'])
+@authorization.gatekeeper
 def execute_sync():
     """
     Execution method for synchronous commands. Command thread
@@ -37,6 +40,7 @@ def execute_sync():
 
 
 @server_runner.APPLICATION.route('/command-async', methods=['GET', 'POST'])
+@authorization.gatekeeper
 def execute_async():
     """
     Execution method for synchronous commands. Command threads
@@ -162,6 +166,7 @@ def execute(async: bool = False):
 
 
 @server_runner.APPLICATION.route('/abort', methods=['GET', 'POST'])
+@authorization.gatekeeper
 def abort():
     """
 
@@ -224,6 +229,7 @@ def abort():
 
 
 @server_runner.APPLICATION.route('/shutdown', methods=['GET', 'POST'])
+@authorization.gatekeeper
 def shutdown():
     """
 

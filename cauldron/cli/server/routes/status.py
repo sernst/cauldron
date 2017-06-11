@@ -2,9 +2,11 @@ import cauldron
 import flask
 from cauldron.cli.server import run as server_runner
 from cauldron.environ.response import Response
+from cauldron.cli.server import authorization
 
 
 @server_runner.APPLICATION.route('/ping', methods=['GET', 'POST'])
+@authorization.gatekeeper
 def server_status():
     """
 
@@ -21,6 +23,7 @@ def server_status():
 
 
 @server_runner.APPLICATION.route('/status', methods=['GET', 'POST'])
+@authorization.gatekeeper
 def project_status():
     """
 
@@ -50,6 +53,7 @@ def project_status():
     '/clean-step/<step_name>',
     methods=['GET', 'POST']
 )
+@authorization.gatekeeper
 def clean_step(step_name: str):
     """ """
 
@@ -78,6 +82,7 @@ def clean_step(step_name: str):
 
 
 @server_runner.APPLICATION.route('/project', methods=['GET', 'POST'])
+@authorization.gatekeeper
 def project_data():
     """
 
@@ -107,6 +112,7 @@ def project_data():
     '/run-status/<uid>',
     methods=['GET', 'POST']
 )
+@authorization.gatekeeper
 def run_status(uid: str):
     """
 
