@@ -282,25 +282,17 @@ def table(
         random.randint(0, 1e8)
     )
 
-    column_headers = data_frame.columns.tolist()
-    if include_index:
-        column_headers.insert(0, 'index')
-    column_headers = ['"{}"'.format(x) for x in column_headers]
-
-    data = []
-
     df_source = (
         data_frame.head(max_rows)
         if len(data_frame) > max_rows else
         data_frame
     )
 
-    for index, row in df_source.iterrows():
-        entry = row.tolist()
-        if include_index:
-            entry.insert(0, index)
-        data.append(entry)
+    if include_index:
+        df_source = df_source.reset_index()
 
+    column_headers = ['"{}"'.format(x) for x in df_source.columns.tolist()]
+    data = df_source.values.tolist()
     json_data = json_internal.dumps(data, cls=encoding.ComplexJsonEncoder)
 
     return templating.render_template(
