@@ -72,13 +72,15 @@ def text(value: str, preformatted: bool = False):
     r.append_body(result)
 
 
-def markdown(source: str, **kwargs):
+def markdown(source: str = None, source_path: str = None, **kwargs):
     """
-    Renders the source string using markdown and adds the resulting html
-    to the display
+    Renders the specified source string or source file using markdown and 
+    adds the resulting HTML to the notebook display.
 
     :param source:
         A markdown formatted string
+    :param source_path:
+        A file containing markdown text
     :param kwargs:
         Any variable replacements to make within the string using Jinja2
         templating syntax.
@@ -86,7 +88,11 @@ def markdown(source: str, **kwargs):
 
     r = _get_report()
 
-    result = render_texts.markdown(source, **kwargs)
+    result = render_texts.markdown(
+        source=source,
+        source_path=source_path,
+        **kwargs
+    )
     r.library_includes += result['library_includes']
 
     r.append_body(result['body'])

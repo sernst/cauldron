@@ -170,34 +170,47 @@ def preformatted_text(source: str) -> str:
     )
 
 
-def markdown(source: str, **kwargs) -> dict:
+def markdown(source: str = None, source_path: str = None, **kwargs) -> dict:
     """
+    Renders a markdown file with support for Jinja2 templating. Any keyword
+    arguments will be passed to Jinja2 for templating prior to rendering the
+    markdown to HTML for display within the notebook.
 
     :param source:
+        A string of markdown text that should be rendered to HTML for 
+        notebook display.
+    :param source_path:
+        The path to a markdown file that should be rendered to HTML for
+        notebook display.
+
     :return:
+        The HTML results of rendering the specified markdown string or file.
     """
 
     environ.abort_thread()
 
     library_includes = []
-    source = templating.render(source, **kwargs)
+
+    rendered = textwrap.dedent(
+        templating.render_file(source_path, **kwargs)
+        if source_path else
+        templating.render(source or '', **kwargs)
+    )
 
     if md is None:
         raise ImportError('Unable to import the markdown package')
 
-    source = textwrap.dedent(source)
-
     offset = 0
-    while offset < len(source):
+    while offset < len(rendered):
         bound_chars = '$$'
-        start_index = source.find(bound_chars, offset)
+        start_index = rendered.find(bound_chars, offset)
 
         if start_index < 0:
             break
 
-        inline = source[start_index + 2] != '$'
+        inline = rendered[start_index + 2] != '$'
         bound_chars = '$$' if inline else '$$$'
-        end_index = source.find(
+        end_index = rendered.find(
             bound_chars,
             start_index + len(bound_chars)
         )
@@ -206,7 +219,7 @@ def markdown(source: str, **kwargs) -> dict:
             break
         end_index += len(bound_chars)
 
-        chunk = source[start_index: end_index] \
+        chunk = rendered[start_index: end_index] \
             .strip('$') \
             .strip() \
             .replace('@', '\\')
@@ -215,10 +228,10 @@ def markdown(source: str, **kwargs) -> dict:
             chunk = chunk.replace('\\', '\\\\')
 
         chunk = latex(chunk, inline)
-        source = '{pre}{gap}{latex}{gap}{post}'.format(
-            pre=source[:start_index],
+        rendered = '{pre}{gap}{latex}{gap}{post}'.format(
+            pre=rendered[:start_index],
             latex=chunk,
-            post=source[end_index:],
+            post=rendered[end_index:],
             gap='' if inline else '\n\n'
         )
 
@@ -231,7 +244,7 @@ def markdown(source: str, **kwargs) -> dict:
         """
         <div class="textbox markdown">{{ text }}</div>
         """,
-        text=md.markdown(source)
+        text=md.markdown(rendered)
     )
 
     pattern = re.compile('src="(?P<url>[^"]+)"')
