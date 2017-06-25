@@ -79,6 +79,9 @@ class Project:
             return [value] if isinstance(value, str) else list(value)
         folders = listify(self.settings.fetch('library_folders', ['libs']))
 
+        # Include the remote shared library folder as well
+        folders.append('../__cauldron_shared_libs')
+
         return [
             environ.paths.clean(os.path.join(self.source_directory, folder))
             for folder in folders

@@ -139,8 +139,11 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
-/conda-recipe
-/cauldron-web
-appveyor.yml
-.travis.yml
-.codecov.yml
+cauldron-web
+conda-recipe
+
+*.yml
+.coverage
+.coveragerc
+.git
+.idea

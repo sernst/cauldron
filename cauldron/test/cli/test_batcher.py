@@ -7,7 +7,6 @@ from cauldron.test.support.messages import Message
 
 class TestBatcher(scaffolds.ResultsTest):
 
-
     def run_project(self, project_id: str, project_directory: str):
         directory = self.get_temp_path(project_id)
         output_directory = os.path.join(directory, 'test', 'results')

@@ -207,10 +207,19 @@ def raw(
     if hasattr(threading.current_thread(), 'logs'):
         threading.current_thread().logs.append(message)
 
+    def write_file(write_path: str):
+        mode = 'a' if append_to_file else 'w'
+        try:
+            with open(paths.clean(write_path), mode) as f:
+                f.write('{}\n'.format(message))
+        except FileNotFoundError:
+            return write_path
+
+        return None
+
     file_paths = list(set([p for p in (_logging_paths + [file_path]) if p]))
     for path in file_paths:
-        with open(paths.clean(path), 'a' if append_to_file else 'w') as f:
-            f.write('{}\n'.format(message))
+        write_file(path)
 
 
 def add_to_message(data, indent_level=0) -> list:

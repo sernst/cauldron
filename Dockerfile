@@ -1,16 +1,14 @@
 FROM continuumio/anaconda3
 
 RUN apt-get -y install vim && \
-    mkdir /cauldron && \
-    mkdir /commands
+    conda install -y conda-build git && \
+    mkdir /build_data
 
-WORKDIR /commands
+COPY requirements.txt /build_data/requirements.txt
 
-COPY ./requirements.txt /commands/
-COPY ./docker/bin /commands/bin/
-COPY ./docker/.bashrc /root/.bashrc
+RUN /opt/conda/bin/pip install -r /build_data/requirements.txt && \
+    /opt/conda/bin/pip install plotly
 
-RUN chmod -R 775 /commands/bin && \
-    /opt/conda/bin/pip install -r requirements.txt
+WORKDIR /
 
-WORKDIR /cauldron
+EXPOSE 5010

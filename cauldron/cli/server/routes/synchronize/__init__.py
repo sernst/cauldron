@@ -100,7 +100,7 @@ def sync_open_project():
         for lf in definition.get('library_folders', ['libs'])
         if lf and not lf.startswith('..')
     ]
-    definition['library_folders'] += ['../shared_libs']
+    definition['library_folders'] += ['../__cauldron_shared_libs']
 
     container_folder = tempfile.mkdtemp(prefix='cd-remote-project-')
     os.makedirs(os.path.join(container_folder, '__cauldron_shared_libs'))
@@ -141,6 +141,7 @@ def sync_source_file():
     chunk = args.get('chunk')
     index = args.get('index', 0)
     sync_time = args.get('sync_time', -1)
+    location = args.get('location', 'project')
 
     if None in [relative_path, chunk]:
         return r.fail(
@@ -159,6 +160,13 @@ def sync_source_file():
     parts = relative_path.replace('\\', '/').strip('/').split('/')
 
     root_directory = project.source_directory
+    if location == 'shared':
+        root_directory = os.path.realpath(os.path.join(
+            root_directory,
+            '..',
+            '__cauldron_shared_libs'
+        ))
+
     file_path = os.path.join(root_directory, *parts)
     parent_directory = os.path.dirname(file_path)
 
@@ -169,6 +177,7 @@ def sync_source_file():
 
     sync_status.update({}, time=sync_time)
 
+    print('SAVED CHUNK:', file_path)
     return r.notify(
         kind='SUCCESS',
         code='SAVED_CHUNK',
