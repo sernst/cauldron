@@ -4,15 +4,22 @@ import uuid
 
 
 class ThreadAbortError(Exception):
+    """
+    A custom exception type that can be used to interrupt running threads and
+    be handled differently than other types of exceptions. The assumption
+    when handling this type of exception is that the user intentionally aborted
+    the running of the step and so an error display should not be presented.
+    """
     pass
 
 
 class CauldronThread(threading.Thread):
 
     def __init__(self, *args, **kwargs):
-        """ """
+        """Create a new Cauldron Thread"""
 
         super(CauldronThread, self).__init__(*args, **kwargs)
+
         self.abort = False
         self.context = None
         self.daemon = True
@@ -28,7 +35,11 @@ class CauldronThread(threading.Thread):
         self._loop = None
 
     def run(self):
-        """ """
+        """
+        Executes the Cauldron command in a thread to prevent long-running
+        computations from locking the main Cauldron thread, which is needed
+        to serve and print status information.
+        """
 
         async def run_command():
             try:
@@ -46,11 +57,8 @@ class CauldronThread(threading.Thread):
                 ).console(
                     whitespace=1
                 )
-            # self._loop.stop()
 
         self._loop = asyncio.new_event_loop()
-        # self._loop.call_soon(run_command)
-        # self._loop.run_forever()
         self._loop.run_until_complete(run_command())
         self._loop.close()
         self._loop = None
@@ -79,8 +87,6 @@ def abort_thread():
     currently running execution to stop prematurely by marking the running
     thread as aborted. It only applies to operations that are run within
     CauldronThreads and not the main thread.
-
-    :return:
     """
 
     thread = threading.current_thread()

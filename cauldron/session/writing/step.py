@@ -132,9 +132,11 @@ def populate_data(step: 'projects.ProjectStep') -> STEP_DATA:
     return step_data._replace(
         has_error=step.error,
         body=step.get_dom(),
-        data=step_data.data
+        data=(
+            step_data.data
             .copy()
-            .update(report.data.fetch(None)),
+            .update(report.data.fetch(None))
+        ),
         includes=includes,
         file_writes=file_writes
     )

@@ -48,19 +48,27 @@ class RedirectBuffer(io.TextIOWrapper):
 
     def flush_all(self) -> str:
         """
-
+        
         :return:
         """
 
-        self.bytes_buffer.seek(0)
-        contents = self.bytes_buffer.read()
+        # self.bytes_buffer.seek(0)
+        # contents = self.bytes_buffer.read()
+        # self.bytes_buffer.truncate(0)
+        # self.bytes_buffer.seek(0)
+
+        # if contents is None:
+        #     return ''
+
+        contents = self.bytes_buffer.getvalue()
         self.bytes_buffer.truncate(0)
         self.bytes_buffer.seek(0)
 
-        if contents is None:
-            return ''
-
-        return contents.decode(self.source_encoding)
+        return (
+            ''
+            if not contents else
+            contents.decode(self.source_encoding)
+        )
 
     def write_both(self, *args, **kwargs):
         abort_thread()

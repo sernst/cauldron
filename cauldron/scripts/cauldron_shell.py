@@ -98,7 +98,9 @@ def run():
     args = parse_args()
 
     if args.version:
-        print('VERSION: {}'.format(environ.package_settings().get('version', 'unknown')))
+        print('VERSION: {}'.format(
+            environ.package_settings.get('version', 'unknown')
+        ))
         sys.exit(0)
 
     if args.project_directory:

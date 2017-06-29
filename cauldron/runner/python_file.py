@@ -1,15 +1,14 @@
+import codecs
 import os
 import sys
 import threading
 import traceback
 import types
-import codecs
 from importlib.abc import InspectLoader
 
 from cauldron import environ
 from cauldron import templating
 from cauldron.cli import threads
-from cauldron.runner import redirection
 from cauldron.session import projects
 
 
@@ -18,11 +17,7 @@ class UserAbortError(Exception):
 
 
 def set_executing(on: bool):
-    """
-
-    :param on:
-    :return:
-    """
+    """ """
 
     my_thread = threading.current_thread()
 
@@ -31,7 +26,7 @@ def set_executing(on: bool):
 
 
 def get_file_contents(source_path: str) -> str:
-    """ """
+    """Loads the contents of the source into a string for execution"""
 
     try:
         with codecs.open(source_path, encoding='utf-8') as f:
@@ -42,30 +37,41 @@ def get_file_contents(source_path: str) -> str:
     with open(source_path, 'r') as f:
         return f.read()
 
+
 def run(
         project: 'projects.Project',
         step: 'projects.ProjectStep',
 ) -> dict:
-    """
-
-    :param project:
-    :param step:
-    :return:
-    """
+    """ """
 
     module_name = step.definition.name.rsplit('.', 1)[0]
-    module = types.ModuleType(module_name)
+    target_module = types.ModuleType(module_name)
+
+    # The footer is used to force the display to flush the print buffer and
+    # breathe the step to open things up for resolution. This shouldn't be
+    # necessary, but it seems there's an async race condition with print
+    # buffers that is hard to reproduce and so this is in place to fix the
+    # problem.
+    footer = '\n'.join([
+        '',
+        'import cauldron as __cauldron__',
+        '__cauldron__.display.whitespace(0)',
+        '__cauldron__.step.breathe()'
+    ])
 
     source_code = get_file_contents(step.source_path)
 
     try:
-        code = InspectLoader.source_to_code(source_code, step.source_path)
+        code = InspectLoader.source_to_code(
+            source_code  + footer,
+            step.source_path
+        )
     except SyntaxError as error:
         return render_syntax_error(project, source_code, error)
 
-    setattr(module, '__file__', step.source_path)
+    setattr(target_module, '__file__', step.source_path)
     setattr(
-        module,
+        target_module,
         '__package__',
         '.'.join(
             [project.id.replace('.', '-')] +
@@ -75,7 +81,7 @@ def run(
 
     def exec_test():
         step.test_locals = dict()
-        step.test_locals.update(module.__dict__)
+        step.test_locals.update(target_module.__dict__)
         exec(code, step.test_locals)
 
     try:
@@ -85,7 +91,7 @@ def run(
         if environ.modes.has(environ.modes.TESTING):
             exec_test()
         else:
-            exec(code, module.__dict__)
+            exec(code, target_module.__dict__)
         out = None
     except threads.ThreadAbortError:
         out = {'success': False}
