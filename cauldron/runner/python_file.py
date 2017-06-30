@@ -1,18 +1,23 @@
 import codecs
 import os
-import sys
 import threading
-import traceback
 import types
 from importlib.abc import InspectLoader
 
 from cauldron import environ
 from cauldron import templating
 from cauldron.cli import threads
+from cauldron.render import stack as render_stack
 from cauldron.session import projects
 
 
 class UserAbortError(Exception):
+    """
+    Error to raise when the user intentionally aborts a step by stopping it
+    programmatically. A custom exception is required because this type of
+    error should be handled differently by Cauldron. It should not result in
+    the display of an error.
+    """
     pass
 
 
@@ -63,7 +68,7 @@ def run(
 
     try:
         code = InspectLoader.source_to_code(
-            source_code  + footer,
+            source_code + footer,
             step.source_path
         )
     except SyntaxError as error:
@@ -119,7 +124,7 @@ def render_syntax_error(
     """
 
     stack = [dict(
-        filename=error.filename,
+        filename=getattr(error, 'filename'),
         location=None,
         line_number=error.lineno,
         line=error.text.rstrip()
@@ -145,55 +150,6 @@ def render_syntax_error(
     )
 
 
-def get_stack_frames():
-    """
-
-    :return:
-    """
-
-    cauldron_path = environ.paths.package()
-    resources_path = environ.paths.resources()
-    frames = list(traceback.extract_tb(sys.exc_info()[-1])).copy()
-
-    def is_cauldron_code(test_filename: str) -> bool:
-        if not test_filename or not test_filename.startswith(cauldron_path):
-            return False
-
-        if test_filename.startswith(resources_path):
-            return False
-
-        return True
-
-    while len(frames) > 1 and is_cauldron_code(frames[0].filename):
-        frames.pop(0)
-
-    return frames
-
-
-def format_stack_frame(stack_frame, project: 'projects.Project'):
-    """
-
-    :param stack_frame:
-    :param project:
-    :return:
-    """
-
-    filename = stack_frame.filename
-    if filename.startswith(project.source_directory):
-        filename = filename[len(project.source_directory) + 1:]
-
-    location = stack_frame.name
-    if location == '<module>':
-        location = None
-
-    return dict(
-        filename=filename,
-        location=location,
-        line_number=stack_frame.lineno,
-        line=stack_frame.line
-    )
-
-
 def render_error(
         project: 'projects.Project',
         error: Exception
@@ -208,7 +164,7 @@ def render_error(
     render_data = dict(
         type=error.__class__.__name__,
         message='{}'.format(error),
-        stack=[format_stack_frame(f, project) for f in get_stack_frames()]
+        stack=render_stack.get_formatted_stack_frame(project)
     )
 
     return dict(

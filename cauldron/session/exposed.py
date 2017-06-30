@@ -7,6 +7,8 @@ from cauldron.session import report
 from cauldron import environ
 from cauldron.runner.python_file import UserAbortError
 from cauldron.cli import threads
+from cauldron import templating
+from cauldron.render import stack as render_stack
 
 
 class ExposedProject(object):
@@ -145,16 +147,53 @@ class ExposedStep(object):
         except Exception:
             return None
 
-    def stop(self):
+    def stop(self, message: str = None, silent: bool = False):
         """
         Stops the execution of the current step immediately without raising
         an error. Use this to abort the step running process if you want
         to return early.
+
+        :param message:
+            A custom display message to include in the display for the stop
+            action. This message is ignored if silent is set to True.
+        :param silent:
+            When True nothing will be shown in the notebook display when the
+            step is stopped. When False, the notebook display will include
+            information relating to the stopped action.
         """
 
         step = self._step
-        if step:
-            raise UserAbortError()
+
+        if not step:
+            return
+
+        if not silent:
+            stack = render_stack.get_formatted_stack_frame(
+                project=step.project,
+                error_stack=False
+            )
+
+            try:
+                names = [frame['filename'] for frame in stack]
+                index = names.index(os.path.realpath(__file__))
+                frame = stack[index - 1]
+            except Exception:
+                frame = {}
+
+            stop_message = (
+                '{}'.format(message)
+                if message else
+                'This step was explicitly stopped prior to its completion'
+            )
+
+            dom = templating.render_template(
+                'step-stop.html',
+                message=stop_message,
+                frame=frame
+            )
+            step.report.append_body(dom)
+
+        raise UserAbortError()
 
     def breathe(self):
         """

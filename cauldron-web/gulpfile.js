@@ -144,7 +144,7 @@ function css() {
   files.push('app/style/**/*.css');
 
   return merge(sassStream, gulp.src(files))
-      .pipe(gulpif(isProduction, cleanCss()))
+      .pipe(gulpif(isProduction, cleanCss({ rebase: false })))
       .pipe(concat('project.css', { newLine: '\n' }))
       .pipe(getStreamOutput('css'));
 }
@@ -182,8 +182,8 @@ exports.html = html;
  *    Copies all of the material design icon resources files
  */
 function copyIcons() {
-  return gulp.src('app/style/icons/*.*')
-      .pipe(getStreamOutput('css', 'icons'));
+  return gulp.src('app/style/icon_font/*.*')
+      .pipe(getStreamOutput('css', 'icon_font'));
 }
 exports.copyIcons = copyIcons;
 

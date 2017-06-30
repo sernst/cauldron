@@ -57,7 +57,33 @@ class TestExposed(scaffolds.ResultsTest):
 
         support.run_command('run')
         project = cd.project.internal_project
+        step = project.steps[0]
 
         self.assertEqual(project.shared.fetch('test'), 1)
+        self.assertNotEqual(-1, step.dom.find('cd-StepStop'))
+
+        support.run_command('close')
+
+    def test_stop_step_silent(self):
+        """Should stop the step early and silently"""
+
+        contents = '\n'.join([
+            'import cauldron as cd',
+            'cd.shared.test = 0',
+            'cd.step.breathe()',
+            'cd.shared.test = 1',
+            'cd.step.stop(silent=True)',
+            'cd.shared.test = 2'
+        ])
+
+        support.create_project(self, 'homeritis')
+        support.add_step(self, contents=contents)
+
+        support.run_command('run')
+        project = cd.project.internal_project
+        step = project.steps[0]
+
+        self.assertEqual(project.shared.fetch('test'), 1)
+        self.assertEqual(-1, step.dom.find('cd-StepStop'))
 
         support.run_command('close')

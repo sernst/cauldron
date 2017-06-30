@@ -1,0 +1,37 @@
+.cd-StepStop {
+  display: flex;
+  margin: 1em auto;
+  padding: 0.5em;
+  background-color: #ffc6ae;
+  border: 1px solid #cd8e61;
+  color: #815b35;
+  max-width: 640px;
+  
+  &__left {
+    padding-right: 0.5em;
+  }
+
+  &__header {
+    font-size: 1.1em;
+    font-weight: bold;
+  }
+
+  &__message {
+    font-size: 1.2em;
+    margin: 5px 0;
+  }
+
+  &__right {
+    flex: 1;
+  }
+
+  &__frame {
+    margin-top: 0.5em;
+    padding-left: 2em;
+    font-family: monospace;
+  }
+
+  &__value {
+    font-weight: bolder;
+  }
+}

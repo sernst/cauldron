@@ -1,0 +1,28 @@
+<div class="cd-StepStop">
+  <div class="cd-StepStop__left">
+    <i class="material-icons md-xlarge cd-StepStop__icon">error_outline</i>
+  </div>
+
+  <div class="cd-StepStop__right">
+    <div class="cd-StepStop__header">Step Stopped</div>
+    <div class="cd-StepStop__message">{{ message }}</div>
+
+    {% if frame %}
+    <div class="cd-StepStop__frame">
+        <div>
+          file: <span class="cd-StepStop__value">{{ frame.filename | e }}</span>
+        </div>
+
+      {% if frame.location %}
+        <div>
+          &nbsp;&nbsp;in: <span class="cd-StepStop__value">{{ frame.location | e }}</span>
+        </div>
+      {% endif %}
+
+      <div>
+        line: <span class="cd-StepStop__value">{{ frame.line_number | e }}</span>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>

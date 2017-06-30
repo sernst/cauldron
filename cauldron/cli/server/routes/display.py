@@ -1,10 +1,9 @@
-import os
 import mimetypes
+import os
 
 import cauldron
-from cauldron.cli.server import run as server_run
 import flask
-from cauldron.cli.server import authorization
+from cauldron.cli.server import run as server_run
 
 
 @server_run.APPLICATION.route('/view/<path:route>', methods=['GET', 'POST'])
