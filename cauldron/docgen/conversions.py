@@ -1,5 +1,3 @@
-
-
 def arg_type_to_string(arg_type) -> str:
     """
     Converts the argument type to a string
@@ -10,13 +8,15 @@ def arg_type_to_string(arg_type) -> str:
         turned into a comma delimited list of type names
     """
 
-    if hasattr(arg_type, '__union_params__'):
-        return ', '.join([
-            arg_type_to_string(item)
-            for item in arg_type.__union_params__
-        ])
+    union_params = (
+        getattr(arg_type, '__union_params__', None) or
+        getattr(arg_type, '__args__', None)
+    )
+
+    if union_params and isinstance(union_params, (list, tuple)):
+        return ', '.join([arg_type_to_string(item) for item in union_params])
 
     try:
         return arg_type.__name__
-    except:
-        return arg_type
+    except AttributeError:
+        return '{}'.format(arg_type)

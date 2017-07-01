@@ -13,15 +13,16 @@ def parse(target, lines: typing.List[str]) -> typing.Union[None, dict]:
     annotations = getattr(target, '__annotations__')
     annotations = annotations if annotations is not None else {}
     arg_type = annotations.get('return')
-    return_type = None if arg_type is None else conversions.arg_type_to_string(arg_type)
+    return_type = (
+        None
+        if arg_type is None else
+        conversions.arg_type_to_string(arg_type)
+    )
 
     description = ' '.join([
         line[1:].split(':', 1)[-1].strip()
         for line in filter(lambda line: line.startswith(':return'), lines)
     ]).strip()
-
-    if arg_type is None and description is None:
-        return None
 
     return dict(
         type=return_type,

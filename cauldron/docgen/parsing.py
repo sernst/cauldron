@@ -65,12 +65,21 @@ def get_doc_entries(target: typing.Callable) -> list:
     ]
 
 
-def function(name: str,  target: typing.Callable) -> typing.Union[None, dict]:
+def parse_function(
+        name: str,
+        target: typing.Callable
+) -> typing.Union[None, dict]:
     """
+    Parses the documentation for a function, which is specified by the name of
+    the function and the function itself.
 
     :param name:
+        Name of the function to parse
     :param target:
+        The function to parse into documentation
     :return:
+        A dictionary containing documentation for the specified function, or
+        None if the target was not a function.
     """
 
     if not hasattr(target, '__code__'):
@@ -97,13 +106,10 @@ def variable(name: str, target: property) -> typing.Union[None, dict]:
     """
 
     if hasattr(target, 'fget'):
-        doc = function(name, target.fget)
+        doc = parse_function(name, target.fget)
         if doc:
-            doc.update(read_only=bool(target.fset is None))
+            doc['read_only'] = bool(target.fset is None)
             return doc
-
-    if not hasattr(target, '__doc__'):
-        return None
 
     return dict(
         name=name,
@@ -141,7 +147,7 @@ def container(target) -> dict:
             if n not in skip_names
         ]
 
-    functions = list(filter(not_none, fetch_docs(function)))
+    functions = list(filter(not_none, fetch_docs(parse_function)))
     func_names = [doc['name'] for doc in functions]
 
     classes = list(filter(not_none, fetch_docs(class_doc, *func_names)))

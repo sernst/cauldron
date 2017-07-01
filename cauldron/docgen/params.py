@@ -121,11 +121,18 @@ def get_optional_data(target, name, arg_names):
     """
 
     defaults = target.__defaults__
+    args_index = get_args_index(target)
+    kwargs_index = get_kwargs_index(target)
+    offset = (kwargs_index != -1) + (args_index != -1)
+    index = arg_names.index(name)
+
     try:
-        index = arg_names.index(name)
-        default_index = index - (len(arg_names) - len(defaults))
-    except:
+        default_index = index - (len(arg_names) - len(defaults) - offset)
+    except Exception:
         default_index = -1
+
+    if index == kwargs_index:
+        return {'optional': True, 'default': 'dict'}
 
     if default_index < 0:
         return {'optional': False}
