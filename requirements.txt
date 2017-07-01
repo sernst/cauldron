@@ -10,3 +10,5 @@ matplotlib
 bokeh
 seaborn
 requests
+pytest
+pytest-cov

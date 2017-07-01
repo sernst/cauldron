@@ -19,6 +19,9 @@ requirements:
     - pygments
     - beautifulsoup4
     - flask
+    - requests
+    - pytest
+    - pytest-runner
 
   run:
     - python
@@ -29,6 +32,9 @@ requirements:
     - pygments
     - beautifulsoup4
     - flask
+    - requests
+    - pytest
+    - pytest-runner
 
 test:
   imports:
