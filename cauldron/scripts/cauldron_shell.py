@@ -10,6 +10,17 @@ from argparse import ArgumentParser
 MY_DIRECTORY = os.path.abspath(os.path.dirname(__file__))
 
 
+def in_project_directory() -> bool:
+    """
+    Returns whether or not the current working directory is a Cauldron project
+    directory, which contains a cauldron.json file.
+    """
+
+    current_directory = os.path.realpath(os.curdir)
+    project_path = os.path.join(current_directory, 'cauldron.json')
+    return os.path.exists(project_path) and os.path.isfile(project_path)
+
+
 def load_shared_data(path: typing.Union[str, None]) -> dict:
     """
     Load shared data from a JSON file stored on disk
@@ -112,7 +123,12 @@ def run():
         )
         sys.exit(0)
 
-    CauldronShell().cmdloop()
+    shell = CauldronShell()
+
+    if in_project_directory():
+        shell.cmdqueue.append('open "{}"'.format(os.path.realpath(os.curdir)))
+
+    shell.cmdloop()
 
 
 if __name__ == '__main__':

@@ -26,10 +26,7 @@ class CauldronShell(cmd.Cmd):
     prompt = '<>: '
 
     def __init__(self):
-        """
-
-        """
-
+        """Creates a new cauldron shell"""
         super(CauldronShell, self).__init__(completekey='tab')
         self.history = []
         self.last_response = None

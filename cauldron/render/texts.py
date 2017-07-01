@@ -142,8 +142,8 @@ def text(value: str) -> str:
     value = render_utils.html_escape(value)
     lines = str(value).strip().split('\n')
 
-    for index in range(len(lines)):
-        l = lines[index].strip()
+    for index, line in enumerate(lines):
+        l = line.strip()
         if len(l) < 1:
             l = '</p><p class="plaintextbox">'
         lines[index] = l

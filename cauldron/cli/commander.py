@@ -10,8 +10,9 @@ COMMANDS = dict()
 
 def preload():
     """
-
-    :return:
+    The preload action initializes libraries that cannot be initialized inside
+    of a threaded run action. The primary case is the initialization of
+    matplotlib rendering backend.
     """
 
     # Set a backend that will generally work across platforms and Cauldron does 
@@ -26,9 +27,9 @@ def preload():
 
     # Plotly must be preloaded in the main thread
     try:
-        import plotly as plotly_lib
+        import plotly
     except ImportError:
-        plotly_lib = None
+        pass
 
 
 def fetch(reload: bool = False) -> dict:

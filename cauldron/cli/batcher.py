@@ -12,9 +12,16 @@ from cauldron.environ import logger
 
 def initialize_logging_path(path: str = None) -> str:
     """
+    Initializes the logging path for running the project. If no logging path
+    is specified, the current directory will be used instead.
 
     :param path:
+        Path to initialize for logging. Can be either a path to a file or
+        a path to a directory. If a directory is specified, the log file
+        written will be called "cauldron_run.log".
     :return:
+        The absolute path to the log file that will be used when this project
+        is executed.
     """
 
     path = environ.paths.clean(path if path else '.')
@@ -38,16 +45,24 @@ def run_project(
         shared_data: dict = None
 ) -> environ.Response:
     """
+    Opens, executes and closes a Cauldron project in a single command in
+    production mode (non-interactive).
 
     :param project_directory:
+        Directory where the project to run is located
     :param output_directory:
+        Directory where the project display data will be saved
     :param log_path:
+        Path to a file or directory where logging information will be
+        written
     :param shared_data:
+        Data to load into the cauldron.shared object prior to executing the
+        project
     :return:
+        The response result from the project execution
     """
 
     log_path = initialize_logging_path(log_path)
-
     logger.add_output_path(log_path)
 
     def on_complete(message: str = None) -> environ.Response:

@@ -1,6 +1,8 @@
-FROM continuumio/anaconda3
+FROM continuumio/anaconda3:latest
 
-RUN apt-get -y install vim && \
+MAINTAINER swernst@gmail.com
+
+RUN apt-get -y --no-install-recommends install vim && \
     conda install -y conda-build git && \
     mkdir /build_data
 

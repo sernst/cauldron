@@ -6,6 +6,7 @@ from typing import NamedTuple
 from cauldron import environ
 from cauldron.environ.response import Response
 
+
 CommandContext = NamedTuple('COMMAND_CONTEXT', [
     ('name', str),
     ('raw_args', str),

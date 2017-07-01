@@ -16,7 +16,6 @@ const args = require('yargs').argv;
 
 const isDevelop = args.develop;
 const isProduction = !isDevelop;
-console.log(isDevelop, isProduction);
 
 /**
  * Creates a relative path to the a location within the root destination

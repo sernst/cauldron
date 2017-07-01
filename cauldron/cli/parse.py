@@ -115,26 +115,26 @@ def args(
 
     # Clean the argument values of quote characters and hanging whitespace
 
-    def cleanArguments(item):
+    def clean_arguments(item):
         if isinstance(item[1], str):
             return item[0], item[1].strip('" \t')
         return item
 
     return ARGS_RESPONSE_NT(
         parser,
-        dict(map(cleanArguments, args_result.items())),
+        dict(map(clean_arguments, args_result.items())),
         response
     )
 
 
 def get_parser(
-        module,
+        target_module,
         raw_args: typing.List[str],
         assigned_args: dict
 ) -> typing.Tuple[ArgumentParser, Response]:
     """
 
-    :param module:
+    :param target_module:
     :param raw_args:
     :param assigned_args:
     :return:
@@ -143,11 +143,11 @@ def get_parser(
     response = Response()
 
     description = None
-    if hasattr(module, 'DESCRIPTION'):
-        description = getattr(module, 'DESCRIPTION')
+    if hasattr(target_module, 'DESCRIPTION'):
+        description = getattr(target_module, 'DESCRIPTION')
 
     parser = ArgumentParser(
-        prog=module.NAME,
+        prog=target_module.NAME,
         add_help=False,
         description=description
     )
@@ -164,17 +164,17 @@ def get_parser(
         )
     )
 
-    if not hasattr(module, 'populate'):
+    if not hasattr(target_module, 'populate'):
         return parser, response
 
     try:
-        getattr(module, 'populate')(parser, raw_args, assigned_args)
+        getattr(target_module, 'populate')(parser, raw_args, assigned_args)
     except Exception as err:
         response.fail(
             code='ARGS_PARSE_ERROR',
             message='Unable to parse command arguments',
             error=err,
-            name=module.NAME
+            name=target_module.NAME
         ).console(whitespace=1)
 
     return parser, response
