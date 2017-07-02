@@ -80,14 +80,24 @@ def get_running_step_changes(write: bool = False) -> list:
     return [get_changes(step) for step in running_steps]
 
 
-def parse(args=None):
+def parse(
+        args: typing.List[str] = None,
+        arg_parser: ArgumentParser = None
+) -> dict:
+    """Parses the arguments for the cauldron server"""
+
+    parser = arg_parser or create_parser()
+    return vars(parser.parse_args(args))
+
+
+def create_parser(arg_parser: ArgumentParser = None) -> ArgumentParser:
+    """
+    Creates an argument parser populated with the arg formats for the server
+    command.
     """
 
-    :param args:
-    :return:
-    """
-
-    parser = ArgumentParser(description='Cauldron server')
+    parser = arg_parser or ArgumentParser()
+    parser.description = 'Cauldron kernel server'
 
     parser.add_argument(
         '-p', '--port',
@@ -124,7 +134,7 @@ def parse(args=None):
         default=None
     )
 
-    return vars(parser.parse_args(args=args))
+    return parser
 
 
 def execute(

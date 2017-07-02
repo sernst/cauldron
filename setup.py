@@ -54,10 +54,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     entry_points=dict(
-        console_scripts=[
-            'cauldron=cauldron.scripts.cauldron_shell:run',
-            'cauldron-server=cauldron.scripts.cauldron_server:run'
-        ]
+        console_scripts=['cauldron=cauldron.invoke:run']
     ),
     classifiers=[
         'Development Status :: 4 - Beta',

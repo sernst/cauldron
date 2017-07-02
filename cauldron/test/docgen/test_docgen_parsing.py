@@ -1,13 +1,12 @@
-import typing
 import random
+import typing
 
 import cauldron
 from cauldron.docgen import parsing as doc_parsing
 from cauldron.session import display
-from cauldron.test.support import scaffolds
 from cauldron.session.exposed import ExposedStep
 from cauldron.steptest import StepTestCase
-from cauldron.session import display
+from cauldron.test.support import scaffolds
 
 
 class TestDocGenParsing(scaffolds.ResultsTest):
@@ -81,5 +80,6 @@ class TestDocGenParsing(scaffolds.ResultsTest):
     def test_variable_invalid(self):
         """Should return even if parsing not a property"""
 
-        result = doc_parsing.variable('test', None)
+        value = self.test_prop
+        result = doc_parsing.variable('test', value)
         self.assertIsInstance(result, dict)
