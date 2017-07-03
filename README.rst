@@ -319,10 +319,8 @@ https://hub.docker.com/r/swernst/cauldron/tags/
 They are:
 
 - ``standard``: Includes the Python 3.6 distribution in an Ubuntu environment.
-- ``conda``: Includes the full Anaconda distribution of Python 3.6 built
-   upon Anaconda's official docker image.
-- ``miniconda``: Includes the slimmed-down mini Anaconda distribution of
-   Python 3.6 built upon Anaconda's official docker image.
+- ``conda``: Includes the full Anaconda distribution of Python 3.6 built upon Anaconda's official docker image.
+- ``miniconda``: Includes the slimmed-down mini Anaconda distribution of Python 3.6 built upon Anaconda's official docker image.
 
 In all three cases, Cauldron is pre-installed with dependencies and the default
 command for each container is to start the Cauldron kernel on the exposed port
