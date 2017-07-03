@@ -11,4 +11,5 @@ bokeh
 seaborn
 requests
 pytest
+pytest-runner
 pytest-cov
