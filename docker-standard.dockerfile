@@ -17,7 +17,7 @@ RUN apt-get -y --no-install-recommends update && \
     cd Python-3.6.1 && \
     export CPPFLAGS="-I/usr/include/openssl" && \
     ./configure && \
-    make altinstall && \
+    make install && \
     rm -rf /source
 
 COPY cauldron /cauldron_local/cauldron
