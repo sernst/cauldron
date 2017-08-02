@@ -7,6 +7,7 @@ import time
 
 import cauldron as cd
 from cauldron import environ
+from cauldron import runner
 from cauldron.session import projects
 from cauldron.session import exposed
 from cauldron.cli import commander
@@ -119,6 +120,10 @@ class StepTestCase(unittest.TestCase):
         self.temp_directories = dict()
         self.open_project()
 
+        # Load libraries before calling test functions so that patching works
+        # correctly.
+        runner.reload_libraries()
+
     def make_project_path(self, *args) -> str:
         """
         Returns an absolute path to the specified location within the Cauldron
@@ -207,8 +212,11 @@ class StepTestCase(unittest.TestCase):
         if not step:
             self.fail('No step named "{}" was found'.format(step_name))
 
+        print('RUNNING', step_name)
         response = commander.execute('run', '"{}" --force'.format(step_name))
+        print('WAITING', step_name)
         response.thread.join()
+        print('COMPLETE', step_name)
 
         if not allow_failure and response.failed:
             self.fail('Failed to run step "{}"'.format(step_name))

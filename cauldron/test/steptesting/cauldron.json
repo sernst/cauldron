@@ -3,6 +3,7 @@
   "naming_scheme": "S{{##}}-{{name}}.{{ext}}",
   "steps": [
     "S01-first.py",
-    "S02-errors.py"
+    "S02-errors.py",
+    "S03-lib-patching.py"
   ]
 }

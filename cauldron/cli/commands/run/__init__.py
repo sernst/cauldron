@@ -233,7 +233,8 @@ def run_local(
     :return:
     """
 
-    runner.reload_libraries()
+    if not environ.modes.has(environ.modes.TESTING):
+        runner.reload_libraries()
 
     environ.log_header('RUNNING', 5)
 

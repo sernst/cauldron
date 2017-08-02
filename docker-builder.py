@@ -9,7 +9,7 @@ HUB_PREFIX = 'swernst/cauldron'
 my_directory = os.path.dirname(os.path.realpath(__file__))
 glob_path = os.path.join(my_directory, 'docker-*.dockerfile')
 
-file_pattern = re.compile('docker-(?P<id>[^\.]+).dockerfile')
+file_pattern = re.compile('docker-(?P<id>[^.]+).dockerfile')
 
 with open(os.path.join(my_directory, 'cauldron', 'settings.json')) as f:
     settings = json.load(f)

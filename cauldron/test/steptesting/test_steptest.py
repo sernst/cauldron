@@ -1,5 +1,6 @@
 import os
 from unittest.mock import patch
+from unittest.mock import MagicMock
 
 import cauldron as cd
 from cauldron import steptest
@@ -39,6 +40,19 @@ class StepTest(StepTestCase):
 
         with self.assertRaises(Exception):
             self.run_step('S02-errors.py', allow_failure=False)
+
+    @patch('_testlib.patching_test')
+    def test_second_step_with_patching(self, patching_test: MagicMock):
+        """
+        should fail because of an exception raised in the source when strict
+        failure is enforced
+        """
+
+        patching_test.return_value = 12
+        cd.shared.value = 42
+
+        self.run_step('S03-lib-patching.py')
+        self.assertEqual(cd.shared.result, 12)
 
     def test_to_strings(self):
         """ should convert list of integers to a list of strings """
