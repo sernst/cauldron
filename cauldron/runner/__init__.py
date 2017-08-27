@@ -77,6 +77,7 @@ def close():
         return False
 
     [remove_library_path(path) for path in project.library_directories]
+    remove_library_path(project.source_directory)
 
     cauldron.project.unload()
     return True

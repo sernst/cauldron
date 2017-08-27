@@ -64,6 +64,7 @@ def run_project(
         project_directory: str,
         output_directory: str = None,
         logging_path: str = None,
+        reader_path: str = None,
         **kwargs
 ) -> _environ.Response:
     """
@@ -82,6 +83,11 @@ def run_project(
         directory is specified instead of a file, a file will be created using
         the default filename of cauldron_run.log. If a file already exists at
         that location it will be removed and a new file created in its place.
+    :param reader_path:
+        Specifies a path where a reader file will be saved after the project
+        has finished running. If no path is specified, no reader file will be
+        saved. If the path is a directory, a reader file will be saved in that
+        directory with the project name as the file name.
     :param kwargs:
         Any variables to be available in the cauldron.shared object during
         execution of the project can be specified here as keyword arguments.
@@ -94,5 +100,6 @@ def run_project(
         project_directory=project_directory,
         output_directory=output_directory,
         log_path=logging_path,
+        reader_path=reader_path,
         shared_data=kwargs
     )

@@ -7,6 +7,7 @@ from cauldron.cli import commander
 from cauldron.cli.commands import close as close_command
 from cauldron.cli.commands import open as open_command
 from cauldron.cli.commands import run as run_command
+from cauldron.cli.commands import save as save_command
 from cauldron.environ import logger
 
 
@@ -42,7 +43,8 @@ def run_project(
         project_directory: str,
         output_directory: str = None,
         log_path: str = None,
-        shared_data: dict = None
+        shared_data: dict = None,
+        reader_path: str = None
 ) -> environ.Response:
     """
     Opens, executes and closes a Cauldron project in a single command in
@@ -58,6 +60,11 @@ def run_project(
     :param shared_data:
         Data to load into the cauldron.shared object prior to executing the
         project
+    :param reader_path:
+        Specifies a path where a reader file will be saved after the project
+        has finished running. If no path is specified, no reader file will be
+        saved. If the path is a directory, a reader file will be saved in that
+        directory with the project name as the file name.
     :return:
         The response result from the project execution
     """
@@ -91,6 +98,12 @@ def run_project(
     )
     if response.failed:
         return on_complete('[ERROR]: Aborted trying to run project steps')
+
+    if reader_path:
+        save_command.execute(
+            context=cli.make_command_context(save_command.NAME),
+            path=reader_path
+        )
 
     response = close_command.execute(
         context=cli.make_command_context(close_command.NAME)

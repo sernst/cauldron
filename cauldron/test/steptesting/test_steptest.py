@@ -43,16 +43,20 @@ class StepTest(StepTestCase):
 
     @patch('_testlib.patching_test')
     def test_second_step_with_patching(self, patching_test: MagicMock):
-        """
-        should fail because of an exception raised in the source when strict
-        failure is enforced
-        """
+        """Should override the return value with the patch"""
 
         patching_test.return_value = 12
         cd.shared.value = 42
 
         self.run_step('S03-lib-patching.py')
         self.assertEqual(cd.shared.result, 12)
+
+    def test_second_step_without_patching(self):
+        """Should succeed running the step without patching"""
+
+        cd.shared.value = 42
+        self.run_step('S03-lib-patching.py')
+        self.assertEqual(cd.shared.result, 42)
 
     def test_to_strings(self):
         """ should convert list of integers to a list of strings """

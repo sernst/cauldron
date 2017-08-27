@@ -138,7 +138,8 @@ def execute(
     if context.remote_connection.active:
         response.consume(remote_opener.sync_open(
             context=context,
-            path=path
+            path=path,
+            forget=forget
         ))
     else:
         response.consume(opener.open_project(

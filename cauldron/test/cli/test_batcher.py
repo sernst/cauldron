@@ -12,7 +12,8 @@ RunResult = typing.NamedTuple('RunResult', [
     ('response', Response),
     ('directory', str),
     ('logging_path', str),
-    ('results_directory', str)
+    ('results_directory', str),
+    ('reader_path', str)
 ])
 
 
@@ -33,19 +34,22 @@ def run_project(
     """
 
     results_directory = os.path.join(save_directory, 'output')
+    reader_path = os.path.join(save_directory, 'reader.cauldron')
     logging_path = os.path.join(save_directory, 'test.log')
 
     response = cauldron.run_project(
         project_directory=project_directory,
         output_directory=results_directory,
-        logging_path=logging_path
+        logging_path=logging_path,
+        reader_path=reader_path
     )
 
     return RunResult(
         response=response,
         directory=save_directory,
         results_directory=results_directory,
-        logging_path=logging_path
+        logging_path=logging_path,
+        reader_path=reader_path
     )
 
 
@@ -67,6 +71,7 @@ class TestBatcher(scaffolds.ResultsTest):
         )))
         self.assertTrue(os.path.exists(result.logging_path))
         self.assertTrue(os.path.getsize(result.logging_path) > 0)
+        self.assertTrue(os.path.exists(result.reader_path))
 
     def test_run_project(self):
         self.run_project('hello-cauldron', '@examples:hello_cauldron')

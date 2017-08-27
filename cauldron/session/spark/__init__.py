@@ -18,7 +18,7 @@ def unload():
         if existing_path in sys.path:
             sys.path.remove(existing_path)
 
-    for name, module in list(sys.modules.items()):
+    for name in list(sys.modules.keys()):
         if name.startswith('pyspark'):
             del sys.modules[name]
 

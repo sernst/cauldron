@@ -1,4 +1,5 @@
 import os
+import sys
 
 import cauldron
 from cauldron import environ
@@ -7,7 +8,15 @@ from cauldron import session
 from cauldron.environ import Response
 
 
-def project_exists(response, path):
+def project_exists(response: 'environ.Response', path: str) -> bool:
+    """
+    Determines whether or not a project exists at the specified path
+
+    :param response:
+    :param path:
+    :return:
+    """
+
     if os.path.exists(path):
         return True
 
@@ -161,6 +170,8 @@ def open_project(
             code='PROJECT_WRITE_FAILURE',
             message='Unable to write project notebook data'
         ).console(whitespace=1).response
+
+    runner.add_library_path(project.source_directory)
 
     return response.update(
         project=project.kernel_serialize()

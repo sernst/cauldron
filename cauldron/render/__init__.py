@@ -291,8 +291,15 @@ def table(
     if include_index:
         df_source = df_source.reset_index()
 
-    column_headers = ['"{}"'.format(x) for x in df_source.columns.tolist()]
-    data = df_source.values.tolist()
+    try:
+        column_headers = ['"{}"'.format(x) for x in df_source.columns.tolist()]
+        data = df_source.values.tolist()
+    except AttributeError:
+        # If no columns are found assume that it is a Series instead of a
+        # DataFrame and reformat the data to match the expected structure.
+        column_headers = ['"{}"'.format(df_source.name)]
+        data = df_source.values.reshape([len(df_source), 1]).tolist()
+
     json_data = json_internal.dumps(data, cls=encoding.ComplexJsonEncoder)
 
     return templating.render_template(

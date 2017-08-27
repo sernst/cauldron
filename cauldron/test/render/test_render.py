@@ -9,10 +9,10 @@ from cauldron.test.support import scaffolds
 
 
 class TestRender(scaffolds.ResultsTest):
-    """ """
+    """Test suite for the render module"""
 
     def test_table(self):
-        """ should render a table """
+        """Should render a table"""
 
         df = pd.DataFrame([
             {'a': 1, 'b': 'hello', 'c': True, 'd': date(2016, 9, 9)},
@@ -24,11 +24,34 @@ class TestRender(scaffolds.ResultsTest):
         result = render.table(df, 0.5, include_index=True)
         self.assertGreater(len(result), 1)
 
-    def test_listing(self):
-        """
+    def test_table_series(self):
+        """Should render a table for a Series instead of a DataFrame"""
 
-        :return:
-        """
+        df = pd.DataFrame([
+            {'d': date(2016, 9, 9)},
+            {'d': date(2016, 9, 9)},
+            {'d': date(2016, 9, 9)},
+            {'d': date(2016, 9, 9)}
+        ])
+
+        result = render.table(df['d'], 0.5, include_index=False)
+        self.assertGreater(len(result), 1)
+
+    def test_table_series_with_index(self):
+        """Should render a table for a Series with index"""
+
+        df = pd.DataFrame([
+            {'d': date(2016, 9, 9)},
+            {'d': date(2016, 9, 9)},
+            {'d': date(2016, 9, 9)},
+            {'d': date(2016, 9, 9)}
+        ])
+
+        result = render.table(df['d'], 0.5, include_index=True)
+        self.assertGreater(len(result), 1)
+
+    def test_listing(self):
+        """Should render a list of the results"""
 
         result = render.listing([1, 2, 3, 4, 5])
         self.assertGreater(len(result), 1)
@@ -37,18 +60,14 @@ class TestRender(scaffolds.ResultsTest):
         self.assertGreater(len(result), 1)
 
     def test_json(self):
-        """
-
-        :return:
-        """
+        """Should inject JSON into body"""
 
         data = {'a': 1, 'b': 'hello', 'c': True, 'd': date(2016, 9, 9)}
-
         result = render.json(hello=data)
         self.assertGreater(len(result), 1)
 
     def test_html(self):
-        """ should render html """
+        """Should render html"""
 
         dom = '<div class="test-me">me</div>'
 
@@ -56,7 +75,7 @@ class TestRender(scaffolds.ResultsTest):
         self.assertGreater(len(result), 1)
 
     def test_code_block_from_file(self):
-        """ should render a block of code from the specified path """
+        """Should render a block of code from the specified path"""
 
         result = render.code_block(
             path=__file__,
@@ -68,7 +87,7 @@ class TestRender(scaffolds.ResultsTest):
         self.assertTrue(result.find('Render Test') != -1)
 
     def test_code_block_from_string(self):
-        """ should render block of code from string argument """
+        """Should render block of code from string argument"""
 
         block = '\n'.join([
             'function add(a, b) {',
@@ -89,15 +108,14 @@ class TestRender(scaffolds.ResultsTest):
         self.assertTrue(result.find('caption') != -1)
 
     def test_svg(self):
-        """ should properly insert arbitrary svg string """
+        """Should properly insert arbitrary svg string"""
 
         source = '<svg><circle r="1" cx="1" cy="1"></circle></svg>'
-
         dom = render.svg(source)
         self.assertGreater(dom.find(source), 0)
 
     def test_code_block_fail(self):
-        """ should fail if the open command does not work properly """
+        """Should fail if the open command does not work properly"""
 
         path = os.path.realpath(__file__)
         with patch('builtins.open') as open_func:
@@ -107,7 +125,7 @@ class TestRender(scaffolds.ResultsTest):
         self.assertEqual(len(result), 0)
 
     def test_plotly_import_error(self):
-        """ should fail if unable to import with plotly """
+        """Should fail if unable to import with plotly"""
 
         real_import = builtins.__import__
 
@@ -123,7 +141,7 @@ class TestRender(scaffolds.ResultsTest):
         self.assertGreater(result.find('cd-ImportError'), 0)
 
     def test_plotly_static(self):
-        """ should create a static Plotly plot """
+        """Should create a static Plotly plot"""
 
         trace = dict(
             type='scatter',
@@ -135,7 +153,7 @@ class TestRender(scaffolds.ResultsTest):
         self.assertLess(0, result.index('"staticPlot": true'))
 
     def test_status(self):
-        """ should display status of specified data """
+        """Should display status of specified data"""
 
         df = pd.DataFrame([
             {'a': 1, 'b': 2, 'c': 3},

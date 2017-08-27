@@ -4,13 +4,15 @@ import os
 from cauldron import cli
 from cauldron import environ
 from cauldron.cli import sync
+from cauldron import runner
 from cauldron.environ.response import Response
 from cauldron.cli.commands.open import opener as local_opener
 
 
 def sync_open(
         context: cli.CommandContext,
-        path: str
+        path: str,
+        forget: bool = False
 ) -> Response:
     """ """
 
@@ -30,6 +32,9 @@ def sync_open(
     )
     response.log_notifications()
 
-    local_opener.update_recent_paths(response, source_directory)
+    if not forget:
+        local_opener.update_recent_paths(response, source_directory)
+
+    runner.add_library_path(source_directory)
 
     return response

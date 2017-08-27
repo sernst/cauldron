@@ -3,3 +3,4 @@ omit =
     cauldron/scripts/*.py
     /setup.py
     /release.py
+    /run.py
