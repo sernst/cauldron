@@ -1,5 +1,4 @@
 import os
-import sys
 
 import cauldron
 from cauldron import environ

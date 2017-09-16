@@ -1,4 +1,5 @@
 from unittest.mock import patch
+from unittest.mock import MagicMock
 
 from cauldron import environ
 from cauldron.cli.commands.open import opener
@@ -80,3 +81,36 @@ class TestOpenOpener(scaffolds.ResultsTest):
         response = Response()
         self.assertFalse(opener.load_project(response, INVALID_PATH))
         self.assertTrue(response.errors[0].code == 'PROJECT_INIT_FAILURE')
+
+    @patch('cauldron.session.initialize_results_path')
+    def test_initialize_results_abort(self, initialize_results_path: MagicMock):
+        """Should abort initializing project has no results path"""
+
+        response = Response()
+        project = MagicMock()
+        project.results_path = None
+        result = opener.initialize_results(response, project)
+        self.assertTrue(result)
+        self.assertEqual(0, initialize_results_path.call_count)
+
+    @patch('cauldron.session.initialize_results_path')
+    def test_initialize_results(self, initialize_results_path: MagicMock):
+        """Should initialize paths for project"""
+
+        response = Response()
+        project = MagicMock()
+        result = opener.initialize_results(response, project)
+        self.assertTrue(result)
+        self.assertEqual(1, initialize_results_path.call_count)
+
+    @patch('cauldron.session.initialize_results_path')
+    def test_initialize_results_error(self, initialize_results_path: MagicMock):
+        """Should fail to initialize paths for project"""
+
+        initialize_results_path.side_effect = ValueError('FAKE')
+        response = Response()
+        project = MagicMock()
+        result = opener.initialize_results(response, project)
+        self.assertFalse(result)
+        self.assertTrue(response.failed)
+        self.assertEqual(1, initialize_results_path.call_count)

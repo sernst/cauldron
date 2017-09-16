@@ -224,27 +224,6 @@ class Project:
 
         return '{}/view/project.html?id={}'.format(host, self.uuid)
 
-    def snapshot_path(self, *args: typing.Tuple[str]) -> str:
-        """
-
-        :param args:
-        """
-
-        return os.path.join(self.output_directory, '..', 'snapshots', *args)
-
-    def snapshot_url(self, snapshot_name: str) -> typing.Union[None, str]:
-        """
-
-        :param snapshot_name:
-        :return:
-        """
-
-        url = self.url
-        if url is None:
-            return None
-
-        return '{}&sid={}'.format(self.url, snapshot_name)
-
     def kernel_serialize(self):
         """ """
 

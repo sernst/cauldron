@@ -5,7 +5,6 @@
 from cauldron.cli.commands import configure
 from cauldron.cli.commands import open
 from cauldron.cli.commands import run
-from cauldron.cli.commands import snapshot
 from cauldron.cli.commands import steps
 from cauldron.cli.commands import alias
 from cauldron.cli.commands import clear

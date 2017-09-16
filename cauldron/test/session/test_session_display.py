@@ -80,6 +80,23 @@ class TestSessionDisplay(scaffolds.ResultsTest):
 
         support.run_command('close')
 
+    def test_list_grid(self):
+        """ should add list grid to display """
+
+        support.create_project(self, 'apollo-grid')
+
+        step_contents = '\n'.join([
+            'import cauldron as cd',
+            'cd.display.list_grid([1, 2, 3, 4])'
+        ])
+
+        support.add_step(self, contents=step_contents)
+
+        r = support.run_command('run')
+        self.assertFalse(r.failed, 'should not have failed')
+
+        support.run_command('close')
+
     def test_whitespace(self):
         """ should add list to display """
 
