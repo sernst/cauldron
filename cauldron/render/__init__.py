@@ -1,4 +1,5 @@
 import json as json_internal
+import math
 import re
 import os
 import random
@@ -13,6 +14,36 @@ from cauldron.render import syntax_highlighting
 from cauldron.render import utils as render_utils
 
 
+def list_grid(
+        source: list,
+        expand_full: bool = False,
+        column_count: int = 2,
+        row_spacing: float = 1
+):
+    """
+
+    :param source:
+    :param expand_full:
+    :param column_count:
+    :param row_spacing:
+    :return:
+    """
+
+    environ.abort_thread()
+    max_width = 1400 if expand_full else 900
+    column_width = '{}px'.format(
+        max(50, int(math.floor(max_width / column_count)))
+    )
+
+    return templating.render_template(
+        'list_grid.html',
+        items=['{}'.format(x) for x in source],
+        css_modifier='full' if expand_full else 'limited',
+        column_width=column_width,
+        row_spacing=row_spacing
+    )
+
+
 def listing(
         source: list,
         ordered: bool = False,
@@ -25,6 +56,7 @@ def listing(
     :param expand_full:
     :return:
     """
+
     environ.abort_thread()
 
     return templating.render_template(

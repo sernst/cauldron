@@ -1,0 +1,21 @@
+<ul id="{{ "list-grid" | id }}" class="cd-ListGrid cd-ListGrid--{{ css_modifier }}">
+  <style scoped>
+    .cd-ListGrid { margin: 0 auto; }
+    .cd-ListGrid--full { width: 100%; }
+    .cd-ListGrid--limited { max-width: 1280px; min-width: 320px; }
+
+    #{{ "list-grid" | id }} {
+      -moz-column-width: {{ column_width }}; /* Firefox */
+      -webkit-column-width: {{ column_width }}; /* webkit, Safari, Chrome */
+      column-width: {{ column_width }};
+      list-style-type: none;
+    }
+
+    #{{ "list-grid" | id }} li {
+      margin-top: {{ row_spacing }}rem;
+    }
+  </style>
+  {% for item in items %}
+  <li>{{ item }}</li>
+  {% endfor %}
+</ul>

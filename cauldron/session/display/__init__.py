@@ -351,7 +351,11 @@ def bokeh(model, scale: float = 0.7, responsive: bool = True):
     ))
 
 
-def listing(source: list, ordered: bool = False, expand_full: bool = False):
+def listing(
+        source: list,
+        ordered: bool = False,
+        expand_full: bool = False
+):
     """
     An unordered or ordered list of the specified *source* iterable where
     each element is converted to a string representation for display.
@@ -361,10 +365,55 @@ def listing(source: list, ordered: bool = False, expand_full: bool = False):
     :param ordered:
         Whether or not the list should be ordered. If False, which is the
         default, an unordered bulleted list is created.
+    :param expand_full:
+        Whether or not the list should expand to fill the screen horizontally.
+        When defaulted to False, the list is constrained to the center view
+        area of the screen along with other text. This can be useful to keep
+        lists aligned with the text flow.
     """
 
     r = _get_report()
-    r.append_body(render.listing(source, ordered, expand_full=expand_full))
+    r.append_body(render.listing(
+        source=source,
+        ordered=ordered,
+        expand_full=expand_full
+    ))
+
+
+def list_grid(
+        source: list,
+        expand_full: bool = False,
+        column_count: int = 2,
+        row_spacing: float = 1.0
+):
+    """
+    An multi-column list of the specified *source* iterable where
+    each element is converted to a string representation for display.
+
+    :param source:
+        The iterable to display as a list
+    :param expand_full:
+        Whether or not the list should expand to fill the screen horizontally.
+        When defaulted to False, the list is constrained to the center view
+        area of the screen along with other text. This can be useful to keep
+        lists aligned with the text flow.
+    :param column_count:
+        The number of columns to display. The specified count is applicable to
+        high-definition screens. For Lower definition screens the actual count
+        displayed may be fewer as the layout responds to less available
+        horizontal screen space.
+    :param row_spacing:
+        The number of lines of whitespace to include between each row in the
+        grid. Set this to 0 for tightly displayed lists.
+    """
+
+    r = _get_report()
+    r.append_body(render.list_grid(
+        source=source,
+        expand_full=expand_full,
+        column_count=column_count,
+        row_spacing=row_spacing
+    ))
 
 
 def latex(source: str):

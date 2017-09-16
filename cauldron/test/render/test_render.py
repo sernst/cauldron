@@ -59,6 +59,12 @@ class TestRender(scaffolds.ResultsTest):
         result = render.listing([1, 2, 3, 4, 5], True)
         self.assertGreater(len(result), 1)
 
+    def test_list_grid(self):
+        """Should render a list grid of the results"""
+
+        result = render.list_grid([1, 2, 3, 4, 5])
+        self.assertGreater(len(result), 1)
+
     def test_json(self):
         """Should inject JSON into body"""
 
