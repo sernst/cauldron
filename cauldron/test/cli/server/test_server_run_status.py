@@ -1,9 +1,11 @@
 import typing
 from collections import namedtuple
 from unittest.mock import patch
+from unittest.mock import MagicMock
 
 from cauldron.cli.server import run as server_runner
 from cauldron.environ.response import Response
+from cauldron.test.support.messages import Message
 from cauldron.test.support import flask_scaffolds
 
 FakeThread = namedtuple('FakeThread_NT', ['is_alive', 'uid'])
@@ -31,10 +33,11 @@ class TestServerRunStatus(flask_scaffolds.FlaskResultsTest):
         def is_thread_alive():
             return is_alive
 
-        r.thread = FakeThread(
-            is_alive=is_thread_alive,
-            uid=uid
-        )
+        r.thread = MagicMock()
+        r.thread.uid = uid
+        r.thread.is_alive = is_thread_alive
+        r.thread.is_running = is_alive
+        r.thread.logs = []
 
         self.deactivate_execution(uid)
         self.active_responses[uid] = r
@@ -80,7 +83,10 @@ class TestServerRunStatus(flask_scaffolds.FlaskResultsTest):
         self.assertEqual(run_status.flask.status_code, 200)
 
         response = run_status.response
-        self.assertFalse(response.failed)
+        self.assertFalse(
+            response.failed,
+            Message('Failed Response', response=response)
+        )
         self.assertEqual(response.data['run_status'], 'running')
         self.assertIsNone(response.data['step_changes'])
 
@@ -116,7 +122,10 @@ class TestServerRunStatus(flask_scaffolds.FlaskResultsTest):
         self.assertEqual(run_status.flask.status_code, 200)
 
         response = run_status.response
-        self.assertFalse(response.failed)
+        self.assertFalse(
+            response.failed,
+            Message('Response Failed', response=response)
+        )
         self.assertEqual(response.data['run_status'], 'complete')
 
         self.assertNotIn(

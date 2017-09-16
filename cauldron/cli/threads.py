@@ -1,6 +1,7 @@
 import asyncio
 import threading
 import uuid
+from datetime import datetime
 
 
 class ThreadAbortError(Exception):
@@ -33,6 +34,18 @@ class CauldronThread(threading.Thread):
         self.exception = None
         self.logs = []
         self._loop = None
+        self.completed_at = None  # datetime
+        self._has_started = False
+
+    @property
+    def is_running(self) -> bool:
+        """Specifies whether or not the thread is running"""
+        return (
+            self._has_started and
+            self.is_alive() or
+            self.completed_at is None or
+            (datetime.utcnow() - self.completed_at).total_seconds() < 0.5
+        )
 
     def run(self):
         """
@@ -58,10 +71,12 @@ class CauldronThread(threading.Thread):
                     whitespace=1
                 )
 
+        self._has_started = True
         self._loop = asyncio.new_event_loop()
         self._loop.run_until_complete(run_command())
         self._loop.close()
         self._loop = None
+        self.completed_at = datetime.utcnow()
 
     def abort_running(self) -> bool:
         """
@@ -79,6 +94,8 @@ class CauldronThread(threading.Thread):
             return True
         except Exception:
             return False
+        finally:
+            self.completed_at = datetime.utcnow()
 
 
 def abort_thread():

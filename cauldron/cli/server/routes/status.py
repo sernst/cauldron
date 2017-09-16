@@ -137,7 +137,7 @@ def run_status(uid: str):
                 ).serialize()
             )
 
-        if r.thread.is_alive():
+        if r.thread.is_running:
             try:
                 step_changes = server_runner.get_running_step_changes(True)
             except Exception:
