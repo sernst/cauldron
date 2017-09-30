@@ -32,8 +32,6 @@ class TestExport(scaffolds.ResultsTest):
             os.path.exists(directory) and os.path.isdir(directory)
         )
 
-        support.run_command('close')
-
     def test_with_args(self):
         """ should successfully export project """
 
@@ -54,8 +52,6 @@ class TestExport(scaffolds.ResultsTest):
         r = support.run_command('export "{}"'.format(path))
         self.assertTrue(r.failed, 'should have failed')
         self.assertEqual(r.errors[0].code, 'ALREADY_EXISTS')
-
-        support.run_command('close')
 
     def test_appending(self):
         """ should successfully append project export """
@@ -81,8 +77,6 @@ class TestExport(scaffolds.ResultsTest):
         self.assertFalse(r.failed, 'should not have failed')
         self.assertTrue(os.path.exists(out_path) and os.path.isdir(out_path))
 
-        support.run_command('close')
-
     def test_no_args(self):
         """ should fail if no path argument """
 
@@ -94,8 +88,6 @@ class TestExport(scaffolds.ResultsTest):
         )
         self.assertTrue(r.failed)
         self.assertEqual(r.errors[0].code, 'MISSING_PATH_ARG')
-
-        support.run_command('close')
 
     def test_autocomplete_flags(self):
         """ """

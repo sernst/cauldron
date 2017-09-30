@@ -28,5 +28,3 @@ class TestSyncStatus(flask_scaffolds.FlaskResultsTest):
         status = response.data.get('status')
         self.assertIsNotNone(status)
         self.assertTrue('project' in status)
-
-        support.run_command('close')

@@ -23,8 +23,6 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
 
         self.assertFalse(r.failed)
 
-        support.run_command('close')
-
     @patch('cauldron.cli.commands.steps.renaming.synchronize_step_names')
     def test_sync_failure(self, synchronize_step_names: MagicMock):
         """ should fail synchronizing step names fails """
@@ -43,5 +41,3 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
 
         self.assertTrue(r.failed)
         self.assertEqual(r.errors[0], failedResponse.errors[0])
-
-        support.run_command('close')

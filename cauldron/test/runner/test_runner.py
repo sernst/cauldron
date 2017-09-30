@@ -24,8 +24,6 @@ class TestRunner(scaffolds.ResultsTest):
         self.assertTrue(step.dom.find('cd-CodeError') > 0)
         self.assertTrue(step.dom.find('SyntaxError') > 0)
 
-        support.run_command('close')
-
     def test_exception(self):
         """
         """
@@ -56,8 +54,6 @@ class TestRunner(scaffolds.ResultsTest):
 
         r = support.run_command('run .')
         self.assertTrue(r.failed, 'should have failed')
-
-        support.run_command('close')
 
     def test_library(self):
         """ should refresh the local project library with the updated value """
@@ -101,5 +97,3 @@ class TestRunner(scaffolds.ResultsTest):
 
         support.run_command('run --force')
         self.assertEqual(cd.shared.TEST_VALUE, 2)
-
-        support.run_command('close')

@@ -14,8 +14,6 @@ class TestSave(scaffolds.ResultsTest):
     def test_fails_no_project(self):
         """ should fail if there is no open project """
 
-        support.run_command('close')
-
         path = self.get_temp_path('save-fail-1')
         r = support.run_command('save "{}"'.format(path))
         self.assertTrue(r.failed)
@@ -34,8 +32,6 @@ class TestSave(scaffolds.ResultsTest):
         self.assertGreater(len(r.errors), 0)
         self.assertEqual(r.errors[0].code, 'WRITE_SAVE_ERROR')
 
-        support.run_command('close')
-
     def test_save_directory_success(self):
         """ should write a cauldron file """
 
@@ -50,8 +46,6 @@ class TestSave(scaffolds.ResultsTest):
             r.data['path'].endswith('{}.cauldron'.format(project.title))
         )
 
-        support.run_command('close')
-
     def test_save_file_no_extension_success(self):
         """ should write a cauldron file """
 
@@ -62,8 +56,6 @@ class TestSave(scaffolds.ResultsTest):
         self.assertTrue(os.path.exists(r.data['path']))
         self.trace('PATH:', r.data['path'])
         self.assertTrue(r.data['path'].endswith('project.cauldron'))
-
-        support.run_command('close')
 
     def test_save_file_success(self):
         """ should write a cauldron file """
@@ -78,8 +70,6 @@ class TestSave(scaffolds.ResultsTest):
         self.assertFalse(r.failed)
         self.assertTrue(os.path.exists(r.data['path']))
         self.assertTrue(r.data['path'].endswith('project.cauldron'))
-
-        support.run_command('close')
 
     def test_remote_save_no_project(self):
         """ """

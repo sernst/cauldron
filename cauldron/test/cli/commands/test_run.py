@@ -24,7 +24,6 @@ class TestRun(scaffolds.ResultsTest):
         r.thread.join()
 
         self.assertFalse(r.failed)
-        support.run_command('close')
 
     def test_run_step_example(self):
         """
@@ -37,11 +36,9 @@ class TestRun(scaffolds.ResultsTest):
         r.thread.join()
 
         self.assertFalse(r.failed)
-        support.run_command('close')
 
     def test_run_in_parts(self):
-        """
-        """
+        """ """
 
         support.open_project(self, '@examples:hello_cauldron')
 
@@ -54,11 +51,9 @@ class TestRun(scaffolds.ResultsTest):
         commander.execute('run', 'S02-plot-data.py', r)
         r.thread.join()
         self.assertFalse(r.failed)
-        support.run_command('close')
 
     def test_run_bokeh(self):
-        """
-        """
+        """ """
 
         support.open_project(self, '@examples:bokeh')
 
@@ -67,7 +62,6 @@ class TestRun(scaffolds.ResultsTest):
         r.thread.join()
 
         self.assertFalse(r.failed)
-        support.run_command('close')
 
     def test_autocomplete_flags(self):
         """ should return list of short flags """
@@ -101,8 +95,6 @@ class TestRun(scaffolds.ResultsTest):
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0], step.filename)
 
-        support.run_command('close')
-
     def test_run_no_project(self):
         """ should abort if no project is open """
 
@@ -135,8 +127,6 @@ class TestRun(scaffolds.ResultsTest):
         self.assertFalse(project.steps[1].is_dirty())
         self.assertTrue(project.steps[2].is_dirty())
 
-        support.run_command('close')
-
     def test_single_step(self):
         """ should run single step only """
 
@@ -167,8 +157,6 @@ class TestRun(scaffolds.ResultsTest):
         self.assertFalse(project.steps[1].is_dirty())
         self.assertTrue(project.steps[2].is_dirty())
 
-        support.run_command('close')
-
     def test_run_count(self):
         """ should run single step only """
 
@@ -187,8 +175,6 @@ class TestRun(scaffolds.ResultsTest):
         self.assertFalse(r.failed)
         self.assertFalse(project.steps[0].is_dirty())
         self.assertFalse(project.steps[1].is_dirty())
-
-        support.run_command('close')
 
     def test_repeats(self):
         """ should not repeat run multiple named steps in a single run """
@@ -211,8 +197,6 @@ class TestRun(scaffolds.ResultsTest):
         self.assertFalse(project.steps[0].is_dirty())
         self.assertFalse(project.steps[1].is_dirty())
         self.assertTrue(project.steps[2].is_dirty())
-
-        support.run_command('close')
 
     def test_repeat_additions(self):
         """ should not repeat run multiple named steps in a single run """
@@ -239,8 +223,6 @@ class TestRun(scaffolds.ResultsTest):
         self.assertTrue(project.steps[1].is_dirty())
         self.assertTrue(project.steps[2].is_dirty())
 
-        support.run_command('close')
-
     def test_no_such_step(self):
         """ should fail if unable to find a step """
 
@@ -258,8 +240,6 @@ class TestRun(scaffolds.ResultsTest):
         )
 
         self.assert_has_error_code(r, 'MISSING_STEP')
-
-        support.run_command('close')
 
     def test_run_remote(self):
         """ should successfully run remote project """

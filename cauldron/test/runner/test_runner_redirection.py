@@ -51,5 +51,3 @@ class TestRunnerRedirection(scaffolds.ResultsTest):
         self.assertNotIsInstance(sys.stderr, redirection.RedirectBuffer)
         self.assertEqual(sys.stdout, sys.__stdout__)
         self.assertEqual(sys.stderr, sys.__stderr__)
-
-        support.run_command('close')

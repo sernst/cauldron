@@ -41,7 +41,6 @@ class TestOpen(scaffolds.ResultsTest):
             len(r.messages), 1,
             'success response message?'
         )
-        support.run_command('close')
 
     def test_open_new_project(self):
         """
@@ -59,7 +58,6 @@ class TestOpen(scaffolds.ResultsTest):
             len(r.messages), 1,
             'success response message?'
         )
-        support.run_command('close')
 
     def test_autocomplete_flags(self):
         """

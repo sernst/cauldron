@@ -132,8 +132,6 @@ class TestServer(FlaskResultsTest):
         aborted = self.get('/abort')
         self.assert_no_errors(aborted.response)
 
-        support.run_command('close')
-
     def test_long_running_print_buffering(self):
         support.create_project(self, 'walter2')
         support.add_step(self, contents=cli.reformat(
@@ -157,5 +155,3 @@ class TestServer(FlaskResultsTest):
 
         aborted = self.get('/abort')
         self.assert_no_errors(aborted.response)
-
-        support.run_command('close')

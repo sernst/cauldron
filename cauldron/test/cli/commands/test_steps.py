@@ -24,8 +24,6 @@ class TestSteps(scaffolds.ResultsTest):
             os.path.join(project.source_directory, 'S01-first.py')
         ))
 
-        support.run_command('close')
-
     def test_steps_muting(self):
         """
         """
@@ -39,8 +37,6 @@ class TestSteps(scaffolds.ResultsTest):
 
         r = support.run_command('steps unmute S01-first.py')
         self.assertFalse(r.failed, 'should nto have failed')
-
-        support.run_command('close')
 
     def test_steps_modify(self):
         """
@@ -71,8 +67,6 @@ class TestSteps(scaffolds.ResultsTest):
             os.path.exists(os.path.join(directory, 'S01-second.py'))
         )
 
-        support.run_command('close')
-
     def test_steps_remove(self):
         """
         """
@@ -87,8 +81,6 @@ class TestSteps(scaffolds.ResultsTest):
 
         r = support.run_command('steps remove S01-fake.py')
         self.assertTrue(r.failed, 'should have failed')
-
-        support.run_command('close')
 
     def test_steps_remove_renaming(self):
 
@@ -109,8 +101,6 @@ class TestSteps(scaffolds.ResultsTest):
         for i in range(STEP_COUNT - 1):
             self.assertEqual('S0{}.py'.format(i + 1), step_names[i])
 
-        support.run_command('close')
-
     def test_steps_list(self):
         """
         """
@@ -128,8 +118,6 @@ class TestSteps(scaffolds.ResultsTest):
 
         r = support.run_command('steps list')
         self.assertFalse(r.failed, 'should not have failed')
-
-        support.run_command('close')
 
     def test_autocomplete(self):
         """
@@ -158,8 +146,6 @@ class TestSteps(scaffolds.ResultsTest):
             len(result), 2,
             'there are two steps in {}'.format(result)
         )
-
-        support.run_command('close')
 
     def test_modify_move(self):
         """
@@ -193,8 +179,6 @@ class TestSteps(scaffolds.ResultsTest):
             response=r
         ))
 
-        support.run_command('close')
-
     def test_remote(self):
         """ should function remotely """
 
@@ -213,5 +197,3 @@ class TestSteps(scaffolds.ResultsTest):
         ))
 
         self.assertEqual(len(project.steps), 1)
-
-        support.run_command('close')

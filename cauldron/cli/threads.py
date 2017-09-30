@@ -11,6 +11,7 @@ class ThreadAbortError(Exception):
     when handling this type of exception is that the user intentionally aborted
     the running of the step and so an error display should not be presented.
     """
+
     pass
 
 

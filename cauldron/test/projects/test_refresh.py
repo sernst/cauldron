@@ -52,14 +52,11 @@ class TestRefresh(scaffolds.ResultsTest):
         self.assertEqual(len(project.steps), 1)
         self.assertEqual(project.steps[0].definition.name, step_name)
 
-        support.run_command('close')
-
     def test_custom_results_path(self):
         """
         Project should update with a results path that matches the source path
         """
 
-        support.run_command('close')
         support.create_project(self, 'lucius')
 
         project = cd.project.internal_project
@@ -69,8 +66,6 @@ class TestRefresh(scaffolds.ResultsTest):
 
         self.assertTrue(project.refresh(force=True), 'should have refreshed')
         self.assertEqual(project.source_directory, project.results_path)
-
-        support.run_command('close')
 
     def test_modified_same_steps(self):
         """
@@ -88,8 +83,6 @@ class TestRefresh(scaffolds.ResultsTest):
         self.assertTrue(project.refresh(force=True), 'should have refreshed')
         self.assertEqual(len(project.steps), 0)
 
-        support.run_command('close')
-
     def test_update_not_modified(self):
         """ should abort refresh if updated file is identical to previous """
 
@@ -100,5 +93,3 @@ class TestRefresh(scaffolds.ResultsTest):
 
         project = cd.project.internal_project
         self.assertFalse(project.refresh(), 'should not have refreshed')
-
-        support.run_command('close')

@@ -12,6 +12,3 @@ class TestWriting(scaffolds.ResultsTest):
 
         response = support.run_command('run')
         self.assertFalse(response.failed)
-
-        support.run_command('close')
-

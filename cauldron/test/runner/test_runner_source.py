@@ -22,8 +22,6 @@ class TestRunnerSource(scaffolds.ResultsTest):
         result = source.get_step(project, step.filename)
         self.assertEqual(step, result)
 
-        support.run_command('close')
-
     def test_get_missing_step(self):
         """ should get None for a fictional step name """
 
@@ -32,8 +30,6 @@ class TestRunnerSource(scaffolds.ResultsTest):
 
         project = cd.project.internal_project
         self.assertIsNone(source.get_step(project, 'FICTIONAL-STEP'))
-
-        support.run_command('close')
 
     def test_invalid_step_extension(self):
         """ should fail to execute step of unknown extension """
@@ -47,8 +43,6 @@ class TestRunnerSource(scaffolds.ResultsTest):
 
         self.assertFalse(result['success'], False)
 
-        support.run_command('close')
-
     def test_run_no_step(self):
         """ should fail to run a None step """
 
@@ -56,8 +50,6 @@ class TestRunnerSource(scaffolds.ResultsTest):
         project = cd.project.internal_project
         result = source.run_step(Response(), project, 'FAKE.STEP')
         self.assertFalse(result)
-
-        support.run_command('close')
 
     @patch(
         'cauldron.runner.source.check_status',
@@ -74,8 +66,6 @@ class TestRunnerSource(scaffolds.ResultsTest):
         result = source.run_step(Response(), project, step)
         self.assertFalse(result)
 
-        support.run_command('close')
-
     @patch(
         'cauldron.runner.source.check_status',
         return_value=source.SKIP_STATUS
@@ -91,8 +81,6 @@ class TestRunnerSource(scaffolds.ResultsTest):
         result = source.run_step(Response(), project, step)
         self.assertTrue(result)
 
-        support.run_command('close')
-
     def test_run_step_execution_error(self):
         """ should fail when running a step that fails to execute """
 
@@ -107,8 +95,6 @@ class TestRunnerSource(scaffolds.ResultsTest):
 
         self.assertFalse(result)
 
-        support.run_command('close')
-
     def test_status_of_muted_step(self):
         """ should have a skip status if the step is muted """
 
@@ -120,8 +106,6 @@ class TestRunnerSource(scaffolds.ResultsTest):
 
         status = source.check_status(Response(), project, step)
         self.assertEqual(status, source.SKIP_STATUS)
-
-        support.run_command('close')
 
     def test_status_of_missing_step_file(self):
         """ should have an error status if the step has no file """
@@ -135,8 +119,6 @@ class TestRunnerSource(scaffolds.ResultsTest):
             status = source.check_status(Response(), project, step)
         self.assertEqual(status, source.ERROR_STATUS)
 
-        support.run_command('close')
-
     def test_status_of_clean_step(self):
         """ should have an skip status if the step is not dirty """
 
@@ -148,5 +130,3 @@ class TestRunnerSource(scaffolds.ResultsTest):
 
         status = source.check_status(Response(), project, step)
         self.assertEqual(status, source.SKIP_STATUS)
-
-        support.run_command('close')

@@ -62,5 +62,3 @@ class TestSyncOpen(FlaskResultsTest):
 
         project = cauldron.project.internal_project
         self.assertEqual(project.remote_source_directory, source_directory)
-
-        support.run_command('close')

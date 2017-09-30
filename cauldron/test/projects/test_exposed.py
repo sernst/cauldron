@@ -32,8 +32,6 @@ class TestExposed(scaffolds.ResultsTest):
         cd.project.title = test_title
         self.assertEqual(cd.project.title, test_title)
 
-        support.run_command('close')
-
     def test_no_step_defaults(self):
         """Exposed step should apply defaults without project"""
 
@@ -62,8 +60,6 @@ class TestExposed(scaffolds.ResultsTest):
         self.assertEqual(project.shared.fetch('test'), 1)
         self.assertNotEqual(-1, step.dom.find('cd-StepStop'))
 
-        support.run_command('close')
-
     def test_stop_step_silent(self):
         """Should stop the step early and silently"""
 
@@ -85,5 +81,3 @@ class TestExposed(scaffolds.ResultsTest):
 
         self.assertEqual(project.shared.fetch('test'), 1)
         self.assertEqual(-1, step.dom.find('cd-StepStop'))
-
-        support.run_command('close')

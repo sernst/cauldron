@@ -39,8 +39,6 @@ class TestStepActions(scaffolds.ResultsTest):
         result = step_actions.index_from_location(None, project, '12s', 42)
         self.assertEqual(result, 42)
 
-        support.run_command('close')
-
     def test_index_from_location_step_name(self):
         """ should return index from step name if supplied """
 
@@ -51,8 +49,6 @@ class TestStepActions(scaffolds.ResultsTest):
 
         result = step_actions.index_from_location(None, project, step.filename)
         self.assertEqual(result, 1)
-
-        support.run_command('close')
 
     def test_mute_no_such_step(self):
         """ should fail to mute a step that does not exist """
@@ -65,8 +61,6 @@ class TestStepActions(scaffolds.ResultsTest):
 
         self.assertTrue(r.failed)
         self.assertEqual(r.errors[0].code, 'NO_SUCH_STEP')
-
-        support.run_command('close')
 
     def test_toggle_muting(self):
         """ should reverse the muted state of the step """
@@ -85,5 +79,3 @@ class TestStepActions(scaffolds.ResultsTest):
         r = Response()
         step_actions.toggle_muting(r, project, step.filename)
         self.assertFalse(step.is_muted)
-
-        support.run_command('close')

@@ -9,13 +9,10 @@ from cauldron.test.support.messages import Message
 
 
 class TestSessionReloading(scaffolds.ResultsTest):
-    """
-
-    """
+    """ """
 
     def setUp(self):
         super(TestSessionReloading, self).setUp()
-        support.run_command('close')
 
     def test_watch_bad_argument(self):
         """
@@ -63,9 +60,6 @@ class TestSessionReloading(scaffolds.ResultsTest):
             reloading.refresh(mime_text),
             Message('Should not reload if module has not changed recently')
         )
-
-        project.current_step = None
-        support.run_command('close')
 
     def test_watch_recursive(self):
         """

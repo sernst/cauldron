@@ -24,5 +24,3 @@ class TestSyncTouch(flask_scaffolds.FlaskResultsTest):
 
         response = touched.response
         self.assertEqual(len(response.errors), 0)
-
-        support.run_command('close')

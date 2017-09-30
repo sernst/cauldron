@@ -37,8 +37,6 @@ class TestPrinting(scaffolds.ResultsTest):
             'should have included error line of code'
         )
 
-        support.run_command('close')
-
     def test_standard_error(self):
         """ should include standard error output """
 
@@ -74,5 +72,3 @@ class TestPrinting(scaffolds.ResultsTest):
             project.steps[0].dom.find('cd-StdErr') > 0,
             'should have included StdErr dom'
         )
-
-        support.run_command('close')

@@ -62,20 +62,27 @@ def fetch(reload: bool = False) -> dict:
 
 
 def get_command_from_module(
-        module,
+        command_module,
         remote_connection: environ.RemoteConnection
 ):
     """
     Returns the execution command to use for the specified module, which may
     be different depending upon remote connection
 
-    :param module:
+    :param command_module:
     :param remote_connection:
     :return:
     """
 
-    use_remote = remote_connection.active and hasattr(module, 'execute_remote')
-    return module.execute_remote if use_remote else module.execute
+    use_remote = (
+        remote_connection.active and
+        hasattr(command_module, 'execute_remote')
+    )
+    return (
+        command_module.execute_remote
+        if use_remote else
+        command_module.execute
+    )
 
 
 def execute(
@@ -92,8 +99,8 @@ def execute(
     if not response:
         response = Response(identifier=name)
 
-    module = fetch().get(name)
-    if module is None:
+    command_module = fetch().get(name)
+    if command_module is None:
         return response.fail(
             code='NO_SUCH_COMMAND',
             message='There is no command "{}"'.format(name)
@@ -106,7 +113,7 @@ def execute(
             """.format(name=name)
         ).response
 
-    args = parse.args(module, raw_args)
+    args = parse.args(command_module, raw_args)
     response.consume(args.response)
 
     if args.parser is None:
@@ -135,7 +142,10 @@ def execute(
         preload()
 
     t = CauldronThread()
-    t.command = get_command_from_module(module, context.remote_connection)
+    t.command = get_command_from_module(
+        command_module=command_module,
+        remote_connection=context.remote_connection
+    )
     t.context = context
     t.parser = args.parser
     t.kwargs = args.args

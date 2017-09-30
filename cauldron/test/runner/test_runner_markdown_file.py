@@ -4,7 +4,7 @@ from cauldron.test.support import scaffolds
 
 
 class TestRunnerMarkdownFile(scaffolds.ResultsTest):
-    """ """
+    """Test suite for the runner.markdown_file module"""
 
     def test_run_markdown(self):
         """ should render markdown """
@@ -16,8 +16,6 @@ class TestRunnerMarkdownFile(scaffolds.ResultsTest):
 
         step = cd.project.internal_project.steps[0]
         self.assertFalse(step.is_dirty())
-
-        support.run_command('close')
 
     def test_invalid_markdown(self):
         """ should fail with a jinja error """

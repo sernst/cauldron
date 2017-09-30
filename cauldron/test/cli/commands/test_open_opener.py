@@ -56,7 +56,6 @@ class TestOpenOpener(scaffolds.ResultsTest):
 
         response = support.create_project(self, 'minnesota', confirm=False)
         self.assertTrue(response.failed)
-        support.run_command('close')
 
     @patch(opener_package('write_results'), return_value=False)
     def test_bad_write_results(self, *args):
@@ -64,7 +63,6 @@ class TestOpenOpener(scaffolds.ResultsTest):
 
         response = support.create_project(self, 'iowa', confirm=False)
         self.assertTrue(response.failed)
-        support.run_command('close')
 
     @patch('cauldron.runner.initialize')
     def test_load_project_bad(self, runner_initialize):

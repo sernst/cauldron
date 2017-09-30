@@ -23,8 +23,6 @@ class TestProjectDownload(FlaskResultsTest):
         downloaded = self.get('/project-download/fake.filename.not_real')
         self.assertEqual(downloaded.flask.status_code, 204)
 
-        support.run_command('close')
-
     def test_valid(self):
         """ should successfully download file """
 
@@ -42,6 +40,3 @@ class TestProjectDownload(FlaskResultsTest):
             self.assertGreater(func.call_count, 0)
 
         self.assertEqual(downloaded.flask.status_code, 200)
-
-        support.run_command('close')
-

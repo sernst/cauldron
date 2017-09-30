@@ -5,7 +5,9 @@ import unittest
 
 import cauldron
 from cauldron import environ
+from cauldron import cli
 from cauldron.cli import commander
+from cauldron.cli.commands import close
 from cauldron.test.support.messages import Message
 
 
@@ -40,8 +42,7 @@ class ResultsTest(unittest.TestCase):
 
         # Close any open project so that it doesn't persist to the next test
         if cauldron.project.internal_project is not None:
-            closed = commander.execute('close', '')
-            closed.thread.join()
+            close.execute(cli.make_command_context('close'))
 
         environ.configs.remove('results_directory', include_persists=False)
 

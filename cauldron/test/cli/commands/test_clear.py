@@ -11,7 +11,6 @@ class TestClear(scaffolds.ResultsTest):
         support.run_command('open @examples:hello_cauldron')
         response = support.run_command('clear')
         self.assertFalse(response.failed, 'should not have failed')
-        support.run_command('close')
 
     def test_no_project(self):
         """ should error when no project is open """

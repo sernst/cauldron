@@ -24,8 +24,6 @@ class TestStatus(scaffolds.ResultsTest):
         self.assertFalse(r.failed, 'should not have failed')
         self.assertEqual(r.messages[0].code, 'STATUS_CREATED')
 
-        support.run_command('close')
-
     def test_status_with_data(self):
         """ """
 
@@ -34,8 +32,6 @@ class TestStatus(scaffolds.ResultsTest):
         r = support.run_command('status')
         self.assertFalse(r.failed, 'should not have failed')
         self.assertEqual(r.messages[0].code, 'STATUS_CREATED')
-
-        support.run_command('close')
 
     @patch('cauldron.cli.commands.status.to_console_formatted_string')
     def test_status_failure(self, to_console_formatted_string: MagicMock):
@@ -47,8 +43,6 @@ class TestStatus(scaffolds.ResultsTest):
         r = support.run_command('status')
         self.assertTrue(r.failed, 'should have failed')
         self.assertEqual(r.errors[0].code, 'STATUS_ERROR')
-
-        support.run_command('close')
 
     def test_console_formatting(self):
         """ """
@@ -70,5 +64,3 @@ class TestStatus(scaffolds.ResultsTest):
         r = support.run_remote_command('status')
         self.assertFalse(r.failed, 'should not have failed')
         self.assertEqual(r.messages[0].code, 'STATUS_CREATED')
-
-        support.run_command('close')

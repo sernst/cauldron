@@ -13,7 +13,6 @@ class TestReload(scaffolds.ResultsTest):
         support.run_command('open @examples:hello_cauldron')
         r = support.run_command('reload')
         self.assertFalse(r.failed, 'should not have failed')
-        support.run_command('close')
 
     def test_no_open_project(self):
         """ should fail when no project is open """
@@ -21,7 +20,6 @@ class TestReload(scaffolds.ResultsTest):
         r = support.run_command('reload')
         self.assertTrue(r.failed, 'should have failed')
         self.assertEqual(r.errors[0].code, 'NO_PROJECT_FOUND')
-        support.run_command('close')
 
     def test_missing_project_path(self):
         """ should fail if the project directory does not exist """
@@ -35,8 +33,6 @@ class TestReload(scaffolds.ResultsTest):
         self.assertTrue(r.failed, 'should have failed')
         self.assertEqual(r.errors[0].code, 'MISSING_PROJECT_PATH')
 
-        support.run_command('close')
-
     def test_initialize_failure(self):
         """ should fail if cannot initialize project """
 
@@ -49,12 +45,9 @@ class TestReload(scaffolds.ResultsTest):
         self.assertTrue(r.failed, 'should have failed')
         self.assertEqual(r.errors[0].code, 'PROJECT_INIT_FAILURE')
 
-        support.run_command('close')
-
     def test_reload_remote(self):
         """ should reload the currently opened project """
 
         support.run_command('open @examples:hello_cauldron')
         r = support.run_remote_command('reload')
         self.assertFalse(r.failed, 'should not have failed')
-        support.run_command('close')

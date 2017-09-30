@@ -12,8 +12,6 @@ class TestShow(scaffolds.ResultsTest):
     def test_show_fail(self):
         """ should fail to show when no project is opened """
 
-        support.run_command('close')
-
         with patch('webbrowser.open') as func:
             r = support.run_command('show')
             self.assertTrue(r.failed, 'should have failed with no project')
@@ -29,7 +27,6 @@ class TestShow(scaffolds.ResultsTest):
             r = support.run_command('show')
             self.assertFalse(r.failed, 'should not have failed')
             func.assert_called_once_with(url)
-        support.run_command('close')
 
     def test_show_remote(self):
         """ should show remote url """
@@ -54,5 +51,3 @@ class TestShow(scaffolds.ResultsTest):
             )
             self.assertFalse(r.failed, 'should not have failed')
             func.assert_called_once_with(url)
-
-        support.run_command('close')

@@ -22,8 +22,6 @@ class TestSessionDisplay(scaffolds.ResultsTest):
         r = support.run_command('run')
         self.assertFalse(r.failed, 'should not have failed')
 
-        support.run_command('close')
-
     def test_svg(self):
         """ should add an svg tag to the display """
 
@@ -38,8 +36,6 @@ class TestSessionDisplay(scaffolds.ResultsTest):
 
         r = support.run_command('run')
         self.assertFalse(r.failed, 'should not have failed')
-
-        support.run_command('close')
 
     def test_status(self):
         """ should update status display """
@@ -61,8 +57,6 @@ class TestSessionDisplay(scaffolds.ResultsTest):
         r = support.run_command('run')
         self.assertFalse(r.failed, 'should not have failed')
 
-        support.run_command('close')
-
     def test_listing(self):
         """ should add list to display """
 
@@ -77,8 +71,6 @@ class TestSessionDisplay(scaffolds.ResultsTest):
 
         r = support.run_command('run')
         self.assertFalse(r.failed, 'should not have failed')
-
-        support.run_command('close')
 
     def test_list_grid(self):
         """ should add list grid to display """
@@ -95,8 +87,6 @@ class TestSessionDisplay(scaffolds.ResultsTest):
         r = support.run_command('run')
         self.assertFalse(r.failed, 'should not have failed')
 
-        support.run_command('close')
-
     def test_whitespace(self):
         """ should add list to display """
 
@@ -111,8 +101,6 @@ class TestSessionDisplay(scaffolds.ResultsTest):
 
         r = support.run_command('run')
         self.assertFalse(r.failed, 'should not have failed')
-
-        support.run_command('close')
 
     def test_jinja(self):
         """ should add jinja template to display """
@@ -140,5 +128,3 @@ class TestSessionDisplay(scaffolds.ResultsTest):
 
         r = support.run_command('run')
         self.assertFalse(r.failed, 'should not have failed')
-
-        support.run_command('close')

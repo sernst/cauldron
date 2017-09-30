@@ -171,8 +171,6 @@ class TestCreate(scaffolds.ResultsTest):
         self.assertEqual(libs_folder, data['library_folders'][0])
         self.assertEqual(assets_folder, data['asset_folders'][0])
 
-        support.run_command('close')
-
     def test_write_fail(self):
         """ should fail if directory cannot be written """
 
@@ -182,8 +180,6 @@ class TestCreate(scaffolds.ResultsTest):
             result = support.create_project(self, 'aurelius', confirm=False)
 
         self.assertTrue(result.failed)
-
-        support.run_command('close')
 
     def test_create_fail(self):
         """ should fail if directory cannot be created """
@@ -197,8 +193,6 @@ class TestCreate(scaffolds.ResultsTest):
             result = support.create_project(self, 'augustus', confirm=False)
 
         self.assertTrue(result.failed)
-
-        support.run_command('close')
 
     def test_autocomplete_absolute_path(self):
         """ should properly autocomplete an alias """

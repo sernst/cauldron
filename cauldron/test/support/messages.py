@@ -1,4 +1,4 @@
-import typing
+import textwrap
 
 from cauldron.environ import Response
 
@@ -35,12 +35,12 @@ class Message(object):
     def __init__(
             self,
             name: str,
-            *args: typing.List[str],
+            *args: str,
             response: Response = None,
             **kwargs
     ):
         self.name = name
-        self.text = ' '.join(['{}'.format(a) for a in args])
+        self.text = ' '.join([textwrap.dedent('{}'.format(a)) for a in args])
         self.response = response
         self.data = kwargs
 

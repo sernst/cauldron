@@ -1,0 +1,5 @@
+{{ source_contents }}
+
+import cauldron as __cauldron__
+__cauldron__.display.whitespace(0)
+__cauldron__.step.breathe()

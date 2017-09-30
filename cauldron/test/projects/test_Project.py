@@ -23,8 +23,6 @@ class TestProject(scaffolds.ResultsTest):
         self.assertTrue(os.path.isdir(p.source_directory))
         self.assertEqual(p.source_directory, project.source_directory)
 
-        support.run_command('close')
-
     def test_shared_dict(self):
         """A dict shared argument should be converted into a SharedCache"""
 
@@ -39,8 +37,6 @@ class TestProject(scaffolds.ResultsTest):
         for key, value in shared_data.items():
             self.assertEqual(p.shared.fetch(key), value)
 
-        support.run_command('close')
-
     def test_title(self):
         """Project title should be readable and writable"""
 
@@ -50,8 +46,6 @@ class TestProject(scaffolds.ResultsTest):
         title = 'My Title'
         project.title = title
         self.assertEqual(title, project.title)
-
-        support.run_command('close')
 
     def test_results_path(self):
         """Results path should always be valid"""
@@ -81,8 +75,6 @@ class TestProject(scaffolds.ResultsTest):
 
         environ.configs.put(results_directory=results_directory, persists=False)
 
-        support.run_command('close')
-
     def test_has_no_error(self):
         """Should not have an error"""
 
@@ -99,8 +91,6 @@ class TestProject(scaffolds.ResultsTest):
 
         self.assertFalse(project.has_error, 'error after running steps')
 
-        support.run_command('close')
-
     def test_has_error(self):
         """Should have error if step raises an error when run"""
 
@@ -111,8 +101,6 @@ class TestProject(scaffolds.ResultsTest):
         support.run_command('run')
 
         self.assertTrue(project.has_error, 'step should have errored')
-
-        support.run_command('close')
 
     def test_get_no_step(self):
         """Should not find a step that doesn't exist"""
@@ -126,8 +114,6 @@ class TestProject(scaffolds.ResultsTest):
         self.assertIsNone(project.get_step('NoSuchStep'))
         self.assertIsNone(project.get_step_by_reference_id('NoSuchStep'))
         self.assertIsNone(project.index_of_step('NoSuchStep'))
-
-        support.run_command('close')
 
     def test_no_such_settings(self):
         """Error when no project settings file exists"""

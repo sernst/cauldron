@@ -33,8 +33,6 @@ class TestServerStatus(flask_scaffolds.FlaskResultsTest):
         self.assertTrue(response.failed)
         self.assert_has_error_code(response, 'PROJECT_STATUS_ERROR')
 
-        support.run_command('close')
-
     def test_clean_step_no_project(self):
         """ should fail when no project is open """
 
@@ -57,8 +55,6 @@ class TestServerStatus(flask_scaffolds.FlaskResultsTest):
         self.assertFalse(response.success)
         self.assert_has_error_code(response, 'STEP_FETCH_ERROR')
 
-        support.run_command('close')
-
     def test_clean_step(self):
         """ should succeed in cleaning step """
 
@@ -73,8 +69,6 @@ class TestServerStatus(flask_scaffolds.FlaskResultsTest):
         response = cleaned.response
         self.assertTrue(response.success)
         self.assertIsNotNone(response.data['project'])
-
-        support.run_command('close')
 
     def test_no_project(self):
         """ """

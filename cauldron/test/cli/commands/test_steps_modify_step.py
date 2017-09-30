@@ -36,8 +36,6 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
         self.assertGreater(project.steps[1].filename.find('third'), 0)
         self.assertGreater(project.steps[2].filename.find('first'), 0)
 
-        support.run_command('close')
-
     def test_fail_remove_old_step(self):
         """ should fail if unable to remove the old step """
 
@@ -54,8 +52,6 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
 
         self.assertFalse(result)
         self.assert_has_error_code(r, 'NO_SUCH_STEP')
-
-        support.run_command('close')
 
     def test_no_existing_source_file(self):
         """ should succeed even if the step has no source file """
@@ -84,8 +80,6 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
         self.assertTrue(result)
         self.assertTrue(os.path.exists(new_step.source_path))
 
-        support.run_command('close')
-
     def test_nameless_step(self):
         """ should rename properly a nameless step """
 
@@ -112,8 +106,6 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
             )
 
         self.assertFalse(r.failed)
-
-        support.run_command('close')
 
     def test_change_title(self):
         """ should change title """

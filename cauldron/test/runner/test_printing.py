@@ -10,7 +10,7 @@ from cauldron.test.support.messages import Message
 class TestPrinting(scaffolds.ResultsTest):
 
     def test_slow_printing(self):
-        """ should not repeat print statements during slow running steps """
+        """Should not repeat print statements during slow running steps"""
 
         response = support.create_project(self, 'duluth')
         self.assertFalse(
@@ -43,8 +43,6 @@ class TestPrinting(scaffolds.ResultsTest):
         self.assertEqual(dom.count('BAT'), 1)
         self.assertLess(dom.count('SAT'), 2)
 
-        support.run_command('close')
-
     def test_print_solo(self):
         """ should properly print in a step that does nothing but print """
         response = support.create_project(self, 'minneapolis')
@@ -76,8 +74,6 @@ class TestPrinting(scaffolds.ResultsTest):
             2,
             'should have printed ascii lowercase'
         )
-
-        support.run_command('close')
 
     def test_print_start(self):
         """ should properly print at the beginning of a step """
@@ -113,8 +109,6 @@ class TestPrinting(scaffolds.ResultsTest):
             'should have printed ascii lowercase'
         )
 
-        support.run_command('close')
-
     def test_print_end(self):
         """ should properly print at the end of step """
 
@@ -148,8 +142,6 @@ class TestPrinting(scaffolds.ResultsTest):
             2,
             'should have printed ascii lowercase'
         )
-
-        support.run_command('close')
 
     def test_print_multiple(self):
         """ should properly print multiple times within a step """
@@ -197,5 +189,3 @@ class TestPrinting(scaffolds.ResultsTest):
             1,
             'should have printed hex digits'
         )
-
-        support.run_command('close')
