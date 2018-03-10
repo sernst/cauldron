@@ -22,7 +22,7 @@ cd.display.markdown(
 
 
 # the histogram of the data
-n, bins, patches = plt.hist(x, 50, normed=1, facecolor='green', alpha=0.75)
+n, bins, patches = plt.hist(x, 50, facecolor='green', alpha=0.75)
 
 # add a 'best fit' line
 y = mlab.normpdf(bins, mu, sigma)
