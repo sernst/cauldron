@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
 import cauldron as cd
@@ -20,13 +19,8 @@ cd.display.markdown(
    sigma=sigma
 )
 
-
-# the histogram of the data
+# Histogram of the data
 n, bins, patches = plt.hist(x, 50, facecolor='green', alpha=0.75)
-
-# add a 'best fit' line
-y = mlab.normpdf(bins, mu, sigma)
-l = plt.plot(bins, y, 'r--', linewidth=1)
 
 plt.xlabel('Smarts')
 plt.ylabel('Probability')
