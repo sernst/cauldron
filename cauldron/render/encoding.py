@@ -20,6 +20,10 @@ def default_override(value: typing.Any):
         return value.isoformat()
     elif isinstance(value, datetime.time):
         return value.isoformat()
+    elif isinstance(value, pd.Timestamp):
+        return value.to_pydatetime().isoformat()
+    elif isinstance(value, np.datetime64):
+        return pd.Timestamp(value).to_pydatetime().isoformat()
     elif isinstance(value, datetime.timedelta):
         return value.total_seconds()
     elif isinstance(value, np.ndarray):

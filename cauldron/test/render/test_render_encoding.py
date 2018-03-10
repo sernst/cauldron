@@ -94,3 +94,17 @@ class TestRenderEncoding(unittest.TestCase):
 
         output = json.dumps(source, cls=ComplexJsonEncoder)
         self.assertIsInstance(output, str)
+
+    def test_odd_dates(self):
+        """
+        Should convert to iso strings where numpy or pandas datetimes are found.
+        """
+        dt64 = np.datetime64('2002-06-28T01:00:00')
+        source = dict(
+            datetime64=dt64,
+            timestamp=pd.Timestamp(dt64)
+        )
+
+        output = json.dumps(source, cls=ComplexJsonEncoder)
+        self.assertIsInstance(output, str)
+        self.assertEqual(2, output.count('2002-06-28T01:00:00'))
