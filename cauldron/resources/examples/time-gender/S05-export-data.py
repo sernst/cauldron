@@ -5,7 +5,7 @@ df = cd.shared.df
 percentages = df['Female'] / df['Total']
 smoothed = cd.shared.smooth_data(percentages, 4)
 
-normalized = smoothed - min(smoothed) 
+normalized = [s - min(smoothed) for s in smoothed]
 normalized /= max(normalized)
 
 cd.display.json(percentages=normalized)

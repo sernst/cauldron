@@ -24,7 +24,7 @@ def smooth_data(data, window_size):
 
     for i in range(n, len(data) - n):
         normalizer = 1 / (2 * n + 1)
-        out.append(normalizer * sum(percentages[i - n : i + n]))
+        out.append(normalizer * sum(percentages[i - n:i + n]))
 
     for i in range(window_size):
         out.insert(0, out[0])
