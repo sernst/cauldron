@@ -1,8 +1,9 @@
-import os
-import json
 import glob
-from setuptools import setup
+import json
+import os
+
 from setuptools import find_packages
+from setuptools import setup
 
 # python3 setup.py register -r pypitest
 
