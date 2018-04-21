@@ -64,6 +64,7 @@ class CauldronThread(threading.Thread):
             except Exception as error:
                 self.exception = error
                 print(error)
+                import sys
                 self.context.response.fail(
                     code='COMMAND_EXECUTION_ERROR',
                     message='Failed to execute command due to internal error',

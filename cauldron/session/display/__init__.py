@@ -1,4 +1,6 @@
 import typing
+import sys
+from datetime import timedelta
 
 import cauldron as _cd
 from cauldron.session import report
@@ -23,7 +25,6 @@ def inspect(source: dict):
         A dictionary object to be inspected
     :return:
     """
-
     r = _get_report()
     r.append_body(render.inspect(source))
 
@@ -42,7 +43,6 @@ def header(header_text: str, level: int = 1, expand_full: bool = False):
         notebook page, or be constrained by automatic maximum page width. The
         default value of False lines the header up with text displays.
     """
-
     r = _get_report()
     r.append_body(render.header(
         header_text,
@@ -506,14 +506,13 @@ def status(
         current section status. If no value is specified, the previously
         assigned section progress value will be retained.
     """
-
     environ.abort_thread()
     step = _cd.project.internal_project.current_step
 
     if message is not None:
         step.progress_message = message
     if progress is not None:
-        step.progress = max(0, min(1.0, progress))
+        step.progress = max(0.0, min(1.0, progress))
     if section_message is not None:
         step.sub_progress_message = section_message
     if section_progress is not None:
@@ -547,7 +546,6 @@ def code_block(
         If specified, the code block will include a caption box below the code
         that contains the value of this argument
     """
-
     environ.abort_thread()
 
     _get_report().append_body(render.code_block(
@@ -557,3 +555,14 @@ def code_block(
         title=title,
         caption=caption
     ))
+
+
+def elapsed():
+    """
+    Displays the elapsed time since the step started running.
+    """
+    environ.abort_thread()
+    step = _cd.project.internal_project.current_step
+    result = '[ELAPSED]: {}\n'.format(timedelta(seconds=step.elapsed_time))
+    sys.stdout.buffer.write(result.encode())
+    _get_report().append_body(render.elapsed_time(step.elapsed_time))

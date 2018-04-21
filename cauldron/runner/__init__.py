@@ -1,15 +1,15 @@
-import sys
-import os
 import glob
 import importlib
+import os
+import sys
 import typing
 
 import cauldron
 from cauldron import environ
+from cauldron.environ import Response
 from cauldron.runner import source
 from cauldron.session.projects import Project
 from cauldron.session.projects import ProjectStep
-from cauldron.environ import Response
 
 
 def add_library_path(path: str) -> bool:
@@ -92,6 +92,8 @@ def reload_libraries():
     """
 
     project = cauldron.project.internal_project
+    if project:
+        return
 
     def reload_module(path: str, library_directory: str):
         path = os.path.dirname(path) if path.endswith('__init__.py') else path
@@ -225,7 +227,8 @@ def complete(
         count += 1
 
         steps_run.append(ps)
-        if not source.run_step(response, project, ps, force=True):
+        success = source.run_step(response, project, ps, force=True)
+        if not success or project.stop_condition.halt:
             return steps_run
 
     return steps_run

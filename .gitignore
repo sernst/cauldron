@@ -175,3 +175,6 @@ jspm_packages
 /build
 /dist
 release-settings.json
+
+.pytest_cache
+/cauldron-web/package-lock.json

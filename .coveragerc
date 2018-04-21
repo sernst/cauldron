@@ -4,3 +4,4 @@ omit =
     /setup.py
     /release.py
     /run.py
+    /conda-recipe/*.py

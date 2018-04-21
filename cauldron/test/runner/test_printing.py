@@ -1,3 +1,4 @@
+from unittest.mock import patch
 import string
 
 import cauldron
@@ -11,7 +12,6 @@ class TestPrinting(scaffolds.ResultsTest):
 
     def test_slow_printing(self):
         """Should not repeat print statements during slow running steps"""
-
         response = support.create_project(self, 'duluth')
         self.assertFalse(
             response.failed,
@@ -20,28 +20,27 @@ class TestPrinting(scaffolds.ResultsTest):
 
         code = '\n'.join([
             'import time',
-            'for letter in "BCFHMNOPRS":',
+            'for letter in "BCFHMNOPRSTUVWX":',
             '    print("{}AT".format(letter))',
             '    time.sleep(0.5)'
         ])
 
         support.add_step(self, contents=code)
         response = commander.execute('run', '-f')
+        response.thread.join(2)
 
         step = cauldron.project.internal_project.steps[0]
+        dom = step.dumps()
+        self.assertEqual(dom.count('BAT'), 1, 'first check failed')
 
         response.thread.join(1)
         dom = step.dumps()
-        self.assertEqual(dom.count('BAT'), 1)
-
-        response.thread.join(1)
-        dom = step.dumps()
-        self.assertEqual(dom.count('BAT'), 1)
+        self.assertEqual(dom.count('BAT'), 1, 'second check failed')
 
         response.thread.join()
         dom = step.dumps()
-        self.assertEqual(dom.count('BAT'), 1)
-        self.assertLess(dom.count('SAT'), 2)
+        self.assertEqual(dom.count('BAT'), 1, 'third check failed')
+        self.assertLess(dom.count('SAT'), 2, 'fourth check failed')
 
     def test_print_solo(self):
         """ should properly print in a step that does nothing but print """

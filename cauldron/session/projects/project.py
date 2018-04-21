@@ -4,6 +4,7 @@ import json
 import os
 import time
 import typing
+from collections import namedtuple
 
 from cauldron import environ
 from cauldron.session import definitions as file_definitions
@@ -14,6 +15,8 @@ from cauldron.session.projects import steps
 from cauldron.session.report import Report
 
 DEFAULT_SCHEME = 'S{{##}}-{{name}}.{{ext}}'
+
+StopCondition = namedtuple('StopCondition', ['aborted', 'halt'])
 
 
 class Project:
@@ -54,6 +57,7 @@ class Project:
                 return SharedCache().put(**source)
             return source
 
+        self.stop_condition = StopCondition(False, False)  # type: StopCondition
         self.shared = as_shared_cache(shared)
         self.settings = SharedCache()
         self.refresh()
@@ -74,7 +78,6 @@ class Project:
         """
         The list of directories to all of the library locations
         """
-
         def listify(value):
             return [value] if isinstance(value, str) else list(value)
         folders = listify(self.settings.fetch('library_folders', ['libs']))
@@ -229,6 +232,7 @@ class Project:
 
         return dict(
             uuid=self.uuid,
+            stop_condition=self.stop_condition._asdict(),
             serial_time=time.time(),
             last_modified=self.last_modified,
             remote_source_directory=self.remote_source_directory,
@@ -436,6 +440,7 @@ class Project:
         return dict(
             id=self.id,
             steps=[s.status() for s in self.steps],
+            stop_condition=self.stop_condition._asdict(),
             last_modified=self.last_modified,
             remote_slug=self.make_remote_url()
         )

@@ -1,0 +1,60 @@
+<div id="{{ "elapsed-time" | id }}" class="cd-ElapsedTime">
+  <style scoped>
+    .cd-ElapsedTime {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .cd-ElapsedTime__box {
+      font-family: 'Consolas', 'Monaco', 'Bitstream Vera Sans Mono', monospace;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 2px 10px;
+      padding: 2px 5px;
+      background-color: #EFEFEF;
+      border: 1px solid #DDD;
+    }
+
+    .cd-ElapsedTime__valueBox {
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .cd-ElapsedTime__header {
+      color: #777;
+      font-size: 0.7rem;
+      margin-right: 5px;
+    }
+
+    .cd-ElapsedTime__value {
+      color: #666;
+    }
+    .cd-ElapsedTime__value--small {
+      color: #777;
+      font-size: 0.7rem;
+    }
+
+    .cd-ElapsedTime__separator {
+      color: #999;
+    }
+    .cd-ElapsedTime__separator--small {
+      font-size: 0.7rem;
+    }
+  </style>
+  <div class="cd-ElapsedTime__box">
+    <span class="cd-ElapsedTime__header">ELAPSED</span>
+    <div class="cd-ElapsedTime__valueBox">
+      <span class="cd-ElapsedTime__value">{{ hours }}</span>
+      <span class="cd-ElapsedTime__separator">:</span>
+      <span class="cd-ElapsedTime__value">{{ minutes }}</span>
+      <span class="cd-ElapsedTime__separator">:</span>
+      <span class="cd-ElapsedTime__value">{{ seconds }}</span>
+      {% if microseconds %}
+      <span class="cd-ElapsedTime__separator cd-ElapsedTime__separator--small">.</span>
+      <span class="cd-ElapsedTime__value cd-ElapsedTime__value--small">{{ microseconds }}</span>
+      {% endif %}
+    </div>
+  </div>
+</div>

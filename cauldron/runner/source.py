@@ -1,6 +1,7 @@
 import os
 import time
 import typing
+from datetime import datetime
 
 import cauldron
 from cauldron import environ
@@ -10,6 +11,7 @@ from cauldron.runner import markdown_file
 from cauldron.runner import python_file
 from cauldron.session.projects import Project
 from cauldron.session.projects import ProjectStep
+from cauldron.session.projects import StopCondition
 from cauldron.runner import redirection
 
 ERROR_STATUS = 'error'
@@ -114,6 +116,10 @@ def run_step(
     step.is_running = True
     step.progress_message = None
     step.progress = 0
+    step.sub_progress_message = None
+    step.sub_progress = 0
+    step.start_time = datetime.utcnow()
+    step.end_time = None
 
     # Set the top-level display and cache values to the current project values
     # before running the step for availability within the step scripts
@@ -130,6 +136,7 @@ def run_step(
             html_message='<pre>{}</pre>'.format(error)
         )
 
+    step.end_time = datetime.utcnow()
     os.chdir(os.path.expanduser('~'))
 
     step.mark_dirty(not result['success'])
@@ -143,6 +150,11 @@ def run_step(
     # Make sure this is called prior to printing response information to the
     # console or that will come along for the ride
     redirection.disable(step)
+
+    step.project.stop_condition = result.get(
+        'stop_condition',
+        StopCondition(False, False)
+    )
 
     if result['success']:
         environ.log('[{}]: Updated'.format(step.definition.name))

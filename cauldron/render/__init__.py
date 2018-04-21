@@ -5,6 +5,7 @@ import os
 import random
 import textwrap
 from datetime import datetime
+from datetime import timedelta
 
 from cauldron import environ
 from cauldron import templating
@@ -12,6 +13,23 @@ from cauldron.render import encoding
 from cauldron.render import inspection
 from cauldron.render import syntax_highlighting
 from cauldron.render import utils as render_utils
+
+
+def elapsed_time(seconds: float) -> str:
+    """Displays the elapsed time since the current step started running."""
+    environ.abort_thread()
+    parts = (
+        '{}'.format(timedelta(seconds=seconds))
+        .rsplit('.', 1)
+    )
+    hours, minutes, seconds = parts[0].split(':')
+    return templating.render_template(
+        'elapsed_time.html',
+        hours=hours.zfill(2),
+        minutes=minutes.zfill(2),
+        seconds=seconds.zfill(2),
+        microseconds=parts[-1] if len(parts) > 1 else ''
+    )
 
 
 def list_grid(
@@ -28,7 +46,6 @@ def list_grid(
     :param row_spacing:
     :return:
     """
-
     environ.abort_thread()
     max_width = 1400 if expand_full else 900
     column_width = '{}px'.format(
@@ -56,7 +73,6 @@ def listing(
     :param expand_full:
     :return:
     """
-
     environ.abort_thread()
 
     return templating.render_template(
@@ -169,6 +185,7 @@ def code_block(
     :param caption:
     :return:
     """
+    environ.abort_thread()
 
     code_dom = (
         code_file(path, language=language, is_code_block=True)
@@ -306,7 +323,6 @@ def table(
     :param max_rows:
     :return:
     """
-
     environ.abort_thread()
 
     table_id = 'table-{}-{}'.format(
@@ -350,7 +366,6 @@ def whitespace(lines: float = 1.0) -> str:
     :return:
     """
     environ.abort_thread()
-
     pixels = round(12 * lines)
     return '<div style="height:{}px"> </div>'.format(pixels)
 
@@ -363,7 +378,6 @@ def jinja(path: str, **kwargs) -> str:
     :return:
     """
     environ.abort_thread()
-
     return templating.render_file(path, **kwargs)
 
 

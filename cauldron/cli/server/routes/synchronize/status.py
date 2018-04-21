@@ -20,7 +20,6 @@ def of_project(project: 'projects.Project') -> dict:
                 library resides within the project source directory, the entry
                 will be an empty dictionary to prevent duplication.
     """
-
     source_directory = project.source_directory
 
     libraries_status = [

@@ -107,26 +107,38 @@ function loadProjectData() {
   });
 }
 
+function loadIncludes() {
+  if (window.COMBINED_INCLUDES) {
+    return exports.loadSourceFiles(window.COMBINED_INCLUDES);
+  }
+
+  return exports.loadSourceFiles(window.RESULTS.includes)
+    .then(() => exports.loadStepIncludes(exports.RESULTS.steps));
+}
+
+function preload() {
+  if (!exports.PARAMS.preload_url) {
+    return Promise.resolve();
+  }
+
+  return Promise.resolve();
+}
 
 /**
  *
  */
 function initialize() {
   exports.DATA_DIRECTORY = getDataDirectory();
-
-  return loadProjectData()
+  return preload()
+    .then(() => loadProjectData())
     .then(() => {
       window.CAULDRON_VERSION = window.RESULTS.cauldron_version;
 
       exports.RESULTS = window.RESULTS;
       exports.DATA = window.RESULTS.data;
       exports.SETTINGS = window.RESULTS.settings;
-      exports.TITLE = exports.SETTINGS.title || exports.SETTINGS.id || id;
-      return exports.loadSourceFiles(window.RESULTS.includes);
-    })
-    .then(() => {
-      // Load the include files for each step
-      return exports.loadStepIncludes(exports.RESULTS.steps);
+      exports.TITLE = exports.SETTINGS.title || exports.SETTINGS.id;
+      return loadIncludes();
     })
     .then(() => {
       // Add the body for each step to the page body

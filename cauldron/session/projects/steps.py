@@ -2,13 +2,14 @@ import hashlib
 import os
 import time
 import typing
+from datetime import datetime
 
 from cauldron import render
 from cauldron import templating
 from cauldron.session import definitions
 from cauldron.session import naming
-from cauldron.session.report import Report
 from cauldron.session.projects import project as projects
+from cauldron.session.report import Report
 
 
 class ProjectStep(object):
@@ -50,6 +51,8 @@ class ProjectStep(object):
         self.progress = 0
         self.sub_progress = 0
         self.test_locals = None  # type: dict
+        self.start_time = None  # type: datetime
+        self.end_time = None  # type: datetime
 
     @property
     def reference_id(self):
@@ -92,6 +95,19 @@ class ProjectStep(object):
         if not self.project or not self.report:
             return None
         return os.path.join(self.project.source_directory, self.filename)
+
+    @property
+    def elapsed_time(self) -> float:
+        """
+        The number of seconds that has elapsed since the step started running
+        if the step is still running. Or, if the step has already finished
+        running, the amount of time that elapsed during the last execution of
+        the step.
+        """
+        current_time = datetime.utcnow()
+        start = self.start_time or current_time
+        end = self.end_time or current_time
+        return (end - start).total_seconds()
 
     def kernel_serialize(self):
         """ """

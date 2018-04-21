@@ -177,3 +177,10 @@ class TestRender(scaffolds.ResultsTest):
 
         result = render.status(source)
         self.assertGreater(len(result), 0)
+
+    def test_elapsed(self):
+        """Should render an elapsed time"""
+        result = render.elapsed_time(3600 + 120 + 12)
+        self.assertGreater(result.find('01'), 0)
+        self.assertGreater(result.find('02'), 0)
+        self.assertGreater(result.find('12'), 0)

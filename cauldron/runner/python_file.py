@@ -21,7 +21,9 @@ class UserAbortError(Exception):
     the display of an error.
     """
 
-    pass
+    def __init__(self, halt: bool = False):
+        """Create UserAbortError"""
+        self.halt = halt
 
 
 def set_executing(on: bool):
@@ -163,17 +165,26 @@ def run(
             exec_test()
         else:
             exec(code, target_module.__dict__)
-        out = {'success': True}
+        out = {
+            'success': True,
+            'stop_condition': projects.StopCondition(False, False)
+        }
     except threads.ThreadAbortError:
         # Raised when a user explicitly aborts the running of the step through
         # a user-interface action.
-        out = {'success': False}
-    except UserAbortError:
+        out = {
+            'success': False,
+            'stop_condition': projects.StopCondition(True, True)
+        }
+    except UserAbortError as error:
         # Raised when a user explicitly aborts the running of the step using
         # a cd.step.stop(). This behavior should be considered a successful
         # outcome as it was intentional on the part of the user that the step
         # abort running early.
-        out = {'success': True}
+        out = {
+            'success': True,
+            'stop_condition': projects.StopCondition(True, error.halt)
+        }
     except Exception as error:
         out = render_error(project, error)
 

@@ -128,3 +128,14 @@ class TestSessionDisplay(scaffolds.ResultsTest):
 
         r = support.run_command('run')
         self.assertFalse(r.failed, 'should not have failed')
+
+    def test_elapsed(self):
+        """Should render elapsed time"""
+        support.create_project(self, 'test_elapsed')
+        step_contents = '\n'.join([
+            'import cauldron as cd',
+            'cd.display.elapsed()'
+        ])
+        support.add_step(self, contents=step_contents)
+        r = support.run_command('run')
+        self.assertFalse(r.failed, 'should not have failed')
