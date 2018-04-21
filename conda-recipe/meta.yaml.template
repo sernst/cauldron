@@ -4,7 +4,7 @@ package:
 
 build:
     number: 1
-    noarch_python: True
+    noarch: python
 
 source:
   path: {{ PATH }}

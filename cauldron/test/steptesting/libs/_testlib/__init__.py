@@ -6,5 +6,4 @@ def patching_test(value):
     function returns the value it was passed. Patching this should change its
     behavior in step tests.
     """
-
     return value

@@ -57,18 +57,20 @@ class TestRunner(scaffolds.ResultsTest):
 
     def test_library(self):
         """ should refresh the local project library with the updated value """
-
         support.create_project(self, 'jack')
         project = cd.project.internal_project
 
         lib_directory = os.path.join(project.source_directory, 'libs', '_jack')
         os.makedirs(lib_directory)
 
-        with open(os.path.join(lib_directory, '__init__.py'), 'w') as fp:
+        path = os.path.join(lib_directory, '__init__.py')
+        with open(path, 'w') as fp:
             fp.write('TEST_VALUE = 1\n')
 
         # TODO: Fix these forced pauses
         time.sleep(1)
+
+        self.assertTrue(os.path.exists(path), 'Library does not exist')
 
         support.add_step(self, contents='\n'.join([
             'import cauldron as cd',

@@ -7,11 +7,11 @@ from cauldron import steptest
 from cauldron.steptest import StepTestCase
 
 
-class StepTest(StepTestCase):
+class TestStepTesting(StepTestCase):
+    """Tests the step testing module"""
 
     def test_first_step(self):
         """ should not be any null/NaN values in df """
-
         self.assertIsNone(cd.shared.fetch('df'))
         step = self.run_step('S01-first.py')
         df = cd.shared.df
@@ -25,7 +25,6 @@ class StepTest(StepTestCase):
         should fail without exception because of an exception raised in the 
         source but failure is allowed
         """
-
         step = self.run_step('S02-errors.py', allow_failure=True)
         self.assertFalse(step.success)
 
@@ -37,14 +36,12 @@ class StepTest(StepTestCase):
         should fail because of an exception raised in the source when strict
         failure is enforced
         """
-
         with self.assertRaises(Exception):
             self.run_step('S02-errors.py', allow_failure=False)
 
     @patch('_testlib.patching_test')
     def test_second_step_with_patching(self, patching_test: MagicMock):
         """Should override the return value with the patch"""
-
         patching_test.return_value = 12
         cd.shared.value = 42
 
@@ -53,14 +50,12 @@ class StepTest(StepTestCase):
 
     def test_second_step_without_patching(self):
         """Should succeed running the step without patching"""
-
         cd.shared.value = 42
         self.run_step('S03-lib-patching.py')
         self.assertEqual(cd.shared.result, 42)
 
     def test_to_strings(self):
         """ should convert list of integers to a list of strings """
-
         before = [1, 2, 3]
         step = self.run_step('S01-first.py')
         after = step.local.to_strings(before)
@@ -69,7 +64,6 @@ class StepTest(StepTestCase):
 
     def test_modes(self):
         """ should be testing and not interactive or single run """
-
         step = self.run_step('S01-first.py')
         self.assertTrue(step.success)
         self.assertTrue(step.local.is_testing)
@@ -78,14 +72,12 @@ class StepTest(StepTestCase):
 
     def test_find_in_current_path(self):
         """ should find a project in this file's directory """
-
         directory = os.path.dirname(os.path.realpath(__file__))
         result = steptest.find_project_directory(directory)
         self.assertEqual(directory, result)
 
     def test_find_in_parent_path(self):
         """ should find a project in the parent directory """
-
         directory = os.path.dirname(os.path.realpath(__file__))
         subdirectory = os.path.join(directory, 'fake')
         result = steptest.find_project_directory(subdirectory)
@@ -93,7 +85,6 @@ class StepTest(StepTestCase):
 
     def test_find_in_grandparent_path(self):
         """ should find a project in the grandparent directory """
-
         directory = os.path.dirname(os.path.realpath(__file__))
         subdirectory = os.path.join(directory, 'fake', 'fake')
         result = steptest.find_project_directory(subdirectory)
@@ -101,7 +92,6 @@ class StepTest(StepTestCase):
 
     def test_find_failed_at_root(self):
         """ should return None if top-level directory has no project """
-
         directory = os.path.dirname(os.path.realpath(__file__))
         subdirectory = os.path.join(directory, 'fake')
 
@@ -112,19 +102,16 @@ class StepTest(StepTestCase):
 
     def test_make_temp_path(self):
         """ should make a temp path for testing """
-
         temp_path = self.make_temp_path('some-id', 'a', 'b.test')
         self.assertTrue(temp_path.endswith('b.test'))
 
     def test_no_such_step(self):
         """ should fail if no such step exists """
-
         with self.assertRaises(Exception):
             self.run_step('FAKE-STEP.no-exists')
 
     def test_no_such_project(self):
         """ should fail if no project exists """
-
         project = cd.project.internal_project
         cd.project.load(None)
 

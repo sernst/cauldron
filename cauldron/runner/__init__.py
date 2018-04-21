@@ -92,7 +92,7 @@ def reload_libraries():
     """
 
     project = cauldron.project.internal_project
-    if project:
+    if not project:
         return
 
     def reload_module(path: str, library_directory: str):
