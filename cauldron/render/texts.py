@@ -244,7 +244,12 @@ def markdown(source: str = None, source_path: str = None, **kwargs) -> dict:
         """
         <div class="textbox markdown">{{ text }}</div>
         """,
-        text=md.markdown(rendered)
+        text=md.markdown(rendered, extensions=[
+            'markdown.extensions.nl2br',
+            'markdown.extensions.extra',
+            'markdown.extensions.admonition',
+            'markdown.extensions.sane_lists'
+        ])
     )
 
     pattern = re.compile('src="(?P<url>[^"]+)"')

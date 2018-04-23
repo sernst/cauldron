@@ -1,4 +1,10 @@
 <div class="cd-StdErr">
+  <style scoped>
+    .cd-StdErr__pre {
+      background-color: transparent;
+      border: 0;
+    }
+  </style>
   <div class="cd-StdErr__bar">
     <div
       id="{{ "cd-StdErr__titleBox" | id }}"
@@ -19,6 +25,8 @@
     class="cd-StdErr__body"
     style="display:none"
   >
-    {{ std_err }}
+    <pre class="cd-StdErr__pre">
+    {{ std_err | e }}
+    </pre>
   </div>
 </div>
