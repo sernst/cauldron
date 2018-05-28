@@ -119,3 +119,10 @@ class TestStepTesting(StepTestCase):
             self.run_step('FAKE')
 
         cd.project.load(project)
+
+    def test_open_project_fails(self):
+        """Should raise Assertion error after failing to open the project"""
+        with patch('cauldron.steptest.support.open_project') as open_project:
+            open_project.side_effect = RuntimeError('FAKE')
+            with self.assertRaises(AssertionError):
+                self.open_project()

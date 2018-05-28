@@ -83,16 +83,17 @@ def close():
     return True
 
 
-def reload_libraries():
+def reload_libraries(library_directories: list = None):
     """
     Reload the libraries stored in the project's local and shared library
     directories
-
-    :return:
     """
-
+    directories = library_directories or []
     project = cauldron.project.internal_project
-    if not project:
+    if project:
+        directories += project.library_directories
+
+    if not directories:
         return
 
     def reload_module(path: str, library_directory: str):
@@ -120,7 +121,7 @@ def reload_libraries():
 
     return [
         reloaded_module
-        for directory in project.library_directories
+        for directory in directories
         for reloaded_module in reload_library(directory)
         if reload_module is not None
     ]
