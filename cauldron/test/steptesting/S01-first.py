@@ -28,6 +28,7 @@ def create_unified_column(data_frame: pd.DataFrame) -> pd.Series:
 
     return pd.Series(unified)
 
+
 df['d'] = create_unified_column(df)
 
 cd.shared.df = df

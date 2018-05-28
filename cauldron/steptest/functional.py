@@ -1,45 +1,59 @@
 import inspect
 import os
+import sys
 import tempfile
-import unittest
 
 from cauldron import environ
 from cauldron import runner
 from cauldron.cli import commander
 from cauldron.session import exposed  # noqa
 from cauldron.steptest import support
-from cauldron.steptest.functional import CauldronTest
 from cauldron.steptest.results import StepTestRunResult
-from cauldron.steptest.support import find_project_directory
 
 
-class StepTestCase(unittest.TestCase):
-    """
-    The base class to use for step "unit" testing. This class overrides
-    the default setup and tearDown methods from the unittest.TestCase to add
-    functionality for loading and unloading the Cauldron notebook settings
-    needed to run and test steps. If you override either of these methods
-    make sure that you call their super methods as well or the functionality
-    will be lost.
-    """
+class CauldronTest:
+    """A Decorator class for use with the Pytest testing framework."""
 
     def __init__(self, *args, **kwargs):
         """
-        Initializes a StepTestCase with default attribute values that will be
-        populated during the setup and teardown phases of each test.
+        Initializes the decorator with default values that will be populated
+        during the lifecycle of the decorator and test.
         """
-        super(StepTestCase, self).__init__(*args, **kwargs)
+        self._call_args = args
+        self._call_kwargs = kwargs
+        self._test_function = None
         self.results_directory = None
         self.temp_directories = dict()
 
-    def setUp(self):
+    def __call__(self, test_function):
         """
-        A modified setup function that handles opening the project for testing.
-        If you override the setUp function in your tests, be sure to call the
-        super function so that this initialization happens properly
+        Executed during decoration, this function wraps the supplied test
+        function and returns a wrapped function that should be called to
+        executed the step test.
+        """
+        self._test_function = test_function
+
+        def cauldron_test_wrapper(*args, **kwargs):
+            return self.run_test(*args, **kwargs)
+
+        project_path = self.make_project_path('cauldron.json')
+        self._library_paths = support.get_library_paths(project_path)
+        sys.path.extend(self._library_paths)
+
+        # Load libraries before calling test functions so that patching works
+        # correctly, but do this during the decoration process so subsequent
+        # patching isn't reverted.
+        runner.reload_libraries(self._library_paths)
+
+        cauldron_test_wrapper.__name__ = test_function.__name__
+        return cauldron_test_wrapper
+
+    def setup(self):
+        """
+        Handles initializing the environment and opening the project for
+        testing.
         """
         environ.modes.add(environ.modes.TESTING)
-        super(StepTestCase, self).setUp()
         results_directory = tempfile.mkdtemp(
             prefix='cd-step-test-results-{}--'.format(self.__class__.__name__)
         )
@@ -47,10 +61,6 @@ class StepTestCase(unittest.TestCase):
         environ.configs.put(results_directory=results_directory, persists=False)
         self.temp_directories = dict()
         self.open_project()
-
-        # Load libraries before calling test functions so that patching works
-        # correctly.
-        runner.reload_libraries()
 
     def make_project_path(self, *args) -> str:
         """
@@ -64,7 +74,7 @@ class StepTestCase(unittest.TestCase):
             components are specified, the location returned will be the
             project directory itself.
         """
-        filename = inspect.getfile(self.__class__)
+        filename = inspect.getfile(self._test_function)
         project_directory = support.find_project_directory(filename)
         return os.path.join(project_directory, *args)
 
@@ -72,16 +82,17 @@ class StepTestCase(unittest.TestCase):
         """
         Opens the project associated with this test and returns the public
         (exposed) project after it has been loaded. If the project cannot be
-        opened the test will fail.
+        opened the test will fail with an AssertionError.
         """
         try:
             project_path = self.make_project_path()
             return support.open_project(project_path)
         except RuntimeError as error:
-            self.fail('{}'.format(error))
+            raise AssertionError('{}'.format(error))
 
+    @classmethod
     def run_step(
-            self,
+            cls,
             step_name: str,
             allow_failure: bool = False
     ) -> StepTestRunResult:
@@ -100,33 +111,7 @@ class StepTestCase(unittest.TestCase):
             A StepTestRunResult instance containing information about the
             execution of the step.
         """
-        try:
-            return support.run_step(step_name, allow_failure)
-        except AssertionError as error:
-            self.fail('{}'.format(error))
-
-    def tearDown(self):
-        """
-        After a test is run this function is used to undo any side effects that
-        were created by setting up and running the test. This includes removing
-        the temporary directories that were created to store test information
-        during test execution.
-        """
-        super(StepTestCase, self).tearDown()
-
-        # Close any open project so that it doesn't persist to the next test
-        closed = commander.execute('close', '')
-        closed.thread.join()
-
-        environ.configs.remove('results_directory', include_persists=False)
-
-        environ.systems.remove(self.results_directory)
-        self.results_directory = None
-
-        for key, path in self.temp_directories.items():
-            environ.systems.remove(path)
-
-        environ.modes.remove(environ.modes.TESTING)
+        return support.run_step(step_name, allow_failure)
 
     def make_temp_path(self, identifier, *args) -> str:
         """
@@ -143,3 +128,44 @@ class StepTestCase(unittest.TestCase):
             appear beneath the identifier folder.
         """
         return support.make_temp_path(self.temp_directories, identifier, *args)
+
+    def run_test(self, *args, **kwargs):
+        """
+        The function called to actually carry out the execution of the test,
+        which is wrapped within a function and closure in the `__call__`
+        method for decoration purposes.
+
+        :param args:
+            Positional arguments passed to the test function at execution time.
+        :param kwargs:
+            Keyword arguments passed to the test function at execution time.
+        """
+        self.setup()
+        result = self._test_function(self, *args, **kwargs)
+        self.tear_down()
+        return result
+
+    def tear_down(self):
+        """
+        After a test is run this function is used to undo any side effects that
+        were created by setting up and running the test. This includes removing
+        the temporary directories that were created to store test information
+        during test execution.
+        """
+        # Close any open project so that it doesn't persist to the next test
+        closed = commander.execute('close', '')
+        closed.thread.join()
+
+        environ.configs.remove('results_directory', include_persists=False)
+
+        environ.systems.remove(self.results_directory)
+        self.results_directory = None
+
+        for path in self.temp_directories.values():
+            environ.systems.remove(path)
+
+        paths_to_remove = [p for p in self._library_paths if p in sys.path]
+        for path in paths_to_remove:
+            sys.path.remove(path)
+
+        environ.modes.remove(environ.modes.TESTING)
