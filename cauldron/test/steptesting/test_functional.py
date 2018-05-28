@@ -11,7 +11,7 @@ from cauldron.steptest import CauldronTest
 
 @CauldronTest()
 def test_first_step(tester: CauldronTest):
-    """ should not be any null/NaN values in df """
+    """Should not be any null/NaN values in df"""
     assert cd.shared.fetch('df') is None
     step = tester.run_step('S01-first.py')
     df = cd.shared.df
@@ -24,7 +24,7 @@ def test_first_step(tester: CauldronTest):
 @CauldronTest()
 def test_second_step(tester: CauldronTest):
     """
-    should fail without exception because of an exception raised in the
+    Should fail without exception because of an exception raised in the
     source but failure is allowed
     """
     step = tester.run_step('S02-errors.py', allow_failure=True)
@@ -37,7 +37,7 @@ def test_second_step(tester: CauldronTest):
 @CauldronTest()
 def test_second_step_strict(tester: CauldronTest):
     """
-    should fail because of an exception raised in the source when strict
+    Should fail because of an exception raised in the source when strict
     failure is enforced
     """
     with pytest.raises(Exception):
@@ -68,7 +68,7 @@ def test_second_step_without_patching(tester: CauldronTest):
 
 @CauldronTest()
 def test_to_strings(tester: CauldronTest):
-    """ should convert list of integers to a list of strings """
+    """Should convert list of integers to a list of strings"""
     before = [1, 2, 3]
     step = tester.run_step('S01-first.py')
     after = step.local.to_strings(before)
@@ -78,7 +78,7 @@ def test_to_strings(tester: CauldronTest):
 
 @CauldronTest()
 def test_modes(tester: CauldronTest):
-    """ should be testing and not interactive or single run """
+    """Should be testing and not interactive or single run"""
     step = tester.run_step('S01-first.py')
     assert step.success
     assert step.local.is_testing
@@ -88,7 +88,7 @@ def test_modes(tester: CauldronTest):
 
 @CauldronTest()
 def test_find_in_current_path(tester: CauldronTest):
-    """ should find a project in this file's directory """
+    """Should find a project in this file's directory"""
     directory = os.path.dirname(os.path.realpath(__file__))
     result = steptest.find_project_directory(directory)
     assert directory == result
@@ -96,7 +96,7 @@ def test_find_in_current_path(tester: CauldronTest):
 
 @CauldronTest()
 def test_find_in_parent_path(tester: CauldronTest):
-    """ should find a project in the parent directory """
+    """Should find a project in the parent directory"""
     directory = os.path.dirname(os.path.realpath(__file__))
     subdirectory = os.path.join(directory, 'fake')
     result = steptest.find_project_directory(subdirectory)
@@ -105,7 +105,7 @@ def test_find_in_parent_path(tester: CauldronTest):
 
 @CauldronTest()
 def test_find_in_grandparent_path(tester: CauldronTest):
-    """ should find a project in the grandparent directory """
+    """Should find a project in the grandparent directory"""
     directory = os.path.dirname(os.path.realpath(__file__))
     subdirectory = os.path.join(directory, 'fake', 'fake')
     result = steptest.find_project_directory(subdirectory)
@@ -126,21 +126,21 @@ def test_find_failed_at_root(tester: CauldronTest):
 
 @CauldronTest()
 def test_make_temp_path(tester: CauldronTest):
-    """ should make a temp path for testing """
+    """Should make a temp path for testing"""
     temp_path = tester.make_temp_path('some-id', 'a', 'b.test')
     assert temp_path.endswith('b.test')
 
 
 @CauldronTest()
 def test_no_such_step(tester: CauldronTest):
-    """ should fail if no such step exists """
+    """Should fail if no such step exists"""
     with pytest.raises(Exception):
         tester.run_step('FAKE-STEP.no-exists')
 
 
 @CauldronTest()
 def test_no_such_project(tester: CauldronTest):
-    """ should fail if no project exists """
+    """Should fail if no project exists"""
     project = cd.project.internal_project
     cd.project.load(None)
 
