@@ -96,9 +96,9 @@ class TestStepTesting(StepTestCase):
         subdirectory = os.path.join(directory, 'fake')
 
         with patch('os.path.dirname', return_value=subdirectory) as func:
-            result = steptest.find_project_directory(subdirectory)
+            with self.assertRaises(FileNotFoundError):
+                steptest.find_project_directory(subdirectory)
             func.assert_called_once_with(subdirectory)
-        self.assertIsNone(result)
 
     def test_make_temp_path(self):
         """ should make a temp path for testing """

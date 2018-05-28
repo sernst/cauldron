@@ -114,14 +114,14 @@ def test_find_in_grandparent_path(tester: CauldronTest):
 
 @CauldronTest()
 def test_find_failed_at_root(tester: CauldronTest):
-    """ should return None if top-level directory has no project """
+    """Should raise FileNotFoundError if top-level directory has no project"""
     directory = os.path.dirname(os.path.realpath(__file__))
     subdirectory = os.path.join(directory, 'fake')
 
     with patch('os.path.dirname', return_value=subdirectory) as func:
-        result = steptest.find_project_directory(subdirectory)
+        with pytest.raises(FileNotFoundError):
+            steptest.find_project_directory(subdirectory)
         func.assert_called_once_with(subdirectory)
-    assert result is None
 
 
 @CauldronTest()
