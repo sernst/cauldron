@@ -1,6 +1,9 @@
-FROM ubuntu:14.04
+FROM ubuntu:18.04
 
 MAINTAINER swernst@gmail.com
+
+ENV PYTHON_RELEASE 3.6
+ENV PYTHON_VERSION 3.6.5
 
 RUN apt-get -y --no-install-recommends update && \
     apt-get -y --no-install-recommends install \
@@ -12,9 +15,9 @@ RUN apt-get -y --no-install-recommends update && \
         wget && \
     mkdir /source && \
     cd /source && \
-    wget --no-check-certificate https://www.python.org/ftp/python/3.6.1/Python-3.6.1.tgz && \
-    tar xzf Python-3.6.1.tgz && \
-    cd Python-3.6.1 && \
+    wget --no-check-certificate https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tgz && \
+    tar xzf Python-${PYTHON_VERSION}.tgz && \
+    cd Python-${PYTHON_VERSION} && \
     export CPPFLAGS="-I/usr/include/openssl" && \
     ./configure && \
     make install && \
@@ -29,8 +32,8 @@ COPY docker-run.sh /cauldron_local/
 
 WORKDIR /cauldron_local
 
-RUN pip3.6 install -r /cauldron_local/requirements.txt && \
-    python3.6 setup.py develop && \
+RUN pip3 install -r /cauldron_local/requirements.txt && \
+    python3 setup.py develop && \
     chmod -R 775 /cauldron_local
 
 EXPOSE 5010

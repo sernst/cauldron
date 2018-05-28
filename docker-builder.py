@@ -1,6 +1,6 @@
-import os
 import glob
 import json
+import os
 import re
 from argparse import ArgumentParser
 
@@ -16,19 +16,36 @@ with open(os.path.join(my_directory, 'cauldron', 'settings.json')) as f:
 version = settings['version']
 
 
+def update_base_image(path: str):
+    """Pulls the latest version of the base image"""
+    with open(path, 'r') as file_handle:
+        contents = file_handle.read()
+
+    regex = re.compile('from\s+(?P<source>[^\s]+)', re.IGNORECASE)
+    matches = regex.findall(contents)
+
+    if not matches:
+        return None
+
+    match = matches[0]
+    os.system('docker pull {}'.format(match))
+    return match
+
+
 def build(path: str) -> dict:
     """Builds the container from the specified docker file path"""
-
+    update_base_image(path)
     match = file_pattern.search(os.path.basename(path))
     build_id = match.group('id')
     tags = [
         '{}:{}-{}'.format(HUB_PREFIX, version, build_id),
-        '{}:latest-{}'.format(HUB_PREFIX, build_id)
+        '{}:latest-{}'.format(HUB_PREFIX, build_id),
+        '{}:current-{}'.format(HUB_PREFIX, build_id)
     ]
     if build_id == 'standard':
         tags.append('{}:latest'.format(HUB_PREFIX))
 
-    command= 'docker build --file "{}" {} .'.format(
+    command = 'docker build --file "{}" {} .'.format(
         path,
         ' '.join(['-t {}'.format(t) for t in tags])
     )
@@ -46,7 +63,6 @@ def build(path: str) -> dict:
 
 def publish(build_entry: dict):
     """Publishes the specified build entry to docker hub"""
-
     for tag in build_entry['tags']:
         print('[PUSHING]:', tag)
         os.system('docker push {}'.format(tag))
@@ -54,16 +70,13 @@ def publish(build_entry: dict):
 
 def parse() -> dict:
     """Parse command line arguments"""
-
     parser = ArgumentParser()
     parser.add_argument('-p', '--publish', action='store_true', default=False)
-
     return vars(parser.parse_args())
 
 
 def run():
     """Execute the build process"""
-
     args = parse()
     build_results = [build(p) for p in glob.iglob(glob_path)]
 

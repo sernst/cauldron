@@ -5,3 +5,5 @@ omit =
     /release.py
     /run.py
     /conda-recipe/*.py
+    /docker-builder.py
+    /launcher.py
