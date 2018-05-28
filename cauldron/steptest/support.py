@@ -38,7 +38,14 @@ def find_project_directory(subdirectory: str) -> typing.Union[str, None]:
 
 def open_project(project_path: str) -> 'exposed.ExposedProject':
     """
-    Returns the Response object populated by the open project command
+    Opens the project located at the specified path and returns the public
+    (exposed) project after it has been loaded. If the project cannot be
+    opened a `RuntimeError` will be raised instead.
+
+    :param project_path:
+        The path to the Cauldron project to open. It should be either a
+        directory that contains a `cauldron.json` file or a file path to the
+        `cauldron.json` file for the project to load.
     """
     res = commander.execute(
         name='open',
@@ -105,12 +112,24 @@ def run_step(
     return StepTestRunResult(step, response)
 
 
-def make_temp_path(existing_directories, identifier, *args) -> str:
+def make_temp_path(existing_directories: dict, identifier: str, *args) -> str:
     """
+    Creates a temporary path within a named directory created
+    for the test being executed. If any directories in the path don't exist
+    already, they will be created before returning the path.
+
     :param existing_directories:
+        A dictionary that contains a map of existing temporary directory paths
+        listed by their identifiers. Used to determine what exists and what
+        needs to be added. If the folder for the given identifier does not
+        exist yet, it will be added to this dictionary (mutating the results).
     :param identifier:
+        The identifier for the test the is used to name the folder in which
+        the temp path will reside within the root test folder for the given
+        test.
     :param args:
-    :return:
+        Any additional path elements to identify the path that will
+        appear beneath the identifier folder.
     """
     if identifier not in existing_directories:
         existing_directories[identifier] = tempfile.mkdtemp(
@@ -122,7 +141,17 @@ def make_temp_path(existing_directories, identifier, *args) -> str:
 
 
 def get_library_paths(project_path: str):
-    """..."""
+    """
+    Returns a list of library paths associated with the project located at
+    the specified project location. These are the paths that should be added
+    to the `sys.path` during project execution for the necessary libraries to
+    be available during step testing.
+
+    :param project_path:
+        The path to the Cauldron project to open. It should be either a
+        directory that contains a `cauldron.json` file or a file path to the
+        `cauldron.json` file for the project to load.
+    """
     path = (
         os.path.join(project_path, 'cauldron.json')
         if not project_path.endswith('cauldron.json') else

@@ -12,10 +12,13 @@ from cauldron.steptest.results import StepTestRunResult
 
 
 class CauldronTest:
-    """..."""
+    """A Decorator class for use with the Pytest testing framework."""
 
     def __init__(self, *args, **kwargs):
-        """..."""
+        """
+        Initializes the decorator with default values that will be populated
+        during the lifecycle of the decorator and test.
+        """
         self._call_args = args
         self._call_kwargs = kwargs
         self._test_function = None
@@ -23,7 +26,11 @@ class CauldronTest:
         self.temp_directories = dict()
 
     def __call__(self, test_function):
-        """..."""
+        """
+        Executed during decoration, this function wraps the supplied test
+        function and returns a wrapped function that should be called to
+        executed the step test.
+        """
         self._test_function = test_function
 
         def cauldron_test_wrapper(*args, **kwargs):
@@ -42,7 +49,10 @@ class CauldronTest:
         return cauldron_test_wrapper
 
     def setup(self):
-        """..."""
+        """
+        Handles initializing the environment and opening the project for
+        testing.
+        """
         environ.modes.add(environ.modes.TESTING)
         results_directory = tempfile.mkdtemp(
             prefix='cd-step-test-results-{}--'.format(self.__class__.__name__)
@@ -70,7 +80,9 @@ class CauldronTest:
 
     def open_project(self) -> 'exposed.ExposedProject':
         """
-        Returns the Response object populated by the open project command
+        Opens the project associated with this test and returns the public
+        (exposed) project after it has been loaded. If the project cannot be
+        opened the test will fail with an AssertionError.
         """
         try:
             project_path = self.make_project_path()
@@ -103,22 +115,43 @@ class CauldronTest:
 
     def make_temp_path(self, identifier, *args) -> str:
         """
+        Creates a temporary path within a named directory created
+        for the test being executed. If any directories in the path don't exist
+        already, they will be created before returning the path.
+
         :param identifier:
+            The identifier for the test the is used to name the folder in which
+            the temp path will reside within the root test folder for the given
+            test.
         :param args:
-        :return:
+            Any additional path elements to identify the path that will
+            appear beneath the identifier folder.
         """
         return support.make_temp_path(self.temp_directories, identifier, *args)
 
     def run_test(self, *args, **kwargs):
-        """..."""
+        """
+        The function called to actually carry out the execution of the test,
+        which is wrapped within a function and closure in the `__call__`
+        method for decoration purposes.
+
+        :param args:
+            Positional arguments passed to the test function at execution time.
+        :param kwargs:
+            Keyword arguments passed to the test function at execution time.
+        """
         self.setup()
         result = self._test_function(self, *args, **kwargs)
         self.tear_down()
         return result
 
     def tear_down(self):
-        """..."""
-
+        """
+        After a test is run this function is used to undo any side effects that
+        were created by setting up and running the test. This includes removing
+        the temporary directories that were created to store test information
+        during test execution.
+        """
         # Close any open project so that it doesn't persist to the next test
         closed = commander.execute('close', '')
         closed.thread.join()

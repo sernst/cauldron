@@ -6,7 +6,7 @@ import unittest
 from cauldron import environ
 from cauldron import runner
 from cauldron.cli import commander
-from cauldron.session import exposed
+from cauldron.session import exposed  # noqa
 from cauldron.steptest import support
 from cauldron.steptest.functional import CauldronTest
 from cauldron.steptest.results import StepTestRunResult
@@ -24,6 +24,10 @@ class StepTestCase(unittest.TestCase):
     """
 
     def __init__(self, *args, **kwargs):
+        """
+        Initializes a StepTestCase with default attribute values that will be
+        populated during the setup and teardown phases of each test.
+        """
         super(StepTestCase, self).__init__(*args, **kwargs)
         self.results_directory = None
         self.temp_directories = dict()
@@ -66,7 +70,9 @@ class StepTestCase(unittest.TestCase):
 
     def open_project(self) -> 'exposed.ExposedProject':
         """
-        Returns the Response object populated by the open project command
+        Opens the project associated with this test and returns the public
+        (exposed) project after it has been loaded. If the project cannot be
+        opened the test will fail.
         """
         try:
             project_path = self.make_project_path()
@@ -100,6 +106,12 @@ class StepTestCase(unittest.TestCase):
             self.fail('{}'.format(error))
 
     def tearDown(self):
+        """
+        After a test is run this function is used to undo any side effects that
+        were created by setting up and running the test. This includes removing
+        the temporary directories that were created to store test information
+        during test execution.
+        """
         super(StepTestCase, self).tearDown()
 
         # Close any open project so that it doesn't persist to the next test
@@ -118,8 +130,16 @@ class StepTestCase(unittest.TestCase):
 
     def make_temp_path(self, identifier, *args) -> str:
         """
+        Creates a temporary path within a named directory created
+        for the test being executed. If any directories in the path don't exist
+        already, they will be created before returning the path.
+
         :param identifier:
+            The identifier for the test the is used to name the folder in which
+            the temp path will reside within the root test folder for the given
+            test.
         :param args:
-        :return:
+            Any additional path elements to identify the path that will
+            appear beneath the identifier folder.
         """
         return support.make_temp_path(self.temp_directories, identifier, *args)
