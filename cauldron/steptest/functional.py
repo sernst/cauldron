@@ -6,7 +6,7 @@ import tempfile
 from cauldron import environ
 from cauldron import runner
 from cauldron.cli import commander
-from cauldron.session import exposed
+from cauldron.session import exposed  # noqa
 from cauldron.steptest import support
 from cauldron.steptest.results import StepTestRunResult
 
@@ -128,7 +128,7 @@ class CauldronTest:
         environ.systems.remove(self.results_directory)
         self.results_directory = None
 
-        for key, path in self.temp_directories.items():
+        for path in self.temp_directories.values():
             environ.systems.remove(path)
 
         paths_to_remove = [p for p in self._library_paths if p in sys.path]
