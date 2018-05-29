@@ -20,7 +20,6 @@ def assemble_url(
     :return:
         The fully-resolved URL for the given endpoint
     """
-
     url_root = (
         remote_connection.url
         if remote_connection else
@@ -51,7 +50,6 @@ def parse_http_response(http_response: HttpResponse) -> 'environ.Response':
     :return:
         The Cauldron response object for the given http response
     """
-
     try:
         response = environ.Response.deserialize(http_response.json())
     except Exception as error:
@@ -67,35 +65,65 @@ def parse_http_response(http_response: HttpResponse) -> 'environ.Response':
     return response
 
 
-def get_request_function(data: dict = None, method: str = None):
-    """ """
-
-    default_method = 'post' if data else 'get'
-    return getattr(requests, method.lower() if method else default_method)
-
-
 def send_request(
         endpoint: str,
         data: dict = None,
         remote_connection: 'environ.RemoteConnection' = None,
         method: str = None,
+        timeout: int = 10,
+        max_retries: int = 10,
         **kwargs
 ) -> 'environ.Response':
-    """ """
+    """
+    Sends a request to the remote kernel specified by the RemoteConnection
+    object and processes the result. If the request fails or times out it
+    will be retried until the max retries is reached. After that a failed
+    response will be returned instead.
+
+    :param endpoint:
+        Remote endpoint where the request will be directed.
+    :param data:
+        An optional JSON-serializable dictionary containing the request
+        body data.
+    :param remote_connection:
+        Defines the connection to the remote server where the request will
+        be sent.
+    :param method:
+        The HTTP method type for the request, e.g. GET, POST.
+    :param timeout:
+        Number of seconds before the request aborts when trying to either
+        connect to the target endpoint or receive data from the server.
+    :param max_retries:
+        Number of retry attempts to make before giving up if a non-HTTP
+        error is encountered during communication.
+    """
+    if max_retries < 0:
+        return environ.Response().fail(
+            code='COMMUNICATION_ERROR',
+            error=None,
+            message='Unable to communicate with the remote kernel.'
+        ).console(whitespace=1).response
 
     url = assemble_url(endpoint, remote_connection)
-    func = get_request_function(data, method)
 
     try:
-        http_response = func(url, json=data, **kwargs)
-    except Exception as error:
-        return environ.Response().fail(
-            code='CONNECTION_ERROR',
-            error=error,
-            message='Unable to communicate with the remote connection'
-        ).console(
-            whitespace=1
-        ).response
+        http_response = requests.request(
+            method=method,
+            url=url,
+            json=data,
+            timeout=10,
+            **kwargs
+        )
+    except (requests.ConnectionError, requests.HTTPError, requests.Timeout):
+        return send_request(
+            endpoint=endpoint,
+            data=data,
+            remote_connection=remote_connection,
+            method=method,
+            timeout=timeout,
+            max_retries=max_retries - 1,
+            **kwargs
+        )
 
     return parse_http_response(http_response)
 

@@ -3,6 +3,7 @@ import os
 import shutil
 import site
 import sys
+import time
 import typing
 
 from cauldron.environ import paths
@@ -119,13 +120,19 @@ def get_package_data() -> dict:
         return json.load(f)
 
 
-def remove(path: str) -> bool:
+def remove(path: str, max_retries: int = 3) -> bool:
     """
+    Removes the specified path from the local filesystem if it exists.
+    Directories will be removed along with all files and folders within
+    them as well as files.
 
     :param path:
+        The location of the file or folder to remove.
+    :param max_retries:
+        The number of times to retry before giving up.
     :return:
+        A boolean indicating whether or not the removal was successful.
     """
-
     if not path:
         return False
 
@@ -134,12 +141,14 @@ def remove(path: str) -> bool:
 
     remover = os.remove if os.path.isfile(path) else shutil.rmtree
 
-    for attempt in range(3):
+    for attempt in range(max_retries):
         try:
             remover(path)
             return True
         except Exception:
-            pass
+            # Pause briefly in case there's a race condition on lock
+            # for the target.
+            time.sleep(0.02)
 
     return False
 

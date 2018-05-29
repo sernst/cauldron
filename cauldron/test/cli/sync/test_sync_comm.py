@@ -2,6 +2,7 @@ import os
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
+import requests
 from requests import Response as HttpResponse
 
 from cauldron import environ
@@ -11,11 +12,10 @@ from cauldron.test.support import scaffolds
 
 
 class TestSyncComm(scaffolds.ResultsTest):
-    """ Tests for the cauldron.cli.sync.sync_comm module """
+    """Test suite for the cauldron.cli.sync.sync_comm module"""
 
     def test_assemble_url_without_connection(self):
-        """ should assemble url """
-
+        """Should assemble url"""
         endpoint = '/some-endpoint'
         url_assembled = comm.assemble_url(endpoint)
         self.assertEqual(
@@ -24,8 +24,7 @@ class TestSyncComm(scaffolds.ResultsTest):
         )
 
     def test_assemble_url_specified_connection(self):
-        """ should assemble url using the specified remote connection data """
-
+        """Should assemble url using the specified remote connection data"""
         url = 'some.url:5451'
         endpoint = '/some-endpoint'
         remote_connection = environ.RemoteConnection(url=url, active=True)
@@ -34,8 +33,7 @@ class TestSyncComm(scaffolds.ResultsTest):
         self.assertEqual(url_assembled, 'http://{}{}'.format(url, endpoint))
 
     def test_assemble_url_global_connection(self):
-        """ should assemble url using the specified remote connection data """
-
+        """Should assemble url using the specified remote connection data"""
         url = 'some.url:5451'
         endpoint = '/some-endpoint'
 
@@ -46,25 +44,22 @@ class TestSyncComm(scaffolds.ResultsTest):
 
         support.run_command('disconnect')
 
-    @patch('requests.get')
-    def test_send_request_invalid(self, request_get: MagicMock):
-        """ should fail to send request """
-
-        request_get.side_effect = ValueError('Fake Error')
-
-        response = comm.send_request('/fake', method='get')
-        self.assert_has_error_code(response, 'CONNECTION_ERROR')
+    @patch('requests.request')
+    def test_send_request_invalid(self, request: MagicMock):
+        """Should fail to send request"""
+        request.side_effect = requests.ConnectionError('Fake Error')
+        response = comm.send_request('/fake', method='GET')
+        self.assert_has_error_code(response, 'COMMUNICATION_ERROR')
 
     @patch('cauldron.cli.sync.comm.parse_http_response')
-    @patch('requests.post')
+    @patch('requests.request')
     def test_send_request_valid(
             self,
-            request_post: MagicMock,
+            request: MagicMock,
             parse_http_response: MagicMock
     ):
-        """ should fail to send request """
-
-        request_post.return_value = HttpResponse()
+        """Should successfully send request"""
+        request.return_value = HttpResponse()
         parse_http_response.return_value = environ.Response('test')
 
         response = comm.send_request(
@@ -75,8 +70,7 @@ class TestSyncComm(scaffolds.ResultsTest):
         self.assertEqual(response.identifier, 'test')
 
     def test_parse_valid_http_response(self):
-        """ should fail to send request """
-
+        """Should fail to send request"""
         source_response = environ.Response().update(test='hello_world')
 
         def json_mock(*args, **kwargs):
@@ -93,8 +87,7 @@ class TestSyncComm(scaffolds.ResultsTest):
         )
 
     def test_parse_invalid_http_response(self):
-        """ should fail to parse invalid http response """
-
+        """Should fail to parse invalid http response"""
         http_response = HttpResponse()
         response = comm.parse_http_response(http_response)
         self.assert_has_error_code(response, 'INVALID_REMOTE_RESPONSE')
@@ -102,10 +95,8 @@ class TestSyncComm(scaffolds.ResultsTest):
 
     @patch('requests.get')
     def test_failed_download(self, requests_get: MagicMock):
-        """ should fail to download if the GET request raises an exception """
-
+        """Should fail to download if the GET request raises an exception"""
         requests_get.side_effect = IOError('FAKE ERROR')
-
         path = self.get_temp_path('failed_download', 'fake.filename')
         response = comm.download_file('fake.filename', path)
 
@@ -114,8 +105,7 @@ class TestSyncComm(scaffolds.ResultsTest):
 
     @patch('requests.get')
     def test_failed_download_write(self, requests_get: MagicMock):
-        """ should fail to download if the GET request raises an exception """
-
+        """Should fail to download if the GET request raises an exception"""
         requests_get.return_value = dict()
         path = self.get_temp_path('failed_download', 'fake.filename')
 
@@ -128,8 +118,7 @@ class TestSyncComm(scaffolds.ResultsTest):
 
     @patch('requests.get')
     def test_download(self, requests_get: MagicMock):
-        """ should successfully download saved cauldron file """
-
+        """Should successfully download saved cauldron file"""
         def mock_iter_content(*args, **kwargs):
             yield from [b'a', b'b', b'', None, b'c']
 
@@ -146,4 +135,3 @@ class TestSyncComm(scaffolds.ResultsTest):
         with open(path, 'rb') as f:
             contents = f.read()
         self.assertEqual(contents, b'abc')
-

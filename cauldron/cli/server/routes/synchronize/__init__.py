@@ -3,8 +3,9 @@ import mimetypes
 import os
 import tempfile
 
-import cauldron as cd
 import flask
+
+import cauldron as cd
 from cauldron import cli
 from cauldron import writer
 from cauldron.cli import sync
@@ -115,6 +116,7 @@ def sync_open_project():
     sync_status.update({}, time=-1, project=None)
 
     open_response = project_opener.open_project(project_folder, forget=True)
+    open_response.join()
     project = cd.project.internal_project
     project.remote_source_directory = source_directory
 
@@ -142,6 +144,7 @@ def sync_source_file():
     index = args.get('index', 0)
     sync_time = args.get('sync_time', -1)
     location = args.get('location', 'project')
+    offset = args.get('offset', 0)
 
     if None in [relative_path, chunk]:
         return r.fail(
@@ -173,11 +176,16 @@ def sync_source_file():
     if not os.path.exists(parent_directory):
         os.makedirs(parent_directory)
 
-    sync.io.write_file_chunk(file_path, chunk, append=index > 0)
+    sync.io.write_file_chunk(
+        file_path=file_path,
+        packed_chunk=chunk,
+        append=index > 0,
+        offset=offset
+    )
 
     sync_status.update({}, time=sync_time)
 
-    print('SAVED CHUNK:', file_path)
+    print('SAVED CHUNK:', offset, file_path)
     return r.notify(
         kind='SUCCESS',
         code='SAVED_CHUNK',

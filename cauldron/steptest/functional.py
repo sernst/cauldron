@@ -1,4 +1,3 @@
-import inspect
 import os
 import sys
 import tempfile
@@ -12,32 +11,37 @@ from cauldron.steptest.results import StepTestRunResult
 
 
 class CauldronTest:
-    """A Decorator class for use with the Pytest testing framework."""
+    """
+    A Dependency injection class for use with the Pytest or similar testing
+    framework.
+    """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, project_path: str, *args, **kwargs):
         """
         Initializes the decorator with default values that will be populated
         during the lifecycle of the decorator and test.
         """
+        self.project_path = os.path.realpath(project_path)
         self._call_args = args
         self._call_kwargs = kwargs
         self._test_function = None
         self.results_directory = None
         self.temp_directories = dict()
+        self._library_paths = []
 
-    def __call__(self, test_function):
+    def setup(self) -> 'CauldronTest':
         """
-        Executed during decoration, this function wraps the supplied test
-        function and returns a wrapped function that should be called to
-        executed the step test.
+        Handles initializing the environment and opening the project for
+        testing.
         """
-        self._test_function = test_function
-
-        def cauldron_test_wrapper(*args, **kwargs):
-            return self.run_test(*args, **kwargs)
+        environ.modes.add(environ.modes.TESTING)
 
         project_path = self.make_project_path('cauldron.json')
-        self._library_paths = support.get_library_paths(project_path)
+        self._library_paths = [
+            path
+            for path in support.get_library_paths(project_path)
+            if path not in sys.path
+        ]
         sys.path.extend(self._library_paths)
 
         # Load libraries before calling test functions so that patching works
@@ -45,15 +49,6 @@ class CauldronTest:
         # patching isn't reverted.
         runner.reload_libraries(self._library_paths)
 
-        cauldron_test_wrapper.__name__ = test_function.__name__
-        return cauldron_test_wrapper
-
-    def setup(self):
-        """
-        Handles initializing the environment and opening the project for
-        testing.
-        """
-        environ.modes.add(environ.modes.TESTING)
         results_directory = tempfile.mkdtemp(
             prefix='cd-step-test-results-{}--'.format(self.__class__.__name__)
         )
@@ -61,6 +56,8 @@ class CauldronTest:
         environ.configs.put(results_directory=results_directory, persists=False)
         self.temp_directories = dict()
         self.open_project()
+
+        return self
 
     def make_project_path(self, *args) -> str:
         """
@@ -74,8 +71,7 @@ class CauldronTest:
             components are specified, the location returned will be the
             project directory itself.
         """
-        filename = inspect.getfile(self._test_function)
-        project_directory = support.find_project_directory(filename)
+        project_directory = support.find_project_directory(self.project_path)
         return os.path.join(project_directory, *args)
 
     def open_project(self) -> 'exposed.ExposedProject':
@@ -128,22 +124,6 @@ class CauldronTest:
             appear beneath the identifier folder.
         """
         return support.make_temp_path(self.temp_directories, identifier, *args)
-
-    def run_test(self, *args, **kwargs):
-        """
-        The function called to actually carry out the execution of the test,
-        which is wrapped within a function and closure in the `__call__`
-        method for decoration purposes.
-
-        :param args:
-            Positional arguments passed to the test function at execution time.
-        :param kwargs:
-            Keyword arguments passed to the test function at execution time.
-        """
-        self.setup()
-        result = self._test_function(self, *args, **kwargs)
-        self.tear_down()
-        return result
 
     def tear_down(self):
         """
