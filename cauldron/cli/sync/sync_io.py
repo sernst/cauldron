@@ -3,9 +3,7 @@ import math
 import os
 import zlib
 
-
 from cauldron import writer
-
 
 # Default Chunks are 1MB in size
 DEFAULT_CHUNK_SIZE = 1048576  # type: int
@@ -20,7 +18,6 @@ def pack_chunk(source_data: bytes) -> str:
     :param source_data:
         The data to be converted to a compressed, base64 string
     """
-
     if not source_data:
         return ''
 
@@ -61,12 +58,11 @@ def get_file_chunk_count(
         The number of chunks necessary to send the entire contents of the
         specified file for the given chunk size
     """
-
     if not os.path.exists(file_path):
         return 0
 
     file_size = os.path.getsize(file_path)
-    return max(1, math.ceil(file_size / chunk_size))
+    return max(1, int(math.ceil(file_size / chunk_size)))
 
 
 def read_file_chunks(
@@ -84,7 +80,6 @@ def read_file_chunks(
         The size, in bytes, of each chunk. The final chunk will be less than
         or equal to this size as the remainder.
     """
-
     chunk_count = get_file_chunk_count(file_path, chunk_size)
 
     if chunk_count < 1:
@@ -112,7 +107,6 @@ def write_file_chunk(file_path: str, chunk_data: str, append: bool = True):
         Whether or not the chunk should be appended to the existing file. If
         False the chunk data will overwrite the existing file.
     """
-
     mode = 'ab' if append else 'wb'
     contents = unpack_chunk(chunk_data)
     writer.write_file(file_path, contents, mode=mode)

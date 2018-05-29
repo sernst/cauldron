@@ -11,25 +11,24 @@ from cauldron.environ.response import Response
 def send_chunk(
         chunk: str,
         index: int,
+        offset: int,
         relative_path: str,
         file_kind: str = '',
         remote_connection: 'environ.RemoteConnection' = None,
         sync_time: float = -1
 ):
     """ """
-
-    args = dict(
-        relative_path=relative_path,
-        chunk=chunk,
-        type=file_kind,
-        index=index,
-        sync_time=time.time() if sync_time < 0 else sync_time
-    )
-
     return sync.comm.send_request(
         endpoint='/sync-file',
         remote_connection=remote_connection,
-        data=args
+        data=dict(
+            relative_path=relative_path,
+            chunk=chunk,
+            offset=offset,
+            type=file_kind,
+            index=index,
+            sync_time=time.time() if sync_time < 0 else sync_time
+        )
     )
 
 
@@ -44,7 +43,6 @@ def send(
         sync_time: float = -1
 ) -> Response:
     """ """
-
     response = Response()
     sync_time = time.time() if sync_time < 0 else sync_time
     callback = (
@@ -91,15 +89,18 @@ def send(
         )
     ))
 
+    offset = 0
     for index, chunk in enumerate(chunks):
         response = send_chunk(
             chunk=chunk,
             index=index,
+            offset=offset,
             relative_path=relative_path,
             file_kind=file_kind,
             remote_connection=remote_connection,
             sync_time=sync_time
         )
+        offset += len(chunk)
 
         if response.failed:
             return response
@@ -146,7 +147,6 @@ def send_all_in(
         sync_time: float = -1
 ) -> Response:
     """ """
-
     sync_time = time.time() if sync_time < 0 else sync_time
 
     glob_end = ('**', '*') if recursive else ('*',)
@@ -156,10 +156,10 @@ def send_all_in(
         relative_root_path
         if relative_root_path else
         directory
-    ).rstrip(os.sep)
+    ).rstrip(os.path.sep)
 
     for file_path in glob.iglob(glob_path, recursive=True):
-        relative_path = file_path[len(root_path):].lstrip(os.sep)
+        relative_path = file_path[len(root_path):].lstrip(os.path.sep)
 
         response = send(
             file_path=file_path,
