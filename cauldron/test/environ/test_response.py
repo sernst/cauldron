@@ -133,5 +133,5 @@ class TestResponse(scaffolds.ResultsTest):
         """Should join the associated thread and return True"""
         r = Response()
         r.thread = MagicMock()
-        self.assertTrue(r.thread.join())
+        self.assertTrue(r.join())
         self.assertEqual(1, r.thread.join.call_count)
