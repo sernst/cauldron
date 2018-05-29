@@ -27,15 +27,7 @@ class CauldronTest:
         self._test_function = None
         self.results_directory = None
         self.temp_directories = dict()
-
-        project_path = self.make_project_path('cauldron.json')
-        self._library_paths = support.get_library_paths(project_path)
-        sys.path.extend(self._library_paths)
-
-        # Load libraries before calling test functions so that patching works
-        # correctly, but do this during the decoration process so subsequent
-        # patching isn't reverted.
-        runner.reload_libraries(self._library_paths)
+        self._library_paths = []
 
     def setup(self) -> 'CauldronTest':
         """
@@ -43,6 +35,20 @@ class CauldronTest:
         testing.
         """
         environ.modes.add(environ.modes.TESTING)
+
+        project_path = self.make_project_path('cauldron.json')
+        self._library_paths = [
+            path
+            for path in support.get_library_paths(project_path)
+            if path not in sys.path
+        ]
+        sys.path.extend(self._library_paths)
+
+        # Load libraries before calling test functions so that patching works
+        # correctly, but do this during the decoration process so subsequent
+        # patching isn't reverted.
+        runner.reload_libraries(self._library_paths)
+
         results_directory = tempfile.mkdtemp(
             prefix='cd-step-test-results-{}--'.format(self.__class__.__name__)
         )
@@ -118,22 +124,6 @@ class CauldronTest:
             appear beneath the identifier folder.
         """
         return support.make_temp_path(self.temp_directories, identifier, *args)
-
-    def run_test(self, *args, **kwargs):
-        """
-        The function called to actually carry out the execution of the test,
-        which is wrapped within a function and closure in the `__call__`
-        method for decoration purposes.
-
-        :param args:
-            Positional arguments passed to the test function at execution time.
-        :param kwargs:
-            Keyword arguments passed to the test function at execution time.
-        """
-        self.setup()
-        result = self._test_function(self, *args, **kwargs)
-        self.tear_down()
-        return result
 
     def tear_down(self):
         """
