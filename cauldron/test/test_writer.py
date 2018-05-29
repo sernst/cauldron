@@ -118,11 +118,12 @@ def test_write_offset_ascii():
 
         with open(path, 'rb') as f:
             contents = f.read().decode()
-        assert 'ad\u00A9\u0113kl' == contents, """
-            Expected the offset argument to adjust how data is written
-            to the file to produce an overlapped result.
-            """
-    except Exception:
+    except Exception: # pragma: no cover
         raise
     finally:
         environ.systems.remove(path, 10)
+
+    assert 'ad\u00A9\u0113kl' == contents, """
+        Expected the offset argument to adjust how data is written
+        to the file to produce an overlapped result.
+        """

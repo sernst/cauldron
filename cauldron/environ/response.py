@@ -191,6 +191,24 @@ class Response(object):
         print(self.echo())
         return self
 
+    def join(self, timeout: float = None) -> bool:
+        """
+        Joins on the thread associated with the response if it exists, or
+        just returns after a no-op if no thread exists to join.
+
+        :param timeout:
+            Maximum number of seconds to block on the join before given up
+            and continuing operation. The default `None` value will wait
+            forever.
+        :return:
+            A boolean indicating whether or not a thread existed to join
+            upon.
+        """
+        if self.thread:
+            self.thread.join(timeout)
+            return True
+        return False
+
     def echo(self) -> str:
         """ """
 

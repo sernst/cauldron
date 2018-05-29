@@ -1,22 +1,21 @@
 from unittest import mock
 from unittest.mock import patch
+from unittest.mock import MagicMock
 
 from cauldron.environ.response import Response
 from cauldron.test.support import scaffolds
 
 
 class TestResponse(scaffolds.ResultsTest):
-    """ """
+    """Test suite for the Response class"""
 
     def test_get_response(self):
-        """ should get the response back from the response message """
-
+        """Should get the response back from the response message"""
         r = Response()
         self.assertEqual(r, r.fail().get_response())
 
     def test_warn(self):
-        """ should notify if warned is called """
-
+        """Should notify if warned is called"""
         r = Response()
         r.warn('FAKE_WARN', key='VALUE')
 
@@ -25,14 +24,12 @@ class TestResponse(scaffolds.ResultsTest):
         self.assertEqual(r.warnings[0].data['key'], 'VALUE')
 
     def test_debug_echo(self):
-        """ should echo debug information """
-
+        """Should echo debug information"""
         r = Response()
         r.debug_echo()
 
     def test_echo(self):
-        """ should echo information """
-
+        """Should echo information"""
         r = Response()
         r.warn('WARNING', something=[1, 2, 3], value=False)
         r.fail('ERROR')
@@ -41,8 +38,7 @@ class TestResponse(scaffolds.ResultsTest):
         self.assertGreater(result.find('ERROR'), 0)
 
     def test_echo_parented(self):
-        """ should call parent echo """
-
+        """Should call parent echo"""
         r = Response()
         parent = Response().consume(r)
 
@@ -52,14 +48,12 @@ class TestResponse(scaffolds.ResultsTest):
             func.assert_any_call()
 
     def test_consume_nothing(self):
-        """ should abort consuming if there is nothing to consume """
-
+        """Should abort consuming if there is nothing to consume"""
         r = Response()
         r.consume(None)
 
     def test_grandparent(self):
-        """ should parent correctly if parented """
-
+        """Should parent correctly if parented"""
         child = Response()
         parent = Response()
         grandparent = Response()
@@ -70,8 +64,7 @@ class TestResponse(scaffolds.ResultsTest):
         self.assertEqual(child.parent, grandparent)
 
     def test_update_parented(self):
-        """ should update through parent """
-
+        """Should update through parent"""
         child = Response()
         parent = Response()
         parent.consume(child)
@@ -80,8 +73,7 @@ class TestResponse(scaffolds.ResultsTest):
         self.assertEqual(parent.data['banana'], 'orange')
 
     def test_notify_parented(self):
-        """ should notify through parent """
-
+        """Should notify through parent"""
         child = Response()
         parent = Response()
         parent.consume(child)
@@ -95,8 +87,7 @@ class TestResponse(scaffolds.ResultsTest):
         self.assertEqual(m.message, 'Good Stuff')
 
     def test_end_parented(self):
-        """ should end the parent """
-
+        """Should end the parent"""
         child = Response()
         parent = Response()
         parent.consume(child)
@@ -105,8 +96,7 @@ class TestResponse(scaffolds.ResultsTest):
         self.assertTrue(parent.ended)
 
     def test_logging(self):
-        """ should log messages to the log """
-
+        """Should log messages to the log"""
         r = Response()
         r.notify(
             kind='TEST',
@@ -130,7 +120,18 @@ class TestResponse(scaffolds.ResultsTest):
         self.assertEqual(out, compare)
 
     def test_self_consumption(self):
-        """ should not consume itself and cause regression error """
-
+        """Should not consume itself and cause regression error"""
         r = Response()
         r.consume(r)
+
+    def test_join_nothing(self):
+        """Should do nothing and return if no thread exists"""
+        r = Response()
+        self.assertFalse(r.join())
+
+    def test_join_thread(self):
+        """Should join the associated thread and return True"""
+        r = Response()
+        r.thread = MagicMock()
+        self.assertTrue(r.thread.join())
+        self.assertEqual(1, r.thread.join.call_count)
