@@ -52,14 +52,14 @@ class TestSyncComm(scaffolds.ResultsTest):
         self.assert_has_error_code(response, 'COMMUNICATION_ERROR')
 
     @patch('cauldron.cli.sync.comm.parse_http_response')
-    @patch('requests.post')
+    @patch('requests.request')
     def test_send_request_valid(
             self,
-            request_post: MagicMock,
+            request: MagicMock,
             parse_http_response: MagicMock
     ):
-        """Should fail to send request"""
-        request_post.return_value = HttpResponse()
+        """Should successfully send request"""
+        request.return_value = HttpResponse()
         parse_http_response.return_value = environ.Response('test')
 
         response = comm.send_request(

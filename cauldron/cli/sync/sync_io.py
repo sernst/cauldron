@@ -68,7 +68,7 @@ def get_file_chunk_count(
 def read_file_chunks(
         file_path: str,
         chunk_size: int = DEFAULT_CHUNK_SIZE
-) -> str:
+) -> bytes:
     """
     Reads the specified file in chunks and returns a generator where
     each returned chunk is a compressed base64 encoded string for sync
@@ -94,7 +94,7 @@ def read_file_chunks(
 
 def write_file_chunk(
         file_path: str,
-        chunk_data: str,
+        packed_chunk: str,
         append: bool = True,
         offset: int = -1
 ):
@@ -106,8 +106,9 @@ def write_file_chunk(
 
     :param file_path:
         The file where the chunk will be written or appended
-    :param chunk_data:
-        The packed chunk data to write to the file
+    :param packed_chunk:
+        The packed chunk data to write to the file. It will be unpacked before
+        the file is written.
     :param append:
         Whether or not the chunk should be appended to the existing file. If
         False the chunk data will overwrite the existing file.
@@ -119,5 +120,5 @@ def write_file_chunk(
         append.
     """
     mode = 'ab' if append else 'wb'
-    contents = unpack_chunk(chunk_data)
+    contents = unpack_chunk(packed_chunk)
     writer.write_file(file_path, contents, mode=mode, offset=offset)

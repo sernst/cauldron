@@ -7,7 +7,7 @@ def attempt_file_write(
         path: str,
         contents: typing.Union[str, bytes],
         mode: str = 'w',
-        offset: int = -1
+        offset: int = 0
 ) -> typing.Union[None, Exception]:
     """
     Attempts to write the specified contents to a file and returns None if
@@ -21,20 +21,32 @@ def attempt_file_write(
         The mode in which the file will be opened when written
     :param offset:
         The byte offset in the file where the contents should be written.
-        If the value is less than zero, the offset information will be
-        ignored and the operation will write entirely based on mode. Note
-        that if you indicate an append write mode and an offset, the mode
-        will be forced to write instead of append.
+        If the value is zero, the offset information will be ignored and
+        the operation will write entirely based on mode. Note that if you
+        indicate an append write mode and an offset, the mode will be forced
+        to write instead of append.
     :return:
         None if the write operation succeeded. Otherwise, the exception that
         was raised by the failed write action.
     """
-    write_mode = mode.replace('a', 'w') if offset >= 0 else mode
+    try:
+        data = contents.encode()
+    except Exception:
+        data = contents
+
+    if offset > 0:
+        with open(path, 'rb') as f:
+            existing = f.read(offset)
+    else:
+        existing = None
+
+    append = 'a' in mode
+    write_mode = 'wb' if offset > 0 or not append else 'ab'
     try:
         with open(path, write_mode) as f:
-            if offset > 0:
-                f.seek(offset)
-            f.write(contents)
+            if existing is not None:
+                f.write(existing)
+            f.write(data)
         return None
     except Exception as error:
         return error
@@ -45,7 +57,7 @@ def write_file(
         contents,
         mode: str = 'w',
         retry_count: int = 3,
-        offset: int = -1
+        offset: int = 0
 ) -> typing.Tuple[bool, typing.Union[None, Exception]]:
     """
     Writes the specified contents to a file, with retry attempts if the write
@@ -63,10 +75,10 @@ def write_file(
         failed write.
     :param offset:
         The byte offset in the file where the contents should be written.
-        If the value is less than zero, the offset information will be
-        ignored and the operation will write entirely based on mode. Note
-        that if you indicate an append write mode and an offset, the mode
-        will be forced to write instead of append.
+        If the value is zero, the offset information will be ignored and the
+        operation will write entirely based on mode. Note that if you indicate
+        an append write mode and an offset, the mode will be forced to write
+        instead of append.
     :return:
         Returns two arguments. The first is a boolean specifying whether or
         not the write operation succeeded. The second is the error result, which
