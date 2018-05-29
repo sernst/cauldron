@@ -97,14 +97,15 @@ def test_write_offset_binary():
 
         with open(path, 'rb') as f:
             contents = f.read()
-        assert b'adgjkl' == contents, """
-            Expected the offset argument to adjust how data is written
-            to the file to produce an overlapped result.
-            """
-    except Exception:
+    except Exception:  # pragma: no cover
         raise
     finally:
         environ.systems.remove(path, 10)
+
+    assert b'adgjkl' == contents, """
+        Expected the offset argument to adjust how data is written
+        to the file to produce an overlapped result.
+        """
 
 
 def test_write_offset_ascii():
@@ -118,7 +119,7 @@ def test_write_offset_ascii():
 
         with open(path, 'rb') as f:
             contents = f.read().decode()
-    except Exception: # pragma: no cover
+    except Exception:  # pragma: no cover
         raise
     finally:
         environ.systems.remove(path, 10)

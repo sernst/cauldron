@@ -204,10 +204,11 @@ class Response(object):
             A boolean indicating whether or not a thread existed to join
             upon.
         """
-        if self.thread:
+        try:
             self.thread.join(timeout)
             return True
-        return False
+        except AttributeError:
+            return False
 
     def echo(self) -> str:
         """ """
