@@ -142,6 +142,7 @@ def sync_source_file():
     index = args.get('index', 0)
     sync_time = args.get('sync_time', -1)
     location = args.get('location', 'project')
+    offset = args.get('offset', -1)
 
     if None in [relative_path, chunk]:
         return r.fail(
@@ -173,7 +174,12 @@ def sync_source_file():
     if not os.path.exists(parent_directory):
         os.makedirs(parent_directory)
 
-    sync.io.write_file_chunk(file_path, chunk, append=index > 0)
+    sync.io.write_file_chunk(
+        file_path=file_path,
+        chunk_data=chunk,
+        append=index > 0,
+        offset=offset
+    )
 
     sync_status.update({}, time=sync_time)
 

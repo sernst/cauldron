@@ -92,7 +92,12 @@ def read_file_chunks(
             yield chunk
 
 
-def write_file_chunk(file_path: str, chunk_data: str, append: bool = True):
+def write_file_chunk(
+        file_path: str,
+        chunk_data: str,
+        append: bool = True,
+        offset: int = -1
+):
     """
     Write or append the specified chunk data to the given file path, unpacking
     the chunk before writing. If the file does not yet exist, it will be
@@ -106,7 +111,13 @@ def write_file_chunk(file_path: str, chunk_data: str, append: bool = True):
     :param append:
         Whether or not the chunk should be appended to the existing file. If
         False the chunk data will overwrite the existing file.
+    :param offset:
+        The byte offset in the file where the chunk should be written.
+        If the value is less than zero, the chunk will be written or appended
+        based on the `append` argument. Note that if you indicate an append
+        write mode and an offset, the mode will be forced to write instead of
+        append.
     """
     mode = 'ab' if append else 'wb'
     contents = unpack_chunk(chunk_data)
-    writer.write_file(file_path, contents, mode=mode)
+    writer.write_file(file_path, contents, mode=mode, offset=offset)
