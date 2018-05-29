@@ -1,4 +1,3 @@
-import inspect
 import os
 import sys
 import tempfile
@@ -12,29 +11,22 @@ from cauldron.steptest.results import StepTestRunResult
 
 
 class CauldronTest:
-    """A Decorator class for use with the Pytest testing framework."""
+    """
+    A Dependency injection class for use with the Pytest or similar testing
+    framework.
+    """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, project_path: str, *args, **kwargs):
         """
         Initializes the decorator with default values that will be populated
         during the lifecycle of the decorator and test.
         """
+        self.project_path = os.path.realpath(project_path)
         self._call_args = args
         self._call_kwargs = kwargs
         self._test_function = None
         self.results_directory = None
         self.temp_directories = dict()
-
-    def __call__(self, test_function):
-        """
-        Executed during decoration, this function wraps the supplied test
-        function and returns a wrapped function that should be called to
-        executed the step test.
-        """
-        self._test_function = test_function
-
-        def cauldron_test_wrapper(*args, **kwargs):
-            return self.run_test(*args, **kwargs)
 
         project_path = self.make_project_path('cauldron.json')
         self._library_paths = support.get_library_paths(project_path)
@@ -45,10 +37,7 @@ class CauldronTest:
         # patching isn't reverted.
         runner.reload_libraries(self._library_paths)
 
-        cauldron_test_wrapper.__name__ = test_function.__name__
-        return cauldron_test_wrapper
-
-    def setup(self):
+    def setup(self) -> 'CauldronTest':
         """
         Handles initializing the environment and opening the project for
         testing.
@@ -62,6 +51,8 @@ class CauldronTest:
         self.temp_directories = dict()
         self.open_project()
 
+        return self
+
     def make_project_path(self, *args) -> str:
         """
         Returns an absolute path to the specified location within the Cauldron
@@ -74,8 +65,7 @@ class CauldronTest:
             components are specified, the location returned will be the
             project directory itself.
         """
-        filename = inspect.getfile(self._test_function)
-        project_directory = support.find_project_directory(filename)
+        project_directory = support.find_project_directory(self.project_path)
         return os.path.join(project_directory, *args)
 
     def open_project(self) -> 'exposed.ExposedProject':
