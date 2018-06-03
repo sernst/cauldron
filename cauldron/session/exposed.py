@@ -29,6 +29,11 @@ class ExposedProject(object):
         return self._project
 
     @property
+    def id(self) -> typing.Union[str, None]:
+        """Identifier for the project."""
+        return self._project.id if self._project else None
+
+    @property
     def display(self) -> typing.Union[None, report.Report]:
         """The display report for the current project"""
         return (
