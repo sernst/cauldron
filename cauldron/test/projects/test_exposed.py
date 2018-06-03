@@ -16,6 +16,7 @@ class TestExposed(scaffolds.ResultsTest):
         self.assertIsNone(ep.shared)
         self.assertIsNone(ep.settings)
         self.assertIsNone(ep.title)
+        self.assertIsNone(ep.id)
         self.assertIsNone(ep.path())
 
         with self.assertRaises(RuntimeError):

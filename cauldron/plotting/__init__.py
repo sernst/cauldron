@@ -82,7 +82,6 @@ def create_layout(
     :param y_bounds:
     :return:
     """
-
     if layout is None:
         layout = dict()
 
@@ -95,14 +94,14 @@ def create_layout(
     }
 
     x = layout.get('xaxis', {})
-    x['title'] = x_label if x_label else x['title']
+    x['title'] = x_label if x_label else x.get('title')
     x['titlefont'] = x.get('titlefont', font)
     if x_bounds:
         x['range'] = x_bounds
     layout['xaxis'] = x
 
     y = layout.get('yaxis', {})
-    y['title'] = y_label if y_label else y['title']
+    y['title'] = y_label if y_label else y.get('title')
     y['titlefont'] = y.get('titlefont', font)
     if y_bounds:
         y['range'] = y_bounds

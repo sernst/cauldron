@@ -4,7 +4,7 @@ from cauldron import environ
 
 try:
     import markdown as md
-except Exception:
+except Exception:  # pragma: no cover
     md = None
 
 from cauldron.render import utils as render_utils
@@ -18,7 +18,6 @@ def latex(source: str, inline: bool = False) -> str:
     :param inline:
     :return:
     """
-
     environ.abort_thread()
 
     return templating.render_template(
@@ -35,7 +34,6 @@ def head(value, count: int = 5) -> str:
     :param count:
     :return:
     """
-
     environ.abort_thread()
 
     if count < 1:
@@ -50,9 +48,7 @@ def head(value, count: int = 5) -> str:
         pass
 
     if isinstance(value, str):
-        return preformatted_text(
-            '\n'.join(value.split('\n')[:count])
-        )
+        return preformatted_text('\n'.join(value.split('\n')[:count]))
 
     if isinstance(value, (list, tuple)):
         out = ['{}'.format(v) for v in value[:count]]
@@ -60,19 +56,15 @@ def head(value, count: int = 5) -> str:
 
     if isinstance(value, dict):
         out = []
-        for k, v in value.items():
-            if len(out) >= count:
-                break
-            out.append('{}: {}'.format(k, v))
+        keys = sorted(list(value.keys()))
+        for key in keys[:count]:
+            out.append('{}: {}'.format(key, value[key]))
         return preformatted_text('\n'.join(out))
 
     try:
-        out = []
-        for v in value:
-            if len(out) >= count:
-                break
-            out.append('{}'.format(v))
-            return preformatted_text('\n'.join(out))
+        value = list(value)
+        out = ['{}'.format(v) for v in value[:count]]
+        return preformatted_text('\n'.join(out))
     except Exception:
         pass
 
@@ -88,7 +80,6 @@ def tail(value, count: int = 5) -> str:
     :param count:
     :return:
     """
-
     environ.abort_thread()
 
     if count < 1:
@@ -113,10 +104,9 @@ def tail(value, count: int = 5) -> str:
 
     if isinstance(value, dict):
         out = []
-        for k, v in reversed(list(value.items())):
-            if len(out) >= count:
-                break
-            out.append('{}: {}'.format(k, v))
+        keys = sorted(list(value.keys()), reverse=True)
+        for key in keys[:count]:
+            out.append('{}: {}'.format(key, value[key]))
             return preformatted_text('\n'.join(out))
 
     try:
@@ -136,17 +126,15 @@ def text(value: str) -> str:
     :param value:
     :return:
     """
-
     environ.abort_thread()
 
     value = render_utils.html_escape(value)
     lines = str(value).strip().split('\n')
+    paragraph_separator = '</p><p class="plaintextbox">'
 
+    # Convert empty lines into paragraph separators
     for index, line in enumerate(lines):
-        l = line.strip()
-        if len(l) < 1:
-            l = '</p><p class="plaintextbox">'
-        lines[index] = l
+        lines[index] = line.strip() or paragraph_separator
 
     return '<p class="plaintextbox">{text}</p>'.format(text=' '.join(lines))
 
