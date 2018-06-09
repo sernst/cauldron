@@ -22,14 +22,13 @@ spark = _spark
 
 def get_environment_info() -> dict:
     """
-    Information about Cauldron and its Python interpreter
+    Information about Cauldron and its Python interpreter.
 
     :return:
         A dictionary containing information about the Cauldron and its
         Python environment. This information is useful when providing feedback
-        and bug reports
+        and bug reports.
     """
-
     data = _environ.systems.get_system_data()
     data['cauldron'] = _environ.package_settings.copy()
     return data
@@ -37,7 +36,6 @@ def get_environment_info() -> dict:
 
 def run_shell():
     """ Starts the cauldron shell environment for console based interaction """
-
     from cauldron.cli.shell import CauldronShell
     CauldronShell().cmdloop()
 
@@ -45,7 +43,7 @@ def run_shell():
 def run_server(port=5010, debug=False, **kwargs):
     """
     Run the cauldron http server used to interact with cauldron from a remote
-    host
+    host.
 
     :param port:
         The port on which to bind the cauldron server.
@@ -55,7 +53,6 @@ def run_server(port=5010, debug=False, **kwargs):
     :param kwargs:
         Custom properties to alter the way the server runs.
     """
-
     from cauldron.cli.server import run
     run.execute(port=port, debug=debug, **kwargs)
 
@@ -92,9 +89,8 @@ def run_project(
         Any variables to be available in the cauldron.shared object during
         execution of the project can be specified here as keyword arguments.
     :return:
-        A response object that contains information about the run process
+        A response object that contains information about the run process.
     """
-
     from cauldron.cli import batcher
     return batcher.run_project(
         project_directory=project_directory,
