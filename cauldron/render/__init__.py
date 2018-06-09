@@ -304,6 +304,7 @@ def plotly(
     return templating.render_template(
         'plotly-component.html',
         dom=dom,
+        scale=scale,
         min_height=round(100.0 * scale),
         id=dom_id
     )

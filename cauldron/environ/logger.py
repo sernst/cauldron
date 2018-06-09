@@ -1,8 +1,8 @@
-import threading
-import sys
 import os
-import typing
+import sys
+import threading
 import traceback
+import typing
 from textwrap import dedent
 from textwrap import indent
 
@@ -11,28 +11,36 @@ from cauldron.environ import paths
 _logging_paths = []
 
 
-def add_output_path(path: str) -> str:
-    if not path:
-        path = paths.clean(os.getcwd())
-    else:
-        path = paths.clean(path)
+def add_output_path(path: str = None) -> str:
+    """
+    Adds the specified path to the output logging paths if it is not
+    already in the listed paths.
 
-    if path not in _logging_paths:
-        _logging_paths.append(path)
+    :param path:
+        The path to add to the logging output paths. If the path is empty
+        or no path is given, the current working directory will be used
+        instead.
+    """
+    cleaned = paths.clean(path or os.getcwd())
+    if cleaned not in _logging_paths:
+        _logging_paths.append(cleaned)
+    return cleaned
 
-    return path
 
+def remove_output_path(path: str = None) -> str:
+    """
+    Removes the specified path from the output logging paths if it is
+    in the listed paths.
 
-def remove_output_path(path: str) -> str:
-    if not path:
-        path = paths.clean(os.getcwd())
-    else:
-        path = paths.clean(path)
-
-    if path in _logging_paths:
+    :param path:
+        The path to remove from the logging output paths. If the path is empty
+        or no path is given, the current working directory will be used
+        instead.
+    """
+    cleaned = paths.clean(path or os.getcwd())
+    if cleaned in _logging_paths:
         _logging_paths.remove(path)
-
-    return path
+    return cleaned
 
 
 def header(
@@ -59,7 +67,6 @@ def header(
     :param indent_by:
     :return:
     """
-
     if level == 0:
         message = text
     elif level < 3:
@@ -159,7 +166,6 @@ def log(
         log file specified in the file_path argument
     :param kwargs:
     """
-
     m = add_to_message(message)
     for key, value in kwargs.items():
         m.append('{key}: {value}'.format(key=key, value=value))
@@ -208,14 +214,9 @@ def raw(
         threading.current_thread().logs.append(message)
 
     def write_file(write_path: str):
-        mode = 'a' if append_to_file else 'w'
-        try:
-            with open(paths.clean(write_path), mode) as f:
-                f.write('{}\n'.format(message))
-        except FileNotFoundError:
-            return write_path
-
-        return None
+        mode = 'a' if append_to_file and os.path.exists(write_path) else 'w'
+        with open(paths.clean(write_path), mode) as f:
+            f.write('{}\n'.format(message))
 
     file_paths = list(set([p for p in (_logging_paths + [file_path]) if p]))
     for path in file_paths:
@@ -223,23 +224,20 @@ def raw(
 
 
 def add_to_message(data, indent_level=0) -> list:
-    """ Adds data to the message object """
-
-    m = []
+    """Adds data to the message object"""
+    message = []
 
     if isinstance(data, str):
-        m.append(indent(
+        message.append(indent(
             dedent(data.strip('\n')).strip(),
             indent_level * '  '
         ))
-        return m
+        return message
 
     for line in data:
-        if isinstance(line, str):
-            m += add_to_message(line, indent_level)
-        else:
-            m += add_to_message(line, indent_level + 1)
-    return m
+        offset = 0 if isinstance(line, str) else 1
+        message += add_to_message(line, indent_level + offset)
+    return message
 
 
 def get_error_stack() -> typing.List[dict]:
@@ -252,6 +250,8 @@ def get_error_stack() -> typing.List[dict]:
 
         if location == '<module>':
             location = None
+        elif location:
+            location = location.split('__cauldron_shared_libs')[-1]
 
         stack.append(dict(
             filename=filename,
