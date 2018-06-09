@@ -1,4 +1,5 @@
 import os
+import time
 import typing
 from datetime import datetime
 
@@ -117,6 +118,29 @@ class ExposedProject(object):
         if not silent:
             render_stop_display(step, message)
         raise UserAbortError(halt=True)
+
+    def get_internal_project(
+            self,
+            timeout: float = 10
+    ) -> typing.Union['projects.Project', None]:
+        """
+        Attempts to return the internally loaded project. This function
+        prevents race condition issues where projects are loaded via threads
+        because the internal loop will try to continuously load the internal
+        project until it is available or until the timeout is reached.
+
+        :param timeout:
+            Maximum number of seconds to wait before giving up and returning
+            None.
+        """
+        start_time = time.time()
+        while (time.time() - start_time) < timeout:
+            project = self.internal_project
+            if project:
+                return project
+            time.sleep(0.2)
+
+        return self.internal_project
 
 
 class ExposedStep(object):

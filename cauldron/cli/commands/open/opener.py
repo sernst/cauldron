@@ -1,4 +1,5 @@
 import os
+import time
 
 import cauldron
 from cauldron import environ
@@ -150,7 +151,7 @@ def open_project(
             message='Unable to update loaded project status'
         ).console(whitespace=1).response
 
-    project = cauldron.project.internal_project
+    project = cauldron.project.get_internal_project()
     if results_path:
         project.results_path = results_path
 

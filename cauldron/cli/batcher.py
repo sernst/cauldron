@@ -89,7 +89,7 @@ def run_project(
     if response.failed:
         return on_complete('[ERROR]: Aborted trying to open project')
 
-    project = cauldron.project.internal_project
+    project = cauldron.project.get_internal_project()
     project.shared.put(**(shared_data if shared_data is not None else dict()))
 
     commander.preload()

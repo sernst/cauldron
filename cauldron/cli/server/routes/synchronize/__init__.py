@@ -117,7 +117,7 @@ def sync_open_project():
 
     open_response = project_opener.open_project(project_folder, forget=True)
     open_response.join()
-    project = cd.project.internal_project
+    project = cd.project.get_internal_project()
     project.remote_source_directory = source_directory
 
     sync_status.update({}, time=-1, project=project)
