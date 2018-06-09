@@ -60,15 +60,12 @@ class ProjectStep(object):
 
     @property
     def uuid(self):
-        """
-
-        :return:
-        """
-
+        """Unique identifier based on the path of the step"""
         return hashlib.sha1(self.source_path.encode()).hexdigest()
 
     @property
     def filename(self) -> str:
+        """Name of the step file"""
         return self.definition.slug
 
     @property
@@ -109,9 +106,20 @@ class ProjectStep(object):
         end = self.end_time or current_time
         return (end - start).total_seconds()
 
+    def get_elapsed_timestamp(self) -> str:
+        """
+        A human-readable version of the elapsed time for the last execution
+        of the step. The value is derived from the `ProjectStep.elapsed_time`
+        property.
+        """
+        t = self.elapsed_time
+        minutes = int(t / 60)
+        seconds = int(t - (60 * minutes))
+        millis = int(100 * (t - int(t)))
+        return '{:>02d}:{:>02d}.{:<02d}'.format(minutes, seconds, millis)
+
     def kernel_serialize(self):
         """ """
-
         status = self.status()
         out = dict(
             slug=self.definition.slug,
@@ -146,7 +154,6 @@ class ProjectStep(object):
 
     def is_dirty(self):
         """ """
-
         if self._is_dirty:
             return self._is_dirty
 
@@ -183,11 +190,7 @@ class ProjectStep(object):
         return dom
 
     def dumps(self) -> str:
-        """
-
-        :return:
-        """
-
+        """Writes the step information to an HTML-formatted string"""
         code_file_path = os.path.join(
             self.project.source_directory,
             self.filename
@@ -236,6 +239,7 @@ class ProjectStep(object):
         dom = templating.render_template(
             'step-body.html',
             last_display_update=self.report.last_update_time,
+            elapsed_time=self.get_elapsed_timestamp(),
             code=code,
             body=body,
             has_body=has_body,

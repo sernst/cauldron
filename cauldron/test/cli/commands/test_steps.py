@@ -7,14 +7,10 @@ from cauldron.test.support.messages import Message
 
 
 class TestSteps(scaffolds.ResultsTest):
-    """
-
-    """
+    """Test suite for the steps module"""
 
     def test_steps_add(self):
-        """
-        """
-
+        """Should add a step"""
         support.create_project(self, 'bob')
         project = cauldron.project.internal_project
 
@@ -25,9 +21,7 @@ class TestSteps(scaffolds.ResultsTest):
         ))
 
     def test_steps_muting(self):
-        """
-        """
-
+        """Should mute a step"""
         support.create_project(self, 'larry')
 
         support.run_command('steps add first.py')
@@ -39,9 +33,7 @@ class TestSteps(scaffolds.ResultsTest):
         self.assertFalse(r.failed, 'should nto have failed')
 
     def test_steps_modify(self):
-        """
-        """
-
+        """Should modify a step"""
         response = support.create_project(self, 'lindsey')
         self.assertFalse(
             response.failed,
@@ -68,9 +60,7 @@ class TestSteps(scaffolds.ResultsTest):
         )
 
     def test_steps_remove(self):
-        """
-        """
-
+        """Should remove a step"""
         support.create_project(self, 'angelica')
 
         r = support.run_command('steps add first.py')
@@ -83,7 +73,6 @@ class TestSteps(scaffolds.ResultsTest):
         self.assertTrue(r.failed, 'should have failed')
 
     def test_steps_remove_renaming(self):
-
         STEP_COUNT = 6
 
         support.create_project(self, 'bellatrix')
@@ -102,9 +91,7 @@ class TestSteps(scaffolds.ResultsTest):
             self.assertEqual('S0{}.py'.format(i + 1), step_names[i])
 
     def test_steps_list(self):
-        """
-        """
-
+        """Should list steps"""
         support.create_project(self, 'angelica')
         r = support.run_command('steps list')
         self.assertEqual(len(r.data['steps']), 0, Message(
@@ -120,11 +107,7 @@ class TestSteps(scaffolds.ResultsTest):
         self.assertFalse(r.failed, 'should not have failed')
 
     def test_autocomplete(self):
-        """
-
-        :return:
-        """
-
+        """Should autocomplete steps command"""
         support.create_project(self, 'gina')
         support.add_step(self, 'a.py')
         support.add_step(self, 'b.py')
@@ -148,11 +131,7 @@ class TestSteps(scaffolds.ResultsTest):
         )
 
     def test_modify_move(self):
-        """
-
-        :return:
-        """
-
+        """..."""
         support.create_project(self, 'harvey')
         support.add_step(self, contents='#S1')
         support.add_step(self, contents='#S2')
@@ -180,8 +159,7 @@ class TestSteps(scaffolds.ResultsTest):
         ))
 
     def test_remote(self):
-        """ should function remotely """
-
+        """Should function remotely"""
         support.create_project(self, 'nails')
         project = cauldron.project.internal_project
 
