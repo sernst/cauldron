@@ -25,8 +25,11 @@ class ExposedProject(object):
         self._project = None  # type: projects.Project
 
     @property
-    def internal_project(self) -> projects.Project:
-        """The current Cauldron project that is represented by this object."""
+    def internal_project(self) -> typing.UNION[projects.Project, None]:
+        """
+        The current Cauldron project that is represented by this object.
+        The value will be None if no project has been loaded.
+        """
         return self._project
 
     @property
@@ -36,7 +39,7 @@ class ExposedProject(object):
 
     @property
     def display(self) -> typing.Union[None, report.Report]:
-        """The display report for the current project"""
+        """The display report for the current project."""
         return (
             self._project.current_step.report
             if self._project and self._project.current_step else
@@ -45,17 +48,17 @@ class ExposedProject(object):
 
     @property
     def shared(self) -> typing.Union[None, SharedCache]:
-        """The shared display object associated with this project"""
+        """The shared display object associated with this project."""
         return self._project.shared if self._project else None
 
     @property
     def settings(self) -> typing.Union[None, SharedCache]:
-        """The settings associated with this project"""
+        """The settings associated with this project."""
         return self._project.settings if self._project else None
 
     @property
     def title(self) -> typing.Union[None, str]:
-        """The title of this project"""
+        """The title of this project."""
         return self._project.title if self._project else None
 
     @title.setter
@@ -158,7 +161,6 @@ class ExposedStep(object):
         :return:
             The ProjectStep instance that this ExposedStep represents
         """
-
         import cauldron
         try:
             return cauldron.project.internal_project.current_step
@@ -236,7 +238,7 @@ class ExposedStep(object):
 
 
 def render_stop_display(step: 'projects.ProjectStep', message: str):
-    """Renders a stop action to the Cauldron display"""
+    """Renders a stop action to the Cauldron display."""
     stack = render_stack.get_formatted_stack_frame(
         project=step.project,
         error_stack=False
