@@ -25,7 +25,7 @@ class ExposedProject(object):
         self._project = None  # type: projects.Project
 
     @property
-    def internal_project(self) -> typing.UNION[projects.Project, None]:
+    def internal_project(self) -> typing.Union[projects.Project, None]:
         """
         The current Cauldron project that is represented by this object.
         The value will be None if no project has been loaded.
