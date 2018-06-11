@@ -21,7 +21,7 @@ class TestShow(scaffolds.ResultsTest):
         """ should show local project """
 
         support.run_command('open @examples:hello_cauldron')
-        url = cauldron.project.internal_project.baked_url
+        url = cauldron.project.get_internal_project().baked_url
 
         with patch('webbrowser.open') as func:
             r = support.run_command('show')
@@ -41,7 +41,7 @@ class TestShow(scaffolds.ResultsTest):
             remote_connection=remote_connection
         )
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         url = project.make_remote_url(remote_connection.url)
 
         with patch('webbrowser.open') as func:

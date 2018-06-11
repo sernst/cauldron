@@ -155,7 +155,7 @@ class TestCreate(scaffolds.ResultsTest):
         )
         self.assertFalse(result.failed)
 
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
 
         items = os.listdir(project.source_directory)
 

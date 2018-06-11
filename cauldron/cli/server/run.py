@@ -52,12 +52,8 @@ def get_server_data() -> dict:
 
 
 def get_running_step_changes(write: bool = False) -> list:
-    """
-
-    :return:
-    """
-
-    project = cd.project.internal_project
+    """..."""
+    project = cd.project.get_internal_project()
 
     running_steps = list(filter(
         lambda step: step.is_running,

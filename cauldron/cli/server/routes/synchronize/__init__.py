@@ -27,11 +27,10 @@ sync_status = dict(
 @authorization.gatekeeper
 def touch_project():
     """
-    Touches the project to trigger refreshing its cauldron.json state
+    Touches the project to trigger refreshing its cauldron.json state.
     """
-
     r = Response()
-    project = cd.project.internal_project
+    project = cd.project.get_internal_project()
 
     if project:
         project.refresh()
@@ -53,9 +52,8 @@ def fetch_synchronize_status():
     Returns the synchronization status information for the currently opened
     project
     """
-
     r = Response()
-    project = cd.project.internal_project
+    project = cd.project.get_internal_project()
 
     if not project:
         r.fail(
@@ -152,7 +150,7 @@ def sync_source_file():
             message='Missing or invalid arguments'
         ).response.flask_serialize()
 
-    project = cd.project.internal_project
+    project = cd.project.get_internal_project()
 
     if not project:
         return r.fail(
@@ -201,7 +199,7 @@ def sync_source_file():
 def download_file(filename: str):
     """ downloads the specified project file if it exists """
 
-    project = cd.project.internal_project
+    project = cd.project.get_internal_project()
     source_directory = project.source_directory if project else None
 
     if not filename or not project or not source_directory:
@@ -228,7 +226,7 @@ def download_file(filename: str):
 def download_project_file(filename: str):
     """ downloads the specified project file if it exists """
 
-    project = cd.project.internal_project
+    project = cd.project.get_internal_project()
     source_directory = project.source_directory if project else None
 
     if not filename or not project or not source_directory:
@@ -279,7 +277,7 @@ def sync_create_project():
 
     sync_status.update({}, time=-1, project=None)
 
-    project = cd.project.internal_project
+    project = cd.project.get_internal_project()
     project.remote_source_directory = remote_source_directory
 
     with open(project.source_path, 'r') as f:

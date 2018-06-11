@@ -29,7 +29,7 @@ class TestPrinting(scaffolds.ResultsTest):
         response = commander.execute('run', '-f')
         response.thread.join(2)
 
-        step = cauldron.project.internal_project.steps[0]
+        step = cauldron.project.get_internal_project().steps[0]
         dom = step.dumps()
         self.assertEqual(dom.count('BAT'), 1, 'first check failed')
 
@@ -65,7 +65,7 @@ class TestPrinting(scaffolds.ResultsTest):
             Message('should have run step', response=response)
         )
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         dom = project.steps[0].dom  # type: str
 
         self.assertEqual(
@@ -99,7 +99,7 @@ class TestPrinting(scaffolds.ResultsTest):
             Message('should have run step', response=response)
         )
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         dom = project.steps[0].dom  # type: str
 
         self.assertEqual(
@@ -133,7 +133,7 @@ class TestPrinting(scaffolds.ResultsTest):
             Message('should have run step', response=response)
         )
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         dom = project.steps[0].dom  # type: str
 
         self.assertEqual(
@@ -168,7 +168,7 @@ class TestPrinting(scaffolds.ResultsTest):
             Message('should have run step', response=response)
         )
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         dom = project.steps[0].dom  # type: str
 
         self.assertEqual(

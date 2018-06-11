@@ -25,15 +25,11 @@ def server_status():
 @server_runner.APPLICATION.route('/status', methods=['GET', 'POST'])
 @authorization.gatekeeper
 def project_status():
-    """
-
-    :return:
-    """
-
+    """..."""
     r = Response()
 
     try:
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         if project:
             r.update(project=project.status())
         else:
@@ -55,10 +51,9 @@ def project_status():
 )
 @authorization.gatekeeper
 def clean_step(step_name: str):
-    """ """
-
+    """..."""
     r = Response()
-    project = cauldron.project.internal_project
+    project = cauldron.project.get_internal_project()
 
     if not project:
         return flask.jsonify(r.fail(
@@ -92,7 +87,7 @@ def project_data():
     r = Response()
 
     try:
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         if project:
             r.update(project=project.kernel_serialize())
         else:

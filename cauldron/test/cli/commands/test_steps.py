@@ -12,7 +12,7 @@ class TestSteps(scaffolds.ResultsTest):
     def test_steps_add(self):
         """Should add a step"""
         support.create_project(self, 'bob')
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
         r = support.run_command('steps add first.py')
         self.assertFalse(r.failed, 'should not have failed')
@@ -43,7 +43,7 @@ class TestSteps(scaffolds.ResultsTest):
             )
         )
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         directory = project.source_directory
 
         r = support.run_command('steps add first.py')
@@ -84,7 +84,7 @@ class TestSteps(scaffolds.ResultsTest):
         r = support.run_command('steps remove S02.py')
         self.assertFalse(r.failed, 'Removal should have succeeded')
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         step_names = [s.definition.name for s in project.steps]
 
         for i in range(STEP_COUNT - 1):
@@ -161,12 +161,12 @@ class TestSteps(scaffolds.ResultsTest):
     def test_remote(self):
         """Should function remotely"""
         support.create_project(self, 'nails')
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
         support.run_remote_command('open "{}" --forget'.format(
             project.source_directory
         ))
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
         added_response = support.run_remote_command('steps add')
         self.assertTrue(added_response.success, Message(

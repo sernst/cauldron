@@ -15,7 +15,11 @@ class TestRefresh(scaffolds.ResultsTest):
         Reads the project's data file from disk
         """
 
-        target_project = project if project else cd.project.internal_project
+        target_project = (
+            project
+            if project else
+            cd.project.get_internal_project()
+        )
 
         with open(target_project.source_path, 'r') as f:
             return json.load(f)
@@ -25,8 +29,11 @@ class TestRefresh(scaffolds.ResultsTest):
         """
         Overwrites the existing project data file with the specified data
         """
-
-        target_project = project if project else cd.project.internal_project
+        target_project = (
+            project
+            if project else
+            cd.project.get_internal_project()
+        )
 
         with open(target_project.source_path, 'w+') as f:
             json.dump(data, f)
@@ -47,7 +54,7 @@ class TestRefresh(scaffolds.ResultsTest):
         project_data['steps'].append(step_name)
         self.write_project_file(project_data)
 
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         self.assertTrue(project.refresh(force=True), 'should have refreshed')
         self.assertEqual(len(project.steps), 1)
         self.assertEqual(project.steps[0].definition.name, step_name)
@@ -59,7 +66,7 @@ class TestRefresh(scaffolds.ResultsTest):
 
         support.create_project(self, 'lucius')
 
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         project_data = self.read_project_file()
         project_data['path_results'] = project.source_directory
         self.write_project_file(project_data)
@@ -79,7 +86,7 @@ class TestRefresh(scaffolds.ResultsTest):
         project_data['change'] = True
         self.write_project_file(project_data)
 
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         self.assertTrue(project.refresh(force=True), 'should have refreshed')
         self.assertEqual(len(project.steps), 0)
 
@@ -91,5 +98,5 @@ class TestRefresh(scaffolds.ResultsTest):
         project_data = self.read_project_file()
         self.write_project_file(project_data)
 
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         self.assertFalse(project.refresh(), 'should not have refreshed')

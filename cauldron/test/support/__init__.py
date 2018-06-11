@@ -1,17 +1,16 @@
-from cauldron import cli
-import sys
 import re
-import time
+import sys
 from unittest.mock import patch
 
 import cauldron
+from cauldron import cli
 from cauldron import environ
 from cauldron.cli import commander
+from cauldron.cli import parse
 from cauldron.cli.shell import CauldronShell
 from cauldron.test.support import scaffolds
-from cauldron.test.support.messages import Message
-from cauldron.cli import parse
 from cauldron.test.support import server
+from cauldron.test.support.messages import Message
 
 try:
   import readline
@@ -122,22 +121,19 @@ def create_project(
     if r.thread:
         r.thread.join()
 
-    # Prevent threading race conditions
-    check_count = 0
-    while confirm and r.success and not cauldron.project.internal_project:
-        if check_count > 100:
-            break
-
-        check_count += 1
-        time.sleep(0.25)
+    project = (
+        cauldron.project.get_internal_project(2)
+        if r.success else
+        None
+    )
 
     if confirm:
         tester.assertFalse(r.failed, Message(
             'support.create_project',
-            ['project should have been created'],
+            'project should have been created',
             response=r
         ))
-        tester.assertIsNotNone(cauldron.project.internal_project)
+        tester.assertIsNotNone(project)
 
     return r
 
@@ -146,13 +142,7 @@ def open_project(
         tester: scaffolds.ResultsTest,
         path: str
 ) -> 'environ.Response':
-    """
-
-    :param tester:
-    :param path:
-    :return:
-    """
-
+    """..."""
     r = environ.Response()
     commander.execute('open', '{} --forget'.format(path), r)
     r.thread.join()
@@ -160,8 +150,7 @@ def open_project(
 
 
 def autocomplete(command: str):
-    """ """
-
+    """..."""
     # On Linux/OSX the completer delims are retrieved from the readline module,
     # but the delims are different on Windows. So for testing consistency we
     # supply the Linux/OSX delims explicitly here in place of:

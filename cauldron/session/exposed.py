@@ -114,17 +114,17 @@ class ExposedProject(object):
             step is stopped. When False, the notebook display will include
             information relating to the stopped action.
         """
-        step = self.internal_project.current_step
-        if not step:
+        me = self.get_internal_project()
+        if not me or not me.current_step:
             return
 
         if not silent:
-            render_stop_display(step, message)
+            render_stop_display(me.current_step, message)
         raise UserAbortError(halt=True)
 
     def get_internal_project(
             self,
-            timeout: float = 10
+            timeout: float = 3
     ) -> typing.Union['projects.Project', None]:
         """
         Attempts to return the internally loaded project. This function
@@ -136,8 +136,8 @@ class ExposedProject(object):
             Maximum number of seconds to wait before giving up and returning
             None.
         """
-        start_time = time.time()
-        while (time.time() - start_time) < timeout:
+        count = int(timeout / 0.2)
+        for _ in range(count):
             project = self.internal_project
             if project:
                 return project
@@ -163,7 +163,7 @@ class ExposedStep(object):
         """
         import cauldron
         try:
-            return cauldron.project.internal_project.current_step
+            return cauldron.project.get_internal_project().current_step
         except Exception:
             return None
 

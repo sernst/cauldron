@@ -27,7 +27,7 @@ class TestSyncDownload(FlaskResultsTest):
         """ should successfully download file """
 
         support.create_project(self, 'downloader')
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
         support.run_remote_command('open "{}"'.format(project.source_directory))
 

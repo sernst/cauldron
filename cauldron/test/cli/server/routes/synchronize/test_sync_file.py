@@ -49,13 +49,13 @@ class TestSyncFile(FlaskResultsTest):
         """ should synchronize file remotely """
 
         support.create_project(self, 'peter')
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
         response = support.run_remote_command(
             'open "{}"'.format(project.source_directory)
         )
         self.assert_no_errors(response)
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
         posted = self.post('/sync-file', {
             'relative_path': 'test.md',

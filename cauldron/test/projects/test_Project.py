@@ -17,7 +17,7 @@ class TestProject(scaffolds.ResultsTest):
         """A file source directory should be a directory"""
 
         support.create_project(self, 'lupin')
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
 
         p = projects.Project(project.source_path)
         self.assertTrue(os.path.isdir(p.source_directory))
@@ -27,7 +27,7 @@ class TestProject(scaffolds.ResultsTest):
         """A dict shared argument should be converted into a SharedCache"""
 
         support.create_project(self, 'tonks')
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
 
         shared_data = {'a': 1, 'b': True}
         p = projects.Project(project.source_directory, shared=shared_data)
@@ -41,7 +41,7 @@ class TestProject(scaffolds.ResultsTest):
         """Project title should be readable and writable"""
 
         support.create_project(self, 'sirius')
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
 
         title = 'My Title'
         project.title = title
@@ -57,7 +57,7 @@ class TestProject(scaffolds.ResultsTest):
             )
 
         support.create_project(self, 'dudley')
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
 
         project._results_path = None
         assert_valid_path(project.results_path)
@@ -79,7 +79,7 @@ class TestProject(scaffolds.ResultsTest):
         """Should not have an error"""
 
         support.create_project(self, 'vernon')
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
 
         self.assertFalse(project.has_error, 'error on project without steps')
 
@@ -95,7 +95,7 @@ class TestProject(scaffolds.ResultsTest):
         """Should have error if step raises an error when run"""
 
         support.create_project(self, 'petunia')
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
 
         support.add_step(self, contents='raise Exception("test")')
         support.run_command('run')
@@ -106,7 +106,7 @@ class TestProject(scaffolds.ResultsTest):
         """Should not find a step that doesn't exist"""
 
         support.create_project(self, 'luna')
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
 
         support.add_step(self)
         support.add_step(self)

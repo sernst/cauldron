@@ -28,7 +28,7 @@ class TestProjectDownload(FlaskResultsTest):
 
         support.create_project(self, 'project-downloader-2')
         support.add_step(self)
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         step_name = project.steps[0].filename
 
         support.run_remote_command('open "{}"'.format(project.source_directory))

@@ -136,7 +136,7 @@ def test_no_such_step(tester: CauldronTest):
 
 def test_no_such_project(tester: CauldronTest):
     """Should fail if no project exists"""
-    project = cd.project.internal_project
+    project = cd.project.get_internal_project()
     cd.project.load(None)
 
     with pytest.raises(Exception):

@@ -8,8 +8,7 @@ from cauldron.cli.server import run as server_run
 
 @server_run.APPLICATION.route('/view/<path:route>', methods=['GET', 'POST'])
 def view(route: str):
-
-    project = cauldron.project.internal_project
+    project = cauldron.project.get_internal_project()
     results_path = project.results_path if project else None
     if not project or not results_path:
         return '', 204

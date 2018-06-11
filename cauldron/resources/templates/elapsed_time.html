@@ -46,8 +46,10 @@
   <div class="cd-ElapsedTime__box">
     <span class="cd-ElapsedTime__header">ELAPSED</span>
     <div class="cd-ElapsedTime__valueBox">
-      <span class="cd-ElapsedTime__value">{{ hours }}</span>
-      <span class="cd-ElapsedTime__separator">:</span>
+      {% if hours != '00' %}
+        <span class="cd-ElapsedTime__value">{{ hours }}</span>
+        <span class="cd-ElapsedTime__separator">:</span>
+      {%  endif %}
       <span class="cd-ElapsedTime__value">{{ minutes }}</span>
       <span class="cd-ElapsedTime__separator">:</span>
       <span class="cd-ElapsedTime__value">{{ seconds }}</span>

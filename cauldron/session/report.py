@@ -1,7 +1,9 @@
 import os
 import time
+import typing
 
 from cauldron.render import texts as render_texts
+from cauldron.session import projects
 from cauldron.session.buffering import RedirectBuffer
 from cauldron.session.caching import SharedCache
 
@@ -14,9 +16,9 @@ class Report(object):
     """
 
     def __init__(self, step=None):
-        self.step = step
-        self.body = []
-        self.css = []
+        self.step = step  # type: projects.ProjectStep
+        self.body = []  # type: typing.List[str]
+        self.css = []  # type: typing.List[str]
         self.data = SharedCache()
         self.files = SharedCache()
         self.title = self.definition.get('title')
@@ -25,12 +27,11 @@ class Report(object):
         self.library_includes = []
         self.stdout_interceptor = None  # type: RedirectBuffer
         self.stderr_interceptor = None  # type: RedirectBuffer
-
         self._last_update_time = 0
 
     @property
     def last_update_time(self) -> float:
-        """ The last time at which the report was modified """
+        """The last time at which the report was modified."""
         stdout = self.stdout_interceptor
         stderr = self.stderr_interceptor
 
@@ -41,18 +42,19 @@ class Report(object):
         ])
 
     @property
-    def project(self):
+    def project(self) -> typing.Union['projects.Project', None]:
+        """
+        Project in which this report resides if such a project
+        exists or None otherwise.
+        """
         return self.step.project if self.step else None
 
     @property
     def results_cache_path(self) -> str:
         """
         Location where step report is cached between sessions to
-        prevent loss of display data between runs
-
-        :return:
+        prevent loss of display data between runs.
         """
-
         if not self.project:
             return ''
         return os.path.join(
@@ -86,11 +88,9 @@ class Report(object):
 
     def append_body(self, dom: str):
         """
-
-        :param dom:
-        :return:
+        Appends the specified HTML-formatted DOM string to the
+        currently stored report body for the step.
         """
-
         self.flush_stdout()
         self.body.append(dom)
         self._last_update_time = time.time()
@@ -105,7 +105,6 @@ class Report(object):
         :return:
             A dom string for the current state of the print buffer contents
         """
-
         try:
             contents = self.stdout_interceptor.read_all()
         except Exception as err:
@@ -115,9 +114,9 @@ class Report(object):
 
     def flush_stdout(self):
         """
-        Empties
+        Empties the standard out redirect buffer and renders the
+        contents to the body as a preformatted text box.
         """
-
         try:
             contents = self.stdout_interceptor.flush_all()
         except Exception:
@@ -138,17 +137,13 @@ class Report(object):
         :return:
             A string of the current state of the stderr redirect buffer contents
         """
-
         try:
             return self.stderr_interceptor.read_all()
         except Exception:
             return ''
 
     def flush_stderr(self) -> str:
-        """
-        Empties
-        """
-
+        """Empties the standard error redirect buffer."""
         try:
             return self.stderr_interceptor.flush_all()
         except Exception:

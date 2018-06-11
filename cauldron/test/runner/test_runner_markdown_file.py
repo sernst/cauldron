@@ -14,7 +14,7 @@ class TestRunnerMarkdownFile(scaffolds.ResultsTest):
         response = support.run_command('run -f')
         self.assertFalse(response.failed, 'should have failed')
 
-        step = cd.project.internal_project.steps[0]
+        step = cd.project.get_internal_project().steps[0]
         self.assertFalse(step.is_dirty())
 
     def test_invalid_markdown(self):

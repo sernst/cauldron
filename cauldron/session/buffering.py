@@ -36,7 +36,6 @@ class RedirectBuffer(io.TextIOWrapper):
         :return:
             A string for the current state of the print buffer contents
         """
-
         try:
             buffered_bytes = self.bytes_buffer.getvalue()
             if buffered_bytes is None:
@@ -80,6 +79,15 @@ class RedirectBuffer(io.TextIOWrapper):
             self.last_write_time = time.time()
             super(RedirectBuffer, self).write(*args, **kwargs)
 
+        return self.write_source(*args, **kwargs)
+
+    def write_source(self, *args, **kwargs):
+        """
+        Write only to the redirection source and skip the intermediate
+        intercept buffer. Useful for cases where writing output to the
+        console is desired without it ending up in the notebook display
+        as well.
+        """
         return self.redirection_source.write(*args, **kwargs)
 
     def __getattribute__(self, item):

@@ -61,7 +61,7 @@ class TestServerStatus(flask_scaffolds.FlaskResultsTest):
         support.create_project(self, 'luigi')
         support.add_step(self)
 
-        step = cauldron.project.internal_project.steps[0]
+        step = cauldron.project.get_internal_project().steps[0]
 
         cleaned = self.get('/clean-step/{}'.format(step.filename))
         self.assertEqual(cleaned.flask.status_code, 200)

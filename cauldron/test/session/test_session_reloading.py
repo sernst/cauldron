@@ -44,7 +44,7 @@ class TestSessionReloading(scaffolds.ResultsTest):
 
         support.create_project(self, 'betty')
         support.add_step(self)
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         project.current_step = project.steps[0]
 
         self.assertFalse(

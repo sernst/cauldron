@@ -66,11 +66,7 @@ def initialize(project: typing.Union[str, Project]):
 
 
 def close():
-    """
-
-    :return:
-    """
-
+    """..."""
     os.chdir(os.path.expanduser('~'))
     project = cauldron.project.internal_project
     if not project:
@@ -89,7 +85,7 @@ def reload_libraries(library_directories: list = None):
     directories
     """
     directories = library_directories or []
-    project = cauldron.project.internal_project
+    project = cauldron.project.get_internal_project()
     if project:
         directories += project.library_directories
 
@@ -150,7 +146,7 @@ def section(
     limit = max(1, limit)
 
     if project is None:
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
     starting_index = 0
     if starting:
@@ -202,7 +198,7 @@ def complete(
     """
 
     if project is None:
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
     starting_index = 0
     if starting:

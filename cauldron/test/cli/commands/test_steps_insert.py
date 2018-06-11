@@ -13,7 +13,7 @@ class TestStepsInsert(scaffolds.ResultsTest):
         support.add_step(self)
         support.add_step(self, position='0')
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         steps = project.steps
 
         self.assertTrue(steps[0].filename.startswith('S01'))
@@ -26,7 +26,7 @@ class TestStepsInsert(scaffolds.ResultsTest):
         support.add_step(self)
         support.add_step(self, name='.md', position='0')
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         steps = project.steps
 
         self.assertTrue(steps[0].filename.startswith('S01'))
@@ -41,7 +41,7 @@ class TestStepsInsert(scaffolds.ResultsTest):
         support.add_step(self)
         support.add_step(self, name='.md', position='0')
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         steps = project.steps
 
         self.assertTrue(steps[0].filename.startswith('S01'))
@@ -58,7 +58,7 @@ class TestStepsInsert(scaffolds.ResultsTest):
         support.add_step(self, name='C')
         support.add_step(self, name='D.md', position='0')
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         steps = project.steps
 
         self.assertTrue(steps[0].filename.startswith('S01-D'))

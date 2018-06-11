@@ -60,7 +60,7 @@ class TestExposed(scaffolds.ResultsTest):
         ]))
 
         support.run_command('run')
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         step = project.steps[0]
 
         self.assertEqual(project.shared.fetch('test'), 1)
@@ -86,7 +86,7 @@ class TestExposed(scaffolds.ResultsTest):
         ]))
 
         support.run_command('run')
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         step = project.steps[0]
 
         self.assertEqual(project.shared.fetch('test'), 1)
@@ -112,7 +112,7 @@ class TestExposed(scaffolds.ResultsTest):
         ]))
 
         support.run_command('run')
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         step = project.steps[0]
 
         self.assertEqual(project.shared.fetch('test'), 1)
@@ -135,7 +135,7 @@ class TestExposed(scaffolds.ResultsTest):
         support.add_step(self, contents=contents)
 
         support.run_command('run')
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         step = project.steps[0]
 
         self.assertEqual(project.shared.fetch('test'), 1)
@@ -179,4 +179,4 @@ class TestExposed(scaffolds.ResultsTest):
         internal_project.return_value = None
         result = project.get_internal_project()
         self.assertIsNone(result)
-        self.assertEqual(9, sleep.call_count)
+        self.assertEqual(15, sleep.call_count)

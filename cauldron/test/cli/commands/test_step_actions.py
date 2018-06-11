@@ -34,7 +34,7 @@ class TestStepActions(scaffolds.ResultsTest):
         """ should return default value if bad string is supplied """
 
         support.create_project(self, 'ray')
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
         result = step_actions.index_from_location(None, project, '12s', 42)
         self.assertEqual(result, 42)
@@ -44,7 +44,7 @@ class TestStepActions(scaffolds.ResultsTest):
 
         support.create_project(self, 'bradbury')
         support.add_step(self)
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         step = project.steps[0]
 
         result = step_actions.index_from_location(None, project, step.filename)
@@ -54,7 +54,7 @@ class TestStepActions(scaffolds.ResultsTest):
         """ should fail to mute a step that does not exist """
 
         support.create_project(self, 'lewis')
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
         r = Response()
         step_actions.toggle_muting(r, project, 'not-a-step')
@@ -68,7 +68,7 @@ class TestStepActions(scaffolds.ResultsTest):
         support.create_project(self, 'carrol')
         support.add_step(self)
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         step = project.steps[0]
         self.assertFalse(step.is_muted)
 

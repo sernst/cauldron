@@ -41,7 +41,7 @@ class TestSave(scaffolds.ResultsTest):
         self.assertFalse(r.failed)
         self.assertTrue(os.path.exists(r.data['path']))
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         self.assertTrue(
             r.data['path'].endswith('{}.cauldron'.format(project.title))
         )
@@ -84,7 +84,7 @@ class TestSave(scaffolds.ResultsTest):
         download_file.return_value = Response().fail().response
 
         support.create_project(self, 'apophis')
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
         support.run_remote_command('open "{}"'.format(project.source_directory))
 
@@ -98,7 +98,7 @@ class TestSave(scaffolds.ResultsTest):
         download_file.return_value = Response()
 
         support.create_project(self, 'apophis')
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
         support.run_remote_command('open "{}"'.format(project.source_directory))
 

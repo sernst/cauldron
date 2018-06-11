@@ -16,7 +16,7 @@ class TestRunnerSource(scaffolds.ResultsTest):
         support.create_project(self, 'washington')
         support.add_step(self)
 
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         step = project.steps[0]
 
         result = source.get_step(project, step.filename)
@@ -28,7 +28,7 @@ class TestRunnerSource(scaffolds.ResultsTest):
         support.create_project(self, 'george')
         support.add_step(self)
 
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         self.assertIsNone(source.get_step(project, 'FICTIONAL-STEP'))
 
     def test_invalid_step_extension(self):
@@ -37,7 +37,7 @@ class TestRunnerSource(scaffolds.ResultsTest):
         support.create_project(self, 'thomas')
         support.add_step(self, 'TEST.fake')
 
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         step = project.steps[0]
         result = source._execute_step(project, step)
 
@@ -47,7 +47,7 @@ class TestRunnerSource(scaffolds.ResultsTest):
         """ should fail to run a None step """
 
         support.create_project(self, 'jefferson')
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         result = source.run_step(Response(), project, 'FAKE.STEP')
         self.assertFalse(result)
 
@@ -60,7 +60,7 @@ class TestRunnerSource(scaffolds.ResultsTest):
 
         support.create_project(self, 'john')
         support.add_step(self)
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         step = project.steps[0]
 
         result = source.run_step(Response(), project, step)
@@ -75,7 +75,7 @@ class TestRunnerSource(scaffolds.ResultsTest):
 
         support.create_project(self, 'adams')
         support.add_step(self)
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         step = project.steps[0]
 
         result = source.run_step(Response(), project, step)
@@ -86,7 +86,7 @@ class TestRunnerSource(scaffolds.ResultsTest):
 
         support.create_project(self, 'quincy')
         support.add_step(self)
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         step = project.steps[0]
 
         package = 'cauldron.runner.source._execute_step'
@@ -100,7 +100,7 @@ class TestRunnerSource(scaffolds.ResultsTest):
 
         support.create_project(self, 'madison')
         support.add_step(self)
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         step = project.steps[0]
         step.is_muted = True
 
@@ -112,7 +112,7 @@ class TestRunnerSource(scaffolds.ResultsTest):
 
         support.create_project(self, 'james')
         support.add_step(self)
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         step = project.steps[0]
 
         with patch('os.path.exists', return_value=False):
@@ -124,7 +124,7 @@ class TestRunnerSource(scaffolds.ResultsTest):
 
         support.create_project(self, 'monroe')
         support.add_step(self)
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         step = project.steps[0]
         step.is_dirty = lambda: False
 

@@ -16,7 +16,7 @@ class TestSync(scaffolds.ResultsTest):
         response = support.run_remote_command('sync')
         self.assertTrue(response.success)
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         remote_files = sorted(os.listdir(project.remote_source_directory))
         local_files = sorted(os.listdir(project.source_directory))
 

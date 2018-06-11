@@ -201,7 +201,7 @@ def abort():
         except Exception:
             pass
 
-    project = cd.project.internal_project
+    project = cd.project.get_internal_project()
 
     if project and project.current_step:
         step = project.current_step
