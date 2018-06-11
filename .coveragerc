@@ -7,3 +7,4 @@ omit =
     /conda-recipe/*.py
     /docker-builder.py
     /launcher.py
+    *.py.txt

@@ -1,4 +1,5 @@
 import os
+import time
 import typing
 from datetime import datetime
 
@@ -24,8 +25,11 @@ class ExposedProject(object):
         self._project = None  # type: projects.Project
 
     @property
-    def internal_project(self) -> projects.Project:
-        """The current Cauldron project that is represented by this object."""
+    def internal_project(self) -> typing.Union[projects.Project, None]:
+        """
+        The current Cauldron project that is represented by this object.
+        The value will be None if no project has been loaded.
+        """
         return self._project
 
     @property
@@ -35,7 +39,7 @@ class ExposedProject(object):
 
     @property
     def display(self) -> typing.Union[None, report.Report]:
-        """The display report for the current project"""
+        """The display report for the current project."""
         return (
             self._project.current_step.report
             if self._project and self._project.current_step else
@@ -44,17 +48,17 @@ class ExposedProject(object):
 
     @property
     def shared(self) -> typing.Union[None, SharedCache]:
-        """The shared display object associated with this project"""
+        """The shared display object associated with this project."""
         return self._project.shared if self._project else None
 
     @property
     def settings(self) -> typing.Union[None, SharedCache]:
-        """The settings associated with this project"""
+        """The settings associated with this project."""
         return self._project.settings if self._project else None
 
     @property
     def title(self) -> typing.Union[None, str]:
-        """The title of this project"""
+        """The title of this project."""
         return self._project.title if self._project else None
 
     @title.setter
@@ -110,13 +114,36 @@ class ExposedProject(object):
             step is stopped. When False, the notebook display will include
             information relating to the stopped action.
         """
-        step = self.internal_project.current_step
-        if not step:
+        me = self.get_internal_project()
+        if not me or not me.current_step:
             return
 
         if not silent:
-            render_stop_display(step, message)
+            render_stop_display(me.current_step, message)
         raise UserAbortError(halt=True)
+
+    def get_internal_project(
+            self,
+            timeout: float = 3
+    ) -> typing.Union['projects.Project', None]:
+        """
+        Attempts to return the internally loaded project. This function
+        prevents race condition issues where projects are loaded via threads
+        because the internal loop will try to continuously load the internal
+        project until it is available or until the timeout is reached.
+
+        :param timeout:
+            Maximum number of seconds to wait before giving up and returning
+            None.
+        """
+        count = int(timeout / 0.2)
+        for _ in range(count):
+            project = self.internal_project
+            if project:
+                return project
+            time.sleep(0.2)
+
+        return self.internal_project
 
 
 class ExposedStep(object):
@@ -134,10 +161,9 @@ class ExposedStep(object):
         :return:
             The ProjectStep instance that this ExposedStep represents
         """
-
         import cauldron
         try:
-            return cauldron.project.internal_project.current_step
+            return cauldron.project.get_internal_project().current_step
         except Exception:
             return None
 
@@ -212,7 +238,7 @@ class ExposedStep(object):
 
 
 def render_stop_display(step: 'projects.ProjectStep', message: str):
-    """Renders a stop action to the Cauldron display"""
+    """Renders a stop action to the Cauldron display."""
     stack = render_stack.get_formatted_stack_frame(
         project=step.project,
         error_stack=False

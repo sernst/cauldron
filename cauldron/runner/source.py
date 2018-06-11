@@ -157,7 +157,10 @@ def run_step(
     )
 
     if result['success']:
-        environ.log('[{}]: Updated'.format(step.definition.name))
+        environ.log('[{}]: Updated in {}'.format(
+            step.definition.name,
+            step.get_elapsed_timestamp()
+        ))
     else:
         response.fail(
             message='Step execution error',

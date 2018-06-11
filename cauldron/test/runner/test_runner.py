@@ -18,7 +18,7 @@ class TestRunner(scaffolds.ResultsTest):
         response = support.run_command('run -f')
         self.assertTrue(response.failed, 'should have failed')
 
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         step = project.steps[0]
 
         self.assertTrue(step.dom.find('cd-CodeError') > 0)
@@ -58,7 +58,7 @@ class TestRunner(scaffolds.ResultsTest):
     def test_library(self):
         """ should refresh the local project library with the updated value """
         support.create_project(self, 'jack')
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
 
         lib_directory = os.path.join(project.source_directory, 'libs', '_jack')
         os.makedirs(lib_directory)

@@ -81,7 +81,6 @@ class TestBatcher(scaffolds.ResultsTest):
 
     def test_run_open_fail(self):
         """Should fail to open a project"""
-
         directory = self.get_temp_path('open-fail')
         result = run_project('fake-project-does-not-exist', directory)
         self.assertFalse(result.response.success)

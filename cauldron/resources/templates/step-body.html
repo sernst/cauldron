@@ -3,6 +3,33 @@
      data-step-name="{{ id }}"
      data-step-updated="{{ last_display_update }}"
 >
+  <style scoped>
+    .cd-step-elapsed {
+      display: none;
+      position: absolute;
+      z-index: 20;
+      background-color: #555;
+      border: 1px solid #444;
+      color: #EEE;
+      padding: 0.25em 1em;
+      align-items: center;
+      right: 0;
+    }
+    .cd-step-elapsed__header {
+      margin-right: 10px;
+    }
+    .cd-step-elapsed__value {
+      font-size: 1.5rem;
+    }
+    .cd-step-stopwatch {
+      margin-right: 10px;
+      margin-top: 2px;
+      cursor: zoom-in;
+    }
+    .cd-step-stopwatch:hover .cd-step-elapsed {
+      display: block;
+    }
+  </style>
   <a class="step-anchor" name="{{ id }}" data-type=""></a>
   <div class="cd-project-step__header cd-project-step__header--standard"
        data-default-modifier="cd-project-step__header--standard"
@@ -29,6 +56,14 @@
     </div>
 
     <div class="spacer"> </div>
+
+    <div class="cd-step-stopwatch">
+      <i class="material-icons md-18">timer</i>
+      <div class="cd-step-elapsed">
+        <div class="cd-step-elapsed__header">Elapsed Time:</div>
+        <div class="cd-step-elapsed__value">{{ elapsed_time }}</div>
+      </div>
+    </div>
 
     <div class="button-bar">
       {% if code %}

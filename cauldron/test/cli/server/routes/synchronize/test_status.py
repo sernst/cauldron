@@ -41,7 +41,7 @@ class TestStatus(scaffolds.ResultsTest):
         """ should return information about the project """
 
         support.create_project(self, 'eric')
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         results = status.of_project(project)
 
         self.assertEqual(len(results['libraries']), 2)

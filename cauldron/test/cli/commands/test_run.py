@@ -89,7 +89,7 @@ class TestRun(scaffolds.ResultsTest):
         support.create_project(self, 'crystal')
         support.add_step(self)
 
-        step = cauldron.project.internal_project.steps[0]
+        step = cauldron.project.get_internal_project().steps[0]
 
         result = support.autocomplete('run {}'.format(step.filename[:2]))
         self.assertEqual(len(result), 1)
@@ -114,7 +114,7 @@ class TestRun(scaffolds.ResultsTest):
         support.add_step(self)
         support.add_step(self)
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         step_names = [s.filename for s in project.steps[:-1]]
 
         r = run.execute(
@@ -135,7 +135,7 @@ class TestRun(scaffolds.ResultsTest):
         support.add_step(self)
         support.add_step(self)
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
         r = run.execute(
             context=cli.make_command_context(name=run.NAME),
@@ -165,7 +165,7 @@ class TestRun(scaffolds.ResultsTest):
         support.add_step(self)
         support.add_step(self)
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
         r = run.execute(
             context=cli.make_command_context(name=run.NAME),
@@ -184,7 +184,7 @@ class TestRun(scaffolds.ResultsTest):
         support.add_step(self)
         support.add_step(self)
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         step_names = [s.filename for s in project.steps[:-1]]
         step_names.append(project.steps[0].filename)
 
@@ -206,7 +206,7 @@ class TestRun(scaffolds.ResultsTest):
         support.add_step(self)
         support.add_step(self)
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         step_names = [
             project.steps[1].filename,
             project.steps[0].filename,
@@ -230,7 +230,7 @@ class TestRun(scaffolds.ResultsTest):
         support.add_step(self)
         support.add_step(self)
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         step_names = [s.filename for s in project.steps]
         step_names.append('FAKE-STEP')
 
@@ -247,7 +247,9 @@ class TestRun(scaffolds.ResultsTest):
         support.create_project(self, 'rhino')
         support.add_step(self, contents='print("hello!")')
 
-        source_directory = cauldron.project.internal_project.source_directory
+        source_directory = (
+            cauldron.project.get_internal_project().source_directory
+        )
 
         opened_response = support.run_remote_command(
             'open "{}"'.format(source_directory)
@@ -266,7 +268,9 @@ class TestRun(scaffolds.ResultsTest):
         support.create_project(self, 'pig')
         support.add_step(self, contents='print("hello!")')
 
-        source_directory = cauldron.project.internal_project.source_directory
+        source_directory = (
+            cauldron.project.get_internal_project().source_directory
+        )
 
         opened_response = support.run_remote_command(
             'open "{}"'.format(source_directory)

@@ -11,7 +11,7 @@ class TestClose(scaffolds.ResultsTest):
         support.run_command('open @examples:hello_cauldron')
         response = support.run_command('close')
         self.assertTrue(response.success, 'should not have failed')
-        self.assertIsNone(cauldron.project.internal_project)
+        self.assertIsNone(cauldron.project.get_internal_project())
 
     def test_no_open_project(self):
         """Should not close when no project is open"""

@@ -140,12 +140,7 @@ def text(value: str) -> str:
 
 
 def preformatted_text(source: str) -> str:
-    """
-
-    :param source:
-    :return:
-    """
-
+    """Renders preformatted text box"""
     environ.abort_thread()
 
     if not source:

@@ -66,7 +66,7 @@ class TestExport(scaffolds.ResultsTest):
         self.assertFalse(r.failed, 'should not have failed')
         self.assertTrue(os.path.exists(out_path) and os.path.isdir(out_path))
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
         os.makedirs(os.path.join(
             project.results_path,

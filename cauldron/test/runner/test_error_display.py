@@ -25,7 +25,7 @@ class TestPrinting(scaffolds.ResultsTest):
             Message('should have failed', response=response)
         )
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
         self.assertTrue(
             project.steps[0].dom.find('cd-CodeError') > 0,
@@ -61,7 +61,7 @@ class TestPrinting(scaffolds.ResultsTest):
             Message('should have run step', response=response)
         )
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
         self.assertTrue(
             project.steps[0].dom.find(error_string) > 0,

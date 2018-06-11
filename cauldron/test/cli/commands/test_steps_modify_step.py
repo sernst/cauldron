@@ -21,7 +21,7 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
         support.add_step(self, 'second')
         support.add_step(self, 'third')
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
         r = Response()
         result = step_actions.modify_step(
@@ -42,7 +42,7 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
         support.create_project(self, 'bloomington')
         support.add_step(self, 'first')
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         step = project.steps[0]
         r = Response()
 
@@ -59,7 +59,7 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
         support.create_project(self, 'richfield')
         support.add_step(self, 'first')
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         step = project.steps[0]
         r = Response()
 
@@ -84,7 +84,7 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
         """ should rename properly a nameless step """
 
         support.create_project(self, 'columbia-heights')
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         project.naming_scheme = None
 
         support.add_step(self)
@@ -113,7 +113,7 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
         support.create_project(self, 'blaine')
         support.add_step(self)
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
         r = Response()
         step_actions.modify_step(

@@ -1,28 +1,28 @@
+import json as _json_io
+import textwrap
 import typing
-import sys
 from datetime import timedelta
 
 import cauldron as _cd
-from cauldron.session import report
-from cauldron import render
 from cauldron import environ
-from cauldron.render import texts as render_texts
+from cauldron import render
 from cauldron.render import plots as render_plots
+from cauldron.render import texts as render_texts
+from cauldron.session import report
 
 
 def _get_report() -> 'report.Report':
-    """ """
-
-    return _cd.project.internal_project.current_step.report
+    """Fetches the report associated with the currently running step."""
+    return _cd.project.get_internal_project().current_step.report
 
 
 def inspect(source: dict):
     """
     Inspects the data and structure of the source dictionary object and
-    adds the results to the display for viewing
+    adds the results to the display for viewing.
 
     :param source:
-        A dictionary object to be inspected
+        A dictionary object to be inspected.
     :return:
     """
     r = _get_report()
@@ -34,7 +34,7 @@ def header(header_text: str, level: int = 1, expand_full: bool = False):
     Adds a text header to the display with the specified level.
 
     :param header_text:
-        The text to display in the header
+        The text to display in the header.
     :param level:
         The level of the header, which corresponds to the html header
         levels, such as <h1>, <h2>, ...
@@ -58,18 +58,19 @@ def text(value: str, preformatted: bool = False):
     inside a pre tag with a monospace font.
 
     :param value:
-        The text to display
+        The text to display.
     :param preformatted:
-        Whether or not to preserve the whitespace display the text
+        Whether or not to preserve the whitespace display of the text.
     """
-
     if preformatted:
         result = render_texts.preformatted_text(value)
     else:
         result = render_texts.text(value)
-
     r = _get_report()
     r.append_body(result)
+    r.stdout_interceptor.write_source(
+        '{}\n'.format(textwrap.dedent(value))
+    )
 
 
 def markdown(source: str = None, source_path: str = None, **kwargs):
@@ -78,14 +79,13 @@ def markdown(source: str = None, source_path: str = None, **kwargs):
     adds the resulting HTML to the notebook display.
 
     :param source:
-        A markdown formatted string
+        A markdown formatted string.
     :param source_path:
-        A file containing markdown text
+        A file containing markdown text.
     :param kwargs:
         Any variable replacements to make within the string using Jinja2
         templating syntax.
     """
-
     r = _get_report()
 
     result = render_texts.markdown(
@@ -96,6 +96,9 @@ def markdown(source: str = None, source_path: str = None, **kwargs):
     r.library_includes += result['library_includes']
 
     r.append_body(result['body'])
+    r.stdout_interceptor.write_source(
+        '{}\n'.format(textwrap.dedent(source))
+    )
 
 
 def json(**kwargs):
@@ -108,9 +111,11 @@ def json(**kwargs):
         Each keyword argument is added to the CD.data object with the
         specified key and value.
     """
-
     r = _get_report()
     r.append_body(render.json(**kwargs))
+    r.stdout_interceptor.write_source(
+        '{}\n'.format(_json_io.dumps(kwargs, indent=2))
+    )
 
 
 def plotly(
@@ -121,12 +126,13 @@ def plotly(
         static: bool = False
 ):
     """
-    Creates a Plotly plot in the display with the specified data and layout
+    Creates a Plotly plot in the display with the specified data and
+    layout.
 
     :param data:
-        The Plotly trace data to be plotted
+        The Plotly trace data to be plotted.
     :param layout:
-        The layout data used for the plot
+        The layout data used for the plot.
     :param scale:
         The display scale with units of fractional screen height. A value
         of 0.5 constrains the output to a maximum height equal to half the
@@ -140,7 +146,6 @@ def plotly(
         If true, the plot will be created without interactivity.
         This is useful if you have a lot of plots in your notebook.
     """
-
     r = _get_report()
 
     if not figure and not isinstance(data, (list, tuple)):
@@ -156,6 +161,7 @@ def plotly(
         figure=figure,
         static=static
     ))
+    r.stdout_interceptor.write_source('[ADDED] Plotly plot\n')
 
 
 def table(
@@ -166,10 +172,10 @@ def table(
 ):
     """
     Adds the specified data frame to the display in a nicely formatted
-    scrolling table
+    scrolling table.
 
     :param data_frame:
-        The pandas data frame to be rendered to a table
+        The pandas data frame to be rendered to a table.
     :param scale:
         The display scale with units of fractional screen height. A value
         of 0.5 constrains the output to a maximum height equal to half the
@@ -185,7 +191,6 @@ def table(
         sluggish or unresponsive. If you want to display large tables, you need
         only increase the value of this argument.
     """
-
     r = _get_report()
     r.append_body(render.table(
         data_frame=data_frame,
@@ -193,6 +198,7 @@ def table(
         include_index=include_index,
         max_rows=max_rows
     ))
+    r.stdout_interceptor.write_source('[ADDED] Table\n')
 
 
 def svg(svg_dom: str, filename: str = None):
@@ -202,14 +208,14 @@ def svg(svg_dom: str, filename: str = None):
     project results folder.
 
     :param svg_dom:
-        The SVG string data to add to the display
+        The SVG string data to add to the display.
     :param filename:
         An optional filename where the SVG data should be saved within
-        the project results folder
+        the project results folder.
     """
-
     r = _get_report()
     r.append_body(render.svg(svg_dom))
+    r.stdout_interceptor.write_source('[ADDED] SVG\n')
 
     if not filename:
         return
@@ -223,17 +229,17 @@ def svg(svg_dom: str, filename: str = None):
 def jinja(path: str, **kwargs):
     """
     Renders the specified Jinja2 template to HTML and adds the output to the
-    display
+    display.
 
     :param path:
         The fully-qualified path to the template to be rendered.
     :param kwargs:
         Any keyword arguments that will be use as variable replacements within
-        the template
+        the template.
     """
-
     r = _get_report()
     r.append_body(render.jinja(path, **kwargs))
+    r.stdout_interceptor.write_source('[ADDED] Jinja2 rendered HTML\n')
 
 
 def whitespace(lines: float = 1.0):
@@ -243,21 +249,21 @@ def whitespace(lines: float = 1.0):
     :param lines:
         The number of lines of whitespace to show.
     """
-
     r = _get_report()
     r.append_body(render.whitespace(lines))
+    r.stdout_interceptor.write_source('[ADDED] Whitespace\n')
 
 
 def html(dom: str):
     """
-    A string containing a valid HTML snippet
+    A string containing a valid HTML snippet.
 
     :param dom:
-        The HTML string to add to the display
+        The HTML string to add to the display.
     """
-
     r = _get_report()
     r.append_body(render.html(dom))
+    r.stdout_interceptor.write_source('[ADDED] HTML\n')
 
 
 def workspace(show_values: bool = True, show_types: bool = True):
@@ -267,12 +273,11 @@ def workspace(show_values: bool = True, show_types: bool = True):
 
     :param show_values:
         When true the values for each variable will be shown in addition to
-        their name
+        their name.
     :param show_types:
         When true the data types for each shared variable will be shown in
-        addition to their name
+        addition to their name.
     """
-
     r = _get_report()
 
     data = {}
@@ -315,7 +320,6 @@ def pyplot(
         specified, the currently assigned values to the plot will be used
         instead.
     """
-
     r = _get_report()
     r.append_body(render_plots.pyplot(
         figure,
@@ -323,14 +327,15 @@ def pyplot(
         clear=clear,
         aspect_ratio=aspect_ratio
     ))
+    r.stdout_interceptor.write_source('[ADDED] PyPlot plot\n')
 
 
 def bokeh(model, scale: float = 0.7, responsive: bool = True):
     """
-    Adds a Bokeh plot object to the notebook display
+    Adds a Bokeh plot object to the notebook display.
 
     :param model:
-        The plot object to be added to the notebook display
+        The plot object to be added to the notebook display.
     :param scale:
         How tall the plot should be in the notebook as a fraction of screen
         height. A number between 0.1 and 1.0. The default value is 0.7.
@@ -338,7 +343,6 @@ def bokeh(model, scale: float = 0.7, responsive: bool = True):
         Whether or not the plot should responsively scale to fill the width
         of the notebook. The default is True.
     """
-
     r = _get_report()
 
     if 'bokeh' not in r.library_includes:
@@ -349,6 +353,7 @@ def bokeh(model, scale: float = 0.7, responsive: bool = True):
         scale=scale,
         responsive=responsive
     ))
+    r.stdout_interceptor.write_source('[ADDED] Bokeh plot\n')
 
 
 def listing(
@@ -361,7 +366,7 @@ def listing(
     each element is converted to a string representation for display.
 
     :param source:
-        The iterable to display as a list
+        The iterable to display as a list.
     :param ordered:
         Whether or not the list should be ordered. If False, which is the
         default, an unordered bulleted list is created.
@@ -371,13 +376,13 @@ def listing(
         area of the screen along with other text. This can be useful to keep
         lists aligned with the text flow.
     """
-
     r = _get_report()
     r.append_body(render.listing(
         source=source,
         ordered=ordered,
         expand_full=expand_full
     ))
+    r.stdout_interceptor.write_source('[ADDED] Listing\n')
 
 
 def list_grid(
@@ -391,7 +396,7 @@ def list_grid(
     each element is converted to a string representation for display.
 
     :param source:
-        The iterable to display as a list
+        The iterable to display as a list.
     :param expand_full:
         Whether or not the list should expand to fill the screen horizontally.
         When defaulted to False, the list is constrained to the center view
@@ -406,7 +411,6 @@ def list_grid(
         The number of lines of whitespace to include between each row in the
         grid. Set this to 0 for tightly displayed lists.
     """
-
     r = _get_report()
     r.append_body(render.list_grid(
         source=source,
@@ -414,6 +418,7 @@ def list_grid(
         column_count=column_count,
         row_spacing=row_spacing
     ))
+    r.stdout_interceptor.write_source('[ADDED] List grid\n')
 
 
 def latex(source: str):
@@ -426,12 +431,12 @@ def latex(source: str):
     :param source:
         The string representing the latex equation to be rendered.
     """
-
     r = _get_report()
     if 'katex' not in r.library_includes:
         r.library_includes.append('katex')
 
     r.append_body(render_texts.latex(source.replace('@', '\\')))
+    r.stdout_interceptor.write_source('[ADDED] Latex equation\n')
 
 
 def head(source, count: int = 5):
@@ -448,8 +453,9 @@ def head(source, count: int = 5):
     :param count:
         The number of elements to show from the source.
     """
-
-    _get_report().append_body(render_texts.head(source, count=count))
+    r = _get_report()
+    r.append_body(render_texts.head(source, count=count))
+    r.stdout_interceptor.write_source('[ADDED] Head\n')
 
 
 def tail(source, count: int = 5):
@@ -466,8 +472,9 @@ def tail(source, count: int = 5):
     :param count:
         The number of elements to show from the source.
     """
-
-    _get_report().append_body(render_texts.tail(source, count=count))
+    r = _get_report()
+    r.append_body(render_texts.tail(source, count=count))
+    r.stdout_interceptor.write_source('[ADDED] Tail\n')
 
 
 def status(
@@ -507,7 +514,7 @@ def status(
         assigned section progress value will be retained.
     """
     environ.abort_thread()
-    step = _cd.project.internal_project.current_step
+    step = _cd.project.get_internal_project().current_step
 
     if message is not None:
         step.progress_message = message
@@ -547,14 +554,15 @@ def code_block(
         that contains the value of this argument
     """
     environ.abort_thread()
-
-    _get_report().append_body(render.code_block(
+    r = _get_report()
+    r.append_body(render.code_block(
         block=code,
         path=path,
         language=language_id,
         title=title,
         caption=caption
     ))
+    r.stdout_interceptor.write_source('{}\n'.format(code))
 
 
 def elapsed():
@@ -562,7 +570,9 @@ def elapsed():
     Displays the elapsed time since the step started running.
     """
     environ.abort_thread()
-    step = _cd.project.internal_project.current_step
+    step = _cd.project.get_internal_project().current_step
+    r = _get_report()
+    r.append_body(render.elapsed_time(step.elapsed_time))
+
     result = '[ELAPSED]: {}\n'.format(timedelta(seconds=step.elapsed_time))
-    sys.stdout.buffer.write(result.encode())
-    _get_report().append_body(render.elapsed_time(step.elapsed_time))
+    r.stdout_interceptor.write_source(result)

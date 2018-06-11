@@ -1,3 +1,7 @@
+from unittest.mock import patch
+from unittest.mock import MagicMock
+from unittest.mock import PropertyMock
+
 import cauldron as cd
 from cauldron.session import exposed
 from cauldron.test import support
@@ -56,7 +60,7 @@ class TestExposed(scaffolds.ResultsTest):
         ]))
 
         support.run_command('run')
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         step = project.steps[0]
 
         self.assertEqual(project.shared.fetch('test'), 1)
@@ -82,7 +86,7 @@ class TestExposed(scaffolds.ResultsTest):
         ]))
 
         support.run_command('run')
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         step = project.steps[0]
 
         self.assertEqual(project.shared.fetch('test'), 1)
@@ -108,7 +112,7 @@ class TestExposed(scaffolds.ResultsTest):
         ]))
 
         support.run_command('run')
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         step = project.steps[0]
 
         self.assertEqual(project.shared.fetch('test'), 1)
@@ -131,8 +135,48 @@ class TestExposed(scaffolds.ResultsTest):
         support.add_step(self, contents=contents)
 
         support.run_command('run')
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         step = project.steps[0]
 
         self.assertEqual(project.shared.fetch('test'), 1)
         self.assertEqual(-1, step.dom.find('cd-StepStop'))
+
+    @patch(
+        'cauldron.session.exposed.ExposedProject.internal_project',
+        new_callable=PropertyMock
+    )
+    @patch('time.sleep')
+    def test_get_internal_project(
+            self,
+            sleep: MagicMock,
+            internal_project: PropertyMock
+    ):
+        """Should get internal project on the third attempt"""
+        project = exposed.ExposedProject()
+        internal_project.side_effect = [None, None, 'test']
+        result = project.get_internal_project()
+        self.assertEqual('test', result)
+        self.assertEqual(2, sleep.call_count)
+
+    @patch(
+        'cauldron.session.exposed.ExposedProject.internal_project',
+        new_callable=PropertyMock
+    )
+    @patch('time.time')
+    @patch('time.sleep')
+    def test_get_internal_project_fail(
+            self,
+            sleep: MagicMock,
+            time_time: MagicMock,
+            internal_project: PropertyMock
+    ):
+        """
+        Should fail to get internal project and return None after
+        eventually timing out.
+        """
+        project = exposed.ExposedProject()
+        time_time.side_effect = range(20)
+        internal_project.return_value = None
+        result = project.get_internal_project()
+        self.assertIsNone(result)
+        self.assertEqual(15, sleep.call_count)

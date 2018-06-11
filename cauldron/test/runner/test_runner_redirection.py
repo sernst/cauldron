@@ -20,7 +20,7 @@ class TestRunnerRedirection(scaffolds.ResultsTest):
         support.create_project(self, 'percy')
         support.add_step(self)
 
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         step = project.steps[0]
 
         redirection.enable(step)
@@ -39,7 +39,7 @@ class TestRunnerRedirection(scaffolds.ResultsTest):
         support.create_project(self, 'tonks')
         support.add_step(self)
 
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         step = project.steps[0]
 
         redirection.enable(step)

@@ -46,5 +46,5 @@ class TestSyncCreate(FlaskResultsTest):
         response = created.response
         self.assert_has_success_code(response, 'PROJECT_CREATED')
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         self.assertEqual(project.remote_source_directory, source_directory)

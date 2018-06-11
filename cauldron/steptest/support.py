@@ -55,21 +55,18 @@ def open_project(project_path: str) -> 'exposed.ExposedProject':
     res.thread.join()
 
     # Prevent threading race conditions
-    check_count = 0
-    while res.success and not cd.project.internal_project:
-        if check_count > 100:
-            break
+    project = (
+        cd.project.get_internal_project()
+        if res.success else
+        None
+    )
 
-        check_count += 1
-        time.sleep(0.25)
-
-    if res.failed or not cd.project.internal_project:
+    if res.failed or not project:
         raise RuntimeError(
             'Unable to open project at path "{}"'.format(project_path)
         )
 
-    os.chdir(cd.project.internal_project.source_directory)
-
+    os.chdir(project.source_directory)
     return cd.project
 
 
@@ -92,7 +89,7 @@ def run_step(
         A StepTestRunResult instance containing information about the
         execution of the step.
     """
-    project = cd.project.internal_project
+    project = cd.project.get_internal_project()
     if not project:
         raise AssertionError(
             'No project was open. Unable to run step "{}"'

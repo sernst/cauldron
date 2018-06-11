@@ -107,7 +107,7 @@ class TestSessionDisplay(scaffolds.ResultsTest):
 
         support.create_project(self, 'starbuck')
 
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
         jinja_path = os.path.join(
             project.source_directory,

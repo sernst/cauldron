@@ -15,7 +15,7 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
         """ should convert float index to integer """
 
         support.create_project(self, 'minneapolis')
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
         project.naming_scheme = None
 
         r = Response()
@@ -34,7 +34,7 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
         synchronize_step_names.return_value = failedResponse
 
         support.create_project(self, 'st-paul')
-        project = cauldron.project.internal_project
+        project = cauldron.project.get_internal_project()
 
         r = Response()
         step_actions.create_step(r, project, '', '', 'This is my step')

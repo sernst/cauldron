@@ -127,7 +127,7 @@ def reload_module(
         return False
 
     try:
-        step = session.project.internal_project.current_step
+        step = session.project.get_internal_project().current_step
         modified = step.last_modified if step else None
     except AttributeError:
         modified = 0

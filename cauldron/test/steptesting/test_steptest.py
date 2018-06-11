@@ -112,7 +112,7 @@ class TestStepTesting(StepTestCase):
 
     def test_no_such_project(self):
         """Should fail if no project exists"""
-        project = cd.project.internal_project
+        project = cd.project.get_internal_project()
         cd.project.load(None)
 
         with self.assertRaises(Exception):
