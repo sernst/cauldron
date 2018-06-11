@@ -179,4 +179,4 @@ class TestExposed(scaffolds.ResultsTest):
         internal_project.return_value = None
         result = project.get_internal_project()
         self.assertIsNone(result)
-        self.assertEqual(15, sleep.call_count)
+        self.assertEqual(10, sleep.call_count)

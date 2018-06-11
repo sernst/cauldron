@@ -168,11 +168,7 @@ def execute(async: bool = False):
 @server_runner.APPLICATION.route('/abort', methods=['GET', 'POST'])
 @authorization.gatekeeper
 def abort():
-    """
-
-    :return:
-    """
-
+    """..."""
     uid_list = list(server_runner.active_execution_responses.keys())
 
     while len(uid_list) > 0:
@@ -201,7 +197,7 @@ def abort():
         except Exception:
             pass
 
-    project = cd.project.get_internal_project()
+    project = cd.project.internal_project
 
     if project and project.current_step:
         step = project.current_step

@@ -124,7 +124,7 @@ class ExposedProject(object):
 
     def get_internal_project(
             self,
-            timeout: float = 3
+            timeout: float = 1
     ) -> typing.Union['projects.Project', None]:
         """
         Attempts to return the internally loaded project. This function
@@ -136,12 +136,12 @@ class ExposedProject(object):
             Maximum number of seconds to wait before giving up and returning
             None.
         """
-        count = int(timeout / 0.2)
+        count = int(timeout / 0.1)
         for _ in range(count):
             project = self.internal_project
             if project:
                 return project
-            time.sleep(0.2)
+            time.sleep(0.1)
 
         return self.internal_project
 

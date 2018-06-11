@@ -23,7 +23,7 @@ def test_open_project(
     assert 1 == execute.call_count, """
         Expected a single execute call to open the project.
         """
-    assert 15 == sleep.call_count, """
+    assert 10 == sleep.call_count, """
         Expected sleep to be called repeatedly until the wait period
         for opening the project times out.
         """
