@@ -7,8 +7,6 @@ class TestWriting(scaffolds.ResultsTest):
 
     def test_plotly_project(self):
         """Should properly write a project that has been run"""
-
         support.open_project(self, '@examples:time-gender')
-
         response = support.run_command('run')
         self.assertFalse(response.failed)
