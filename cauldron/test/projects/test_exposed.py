@@ -1,6 +1,8 @@
-from unittest.mock import patch
+import os
+from datetime import datetime
 from unittest.mock import MagicMock
 from unittest.mock import PropertyMock
+from unittest.mock import patch
 
 import cauldron as cd
 from cauldron.session import exposed
@@ -13,9 +15,7 @@ class TestExposed(scaffolds.ResultsTest):
 
     def test_no_project_defaults(self):
         """Expected defaults when no project exists"""
-
         ep = exposed.ExposedProject()
-
         self.assertIsNone(ep.display)
         self.assertIsNone(ep.shared)
         self.assertIsNone(ep.settings)
@@ -25,6 +25,46 @@ class TestExposed(scaffolds.ResultsTest):
 
         with self.assertRaises(RuntimeError):
             ep.title = 'Some Title'
+
+    @patch(
+        'cauldron.session.exposed.ExposedStep._step',
+        new_callable=PropertyMock
+    )
+    def test_step_properties(self, _step: PropertyMock):
+        """Should return values from the internal _step object."""
+        now = datetime.utcnow()
+        _step.return_value = MagicMock(
+            start_time=now,
+            end_time=now,
+            elapsed_time=0
+        )
+        es = exposed.ExposedStep()
+        self.assertEqual(now, es.start_time)
+        self.assertEqual(now, es.end_time)
+        self.assertEqual(0, es.elapsed_time)
+
+    @patch(
+        'cauldron.session.exposed.ExposedStep._step',
+        new_callable=PropertyMock
+    )
+    def test_step_stop_aborted(self, _step: PropertyMock):
+        """
+        Should abort stopping and not raise an error when no internal step
+        is available to stop.
+        """
+        _step.return_value = None
+        es = exposed.ExposedStep()
+        es.stop()
+
+    @patch('cauldron.session.exposed.ExposedProject.get_internal_project')
+    def test_project_stop_aborted(self, get_internal_project: MagicMock):
+        """
+        Should abort stopping and not raise an error when no internal project
+        is available to stop.
+        """
+        get_internal_project.return_value = None
+        ep = exposed.ExposedProject()
+        ep.stop()
 
     def test_change_title(self):
         """Title should change through exposed project"""
@@ -37,7 +77,6 @@ class TestExposed(scaffolds.ResultsTest):
 
     def test_no_step_defaults(self):
         """Exposed step should apply defaults without project"""
-
         es = exposed.ExposedStep()
         self.assertIsNone(es._step)
 
@@ -216,3 +255,39 @@ class TestExposed(scaffolds.ResultsTest):
         step = exposed.ExposedStep()
         with self.assertRaises(ValueError):
             step.write_to_console('hello')
+
+    @patch('cauldron.render.stack.get_formatted_stack_frame')
+    def test_render_stop_display(self, get_formatted_stack_frame: MagicMock):
+        """Should render stop display without error"""
+        get_formatted_stack_frame.return_value = [
+            {'filename': 'foo'},
+            {'filename': 'bar'},
+            {'filename': os.path.realpath(exposed.__file__)}
+        ]
+        step = MagicMock()
+        exposed.render_stop_display(step, 'FAKE')
+        self.assertEqual(1, step.report.append_body.call_count)
+
+    @patch('cauldron.templating.render_template')
+    @patch('cauldron.render.stack.get_formatted_stack_frame')
+    def test_render_stop_display_error(
+            self,
+            get_formatted_stack_frame: MagicMock,
+            render_template: MagicMock
+    ):
+        """
+        Should render an empty stack frame when the stack data is invalid.
+        """
+        get_formatted_stack_frame.return_value = None
+        step = MagicMock()
+        exposed.render_stop_display(step, 'FAKE')
+        self.assertEqual({}, render_template.call_args[1]['frame'])
+
+    def test_project_path(self):
+        """Should create an absolute path within the project"""
+        ep = exposed.ExposedProject()
+        project = MagicMock()
+        project.source_directory = os.path.realpath(os.path.dirname(__file__))
+        ep.load(project)
+        result = ep.path('hello.md')
+        self.assertTrue(result.endswith('{}hello.md'.format(os.sep)))
