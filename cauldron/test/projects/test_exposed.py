@@ -180,3 +180,39 @@ class TestExposed(scaffolds.ResultsTest):
         result = project.get_internal_project()
         self.assertIsNone(result)
         self.assertEqual(10, sleep.call_count)
+
+    @patch(
+        'cauldron.session.exposed.ExposedStep._step',
+        new_callable=PropertyMock
+    )
+    def test_write_to_console(self, _step: PropertyMock):
+        """
+        Should write to the console using a write_source function
+        call on the internal step report's stdout_interceptor.
+        """
+        trials = [2, True, None, 'This is a test', b'hello']
+
+        for message in trials:
+            _step_mock = MagicMock()
+            write_source = MagicMock()
+            _step_mock.report.stdout_interceptor.write_source = write_source
+            _step.return_value = _step_mock
+            step = exposed.ExposedStep()
+            step.write_to_console(message)
+
+            args, kwargs = write_source.call_args
+            self.assertEqual('{}'.format(message), args[0])
+
+    @patch(
+        'cauldron.session.exposed.ExposedStep._step',
+        new_callable=PropertyMock
+    )
+    def test_write_to_console_fail(self, _step: PropertyMock):
+        """
+        Should raise a ValueError when there is no current step to operate
+        upon by the write function call.
+        """
+        _step.return_value = None
+        step = exposed.ExposedStep()
+        with self.assertRaises(ValueError):
+            step.write_to_console('hello')
