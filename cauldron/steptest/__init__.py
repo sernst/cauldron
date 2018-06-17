@@ -9,6 +9,7 @@ from cauldron.cli import commander
 from cauldron.session import exposed  # noqa
 from cauldron.steptest import support
 from cauldron.steptest.functional import CauldronTest
+from cauldron.steptest.functional import create_test_fixture
 from cauldron.steptest.results import StepTestRunResult
 from cauldron.steptest.support import find_project_directory
 

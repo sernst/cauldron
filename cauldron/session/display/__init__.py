@@ -97,7 +97,7 @@ def markdown(source: str = None, source_path: str = None, **kwargs):
 
     r.append_body(result['body'])
     r.stdout_interceptor.write_source(
-        '{}\n'.format(textwrap.dedent(source))
+        '{}\n'.format(textwrap.dedent(result['rendered']))
     )
 
 

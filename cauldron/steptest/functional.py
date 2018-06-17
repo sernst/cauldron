@@ -9,6 +9,37 @@ from cauldron.session import exposed  # noqa
 from cauldron.steptest import support
 from cauldron.steptest.results import StepTestRunResult
 
+try:
+    import pytest
+except ImportError:  # pragma: no cover
+    pytest = None
+
+# @pytest.fixture(name='tester')
+# def tester_fixture() -> CauldronTest:
+#     """Create the Cauldron project test environment"""
+#     tester = CauldronTest(project_path=os.path.dirname(__file__))
+#     tester.setup()
+#     yield tester
+#     tester.tear_down()
+
+
+def create_test_fixture(test_file_path: str, fixture_name: str = 'tester'):
+    """..."""
+    path = os.path.realpath(
+        os.path.dirname(test_file_path)
+        if os.path.isfile(test_file_path) else
+        test_file_path
+    )
+
+    @pytest.fixture(name=fixture_name)
+    def tester_fixture() -> CauldronTest:
+        tester = CauldronTest(project_path=path)
+        tester.setup()
+        yield tester
+        tester.tear_down()
+
+    return tester_fixture
+
 
 class CauldronTest:
     """

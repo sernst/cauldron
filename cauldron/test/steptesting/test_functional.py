@@ -6,19 +6,11 @@ import pytest
 
 import cauldron as cd
 from cauldron import steptest
-from cauldron.steptest import CauldronTest
+
+tester_fixture = steptest.create_test_fixture(__file__)
 
 
-@pytest.fixture(name='tester')
-def tester_fixture() -> CauldronTest:
-    """Create the Cauldron project test environment"""
-    tester = CauldronTest(project_path=os.path.dirname(__file__))
-    tester.setup()
-    yield tester
-    tester.tear_down()
-
-
-def test_first_step(tester: CauldronTest):
+def test_first_step(tester: steptest.CauldronTest):
     """Should not be any null/NaN values in df"""
     assert cd.shared.fetch('df') is None
     step = tester.run_step('S01-first.py')
@@ -29,7 +21,7 @@ def test_first_step(tester: CauldronTest):
     assert error_echo == ''
 
 
-def test_second_step(tester: CauldronTest):
+def test_second_step(tester: steptest.CauldronTest):
     """
     Should fail without exception because of an exception raised in the
     source but failure is allowed
@@ -41,7 +33,7 @@ def test_second_step(tester: CauldronTest):
     assert 0 < len(error_echo)
 
 
-def test_second_step_strict(tester: CauldronTest):
+def test_second_step_strict(tester: steptest.CauldronTest):
     """
     Should fail because of an exception raised in the source when strict
     failure is enforced
@@ -53,7 +45,7 @@ def test_second_step_strict(tester: CauldronTest):
 @patch('_testlib.patching_test')
 def test_second_step_with_patching(
         patching_test: MagicMock,
-        tester: CauldronTest
+        tester: steptest.CauldronTest
 ):
     """Should override the return value with the patch"""
     patching_test.return_value = 12
@@ -63,14 +55,14 @@ def test_second_step_with_patching(
     assert 12 == cd.shared.result
 
 
-def test_second_step_without_patching(tester: CauldronTest):
+def test_second_step_without_patching(tester: steptest.CauldronTest):
     """Should succeed running the step without patching"""
     cd.shared.value = 42
     tester.run_step('S03-lib-patching.py')
     assert 42 == cd.shared.result
 
 
-def test_to_strings(tester: CauldronTest):
+def test_to_strings(tester: steptest.CauldronTest):
     """Should convert list of integers to a list of strings"""
     before = [1, 2, 3]
     step = tester.run_step('S01-first.py')
@@ -79,7 +71,7 @@ def test_to_strings(tester: CauldronTest):
     assert ['1', '2', '3'] == after
 
 
-def test_modes(tester: CauldronTest):
+def test_modes(tester: steptest.CauldronTest):
     """Should be testing and not interactive or single run"""
     step = tester.run_step('S01-first.py')
     assert step.success
@@ -122,19 +114,19 @@ def test_find_failed_at_root():
         func.assert_called_once_with(subdirectory)
 
 
-def test_make_temp_path(tester: CauldronTest):
+def test_make_temp_path(tester: steptest.CauldronTest):
     """Should make a temp path for testing"""
     temp_path = tester.make_temp_path('some-id', 'a', 'b.test')
     assert temp_path.endswith('b.test')
 
 
-def test_no_such_step(tester: CauldronTest):
+def test_no_such_step(tester: steptest.CauldronTest):
     """Should fail if no such step exists"""
     with pytest.raises(Exception):
         tester.run_step('FAKE-STEP.no-exists')
 
 
-def test_no_such_project(tester: CauldronTest):
+def test_no_such_project(tester: steptest.CauldronTest):
     """Should fail if no project exists"""
     project = cd.project.get_internal_project()
     cd.project.load(None)
@@ -145,7 +137,7 @@ def test_no_such_project(tester: CauldronTest):
     cd.project.load(project)
 
 
-def test_open_project_fails(tester: CauldronTest):
+def test_open_project_fails(tester: steptest.CauldronTest):
     """Should raise Assertion error after failing to open the project"""
     with patch('cauldron.steptest.support.open_project') as open_project:
         open_project.side_effect = RuntimeError('FAKE')

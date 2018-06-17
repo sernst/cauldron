@@ -236,6 +236,18 @@ class ExposedStep(object):
         if self._step:
             threads.abort_thread()
 
+    def write_to_console(self, message: str):
+        """
+        Writes the specified message to the console stdout without including
+        it in the notebook display.
+        """
+        if not self._step:
+            raise ValueError(
+                'Cannot write to the console stdout on an uninitialized step'
+            )
+        interceptor = self._step.report.stdout_interceptor
+        interceptor.write_source('{}'.format(message))
+
 
 def render_stop_display(step: 'projects.ProjectStep', message: str):
     """Renders a stop action to the Cauldron display."""

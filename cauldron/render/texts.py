@@ -239,5 +239,6 @@ def markdown(source: str = None, source_path: str = None, **kwargs) -> dict:
     body = pattern.sub('data-src="\g<url>"', body)
     return dict(
         body=body,
-        library_includes=library_includes
+        library_includes=library_includes,
+        rendered=rendered
     )
