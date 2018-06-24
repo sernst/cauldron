@@ -73,7 +73,13 @@ def text(value: str, preformatted: bool = False):
     )
 
 
-def markdown(source: str = None, source_path: str = None, **kwargs):
+def markdown(
+        source: str = None,
+        source_path: str = None,
+        preserve_lines: bool = False,
+        font_size: float = None,
+        **kwargs
+):
     """
     Renders the specified source string or source file using markdown and 
     adds the resulting HTML to the notebook display.
@@ -82,6 +88,15 @@ def markdown(source: str = None, source_path: str = None, **kwargs):
         A markdown formatted string.
     :param source_path:
         A file containing markdown text.
+    :param preserve_lines:
+        If True, all line breaks will be treated as hard breaks. Use this
+        for pre-formatted markdown text where newlines should be retained
+        during rendering.
+    :param font_size:
+        Specifies a relative font size adjustment. The default value is 1.0,
+        which preserves the inherited font size values. Set it to a value
+        below 1.0 for smaller font-size rendering and greater than 1.0 for
+        larger font size rendering.
     :param kwargs:
         Any variable replacements to make within the string using Jinja2
         templating syntax.
@@ -91,6 +106,8 @@ def markdown(source: str = None, source_path: str = None, **kwargs):
     result = render_texts.markdown(
         source=source,
         source_path=source_path,
+        preserve_lines=preserve_lines,
+        font_size=font_size,
         **kwargs
     )
     r.library_includes += result['library_includes']

@@ -153,7 +153,13 @@ def preformatted_text(source: str) -> str:
     )
 
 
-def markdown(source: str = None, source_path: str = None, **kwargs) -> dict:
+def markdown(
+        source: str = None,
+        source_path: str = None,
+        preserve_lines: bool = False,
+        font_size: float = None,
+        **kwargs
+) -> dict:
     """
     Renders a markdown file with support for Jinja2 templating. Any keyword
     arguments will be passed to Jinja2 for templating prior to rendering the
@@ -165,7 +171,15 @@ def markdown(source: str = None, source_path: str = None, **kwargs) -> dict:
     :param source_path:
         The path to a markdown file that should be rendered to HTML for
         notebook display.
-
+    :param preserve_lines:
+        If True, all line breaks will be treated as hard breaks. Use this
+        for pre-formatted markdown text where newlines should be retained
+        during rendering.
+    :param font_size:
+        Specifies a relative font size adjustment. The default value is 1.0,
+        which preserves the inherited font size values. Set it to a value
+        below 1.0 for smaller font-size rendering and greater than 1.0 for
+        larger font size rendering.
     :return:
         The HTML results of rendering the specified markdown string or file.
     """
@@ -223,16 +237,19 @@ def markdown(source: str = None, source_path: str = None, **kwargs) -> dict:
 
         offset = end_index
 
-    body = templating.render(
-        """
-        <div class="textbox markdown">{{ text }}</div>
-        """,
+    extensions = [
+        'markdown.extensions.extra',
+        'markdown.extensions.admonition',
+        'markdown.extensions.sane_lists',
+        'markdown.extensions.nl2br' if preserve_lines else None
+    ]
+
+    body = templating.render_template(
+        'markdown-block.html',
         text=md.markdown(rendered, extensions=[
-            'markdown.extensions.nl2br',
-            'markdown.extensions.extra',
-            'markdown.extensions.admonition',
-            'markdown.extensions.sane_lists'
-        ])
+            e for e in extensions if e is not None
+        ]),
+        font_size=font_size
     )
 
     pattern = re.compile('src="(?P<url>[^"]+)"')
