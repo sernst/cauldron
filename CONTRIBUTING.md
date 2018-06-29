@@ -1,0 +1,2 @@
+# Contributing to Cauldron 
+We welcome all contributions, bug reports, bug fixes, documentation improvements, enhancements, and ideas. We are working on our contribution guidelines, but in the meantime we can help you get started if you contact us directly on [Gitter](https://gitter.im/cauldron-notebook/Lobby). If you would rather wait for our guidelines, click to watch the Cauldron repository. You’ll stay up-to-date on our progress and may join us at any time.
