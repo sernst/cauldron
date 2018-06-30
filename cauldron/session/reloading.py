@@ -18,20 +18,17 @@ def get_module(name: str) -> typing.Union[types.ModuleType, None]:
         Either the loaded module with the specified name, or None if no such
         module has been imported.
     """
-
     return sys.modules.get(name)
 
 
 def get_module_name(module: types.ModuleType) -> str:
     """
-    Returns the name of the specified module
+    Returns the name of the specified module by looking up its name in
+    multiple ways to prevent incompatibility issues.
 
     :param module:
-        A module object for which to retrieve the name
-    :return:
-        The name of the module
+        A module object for which to retrieve the name.
     """
-
     try:
         return module.__spec__.name
     except AttributeError:
@@ -52,7 +49,6 @@ def do_reload(module: types.ModuleType, newer_than: int) -> bool:
     :return:
         Whether or not the module was reloaded
     """
-
     path = getattr(module, '__file__')
     directory = getattr(module, '__path__', [None])[0]
 
@@ -84,7 +80,6 @@ def reload_children(parent_module: types.ModuleType, newer_than: int) -> bool:
     :return:
         Whether or not any children were reloaded
     """
-
     if not hasattr(parent_module, '__path__'):
         return False
 
