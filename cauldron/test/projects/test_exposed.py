@@ -9,6 +9,8 @@ from cauldron.session import exposed
 from cauldron.test import support
 from cauldron.test.support import scaffolds
 
+ROOT = 'cauldron.session.exposed'
+
 
 class TestExposed(scaffolds.ResultsTest):
     """Test suite for the exposed module"""
@@ -26,27 +28,31 @@ class TestExposed(scaffolds.ResultsTest):
         with self.assertRaises(RuntimeError):
             ep.title = 'Some Title'
 
-    @patch(
-        'cauldron.session.exposed.ExposedStep._step',
-        new_callable=PropertyMock
-    )
+    @patch('{}.ExposedStep._step'.format(ROOT), new_callable=PropertyMock)
     def test_step_properties(self, _step: PropertyMock):
         """Should return values from the internal _step object."""
         now = datetime.utcnow()
         _step.return_value = MagicMock(
             start_time=now,
             end_time=now,
-            elapsed_time=0
+            elapsed_time=0,
+            is_visible=True
         )
         es = exposed.ExposedStep()
         self.assertEqual(now, es.start_time)
         self.assertEqual(now, es.end_time)
         self.assertEqual(0, es.elapsed_time)
 
-    @patch(
-        'cauldron.session.exposed.ExposedStep._step',
-        new_callable=PropertyMock
-    )
+    @patch('{}.ExposedStep._step'.format(ROOT), new_callable=PropertyMock)
+    def test_step_visibility(self, _step: PropertyMock):
+        """Should return values from the internal _step object."""
+        _step.return_value = MagicMock(is_visible=True)
+        es = exposed.ExposedStep()
+        self.assertTrue(es.visible)
+        es.visible = False
+        self.assertFalse(es.visible)
+
+    @patch('{}.ExposedStep._step'.format(ROOT), new_callable=PropertyMock)
     def test_step_stop_aborted(self, _step: PropertyMock):
         """
         Should abort stopping and not raise an error when no internal step
@@ -68,9 +74,7 @@ class TestExposed(scaffolds.ResultsTest):
 
     def test_change_title(self):
         """Title should change through exposed project"""
-
         test_title = 'Some Title'
-
         support.create_project(self, 'igor')
         cd.project.title = test_title
         self.assertEqual(cd.project.title, test_title)
@@ -160,7 +164,6 @@ class TestExposed(scaffolds.ResultsTest):
 
     def test_stop_step_silent(self):
         """Should stop the step early and silently"""
-
         contents = '\n'.join([
             'import cauldron as cd',
             'cd.shared.test = 0',

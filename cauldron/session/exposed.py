@@ -193,6 +193,22 @@ class ExposedStep(object):
         """
         return self._step.elapsed_time
 
+    @property
+    def visible(self) -> bool:
+        """
+        Whether or not this step will be visible in the display after it
+        has finished running. Steps are always visible while running or
+        if they fail to run due to an error. However, if this is set to
+        False, once the step completes successfully it will no longer be
+        visible in the display.
+        """
+        return self._step.is_visible
+
+    @visible.setter
+    def visible(self, value: bool):
+        """Setter for the visible property."""
+        self._step.is_visible = value
+
     def stop(
             self,
             message: str = None,

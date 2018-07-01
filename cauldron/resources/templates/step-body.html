@@ -2,6 +2,7 @@
      id="{{ "project-step" | id }}"
      data-step-name="{{ id }}"
      data-step-updated="{{ last_display_update }}"
+     style="display:{{ 'block' if is_visible else 'none' }}"
 >
   <style scoped>
     .cd-step-elapsed {

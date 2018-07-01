@@ -9,10 +9,10 @@ from cauldron.environ import Response
 from cauldron.runner import html_file
 from cauldron.runner import markdown_file
 from cauldron.runner import python_file
+from cauldron.runner import redirection
 from cauldron.session.projects import Project
 from cauldron.session.projects import ProjectStep
 from cauldron.session.projects import StopCondition
-from cauldron.runner import redirection
 
 ERROR_STATUS = 'error'
 OK_STATUS = 'ok'
@@ -29,7 +29,6 @@ def get_step(
     :param step:
     :return:
     """
-
     if isinstance(step, ProjectStep):
         return step
 
@@ -95,7 +94,6 @@ def run_step(
     :param force:
     :return:
     """
-
     step = get_step(project, step)
     if step is None:
         return False
@@ -113,6 +111,7 @@ def run_step(
     project.current_step = step
     step.report.clear()
     step.dom = None
+    step.is_visible = True
     step.is_running = True
     step.progress_message = None
     step.progress = 0

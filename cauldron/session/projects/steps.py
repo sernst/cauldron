@@ -31,7 +31,6 @@ class ProjectStep(object):
         :param project:
         :param definition:
         """
-
         self.__class__._reference_index += 1
         self._reference_id = '{}'.format(self.__class__._reference_index)
 
@@ -41,6 +40,7 @@ class ProjectStep(object):
 
         self.last_modified = None
         self.code = None
+        self.is_visible = True
         self.is_running = False
         self._is_dirty = True
         self.error = None
@@ -236,6 +236,10 @@ class ProjectStep(object):
             self.report.flush_stderr()
         ).strip('\n').rstrip()
 
+        # The step will be visible in the display if any of the following
+        # conditions are true.
+        is_visible = self.is_visible or self.is_running or self.error
+
         dom = templating.render_template(
             'step-body.html',
             last_display_update=self.report.last_update_time,
@@ -250,6 +254,7 @@ class ProjectStep(object):
             error=self.error,
             index=self.index,
             is_running=self.is_running,
+            is_visible=is_visible,
             progress_message=self.progress_message,
             progress=int(round(max(0, min(100, 100 * self.progress)))),
             sub_progress_message=self.sub_progress_message,
