@@ -11,3 +11,12 @@ The goal of the bug report is to explain to us how to reproduce the bug on our c
 * The version of Cauldron
 * Versions of all relevant software, e.g., python, operating systems, etc.
 
+# Suggesting Enhancements
+Before creating enhancement suggestions, please check if that enhancement already exsists. After you've determined which repository your enhancement suggestion is related to, create an issue on that repository and provide the following information:
+* Use a clear and descriptive title for the issue to identify the suggestion.
+* Explain why this enhancement would be useful.
+* Provide a step-by-step description of the suggested enhancement in as many details as possible.
+* Provide specific examples to demonstrate the steps. Include copy/pasteable snippets which you use in those examples.
+* Describe the current behavior and explain what behavior you expected to see instead and why.
+* Specify which version of Cauldron you're using.
+* Specify the name and version of the OS you're using and all relevant software.
