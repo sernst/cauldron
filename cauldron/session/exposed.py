@@ -264,6 +264,21 @@ class ExposedStep(object):
         interceptor = self._step.report.stdout_interceptor
         interceptor.write_source('{}'.format(message))
 
+    def render_to_console(self, message: str, **kwargs):
+        """
+        Renders the specified message to the console using Jinja2 template
+        rendering with the kwargs as render variables. The message will also
+        be dedented prior to rendering in the same fashion as other Cauldron
+        template rendering actions.
+
+        :param message:
+            Template string to be rendered.
+        :param kwargs:
+            Variables to be used in rendering the template.
+        """
+        rendered = templating.render(message, **kwargs)
+        return self.write_to_console(rendered)
+
 
 def render_stop_display(step: 'projects.ProjectStep', message: str):
     """Renders a stop action to the Cauldron display."""
