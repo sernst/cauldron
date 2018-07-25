@@ -14,7 +14,6 @@ def in_project_directory() -> bool:
     Returns whether or not the current working directory is a Cauldron project
     directory, which contains a cauldron.json file.
     """
-
     current_directory = os.path.realpath(os.curdir)
     project_path = os.path.join(current_directory, 'cauldron.json')
     return os.path.exists(project_path) and os.path.isfile(project_path)
@@ -43,7 +42,6 @@ def load_shared_data(path: typing.Union[str, None]) -> dict:
 
 def run_version(args: dict) -> int:
     """Displays the current version"""
-
     version = environ.package_settings.get('version', 'unknown')
     print('VERSION: {}'.format(version))
     return 0
@@ -78,7 +76,6 @@ def run_shell(args: dict) -> int:
 
 def run_kernel(args: dict) -> int:
     """Runs the kernel sub command"""
-
     server_run.execute(**args)
     return 0
 
@@ -93,7 +90,6 @@ def run(action: str, args: dict) -> int:
     :param args:
         The arguments parsed for the specified action
     """
-
     if args.get('show_version_info'):
         return run_version(args)
 
