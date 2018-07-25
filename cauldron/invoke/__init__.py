@@ -45,7 +45,6 @@ def initialize():
 
 def run(arguments: typing.List[str] = None):
     """Executes the cauldron command"""
-
     initialize()
 
     from cauldron.invoke import parser
