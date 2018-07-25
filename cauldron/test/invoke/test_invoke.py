@@ -50,5 +50,4 @@ class TestInvoke(unittest.TestCase):
         """Should run the specified command"""
         invoke.run(['--version'])
         self.assertEqual(1, sys_exit.call_count)
-        args, kwargs = sys_exit.call_args
-        self.assertEqual(0, args[0], 'Expect successful exit')
+        sys_exit.assert_called_with(0)
