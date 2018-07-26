@@ -48,6 +48,10 @@ class TestInvoke(unittest.TestCase):
     @patch('cauldron.invoke.sys.exit')
     def test_run(self, sys_exit: MagicMock):
         """Should run the specified command"""
-        invoke.run(['--version'])
+        sys_exit.side_effect = SystemExit('FAKE')
+
+        with self.assertRaises(SystemExit):
+            invoke.run(['--version'])
+
         self.assertEqual(1, sys_exit.call_count)
         sys_exit.assert_called_with(0)
