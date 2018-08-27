@@ -249,6 +249,27 @@ class TestExposed(scaffolds.ResultsTest):
         'cauldron.session.exposed.ExposedStep._step',
         new_callable=PropertyMock
     )
+    def test_render_to_console(self, _step: PropertyMock):
+        """
+        Should render to the console using a write_source function
+        call on the internal step report's stdout_interceptor.
+        """
+        message = '   {{ a }} is not {{ b }}.'
+
+        _step_mock = MagicMock()
+        write_source = MagicMock()
+        _step_mock.report.stdout_interceptor.write_source = write_source
+        _step.return_value = _step_mock
+        step = exposed.ExposedStep()
+        step.render_to_console(message, a=7, b='happy')
+
+        args, kwargs = write_source.call_args
+        self.assertEqual('7 is not happy.', args[0])
+
+    @patch(
+        'cauldron.session.exposed.ExposedStep._step',
+        new_callable=PropertyMock
+    )
     def test_write_to_console_fail(self, _step: PropertyMock):
         """
         Should raise a ValueError when there is no current step to operate
