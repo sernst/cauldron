@@ -98,9 +98,9 @@ def parse_command_args(response: 'Response') -> typing.Tuple[str, str]:
     return name, args
 
 
-def execute(async: bool = False):
+def execute(exec_async: bool = False):
     """
-    :param async:
+    :param exec_async:
         Whether or not to allow asynchronous command execution that returns
         before the command is complete with a run_uid that can be used to
         track the continued execution of the command until completion.
@@ -118,7 +118,7 @@ def execute(async: bool = False):
         if not r.thread:
             return flask.jsonify(r.serialize())
 
-        if not async:
+        if not exec_async:
             r.thread.join()
 
         server_runner.active_execution_responses[r.thread.uid] = r
