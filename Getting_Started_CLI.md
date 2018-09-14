@@ -2,6 +2,22 @@
 
 Cauldron can be used as either through its Command Line Interface (CLI) or with the Cauldron desktop application. This document explains using Cauldron through its CLI.
 
+## System Requirements
+
+The following system requirements must be met for Cauldron to work:
+
+  ### Python 3
+  Cauldron and uses the latest and greatest Python 3 has to offer and works with the following Python 3 versions:
+  
+  * 3.5.3+
+  * 3.6.3+
+  * 3.7 (coming soon)
+  
+Python 2 is nearing its end of life and lacks the necessary functionality to be supported.
+  
+### 64 Bit OS
+The desktop application is available for OSX, Windows and multiple Linux distributions, but they must be the 64 bit versions.
+
 ## Installation
 The latest release of Cauldron is available from both PyPi:
 
