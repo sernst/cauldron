@@ -38,3 +38,11 @@ services:
       - .:/cauldron_local
     ports:
       - "5010:5010"
+
+  test-py37:
+    build:
+      context: .
+      dockerfile: test-py37.dockerfile
+    stdin_open: true
+    tty: true
+    entrypoint: /bin/bash

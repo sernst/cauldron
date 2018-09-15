@@ -238,7 +238,7 @@ def modify_step(
 
     step_data = {'name': new_name}
     if title is None:
-        if old_step.definition.get('title'):
+        if old_step.definition.title:
             step_data['title'] = old_step.definition.title
     else:
         step_data['title'] = title.strip('"')
