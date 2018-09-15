@@ -268,7 +268,7 @@ def whitespace(lines: float = 1.0):
     """
     r = _get_report()
     r.append_body(render.whitespace(lines))
-    r.stdout_interceptor.write_source('[ADDED] Whitespace\n')
+    r.stdout_interceptor.write_source('\n')
 
 
 def html(dom: str):
