@@ -16,7 +16,7 @@ The following system requirements must be met for Cauldron to work:
 Python 2 is nearing its end of life and lacks the necessary functionality to be supported.
   
 ### 64 Bit OS
-The desktop application is available for OSX, Windows and multiple Linux distributions, but they must be the 64 bit versions.
+The desktop application is available for OSX, Windows and multiple Linux distributions, but they must be the 64 bit versions. For instructions on Linux installations see: http://www.unnotebook.com/install/#Deb-Linux-Install. 
 
 ## Installation
 The latest release of Cauldron is available from both PyPi:
