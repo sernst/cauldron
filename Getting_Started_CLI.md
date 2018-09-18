@@ -138,7 +138,7 @@ which opens the current project display file in your default browser. When you a
 This empties all of the information Cauldron has been storing for your project in memory, and takes you back to the initial command prompt where you started:
 
 ```bash
-<>:</pre>
+<>:
 ```
 
 ## Tutorial: First Project
@@ -206,7 +206,7 @@ To create your first project run the Cauldron shell command:
 For more details about the create command, use the Cauldron shell command:
 
 ```bash
-<>: help create</pre>
+<>: help create
 ```
 
 The create command takes two arguments:
