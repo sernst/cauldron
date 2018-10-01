@@ -1,6 +1,6 @@
 # Getting Started with the CLI
 
-Cauldron can be used as either through its Command Line Interface (CLI) or with the Cauldron desktop application. This document explains using Cauldron through its CLI. To install the Cauldron desktop app you can instructions here: http://www.unnotebook.com/install.
+Cauldron can be used as either through its Command Line Interface (CLI) or with the Cauldron desktop application. This document explains using Cauldron through its CLI. To install the Cauldron desktop app you may view the instructions here: http://www.unnotebook.com/install.
 
 ## System Requirements
 
