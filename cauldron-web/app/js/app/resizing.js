@@ -60,7 +60,7 @@ function resizePlotly() {
     return;
   }
 
-  $('.cd-plotly-box').each((index, element) => {
+  $('.cd-plotly-box, .cd-plotly-box-v2').each((index, element) => {
     const e = $(element).find('.plotly-graph-div');
     exports.resizePlotlyBox(e);
   });
