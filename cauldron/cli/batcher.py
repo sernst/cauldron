@@ -1,5 +1,4 @@
 import os
-import tempfile
 
 import cauldron
 from cauldron import cli
@@ -70,8 +69,6 @@ def run_project(
     :return:
         The response result from the project execution
     """
-    if not log_path:
-        log_path = tempfile.mkdtemp()
     log_path = initialize_logging_path(log_path)
     logger.add_output_path(log_path)
 
