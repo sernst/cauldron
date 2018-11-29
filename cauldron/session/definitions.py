@@ -2,7 +2,41 @@ import os
 import typing
 import warnings
 
+from cauldron import environ
 from cauldron.session import projects
+from cauldron.session import caching
+
+
+class ExecutionResult:
+    """Data Structure for data returned by batched project runs."""
+
+    def __init__(
+            self,
+            command_response: 'environ.Response',
+            project_data: 'caching.SharedCache'
+    ):
+        self._response = command_response
+        self._shared = project_data
+
+    @property
+    def success(self) -> bool:
+        """Whether or not the project execution succeeded."""
+        return self._response.success
+
+    @property
+    def failed(self) -> bool:
+        """Whether or not the execution failed."""
+        return self._response.failed
+
+    @property
+    def response(self) -> 'environ.Response':
+        """Command execution response"""
+        return self._response
+
+    @property
+    def shared(self) -> 'caching.SharedCache':
+        """Shared data from the final execution state of the project."""
+        return self._shared
 
 
 class FileDefinition(object):

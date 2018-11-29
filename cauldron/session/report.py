@@ -6,6 +6,7 @@ from cauldron.render import texts as render_texts
 from cauldron.session import projects
 from cauldron.session.buffering import RedirectBuffer
 from cauldron.session.caching import SharedCache
+from cauldron.session import definitions
 
 
 class Report(object):
@@ -21,7 +22,11 @@ class Report(object):
         self.css = []  # type: typing.List[str]
         self.data = SharedCache()
         self.files = SharedCache()
-        self.title = self.definition.get('title')
+        self.title = (
+            self.definition.title
+            if hasattr(self.definition, 'title') else
+            self.definition.get('title')
+        )
         self.subtitle = self.definition.get('subtitle')
         self.summary = self.definition.get('summary')
         self.library_includes = []
@@ -69,7 +74,9 @@ class Report(object):
         return self.step.definition.name if self.step else None
 
     @property
-    def definition(self) -> dict:
+    def definition(
+            self
+    ) -> typing.Union[None, dict, 'definitions.FileDefinition']:
         return self.step.definition if self.step else None
 
     def clear(self) -> 'Report':

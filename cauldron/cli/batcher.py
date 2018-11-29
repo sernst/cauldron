@@ -9,6 +9,8 @@ from cauldron.cli.commands import open as open_command
 from cauldron.cli.commands import run as run_command
 from cauldron.cli.commands import save as save_command
 from cauldron.environ import logger
+from cauldron.session.caching import SharedCache
+from cauldron.session.definitions import ExecutionResult
 
 
 def initialize_logging_path(path: str = None) -> str:
@@ -24,11 +26,10 @@ def initialize_logging_path(path: str = None) -> str:
         The absolute path to the log file that will be used when this project
         is executed.
     """
-
     path = environ.paths.clean(path if path else '.')
 
     if os.path.isdir(path) and os.path.exists(path):
-        path = os.path.join('cauldron_run.log')
+        path = os.path.join(path, 'cauldron_run.log')
     elif os.path.exists(path):
         os.remove(path)
 
@@ -45,7 +46,7 @@ def run_project(
         log_path: str = None,
         shared_data: dict = None,
         reader_path: str = None
-) -> environ.Response:
+) -> ExecutionResult:
     """
     Opens, executes and closes a Cauldron project in a single command in
     production mode (non-interactive).
@@ -68,36 +69,54 @@ def run_project(
     :return:
         The response result from the project execution
     """
-
     log_path = initialize_logging_path(log_path)
     logger.add_output_path(log_path)
 
-    def on_complete(message: str = None) -> environ.Response:
+    def on_complete(
+            command_response: environ.Response,
+            project_data: SharedCache = None,
+            message: str = None
+    ) -> ExecutionResult:
         environ.modes.remove(environ.modes.SINGLE_RUN)
         if message:
             logger.log(message)
         logger.remove_output_path(log_path)
-        return response
+        return ExecutionResult(
+            command_response=command_response,
+            project_data=project_data or SharedCache()
+        )
 
     environ.modes.add(environ.modes.SINGLE_RUN)
 
-    response = open_command.execute(
+    open_response = open_command.execute(
         context=cli.make_command_context(open_command.NAME),
         path=project_directory,
         results_path=output_directory
     )
-    if response.failed:
-        return on_complete('[ERROR]: Aborted trying to open project')
+    if open_response.failed:
+        return on_complete(
+            command_response=open_response,
+            message='[ERROR]: Aborted trying to open project'
+        )
 
     project = cauldron.project.get_internal_project()
     project.shared.put(**(shared_data if shared_data is not None else dict()))
 
     commander.preload()
-    response = run_command.execute(
+    run_response = run_command.execute(
         context=cli.make_command_context(run_command.NAME)
     )
-    if response.failed:
-        return on_complete('[ERROR]: Aborted trying to run project steps')
+
+    project_cache = SharedCache().put(
+        **project.shared._shared_cache_data
+    )
+
+    if run_response.failed:
+        return on_complete(
+            command_response=run_response,
+            project_data=project_cache,
+            message='[ERROR]: Aborted trying to run project steps'
+        )
 
     if reader_path:
         save_command.execute(
@@ -105,10 +124,18 @@ def run_project(
             path=reader_path
         )
 
-    response = close_command.execute(
+    close_response = close_command.execute(
         context=cli.make_command_context(close_command.NAME)
     )
-    if response.failed:
-        return on_complete('[ERROR]: Failed to close project cleanly after run')
+    if close_response.failed:
+        return on_complete(
+            command_response=close_response,
+            project_data=project_cache,
+            message='[ERROR]: Failed to close project cleanly after run'
+        )
 
-    return on_complete('Project execution complete')
+    return on_complete(
+        command_response=run_response,
+        project_data=project_cache,
+        message='Project execution complete'
+    )

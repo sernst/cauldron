@@ -443,7 +443,7 @@ def latex(source: str):
     Add a mathematical equation in latex math-mode syntax to the display.
     Instead of the traditional backslash escape character, the @ character is
     used instead to prevent backslash conflicts with Python strings. For
-    example, \delta would be @delta.
+    example, \\delta would be @delta.
 
     :param source:
         The string representing the latex equation to be rendered.

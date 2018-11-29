@@ -150,10 +150,9 @@ def execute(
     :param authentication_code:
     :return:
     """
-
     if kwargs.get('version'):
         environ.log('VERSION: {}'.format(environ.version))
-        sys.exit(0)
+        return environ.systems.end(0)
 
     if host is None and public:
         host = '0.0.0.0'

@@ -7,7 +7,7 @@ from cauldron import cli
 from cauldron.environ import Response
 
 FLAG_PATTERN = re.compile(
-    '^(?P<prefix>-{1,2})(?P<name>[a-zA-Z0-9\-_]+)=?(?P<value>.*)$'
+    r'^(?P<prefix>-{1,2})(?P<name>[a-zA-Z0-9\-_]+)=?(?P<value>.*)$'
 )
 
 ARGS_RESPONSE_NT = namedtuple(
@@ -39,7 +39,7 @@ def explode_line(raw: str) -> typing.List[str]:
     :return:
     """
 
-    raw = re.sub('\s+', ' ', raw.strip())
+    raw = re.sub(r'\s+', ' ', raw.strip())
     out = ['']
     breaker = ' '
 

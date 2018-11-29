@@ -61,7 +61,7 @@ def explode_filename(name: str, scheme: str) -> dict:
         char = scheme[offset]
         next_char = scheme[offset + 1] if (offset + 1) < len(scheme) else None
 
-        if char in '.()^$?*+\[]|':
+        if char in r'.()^$?*+\[]|':
             addition = '\\{}'.format(char)
             scheme_pattern += addition
             empty_scheme_pattern += addition

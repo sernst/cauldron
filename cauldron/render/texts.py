@@ -253,7 +253,7 @@ def markdown(
     )
 
     pattern = re.compile('src="(?P<url>[^"]+)"')
-    body = pattern.sub('data-src="\g<url>"', body)
+    body = pattern.sub(r'data-src="\g<url>"', body)
     return dict(
         body=body,
         library_includes=library_includes,
