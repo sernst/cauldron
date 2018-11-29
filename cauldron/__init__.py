@@ -3,6 +3,7 @@ from cauldron.session import display as _display
 from cauldron.session.reloading import refresh as _refresh
 from cauldron.session.caching import SharedCache as _SharedCache
 from cauldron.session import spark as _spark
+from cauldron.session.definitions import ExecutionResult
 from cauldron import environ as _environ
 
 # Version Information in commonly viewed formats
@@ -63,7 +64,7 @@ def run_project(
         logging_path: str = None,
         reader_path: str = None,
         **kwargs
-) -> _environ.Response:
+) -> ExecutionResult:
     """
     Runs a project as a single command directly within the current Python
     interpreter.
@@ -89,7 +90,8 @@ def run_project(
         Any variables to be available in the cauldron.shared object during
         execution of the project can be specified here as keyword arguments.
     :return:
-        A response object that contains information about the run process.
+        A response object that contains information about the run process
+        and the shared data from the final state of the project.
     """
     from cauldron.cli import batcher
     return batcher.run_project(
