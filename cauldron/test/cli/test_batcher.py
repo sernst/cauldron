@@ -101,16 +101,18 @@ class TestBatcher(scaffolds.ResultsTest):
         run_result = run_project('@examples:hello_cauldron', directory)
         self.assertFalse(run_result.result.success)
 
+    @patch('cauldron.project.get_internal_project')
     @patch('cauldron.cli.batcher.open_command.execute')
     @patch('cauldron.cli.batcher.run_command.execute')
     @patch('cauldron.cli.batcher.save_command.execute')
     @patch('cauldron.cli.batcher.close_command.execute')
     def test_close_fail(
             self,
-            execute_open: MagicMock,
-            execute_run: MagicMock,
+            execute_close: MagicMock,
             execute_save: MagicMock,
-            execute_close: MagicMock
+            execute_run: MagicMock,
+            execute_open: MagicMock,
+            *args
     ):
         """Should fail to close project."""
         successful = MagicMock()

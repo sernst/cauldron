@@ -1,15 +1,14 @@
 import logging
 import os
 import site
-import sys
+import typing
 from argparse import ArgumentParser
 
 import cauldron as cd
-from cauldron.session import writing
 from cauldron import environ
 from cauldron.render.encoding import ComplexFlaskJsonEncoder
+from cauldron.session import writing
 from flask import Flask
-import typing
 
 APPLICATION = Flask('Cauldron')
 APPLICATION.json_encoder = ComplexFlaskJsonEncoder
@@ -18,7 +17,7 @@ SERVER_VERSION = [0, 0, 1, 1]
 
 try:
     site_packages = list(site.getsitepackages())
-except Exception:
+except Exception:  # pragma: no cover
     site_packages = []
 
 active_execution_responses = dict()  # type: typing.Dict[str, environ.Response]

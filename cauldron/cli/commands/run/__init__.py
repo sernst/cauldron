@@ -59,6 +59,18 @@ def populate(
     )
 
     parser.add_argument(
+        '--skip-reload',
+        dest='skip_library_reload',
+        default=False,
+        action='store_true',
+        help=cli.reformat("""
+            Whether or not to skip reloading all project libraries prior to
+            execution of the project. By default this is False in which case 
+            the project libraries are reloaded prior to execution.
+            """)
+    )
+
+    parser.add_argument(
         '-c', '--continue',
         dest='continue_after',
         default=False,
@@ -139,7 +151,8 @@ def execute(
         continue_after: bool = False,
         single_step: bool = False,
         limit: int = -1,
-        print_status: bool = False
+        print_status: bool = False,
+        skip_library_reload: bool = False
 ) -> Response:
     """
 
@@ -150,9 +163,12 @@ def execute(
     :param single_step:
     :param limit:
     :param print_status:
+    :param skip_library_reload:
+        Whether or not to skip reloading all project libraries prior to
+        execution of the project. By default this is False in which case
+        the project libraries are reloaded prior to execution.
     :return:
     """
-
     project = run_actions.get_project(context.response)
     if not project:
         return context.response.fail(
@@ -205,7 +221,8 @@ def execute(
         continue_after=continue_after,
         single_step=single_step,
         limit=limit,
-        print_status=print_status
+        print_status=print_status,
+        skip_library_reload=skip_library_reload
     )
 
 
@@ -217,7 +234,8 @@ def run_local(
         continue_after: bool,
         single_step: bool,
         limit: int,
-        print_status: bool
+        print_status: bool,
+        skip_library_reload: bool = False
 ) -> environ.Response:
     """
     Execute the run command locally within this cauldron environment
@@ -230,10 +248,17 @@ def run_local(
     :param single_step:
     :param limit:
     :param print_status:
+    :param skip_library_reload:
+        Whether or not to skip reloading all project libraries prior to
+        execution of the project. By default this is False in which case
+        the project libraries are reloaded prior to execution.
     :return:
     """
-
-    if not environ.modes.has(environ.modes.TESTING):
+    skip_reload = (
+        skip_library_reload
+        or environ.modes.has(environ.modes.TESTING)
+    )
+    if not skip_reload:
         runner.reload_libraries()
 
     environ.log_header('RUNNING', 5)
@@ -314,7 +339,7 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
             segment=segment,
             value=parts[-1],
             shorts=['f', 'c', 's', 'l'],
-            longs=['force', 'continue', 'step', 'limit']
+            longs=['force', 'continue', 'step', 'limit', 'skip-reload']
         )
 
     value = parts[-1]

@@ -63,6 +63,7 @@ def run_project(
         output_directory: str = None,
         logging_path: str = None,
         reader_path: str = None,
+        reload_project_libraries: bool = False,
         **kwargs
 ) -> ExecutionResult:
     """
@@ -86,6 +87,10 @@ def run_project(
         has finished running. If no path is specified, no reader file will be
         saved. If the path is a directory, a reader file will be saved in that
         directory with the project name as the file name.
+    :param reload_project_libraries:
+        Whether or not to reload all project libraries prior to execution of
+        the project. By default this is False, but can be enabled in cases
+        where refreshing the project libraries before execution is needed.
     :param kwargs:
         Any variables to be available in the cauldron.shared object during
         execution of the project can be specified here as keyword arguments.
@@ -99,5 +104,6 @@ def run_project(
         output_directory=output_directory,
         log_path=logging_path,
         reader_path=reader_path,
+        reload_project_libraries=reload_project_libraries,
         shared_data=kwargs
     )
