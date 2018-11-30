@@ -45,7 +45,8 @@ def run_project(
         output_directory: str = None,
         log_path: str = None,
         shared_data: dict = None,
-        reader_path: str = None
+        reader_path: str = None,
+        reload_project_libraries: bool = False
 ) -> ExecutionResult:
     """
     Opens, executes and closes a Cauldron project in a single command in
@@ -66,6 +67,10 @@ def run_project(
         has finished running. If no path is specified, no reader file will be
         saved. If the path is a directory, a reader file will be saved in that
         directory with the project name as the file name.
+    :param reload_project_libraries:
+        Whether or not to reload all project libraries prior to execution of
+        the project. By default this is False, but can be enabled in cases
+        where refreshing the project libraries before execution is needed.
     :return:
         The response result from the project execution
     """
@@ -104,7 +109,8 @@ def run_project(
 
     commander.preload()
     run_response = run_command.execute(
-        context=cli.make_command_context(run_command.NAME)
+        context=cli.make_command_context(run_command.NAME),
+        skip_library_reload=not reload_project_libraries
     )
 
     project_cache = SharedCache().put(
