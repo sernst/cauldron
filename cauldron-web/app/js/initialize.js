@@ -4,6 +4,7 @@
 const exports = window.CAULDRON || {};
 window.CAULDRON = exports;
 
+exports.notebookVersion = 1;
 exports.resizeCallbacks = [];
 
 
