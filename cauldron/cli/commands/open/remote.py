@@ -3,10 +3,10 @@ import os
 
 from cauldron import cli
 from cauldron import environ
-from cauldron.cli import sync
 from cauldron import runner
-from cauldron.environ.response import Response
+from cauldron.cli import sync
 from cauldron.cli.commands.open import opener as local_opener
+from cauldron.environ.response import Response
 
 
 def sync_open(
@@ -24,6 +24,7 @@ def sync_open(
 
     response = sync.comm.send_request(
         endpoint='/sync-open',
+        method='POST',
         remote_connection=context.remote_connection,
         data=dict(
             definition=definition,

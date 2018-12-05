@@ -1,19 +1,21 @@
+import json
 import logging
 import os
 import site
 import typing
 from argparse import ArgumentParser
 
+from flask import Flask
+
 import cauldron as cd
 from cauldron import environ
+from cauldron import templating
 from cauldron.render.encoding import ComplexFlaskJsonEncoder
 from cauldron.session import writing
-from flask import Flask
 
 APPLICATION = Flask('Cauldron')
 APPLICATION.json_encoder = ComplexFlaskJsonEncoder
 SERVER_VERSION = [0, 0, 1, 1]
-
 
 try:
     site_packages = list(site.getsitepackages())
@@ -30,9 +32,7 @@ server_data = dict(
     pid=os.getpid()
 )
 
-authorization = dict(
-    code=''
-)
+authorization = {'code': ''}
 
 
 def get_server_data() -> dict:
@@ -166,6 +166,16 @@ def execute(
     if not debug:
         log = logging.getLogger('werkzeug')
         log.setLevel(logging.ERROR)
+
+    with open(environ.paths.package('settings.json'), 'r') as f:
+        package_data = json.load(f)
+
+    print('\n{}\n'.format(
+        templating.render_template(
+            'kernel_introduction.txt',
+            version=package_data['version']
+        )
+    ))
 
     environ.modes.add(environ.modes.INTERACTIVE)
     APPLICATION.run(port=port, debug=debug, host=host)

@@ -1,8 +1,9 @@
-import cauldron
 import flask
+
+import cauldron
+from cauldron.cli.server import authorization
 from cauldron.cli.server import run as server_runner
 from cauldron.environ.response import Response
-from cauldron.cli.server import authorization
 
 
 @server_runner.APPLICATION.route('/ping', methods=['GET', 'POST'])
@@ -17,7 +18,11 @@ def server_status():
     r.update(
         success=True,
         server=server_runner.get_server_data()
-    )
+    ).notify(
+        kind='CONNECTED',
+        code='RECEIVED_PING',
+        message='Established remote connection'
+    ).console(whitespace=1)
 
     return flask.jsonify(r.serialize())
 

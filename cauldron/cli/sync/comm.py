@@ -106,15 +106,21 @@ def send_request(
 
     url = assemble_url(endpoint, remote_connection)
 
+    retriable_errors = (
+        requests.ConnectionError,
+        requests.HTTPError,
+        requests.Timeout
+    )
+    default_method = 'POST' if data is not None else 'GET'
     try:
         http_response = requests.request(
-            method=method,
+            method=method or default_method,
             url=url,
             json=data,
             timeout=10,
             **kwargs
         )
-    except (requests.ConnectionError, requests.HTTPError, requests.Timeout):
+    except retriable_errors:
         return send_request(
             endpoint=endpoint,
             data=data,

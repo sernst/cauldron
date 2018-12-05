@@ -325,7 +325,7 @@ class Response(object):
         if self.parent:
             return self.parent.notify(kind, message, code, **kwargs)
 
-        message_kind = (kind if kind else 'INFO').upper()
+        message_kind = (kind or 'INFO').upper()
         index = sum([len(self.messages), len(self.errors), len(self.warnings)])
         rm = ResponseMessage(
             kind=message_kind,

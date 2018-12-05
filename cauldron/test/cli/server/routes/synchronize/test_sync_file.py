@@ -67,3 +67,32 @@ class TestSyncFile(FlaskResultsTest):
         self.assertTrue(os.path.exists(written_path))
 
         support.run_remote_command('close')
+
+    def test_valid_shared(self):
+        """Should synchronize file remotely to shared library location."""
+        support.create_project(self, 'peter-2')
+        project = cauldron.project.get_internal_project()
+
+        response = support.run_remote_command(
+            'open "{}" --forget'.format(project.source_directory)
+        )
+        self.assert_no_errors(response)
+        project = cauldron.project.get_internal_project()
+
+        posted = self.post('/sync-file', {
+            'relative_path': 'library/test.md',
+            'chunk': sync.io.pack_chunk(b'abcdefg'),
+            'location': 'shared'
+        })
+        self.assert_no_errors(posted.response)
+
+        written_path = os.path.join(
+            project.source_directory,
+            '..',
+            '__cauldron_shared_libs',
+            'library',
+            'test.md'
+        )
+        self.assertTrue(os.path.exists(written_path))
+
+        support.run_remote_command('close')

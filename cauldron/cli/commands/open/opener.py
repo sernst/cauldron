@@ -1,5 +1,4 @@
 import os
-import time
 
 import cauldron
 from cauldron import environ
@@ -69,11 +68,11 @@ def update_recent_paths(response, path):
         recent_paths.insert(0, path)
         environ.configs.put(recent_paths=recent_paths[:10], persists=True)
         environ.configs.save()
-    except Exception as err:
+    except Exception as error:  # pragma: no cover
         response.warn(
             code='FAILED_RECENT_UPDATE',
             message='Unable to update recently opened projects',
-            error=str(err)
+            error=str(error)
         ).console(whitespace=1)
 
     return True
@@ -127,8 +126,9 @@ def open_project(
     response = Response()
 
     try:
+        # Try to close any open projects before opening a new one.
         runner.close()
-    except Exception:
+    except Exception:  # pragma: no cover
         pass
 
     path = environ.paths.clean(path)
