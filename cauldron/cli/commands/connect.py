@@ -2,10 +2,11 @@ import typing
 from argparse import ArgumentParser
 
 import requests
+from requests import exceptions as request_exceptions
+
 from cauldron import cli
 from cauldron import environ
 from cauldron.environ import Response
-from requests import exceptions as request_exceptions
 
 NAME = 'connect'
 DESCRIPTION = """

@@ -124,7 +124,7 @@ def sync_open_project():
         source_directory=project.source_directory,
         project=project.kernel_serialize()
     ).notify(
-        kind='SUCCESS',
+        kind='OPENED',
         code='PROJECT_OPENED',
         message='Project opened'
     ).response.flask_serialize()
@@ -183,12 +183,11 @@ def sync_source_file():
 
     sync_status.update({}, time=sync_time)
 
-    print('SAVED CHUNK:', offset, file_path)
     return r.notify(
-        kind='SUCCESS',
+        kind='SYNCED',
         code='SAVED_CHUNK',
-        message='Saved file chunk'
-    ).response.flask_serialize()
+        message='File chunk {} {}'.format(offset, file_path)
+    ).console().response.flask_serialize()
 
 
 @server_runner.APPLICATION.route(

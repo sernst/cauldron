@@ -74,13 +74,28 @@ class Project:
         return hashlib.sha1(self.source_path.encode()).hexdigest()
 
     @property
+    def is_remote_project(self) -> bool:
+        """Whether or not this project is remote"""
+        project_path = environ.paths.clean(self.source_directory)
+        return project_path.find('cd-remote-project') != -1
+
+    @property
     def library_directories(self) -> typing.List[str]:
         """
         The list of directories to all of the library locations
         """
         def listify(value):
             return [value] if isinstance(value, str) else list(value)
-        folders = listify(self.settings.fetch('library_folders', ['libs']))
+
+        # If this is a project running remotely remove external library
+        # folders as the remote shared libraries folder will contain all
+        # of the necessary dependencies
+        is_local_project = not self.is_remote_project
+        folders = [
+            f
+            for f in listify(self.settings.fetch('library_folders', ['libs']))
+            if is_local_project or not f.startswith('..')
+        ]
 
         # Include the remote shared library folder as well
         folders.append('../__cauldron_shared_libs')

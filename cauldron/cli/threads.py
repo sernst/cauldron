@@ -64,6 +64,8 @@ class CauldronThread(threading.Thread):
             except Exception as error:
                 self.exception = error
                 print(error)
+                import traceback
+                traceback.print_exc()
                 import sys
                 self.context.response.fail(
                     code='COMMAND_EXECUTION_ERROR',

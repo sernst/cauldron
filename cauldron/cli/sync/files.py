@@ -20,6 +20,7 @@ def send_chunk(
     """ """
     return sync.comm.send_request(
         endpoint='/sync-file',
+        method='POST',
         remote_connection=remote_connection,
         data=dict(
             relative_path=relative_path,
