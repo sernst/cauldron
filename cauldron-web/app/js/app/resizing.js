@@ -38,6 +38,7 @@ function resizePlotlyBox(target) {
   const e = $(target);
   const parent = e.parent();
   const skip = e.parents('.cd-project-step-body').hasClass('closed');
+  const parentV2 = e.parents('.cd-plotly-box-v2');
 
   if (skip || resizePaused) {
     // Do not resize plotly objects that are currently invisible
@@ -45,8 +46,8 @@ function resizePlotlyBox(target) {
   }
 
   window.Plotly.relayout(e[0], {
-    width: parent.width(),
-    height: parent.height()
+    width: (parentV2 || parent).width(),
+    height: (parentV2 || parent).height()
   });
 }
 exports.resizePlotlyBox = resizePlotlyBox;
