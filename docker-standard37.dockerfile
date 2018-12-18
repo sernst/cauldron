@@ -2,8 +2,8 @@ FROM ubuntu:18.04
 
 MAINTAINER swernst@gmail.com
 
-ENV PYTHON_RELEASE 3.6
-ENV PYTHON_VERSION 3.6.7
+ENV PYTHON_RELEASE 3.7
+ENV PYTHON_VERSION 3.7.1
 
 RUN apt-get -y --no-install-recommends update && \
     apt-get -y --no-install-recommends install \
