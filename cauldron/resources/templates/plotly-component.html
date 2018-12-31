@@ -1,22 +1,23 @@
-<div class="cd-plotly-box-wrapper">
-  <style scoped>
-    .cd-plotly-box-v2 {
-      margin: 0;
-      padding: 0;
-    }
+<style data-style="{{ "css" | id }}">
+  #{{ "plotly-box" | id }} .cd-plotly-box-v2 {
+    margin: 0;
+    padding: 0;
+  }
 
-    @supports not (-webkit-overflow-scrolling: touch) {
-      .cd-plotly-box-v2 {
-        height: {{ min_height }}vh;
-      }
+  @supports not (-webkit-overflow-scrolling: touch) {
+    #{{ "plotly-box" | id }} .cd-plotly-box-v2 {
+      height: {{ min_height }}vh;
     }
+  }
 
-    @supports (-webkit-overflow-scrolling: touch) {
-      .cd-plotly-box-v2 {
-        height: {{ (scale * 1024) | int }}px;
-      }
+  @supports (-webkit-overflow-scrolling: touch) {
+    #{{ "plotly-box" | id }} .cd-plotly-box-v2 {
+      height: {{ (scale * 1024) | int }}px;
     }
-  </style>
+  }
+</style>
+
+<div id="{{ "plotly-box" | id }}" class="cd-plotly-box-wrapper">
   <div class="cd-plotly-box-v2">
     {{ dom }}
     <script type="application/javascript">

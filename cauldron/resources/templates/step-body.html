@@ -1,36 +1,37 @@
+<style data-style="{{ "css" | id }}">
+  #{{ "project-step" | id }}  .cd-step-elapsed {
+    display: none;
+    position: absolute;
+    z-index: 20;
+    background-color: #555;
+    border: 1px solid #444;
+    color: #EEE;
+    padding: 0.25em 1em;
+    align-items: center;
+    right: 0;
+  }
+  #{{ "project-step" | id }} .cd-step-elapsed__header {
+    margin-right: 10px;
+  }
+  #{{ "project-step" | id }} .cd-step-elapsed__value {
+    font-size: 1.5rem;
+  }
+  #{{ "project-step" | id }} .cd-step-stopwatch {
+    margin-right: 10px;
+    margin-top: 2px;
+    cursor: zoom-in;
+  }
+  #{{ "project-step" | id }} .cd-step-stopwatch:hover .cd-step-elapsed {
+    display: block;
+  }
+</style>
+
 <div class="cd-project-step"
      id="{{ "project-step" | id }}"
      data-step-name="{{ id }}"
      data-step-updated="{{ last_display_update }}"
      style="display:{{ 'block' if is_visible else 'none' }}"
 >
-  <style scoped>
-    .cd-step-elapsed {
-      display: none;
-      position: absolute;
-      z-index: 20;
-      background-color: #555;
-      border: 1px solid #444;
-      color: #EEE;
-      padding: 0.25em 1em;
-      align-items: center;
-      right: 0;
-    }
-    .cd-step-elapsed__header {
-      margin-right: 10px;
-    }
-    .cd-step-elapsed__value {
-      font-size: 1.5rem;
-    }
-    .cd-step-stopwatch {
-      margin-right: 10px;
-      margin-top: 2px;
-      cursor: zoom-in;
-    }
-    .cd-step-stopwatch:hover .cd-step-elapsed {
-      display: block;
-    }
-  </style>
   <a class="step-anchor" name="{{ id }}" data-type=""></a>
   <div class="cd-project-step__header cd-project-step__header--standard"
        data-default-modifier="cd-project-step__header--standard"
