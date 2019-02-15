@@ -1,0 +1,33 @@
+<style data-style="{{ "css" | id }}">
+  #{{ "image-box" | id }}.cd-image-box--left {
+    margin: 10px 20px;
+    text-align: left;
+  }
+
+  #{{ "image-box" | id }}.cd-image-box--center {
+    margin: 10px auto;
+    text-align: center;
+  }
+
+  #{{ "image-box" | id }}.cd-image-box--right {
+    margin: 10px 20px;
+    text-align: right;
+  }
+</style>
+
+<div
+  id="{{ "image-box" | id }}"
+  class="cd-image-box cd-image-box--{{ justification }}"
+>
+  <img
+    id="{{ "image" | id }}"
+    class="cd-image"
+    src="{{ path }}?no-cache={{ "no-cache" | id }}"
+    {% if width is not none %}
+    width="{{ width }}px"
+    {%  endif %}
+    {%  if height is not none %}
+    height="{{ height }}px"
+    {% endif %}
+  />
+</div>

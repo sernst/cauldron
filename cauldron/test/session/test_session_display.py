@@ -139,3 +139,14 @@ class TestSessionDisplay(scaffolds.ResultsTest):
         support.add_step(self, contents=step_contents)
         r = support.run_command('run')
         self.assertFalse(r.failed, 'should not have failed')
+
+    def test_image(self):
+        """Should render an assets image to the dom."""
+        support.create_project(self, 'test_image')
+        step_contents = '\n'.join([
+            'import cauldron as cd',
+            'cd.display.image("foo.jpg", 12, 13, "center")'
+        ])
+        support.add_step(self, contents=step_contents)
+        r = support.run_command('run')
+        self.assertTrue(r.success, 'should not have failed')

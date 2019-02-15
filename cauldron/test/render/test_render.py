@@ -184,3 +184,17 @@ class TestRender(scaffolds.ResultsTest):
         self.assertGreater(result.find('01'), 0)
         self.assertGreater(result.find('02'), 0)
         self.assertGreater(result.find('12'), 0)
+
+    def test_image(self):
+        """Should render an image dom."""
+        path = 'results/foo/latest/assets/test.jpg'
+        result = render.image(
+            rendered_path=path,
+            width=12,
+            height=13,
+            justify='right'
+        )
+        self.assertTrue('width="12px"' in result)
+        self.assertTrue('height="13px"' in result)
+        self.assertTrue('--right' in result)
+        self.assertTrue('src="{}'.format(path) in result)
