@@ -2,6 +2,7 @@ import json as _json_io
 import textwrap
 import typing
 from datetime import timedelta
+import os as _os
 
 import cauldron as _cd
 from cauldron import environ
@@ -269,6 +270,32 @@ def whitespace(lines: float = 1.0):
     r = _get_report()
     r.append_body(render.whitespace(lines))
     r.stdout_interceptor.write_source('\n')
+
+
+def image(
+        filename: str,
+        width: int = None,
+        height: int = None,
+        justify: str = 'left'
+):
+    """
+    Adds an image to the display. The image must be located within the
+    assets directory of the Cauldron notebook's folder.
+
+    :param filename:
+        Name of the file within the assets directory,
+    :param width:
+        Optional width in pixels for the image.
+    :param height:
+        Optional height in pixels for the image.
+    :param justify:
+        One of 'left', 'center' or 'right', which specifies how the image
+        is horizontally justified within the notebook display.
+    """
+    r = _get_report()
+    path = '/'.join(['reports', r.project.uuid, 'latest', 'assets', filename])
+    r.append_body(render.image(path, width, height, justify))
+    r.stdout_interceptor.write_source('[ADDED] Image\n')
 
 
 def html(dom: str):

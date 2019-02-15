@@ -226,6 +226,23 @@ def header(contents: str, level: int = 1, expand_full: bool = False) -> str:
     )
 
 
+def image(
+        rendered_path: str,
+        width: int = None,
+        height: int = None,
+        justify: str = None
+) -> str:
+    """Renders an image block"""
+    environ.abort_thread()
+    return templating.render_template(
+        'image.html',
+        path=rendered_path,
+        width=width,
+        height=height,
+        justification=(justify or 'left').lower()
+    )
+
+
 def json(**kwargs) -> str:
     """
 
