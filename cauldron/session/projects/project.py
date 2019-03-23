@@ -51,11 +51,9 @@ class Project:
         self.remote_source_directory = None  # type: str
 
         def as_shared_cache(source):
-            if source is None:
-                return SharedCache()
-            if not hasattr(source, 'fetch'):
+            if source and not hasattr(source, 'fetch'):
                 return SharedCache().put(**source)
-            return source
+            return source or SharedCache()
 
         self.stop_condition = StopCondition(False, False)  # type: StopCondition
         self.shared = as_shared_cache(shared)
@@ -99,6 +97,9 @@ class Project:
 
         # Include the remote shared library folder as well
         folders.append('../__cauldron_shared_libs')
+
+        # Include the project directory as well
+        folders.append(self.source_directory)
 
         return [
             environ.paths.clean(os.path.join(self.source_directory, folder))

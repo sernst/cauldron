@@ -171,7 +171,10 @@ def open_project(
             message='Unable to write project notebook data'
         ).console(whitespace=1).response
 
-    runner.add_library_path(project.source_directory)
+    # Should no longer be needed because the source directory is included
+    # in the library directories as of v0.4.7
+    # runner.add_library_path(project.source_directory)
+    runner.reload_libraries(project.library_directories)
 
     return response.update(
         project=project.kernel_serialize()
