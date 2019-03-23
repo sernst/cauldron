@@ -44,5 +44,5 @@ class TestStatus(scaffolds.ResultsTest):
         project = cauldron.project.get_internal_project()
         results = status.of_project(project)
 
-        self.assertEqual(len(results['libraries']), 2)
+        self.assertEqual(len(results['libraries']), 3)
         self.assertEqual(len(results['project'].keys()), 1)

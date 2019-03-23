@@ -159,7 +159,13 @@ def send_all_in(
         directory
     ).rstrip(os.path.sep)
 
-    for file_path in glob.iglob(glob_path, recursive=True):
+    # Only send files that have non-zero size
+    file_paths = (
+        p
+        for p in glob.iglob(glob_path, recursive=True)
+        if os.path.isfile(p) and os.path.getsize(p) > 0
+    )
+    for file_path in file_paths:
         relative_path = file_path[len(root_path):].lstrip(os.path.sep)
 
         response = send(

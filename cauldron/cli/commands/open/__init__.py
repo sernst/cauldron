@@ -1,7 +1,6 @@
 import os
 import typing
 from argparse import ArgumentParser
-import requests
 
 import cauldron
 from cauldron import cli
