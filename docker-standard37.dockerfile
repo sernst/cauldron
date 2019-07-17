@@ -3,7 +3,7 @@ FROM ubuntu:18.04
 MAINTAINER swernst@gmail.com
 
 ENV PYTHON_RELEASE 3.7
-ENV PYTHON_VERSION 3.7.1
+ENV PYTHON_VERSION 3.7.2
 
 RUN apt-get -y --no-install-recommends update && \
     apt-get -y --no-install-recommends install \

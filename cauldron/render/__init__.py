@@ -311,12 +311,15 @@ def plotly(
     found = re.search(r'id="(?P<id>[^"]+)"', dom)
     dom_id = found.group('id')
 
-    insert_index = dom.index('"showLink":')
-    dom = ''.join([
-        dom[:insert_index],
-        '"staticPlot": {}, '.format('true' if static else 'false'),
-        dom[insert_index:]
-    ])
+    try:  # Plotly < 4.0
+        insert_index = dom.index('"showLink":')
+        dom = ''.join([
+            dom[:insert_index],
+            '"staticPlot": {}, '.format('true' if static else 'false'),
+            dom[insert_index:]
+        ])
+    except ValueError:  # pragma: no-cover
+        pass
 
     return templating.render_template(
         'plotly-component.html',
