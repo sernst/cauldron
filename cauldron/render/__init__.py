@@ -305,21 +305,21 @@ def plotly(
     dom = plotly_lib.offline.plot(
         figure_or_data=source,
         output_type='div',
-        include_plotlyjs=False
+        include_plotlyjs=False,
+        config={'staticPlot': static, 'showLink': False}
     )
 
     found = re.search(r'id="(?P<id>[^"]+)"', dom)
     dom_id = found.group('id')
 
-    try:  # Plotly < 4.0
+    # Plotly < 4.0 requires manually inserting the static value.
+    if static and dom.find('"staticPlot": ') < 0:  # pragma: no-cover
         insert_index = dom.index('"showLink":')
         dom = ''.join([
             dom[:insert_index],
             '"staticPlot": {}, '.format('true' if static else 'false'),
             dom[insert_index:]
         ])
-    except ValueError:  # pragma: no-cover
-        pass
 
     return templating.render_template(
         'plotly-component.html',
