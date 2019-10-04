@@ -186,7 +186,9 @@ def table(
         data_frame,
         scale: float = 0.7,
         include_index: bool = False,
-        max_rows: int = 500
+        max_rows: int = 500,
+        sample_rows: typing.Optional[int] = None,
+        formats: typing.Union[str, typing.Dict[str, str]] = None
 ):
     """
     Adds the specified data frame to the display in a nicely formatted
@@ -208,13 +210,32 @@ def table(
         frames to a table, which can cause the notebook display to become
         sluggish or unresponsive. If you want to display large tables, you need
         only increase the value of this argument.
+    :param sample_rows:
+        When set to a positive integer value, the DataFrame will be randomly
+        sampled to the specified number of rows when displayed in the table.
+        If the value here is larger than the number of rows in the DataFrame,
+        the sampling will have no effect and the entire DataFrame will be
+        displayed instead.
+    :param formats:
+        An optional dictionary that, when specified, should contain a mapping
+        between column names and formatting strings to apply to that column
+        for display purposes. For example, ``{'foo': '{:,.2f}%'}`` would
+        transform a column ``foo = [12.2121, 34.987123, 42.72839]`` to
+        display as ``foo = [12.21%, 34.99%, 42.73%]``. The formatters should
+        follow the standard Python string formatting guidelines the same as
+        the ``str.format()`` command having the value of the column as the only
+        positional argument in the format arguments. A string value can also
+        be specified for uniform formatting of all columns (or if displaying
+        a series with only a single value).
     """
     r = _get_report()
     r.append_body(render.table(
         data_frame=data_frame,
         scale=scale,
         include_index=include_index,
-        max_rows=max_rows
+        max_rows=max_rows,
+        sample_rows=sample_rows,
+        formats=formats
     ))
     r.stdout_interceptor.write_source('[ADDED] Table\n')
 

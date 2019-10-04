@@ -1,9 +1,10 @@
 import json as json_internal
 import math
-import re
 import os
 import random
+import re
 import textwrap
+import typing
 from datetime import datetime
 from datetime import timedelta
 
@@ -334,7 +335,9 @@ def table(
         data_frame,
         scale: float = 0.7,
         include_index: bool = False,
-        max_rows: int = 500
+        max_rows: int = 500,
+        sample_rows: typing.Optional[int] = None,
+        formats: typing.Union[str, typing.Dict[str, str]] = None
 ) -> str:
     """
 
@@ -342,7 +345,8 @@ def table(
     :param scale:
     :param include_index:
     :param max_rows:
-    :return:
+    :param sample_rows:
+    :param formats:
     """
     environ.abort_thread()
 
@@ -352,22 +356,37 @@ def table(
     )
 
     df_source = (
-        data_frame.head(max_rows)
-        if len(data_frame) > max_rows else
+        data_frame.to_frame()
+        if hasattr(data_frame, 'to_frame') else
         data_frame
     )
+
+    df_source = (
+        df_source.sample(n=sample_rows)
+        if sample_rows and sample_rows > 0 else
+        df_source
+    )
+
+    df_source = (
+        df_source.head(max_rows)
+        if len(df_source) > max_rows else
+        df_source
+    )
+
+    if formats and not hasattr(formats, 'items'):
+        formats = {name: formats for name in df_source.columns}
 
     if include_index:
         df_source = df_source.reset_index()
 
-    try:
-        column_headers = ['"{}"'.format(x) for x in df_source.columns.tolist()]
-        data = df_source.values.tolist()
-    except AttributeError:
-        # If no columns are found assume that it is a Series instead of a
-        # DataFrame and reformat the data to match the expected structure.
-        column_headers = ['"{}"'.format(df_source.name)]
-        data = df_source.values.reshape([len(df_source), 1]).tolist()
+    df_source = df_source.assign(**{
+        name: df_source[name].map(format_definition.format)
+        for name, format_definition in (formats or {}).items()
+        if name in df_source
+    })
+
+    column_headers = ['"{}"'.format(x) for x in df_source.columns.tolist()]
+    data = df_source.values.tolist()
 
     json_data = json_internal.dumps(data, cls=encoding.ComplexJsonEncoder)
 

@@ -50,6 +50,30 @@ class TestRender(scaffolds.ResultsTest):
         result = render.table(df['d'], 0.5, include_index=True)
         self.assertGreater(len(result), 1)
 
+    def test_table_formatting(self):
+        """Should render table with formatted values."""
+        df = pd.DataFrame({
+            'foo': [1.123123, 2.234234, 3.345345],
+            'bar': [1.123123, 2.234234, 3.345345]
+        })
+
+        result = render.table(df, formats={
+            'foo': '{:,.1f}%',
+            'bar': '${:,.2f}'
+        })
+        self.assertTrue('1.1%' in result)
+        self.assertTrue('$1.12' in result)
+
+    def test_table_formatting_simple(self):
+        """Should render table with formatted values."""
+        df = pd.DataFrame({
+            'foo': [1.123123, 2.234234, 3.345345],
+            'bar': [1.123123, 2.234234, 3.345345]
+        })
+
+        result = render.table(df, formats='{:,.1f}%')
+        self.assertEqual(result.count('1.1%'), 2)
+
     def test_listing(self):
         """Should render a list of the results"""
 
