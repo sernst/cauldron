@@ -2,7 +2,6 @@ language: python
 python:
   - "3.5"
   - "3.6"
-  - "3.6-dev"  # 3.6 development branch
 # These have been disabled due to ongoing lack of support from TravisCI
 #  - "3.7"
 #  - "3.7-dev"  # 3.7 development branch
