@@ -11,11 +11,11 @@ COPY docker-run.sh /cauldron_local/
 
 WORKDIR /cauldron_local
 
-RUN conda install -y conda-build git && \
-    /opt/conda/bin/pip install -r /cauldron_local/requirements.txt && \
-    python3 setup.py develop && \
-    chmod -R 775 /cauldron_local && \
-    ln -s /opt/conda/bin/pip /opt/conda/bin/pip3
+RUN conda install -y conda-build git \
+ && /opt/conda/bin/pip install -r /cauldron_local/requirements.txt \
+ && python3 setup.py develop \
+ && chmod -R 775 /cauldron_local \
+ && ln -s /opt/conda/bin/pip /opt/conda/bin/pip3
 
 EXPOSE 5010
 

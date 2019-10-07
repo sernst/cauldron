@@ -1,19 +1,42 @@
-import glob
 import json
 import os
 import re
 from argparse import ArgumentParser
 
 HUB_PREFIX = 'swernst/cauldron'
+MY_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
+BUILDS = [
+    {
+        'ids': ['standard36'],
+        'dockerfile': 'docker-standard.dockerfile',
+        'build_args': {'PYTHON_RELEASE': '3.6', 'PYTHON_VERSION': '3.6.9'}
+    },
+    {
+        'ids': ['standard', 'standard37'],
+        'dockerfile': 'docker-standard.dockerfile',
+        'build_args': {'PYTHON_RELEASE': '3.7', 'PYTHON_VERSION': '3.7.4'}
+    },
+    # {
+    #     'ids': ['standard38'],
+    #     'dockerfile': 'docker-standard.dockerfile',
+    #     'build_args': {'PYTHON_RELEASE': '3.8', 'PYTHON_VERSION': '3.8.0'}
+    # },
+    {
+        'ids': ['miniconda'],
+        'dockerfile': 'docker-miniconda.dockerfile',
+        'build_args': {}
+    },
+    {
+        'ids': ['conda'],
+        'dockerfile': 'docker-conda.dockerfile',
+        'build_args': {}
+    },
+]
 
-my_directory = os.path.dirname(os.path.realpath(__file__))
-glob_path = os.path.join(my_directory, 'docker-*.dockerfile')
-
-file_pattern = re.compile('docker-(?P<id>[^.]+).dockerfile')
-
-with open(os.path.join(my_directory, 'cauldron', 'settings.json')) as f:
+with open(os.path.join(MY_DIRECTORY, 'cauldron', 'settings.json')) as f:
     settings = json.load(f)
-version = settings['version']
+
+VERSION = settings['version']
 
 
 def update_base_image(path: str):
@@ -21,7 +44,7 @@ def update_base_image(path: str):
     with open(path, 'r') as file_handle:
         contents = file_handle.read()
 
-    regex = re.compile('from\s+(?P<source>[^\s]+)', re.IGNORECASE)
+    regex = re.compile(r'from\s+(?P<source>[^\s]+)', re.IGNORECASE)
     matches = regex.findall(contents)
 
     if not matches:
@@ -32,21 +55,25 @@ def update_base_image(path: str):
     return match
 
 
-def build(path: str) -> dict:
+def build(build_id: str, spec: dict) -> dict:
     """Builds the container from the specified docker file path"""
+    path = os.path.join(MY_DIRECTORY, spec['dockerfile'])
     update_base_image(path)
-    match = file_pattern.search(os.path.basename(path))
-    build_id = match.group('id')
+
     tags = [
-        '{}:{}-{}'.format(HUB_PREFIX, version, build_id),
+        '{}:{}-{}'.format(HUB_PREFIX, VERSION, build_id),
         '{}:latest-{}'.format(HUB_PREFIX, build_id),
         '{}:current-{}'.format(HUB_PREFIX, build_id)
     ]
     if build_id == 'standard':
         tags.append('{}:latest'.format(HUB_PREFIX))
 
-    command = 'docker build --file "{}" {} .'.format(
+    command = 'docker build --file "{}" {} {} .'.format(
         path,
+        ' '.join([
+            '--build-arg {}={}'.format(key, value)
+            for key, value in spec['build_args'].items()
+        ]),
         ' '.join(['-t {}'.format(t) for t in tags])
     )
 
@@ -54,6 +81,7 @@ def build(path: str) -> dict:
     os.system(command)
 
     return dict(
+        spec=spec,
         id=build_id,
         path=path,
         command=command,
@@ -78,7 +106,12 @@ def parse() -> dict:
 def run():
     """Execute the build process"""
     args = parse()
-    build_results = [build(p) for p in glob.iglob(glob_path)]
+
+    build_results = [
+        build(build_id, spec)
+        for spec in BUILDS
+        for build_id in spec['ids']
+    ]
 
     if not args['publish']:
         return
