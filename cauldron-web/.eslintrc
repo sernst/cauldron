@@ -1,5 +1,5 @@
 {
-  "extends": "./node_modules/eslint-config-airbnb/index.js",
+  "extends": "eslint-config-airbnb-base",
   "rules": {
     // Airbnb imposed rule for JSON compatibility
     "comma-dangle": 0,
