@@ -11,13 +11,15 @@ from setuptools import setup
 # rm -rf ./dist
 # python3 setup.py sdist bdist_wheel
 # twine upload dist/cauldron*
+# docker run --rm -it -v $(pwd):/cauldron continuumio/anaconda3 /bin/bash
 # python3 conda-recipe/conda-builder.py
 
 # WINDOWS:
 # rmdir dist /s /q
 # python setup.py sdist bdist_wheel
 # twine upload dist/cauldron*
-# python conda-recipe\conda-builder.py
+# docker run --rm -it -v ${pwd}:/cauldron continuumio/anaconda3 /bin/bash
+# python conda-recipe/conda-builder.py
 
 MY_DIRECTORY = os.path.dirname(__file__)
 with open(os.path.join(MY_DIRECTORY, 'cauldron', 'settings.json'), 'r') as f:
@@ -84,6 +86,7 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
 
         'Intended Audience :: Developers',
         'Intended Audience :: System Administrators',
