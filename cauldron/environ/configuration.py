@@ -120,9 +120,9 @@ class Configuration(object):
         :param persists:
         :return:
         """
-
         if persists:
             self.load().persistent.update(**kwargs)
+            self.save()
         else:
             self.session.update(**kwargs)
 

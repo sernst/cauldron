@@ -55,7 +55,7 @@ class TestStepTesting(StepTestCase):
         self.assertEqual(cd.shared.result, 42)
 
     def test_to_strings(self):
-        """ should convert list of integers to a list of strings """
+        """Should convert list of integers to a list of strings."""
         before = [1, 2, 3]
         step = self.run_step('S01-first.py')
         after = step.local.to_strings(before)

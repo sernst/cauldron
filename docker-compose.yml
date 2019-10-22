@@ -8,9 +8,9 @@ services:
       - .:/cauldron
     ports:
       - "5010:5010"
-    stdin_open: true
+#    stdin_open: true
     tty: true
-    entrypoint: /bin/bash
+    entrypoint: /bin/bash -c "cd /cauldron && python setup.py develop && cauldron kernel --port=5010 --name=0.0.0.0"
 
   kernel-conda:
     build:

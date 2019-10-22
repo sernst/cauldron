@@ -13,7 +13,7 @@ class TestCliShell(scaffolds.ResultsTest):
     """ """
 
     def test_default_empty_line(self):
-        """ should abort when an empty line is supplied """
+        """Should abort when an empty line is supplied """
 
         cmd = shell.CauldronShell()
         cmd.default('    ')
@@ -23,7 +23,7 @@ class TestCliShell(scaffolds.ResultsTest):
 
     @patch('cauldron.cli.commander.show_help')
     def test_default_show_help(self, show_help: MagicMock):
-        """ should show help if help command called """
+        """Should show help if help command called """
 
         cmd = shell.CauldronShell()
         cmd.default('help')
@@ -32,7 +32,7 @@ class TestCliShell(scaffolds.ResultsTest):
 
     @patch('cauldron.cli.commander.execute')
     def test_default_message_response(self, execute: MagicMock):
-        """ should handle ResponseMessage returned from commander.execute """
+        """Should handle ResponseMessage returned from commander.execute """
 
         r = Response()
         execute.return_value = r.notify()
@@ -44,7 +44,7 @@ class TestCliShell(scaffolds.ResultsTest):
 
     @patch('cauldron.cli.commander.execute')
     def test_default_none_response(self, execute: MagicMock):
-        """ should handle None response returned from commander.execute """
+        """Should handle None response returned from commander.execute """
 
         execute.return_value = None
 
@@ -55,7 +55,7 @@ class TestCliShell(scaffolds.ResultsTest):
 
     @patch('cauldron.cli.commander.show_help')
     def test_do_help(self, show_help: MagicMock):
-        """ should show help if do_help command called """
+        """Should show help if do_help command called """
 
         arg = 'this is my arg'
         cmd = shell.CauldronShell()
@@ -64,7 +64,7 @@ class TestCliShell(scaffolds.ResultsTest):
         show_help.assert_called_once_with(arg)
 
     def test_completenames(self):
-        """ should autocomplete names """
+        """Should autocomplete names."""
 
         cmd = shell.CauldronShell()
         results = cmd.completenames('ru')
@@ -72,7 +72,7 @@ class TestCliShell(scaffolds.ResultsTest):
 
     @patch('cmd.Cmd.cmdloop')
     def test_command_loop(self, parent_cmdloop: MagicMock):
-        """ should start the command loop """
+        """Should start the command loop."""
 
         intro_arg = 'This is my intro'
         cmd = shell.CauldronShell()

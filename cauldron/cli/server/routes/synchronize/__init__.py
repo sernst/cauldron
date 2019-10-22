@@ -196,7 +196,7 @@ def sync_source_file():
 )
 @authorization.gatekeeper
 def download_file(filename: str):
-    """ downloads the specified project file if it exists """
+    """ downloads the specified project file if it exists."""
 
     project = cd.project.get_internal_project()
     source_directory = project.source_directory if project else None
@@ -223,7 +223,7 @@ def download_file(filename: str):
 )
 @authorization.gatekeeper
 def download_project_file(filename: str):
-    """ downloads the specified project file if it exists """
+    """ downloads the specified project file if it exists."""
 
     project = cd.project.get_internal_project()
     source_directory = project.source_directory if project else None

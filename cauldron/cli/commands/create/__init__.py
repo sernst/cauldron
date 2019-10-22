@@ -147,11 +147,14 @@ def execute(
     )
 
     source_directory = response.data['source_directory']
-    response.consume(create_actions.write_project_data(
+    response.consume(create_actions.create_first_step(
         source_directory,
-        definition
+        project_name
     ))
+    if response.failed:
+        return response
 
+    definition['steps'].append(response.data['step_name'])
     response.consume(create_actions.write_project_data(
         source_directory,
         definition

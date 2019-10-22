@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 import cauldron
 from cauldron import cli
 from cauldron import environ
+from cauldron.cli.commands.listing import discovery
 from cauldron.cli.commands.open import actions
 from cauldron.cli.commands.open import opener
 from cauldron.cli.commands.open import remote as remote_opener
@@ -77,13 +78,13 @@ def populate(
     )
 
     parser.add_argument(
-        '-a', '--available',
+        '-a', '--available', '--all',
         dest='list_available',
         default=False,
         action='store_true',
         help=cli.reformat(
             """
-            List all known projects.
+            List all known projects to choose one to open.
             """
         )
     )
@@ -116,9 +117,9 @@ def execute(
     path = path.strip('"') if path else None
 
     if list_available:
-        actions.echo_known_projects(response)
-        return response
-
+        path = actions.select_from_available(response)
+        if not path:
+            return response
     if last_opened_project:
         path = actions.fetch_last(response)
         if not path:
@@ -128,7 +129,7 @@ def execute(
         if not path:
             return response
     elif not path or not path.strip():
-        actions.echo_known_projects(response)
+        discovery.echo_known_projects(response)
         return response
     else:
         p = actions.fetch_location(response, path)

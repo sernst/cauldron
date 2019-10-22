@@ -20,24 +20,24 @@ class TestOpenOpener(scaffolds.ResultsTest):
 
     @patch('time.sleep')
     def test_not_exists(self,  *args):
-        """ should return False when the project does not exist """
+        """Should return False when the project does not exist."""
         self.assertFalse(opener.project_exists(Response(), INVALID_PATH))
 
     @patch('time.sleep')
     def test_not_exists_load(self, *args):
-        """ should return False when the project does not exist """
+        """Should return False when the project does not exist."""
         self.assertFalse(opener.load_project(Response(), INVALID_PATH))
 
     @patch('time.sleep')
     def test_not_exists_open(self, *args):
-        """ should fail when the project does not exist """
+        """Should fail when the project does not exist."""
         response = opener.open_project(INVALID_PATH, forget=True)
         self.assertTrue(response.failed)
 
     @patch('time.sleep')
     @patch(opener_package('project_exists'), return_value=True)
     def test_not_loadable_open(self, *args):
-        """ should fail when project does not load """
+        """Should fail when project does not load """
         response = opener.open_project(INVALID_PATH, forget=True)
         self.assertTrue(response.failed)
 
@@ -46,21 +46,21 @@ class TestOpenOpener(scaffolds.ResultsTest):
     @patch(opener_package('load_project'), return_value=True)
     @patch(opener_package('update_recent_paths'), return_value=False)
     def test_not_update(self, *args):
-        """ should fail when project does not load """
+        """Should fail when project does not load """
         response = opener.open_project(INVALID_PATH, forget=False)
         self.assertTrue(response.failed)
 
     @patch('time.sleep')
     @patch(opener_package('initialize_results'), return_value=False)
     def test_bad_initialize_results(self, *args):
-        """ should fail opening when initialization fails """
+        """Should fail opening when initialization fails."""
         response = support.create_project(self, 'minnesota', confirm=False)
         self.assertTrue(response.failed)
 
     @patch('time.sleep')
     @patch(opener_package('write_results'), return_value=False)
     def test_bad_write_results(self, *args):
-        """ should fail opening when writing initial results fails """
+        """Should fail opening when writing initial results fails."""
         response = support.create_project(self, 'iowa', confirm=False)
         self.assertTrue(response.failed)
 

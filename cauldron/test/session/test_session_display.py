@@ -8,7 +8,7 @@ from cauldron.test.support import scaffolds
 class TestSessionDisplay(scaffolds.ResultsTest):
 
     def test_html(self):
-        """ should add an html div tag to the display """
+        """Should add an html div tag to the display."""
 
         support.create_project(self, 'helo')
 
@@ -23,7 +23,7 @@ class TestSessionDisplay(scaffolds.ResultsTest):
         self.assertFalse(r.failed, 'should not have failed')
 
     def test_svg(self):
-        """ should add an svg tag to the display """
+        """Should add an svg tag to the display."""
 
         support.create_project(self, 'athena')
 
@@ -38,7 +38,7 @@ class TestSessionDisplay(scaffolds.ResultsTest):
         self.assertFalse(r.failed, 'should not have failed')
 
     def test_status(self):
-        """ should update status display """
+        """Should update status display."""
 
         support.create_project(self, 'husker')
 
@@ -58,7 +58,7 @@ class TestSessionDisplay(scaffolds.ResultsTest):
         self.assertFalse(r.failed, 'should not have failed')
 
     def test_listing(self):
-        """ should add list to display """
+        """Should add list to display."""
 
         support.create_project(self, 'apollo')
 
@@ -73,7 +73,7 @@ class TestSessionDisplay(scaffolds.ResultsTest):
         self.assertFalse(r.failed, 'should not have failed')
 
     def test_list_grid(self):
-        """ should add list grid to display """
+        """Should add list grid to display."""
 
         support.create_project(self, 'apollo-grid')
 
@@ -88,7 +88,7 @@ class TestSessionDisplay(scaffolds.ResultsTest):
         self.assertFalse(r.failed, 'should not have failed')
 
     def test_whitespace(self):
-        """ should add list to display """
+        """Should add list to display."""
 
         support.create_project(self, 'hera')
 
@@ -103,7 +103,7 @@ class TestSessionDisplay(scaffolds.ResultsTest):
         self.assertFalse(r.failed, 'should not have failed')
 
     def test_jinja(self):
-        """ should add jinja template to display """
+        """Should add jinja template to display."""
 
         support.create_project(self, 'starbuck')
 

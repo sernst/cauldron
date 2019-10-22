@@ -10,13 +10,13 @@ class TestSyncDownload(FlaskResultsTest):
     """ """
 
     def test_no_project(self):
-        """ should return a 204 status when no project is open """
+        """Should return a 204 status when no project is open."""
 
         downloaded = self.get('/download/fake')
         self.assertEqual(downloaded.flask.status_code, 204)
 
     def test_no_such_file(self):
-        """ should return a 204 status when no such file exists """
+        """Should return a 204 status when no such file exists."""
 
         support.create_project(self, 'downloader')
 
@@ -24,7 +24,7 @@ class TestSyncDownload(FlaskResultsTest):
         self.assertEqual(downloaded.flask.status_code, 204)
 
     def test_valid(self):
-        """ should successfully download file """
+        """Should successfully download file """
 
         support.create_project(self, 'downloader')
         project = cauldron.project.get_internal_project()

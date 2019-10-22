@@ -10,7 +10,7 @@ class TestMessages(scaffolds.ResultsTest):
     """ """
 
     def test_message(self):
-        """ should echo message when printed """
+        """Should echo message when printed """
 
         r = Response()
         m = messages.Message(

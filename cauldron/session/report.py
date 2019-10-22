@@ -93,6 +93,14 @@ class Report(object):
         self._last_update_time = time.time()
         return self
 
+    def update_last_modified(self, value: float = None):
+        """
+        Manually update the last modified time, which is useful for
+        cases like error responses, which don't modify the dom body
+        but should be included in display update times nonetheless.
+        """
+        self._last_update_time = value if value is not None else time.time()
+
     def append_body(self, dom: str):
         """
         Appends the specified HTML-formatted DOM string to the

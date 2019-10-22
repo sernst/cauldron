@@ -8,7 +8,7 @@ class TestAlias(scaffolds.ResultsTest):
     """ """
 
     def test_unknown_command(self):
-        """ should fail if the command is not recognized """
+        """Should fail if the command is not recognized """
 
         r = support.run_command('alias fake')
         self.assertTrue(r.failed, 'should have failed')

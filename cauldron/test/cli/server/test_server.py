@@ -10,33 +10,33 @@ class TestServer(FlaskResultsTest):
     """ """
 
     def test_execute(self):
-        """ should execute the command """
+        """Should execute the command """
 
         posted = self.post('/', {'command': 'open', 'args': ''})
         self.assertEqual(posted.flask.status_code, 200)
 
     def test_execute_invalid_command(self):
-        """ should fail if command does not exist """
+        """Should fail if command does not exist."""
 
         posted = self.post('/', {'command': 'fake-command', 'args': ''})
         self.assertEqual(posted.flask.status_code, 200)
         self.assert_has_error_code(posted.response, 'NO_SUCH_COMMAND')
 
     def test_execute_fail(self):
-        """ should fail with improper arguments """
+        """Should fail with improper arguments."""
 
         posted = self.post('/', {'command': 'open', 'args': [1234]})
         self.assertEqual(posted.flask.status_code, 200)
         self.assert_has_error_code(posted.response, 'INVALID_COMMAND')
 
     def test_ping(self):
-        """ should successfully ping backend """
+        """Should successfully ping backend """
 
         posted = self.post('/ping')
         self.assertEqual(posted.flask.status_code, 200)
 
     def test_status(self):
-        """ should successfully check status of opened project """
+        """Should successfully check status of opened project."""
 
         opened = self.post('/', dict(
             command='open',
@@ -65,7 +65,7 @@ class TestServer(FlaskResultsTest):
         self.assert_no_errors(project_status.response)
 
     def test_run_status(self):
-        """ should return unknown run status for invalid run uid """
+        """Should return unknown run status for invalid run uid """
 
         run_status = self.get('/run-status/fake-uid')
         response = run_status.response
@@ -73,13 +73,13 @@ class TestServer(FlaskResultsTest):
         self.assertEqual(response.data['run_status'], 'unknown')
 
     def test_abort_invalid(self):
-        """ should cancel abort if nothing to abort """
+        """Should cancel abort if nothing to abort."""
 
         aborted = self.get('/abort')
         self.assert_no_errors(aborted.response)
 
     def test_start_server(self):
-        """ should start server with specified settings """
+        """Should start server with specified settings."""
 
         kwargs = dict(
             port=9999,
@@ -92,7 +92,7 @@ class TestServer(FlaskResultsTest):
             func.assert_called_once_with(**kwargs)
 
     def test_start_server_version(self):
-        """ should return server version without starting the server """
+        """Should return server version without starting the server."""
 
         with mock.patch('cauldron.cli.server.run.APPLICATION.run') as func:
             try:
@@ -102,7 +102,7 @@ class TestServer(FlaskResultsTest):
             func.assert_not_called()
 
     def test_parse(self):
-        """ should properly parse server args """
+        """Should properly parse server args."""
 
         args = server_run.parse(['--port=9999', '--version', '--debug'])
         self.assertTrue(args.get('version'))
@@ -110,7 +110,7 @@ class TestServer(FlaskResultsTest):
         self.assertEqual(args.get('port'), 9999)
 
     def test_abort_running(self):
-        """ should abort long running step """
+        """Should abort long running step."""
 
         support.create_project(self, 'walter')
         support.add_step(self, contents=cli.reformat(

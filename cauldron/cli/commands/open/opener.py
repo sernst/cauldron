@@ -4,6 +4,7 @@ import cauldron
 from cauldron import environ
 from cauldron import runner
 from cauldron import session
+from cauldron.session import projects
 from cauldron.environ import Response
 
 
@@ -78,7 +79,7 @@ def update_recent_paths(response, path):
     return True
 
 
-def initialize_results(response, project):
+def initialize_results(response: environ.Response, project):
     if not project.results_path:
         return True
 
@@ -95,17 +96,19 @@ def initialize_results(response, project):
     return False
 
 
-def write_results(response, project):
+def write_results(response: environ.Response, project: 'projects.Project'):
     try:
         path = project.output_path
         if not path or not os.path.exists(path):
             project.write()
         return True
-    except Exception as err:
+    except Exception as error:
+        import traceback
+        traceback.print_exc()
         response.fail(
             code='WRITE_FAILED',
             message='Unable to write project output data',
-            error=err
+            error=error
         )
         return False
 

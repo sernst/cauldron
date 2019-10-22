@@ -8,7 +8,7 @@ from cauldron.environ.configuration import Configuration
 class TestConfiguration(unittest.TestCase):
 
     def test_no_such_path(self):
-        """ should assign empty dictionary if path does not exist """
+        """Should assign empty dictionary if path does not exist."""
         c = Configuration()
         c.load('~/fake_path')
         self.assertIsInstance(c._persistent, dict)

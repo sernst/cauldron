@@ -14,8 +14,7 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
     """ """
 
     def test_move_step_later(self):
-        """ should move step later in the project """
-
+        """Should move step later in the project."""
         support.create_project(self, 'edina')
         support.add_step(self, 'first')
         support.add_step(self, 'second')
@@ -27,17 +26,18 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
         result = step_actions.modify_step(
             response=r,
             project=project,
-            name=project.steps[0].filename,
+            name=project.steps[1].filename,
             position='3'
         )
 
         self.assertTrue(result)
-        self.assertGreater(project.steps[0].filename.find('second'), 0)
-        self.assertGreater(project.steps[1].filename.find('third'), 0)
-        self.assertGreater(project.steps[2].filename.find('first'), 0)
+        self.assertEqual(
+            ['S01.py', 'S02-second.py', 'S03-first.py', 'S04-third.py'],
+            [s.filename for s in project.steps]
+        )
 
     def test_fail_remove_old_step(self):
-        """ should fail if unable to remove the old step """
+        """Should fail if unable to remove the old step."""
 
         support.create_project(self, 'bloomington')
         support.add_step(self, 'first')
@@ -54,7 +54,7 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
         self.assert_has_error_code(r, 'NO_SUCH_STEP')
 
     def test_no_existing_source_file(self):
-        """ should succeed even if the step has no source file """
+        """Should succeed even if the step has no source file """
 
         support.create_project(self, 'richfield')
         support.add_step(self, 'first')
@@ -81,7 +81,7 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
         self.assertTrue(os.path.exists(new_step.source_path))
 
     def test_nameless_step(self):
-        """ should rename properly a nameless step """
+        """Should rename properly a nameless step."""
 
         support.create_project(self, 'columbia-heights')
         project = cauldron.project.get_internal_project()
@@ -108,7 +108,7 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
         self.assertFalse(r.failed)
 
     def test_change_title(self):
-        """ should change title """
+        """Should change title """
 
         support.create_project(self, 'blaine')
         support.add_step(self)

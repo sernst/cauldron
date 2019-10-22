@@ -11,23 +11,20 @@ class TestRunner(scaffolds.ResultsTest):
     """ """
 
     def test_syntax_error(self):
-        """ should render a syntax error """
-
+        """Should render a syntax error."""
         support.create_project(self, 'seattle')
         support.add_step(self, contents='// Not Python')
         response = support.run_command('run -f')
         self.assertTrue(response.failed, 'should have failed')
 
         project = cd.project.get_internal_project()
-        step = project.steps[0]
+        step = project.steps[1]
 
         self.assertTrue(step.dom.find('cd-CodeError') > 0)
         self.assertTrue(step.dom.find('SyntaxError') > 0)
 
     def test_exception(self):
-        """
-        """
-
+        """Should fail on the third step."""
         support.create_project(self, 'brad')
         support.add_step(
             self, 'brad_one.py', cli.reformat(
@@ -49,14 +46,14 @@ class TestRunner(scaffolds.ResultsTest):
         )
         support.add_step(self, 'brad_two.py', "1 + 's'")
 
-        r = support.run_command('run .')
+        r = support.run_command('run ..')
         self.assertFalse(r.failed, 'should not have failed')
 
         r = support.run_command('run .')
         self.assertTrue(r.failed, 'should have failed')
 
     def test_library(self):
-        """ should refresh the local project library with the updated value """
+        """Should refresh the local project library with the updated value """
         support.create_project(self, 'jack')
         project = cd.project.get_internal_project()
 

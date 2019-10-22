@@ -24,8 +24,11 @@ def run_remote_command(
         remote_connection: 'environ.RemoteConnection' = None,
         mock_send_request=None
 ) -> 'environ.Response':
-    """ """
-
+    """
+    Simulates the execution of a remote command in the local environment,
+    which is useful for testing remote behaviors without having to support
+    a multi-instance environment during testing.
+    """
     name, args = parse.split_line(command)
 
     if not remote_connection:

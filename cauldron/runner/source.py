@@ -36,7 +36,7 @@ def get_step(
     return matches[0] if len(matches) > 0 else None
 
 
-def has_extension(file_path: str, *args: typing.Tuple[str]) -> bool:
+def has_extension(file_path: str, *args: str) -> bool:
     """
     Checks to see if the given file path ends with any of the specified file
     extensions. If a file extension does not begin with a '.' it will be added
@@ -140,7 +140,8 @@ def run_step(
 
     step.mark_dirty(not result['success'])
     step.error = result.get('html_message')
-    step.last_modified = time.time() if result['success'] else 0.0
+    # step.last_modified = time.time() if result['success'] else 0.0
+    step.last_modified = time.time()
     step.is_running = False
     step.progress = 0
     step.progress_message = None
@@ -161,6 +162,9 @@ def run_step(
             step.get_elapsed_timestamp()
         ))
     else:
+        # Update the display timestamp so that the final error message
+        # assigned above will be included in interactive display updates.
+        step.report.update_last_modified()
         response.fail(
             message='Step execution error',
             code='EXECUTION_ERROR',

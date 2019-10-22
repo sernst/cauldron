@@ -43,6 +43,25 @@ def index_from_location(
     return default
 
 
+def clean_steps(response: Response, project: Project) -> Response:
+    """Removes and dirty settings for all steps"""
+    for step in project.steps:
+        if step.is_dirty() and step.last_modified:
+            step.mark_dirty(False, force=True)
+
+    return (
+        response
+        .update(project=project.kernel_serialize())
+        .notify(
+            kind='CLEANED',
+            code='MARKED_CLEAN',
+            message='All steps have been marked as up-to-date'
+        )
+        .console(whitespace=1)
+        .response
+    )
+
+
 def echo_steps(response: Response, project: Project):
     """
     :param response:
@@ -238,7 +257,8 @@ def modify_step(
 
     step_data = {'name': new_name}
     if title is None:
-        if old_step.definition.title:
+        old_title = old_step.definition.title
+        if old_title and old_title != old_step.definition.name:
             step_data['title'] = old_step.definition.title
     else:
         step_data['title'] = title.strip('"')

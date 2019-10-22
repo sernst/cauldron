@@ -60,7 +60,7 @@ class TestServerRunStatus(flask_scaffolds.FlaskResultsTest):
         return response
 
     def test_no_uid(self):
-        """ should do nothing if the run uid is unknown """
+        """Should do nothing if the run uid is unknown."""
 
         run_status = self.get('/run-status/test-1')
         self.assertEqual(run_status.flask.status_code, 200)
@@ -71,7 +71,7 @@ class TestServerRunStatus(flask_scaffolds.FlaskResultsTest):
 
     @patch('cauldron.cli.server.run.get_running_step_changes')
     def test_failed_step_changes(self, get_running_step_changes):
-        """ should fail if unable to get changes for the running step """
+        """Should fail if unable to get changes for the running step."""
 
         get_running_step_changes.side_effect = ValueError('Fake Error')
 
@@ -94,7 +94,7 @@ class TestServerRunStatus(flask_scaffolds.FlaskResultsTest):
 
     @patch('cauldron.cli.server.run.get_running_step_changes')
     def test_no_step_changes(self, get_running_step_changes):
-        """ should succeed even without any changes for the running step """
+        """Should succeed even without any changes for the running step."""
 
         get_running_step_changes.return_value = None
         active_response = self.activate_execution('no-step-changes')
@@ -112,7 +112,7 @@ class TestServerRunStatus(flask_scaffolds.FlaskResultsTest):
         self.deactivate_execution(active_response.identifier)
 
     def test_not_running(self):
-        """ should succeed even if the step is no longer running """
+        """Should succeed even if the step is no longer running """
 
         active_response = self.activate_execution('no-step-running', False)
 
@@ -137,7 +137,7 @@ class TestServerRunStatus(flask_scaffolds.FlaskResultsTest):
 
     @patch('cauldron.cli.server.run.get_server_data')
     def test_error(self, get_server_data):
-        """ should succeed even if the step is no longer running """
+        """Should succeed even if the step is no longer running """
 
         get_server_data.side_effect = ValueError('Fake Error')
 

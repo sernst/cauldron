@@ -2,7 +2,7 @@ import os
 
 
 def join(*args: str) -> str:
-    """ Creates an absolute and cleaned path from the arguments """
+    """ Creates an absolute and cleaned path from the arguments."""
 
     return clean(os.path.join(*args))
 

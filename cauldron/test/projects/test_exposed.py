@@ -104,7 +104,7 @@ class TestExposed(scaffolds.ResultsTest):
 
         support.run_command('run')
         project = cd.project.get_internal_project()
-        step = project.steps[0]
+        step = project.steps[1]
 
         self.assertEqual(project.shared.fetch('test'), 1)
         self.assertNotEqual(-1, step.dom.find('cd-StepStop'))
@@ -130,7 +130,7 @@ class TestExposed(scaffolds.ResultsTest):
 
         support.run_command('run')
         project = cd.project.get_internal_project()
-        step = project.steps[0]
+        step = project.steps[1]
 
         self.assertEqual(project.shared.fetch('test'), 1)
         self.assertNotEqual(-1, step.dom.find('cd-StepStop'))
@@ -156,7 +156,7 @@ class TestExposed(scaffolds.ResultsTest):
 
         support.run_command('run')
         project = cd.project.get_internal_project()
-        step = project.steps[0]
+        step = project.steps[1]
 
         self.assertEqual(project.shared.fetch('test'), 1)
         self.assertEqual(project.shared.fetch('other'), 1)
@@ -193,9 +193,14 @@ class TestExposed(scaffolds.ResultsTest):
             sleep: MagicMock,
             internal_project: PropertyMock
     ):
-        """Should get internal project on the third attempt"""
+        """
+        Should get internal project on the third attempt after one
+        attempt to check before entering the retry and sleep loop
+        and then two iterations through the loop before encountering
+        a non-None value.
+        """
         project = exposed.ExposedProject()
-        internal_project.side_effect = [None, None, 'test']
+        internal_project.side_effect = [None, None, None, 'test']
         result = project.get_internal_project()
         self.assertEqual('test', result)
         self.assertEqual(2, sleep.call_count)

@@ -346,6 +346,3 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
     project = cauldron.project.internal_project
     step_names = [x.definition.name for x in project.steps]
     return autocompletion.match_in_path_list(segment, value, step_names)
-
-
-

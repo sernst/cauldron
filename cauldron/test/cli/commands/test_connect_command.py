@@ -15,7 +15,7 @@ class TestConnectCommand(scaffolds.ResultsTest):
     """ """
 
     def test_no_url(self):
-        """ should fail if no url is provided in the command """
+        """Should fail if no url is provided in the command """
 
         r = support.run_command('connect')
         self.assertTrue(r.failed, support.Message(
@@ -26,7 +26,7 @@ class TestConnectCommand(scaffolds.ResultsTest):
 
     @patch('requests.get')
     def test_invalid_url_error(self, requests_get: MagicMock):
-        """ should fail if the url is not valid """
+        """Should fail if the url is not valid """
 
         requests_get.side_effect = request_exceptions.InvalidURL('Fake')
 
@@ -35,7 +35,7 @@ class TestConnectCommand(scaffolds.ResultsTest):
 
     @patch('requests.get')
     def test_connection_error(self, requests_get: MagicMock):
-        """ should fail if the url cannot be connected to """
+        """Should fail if the url cannot be connected to """
 
         requests_get.side_effect = request_exceptions.ConnectionError('Fake')
 
@@ -44,7 +44,7 @@ class TestConnectCommand(scaffolds.ResultsTest):
 
     @patch('requests.get')
     def test_other_error(self, requests_get: MagicMock):
-        """ should fail if the get request raises an unknown exception """
+        """Should fail if the get request raises an unknown exception."""
 
         requests_get.side_effect = ValueError('Fake')
 
@@ -53,7 +53,7 @@ class TestConnectCommand(scaffolds.ResultsTest):
 
     @patch('requests.get')
     def test_bad_status_code(self, requests_get: MagicMock):
-        """ should fail if the get request does not have a 200 status code """
+        """Should fail if the get request does not have a 200 status code """
 
         requests_get.return_value = MockResponse(status_code=500)
 
@@ -62,7 +62,7 @@ class TestConnectCommand(scaffolds.ResultsTest):
 
     @patch('requests.get')
     def test_valid(self, requests_get: MagicMock):
-        """ should succeed to get ping data from remove cauldron kernel """
+        """Should succeed to get ping data from remove cauldron kernel """
 
         requests_get.return_value = MockResponse(200)
         url_raw = 'something.com'
@@ -86,7 +86,7 @@ class TestConnectCommand(scaffolds.ResultsTest):
         support.run_command('disconnect')
 
     def test_autocomplete(self):
-        """ should return empty options for autocomplete """
+        """Should return empty options for autocomplete """
 
         result = support.autocomplete('connect')
         self.assertEqual(len(result), 0)

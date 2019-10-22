@@ -9,6 +9,8 @@ from textwrap import indent
 from cauldron.environ import paths
 
 _logging_paths = []
+_stdout = sys.stdout
+_stderr = sys.stderr
 
 
 def add_output_path(path: str = None) -> str:
@@ -204,7 +206,7 @@ def raw(
     """
 
     if trace:
-        print(message)
+        _stdout.write('{}\n'.format(message))
 
     # Store the logged information as an entry in the current thread if the
     # thread has as logs variable for such storage. These logs are used to

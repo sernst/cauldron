@@ -9,7 +9,7 @@ class TestEnvironPaths(scaffolds.ResultsTest):
     """ """
 
     def test_clean_current_directory(self):
-        """ should clean path to be current directory """
+        """Should clean path to be current directory."""
 
         directory = os.path.realpath(os.path.abspath(os.curdir))
         self.assertEqual(paths.clean(None), directory)

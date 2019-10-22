@@ -8,8 +8,8 @@ from datetime import datetime
 
 import cauldron
 from cauldron import cli
-from cauldron.cli import sync
 from cauldron import environ
+from cauldron.cli import sync
 from cauldron.environ import Response
 from cauldron.session import projects
 

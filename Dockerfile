@@ -1,15 +1,11 @@
-FROM continuumio/anaconda3:latest
+FROM python:3.7
 
 MAINTAINER swernst@gmail.com
 
-RUN apt-get -y --no-install-recommends install vim && \
-    conda install -y conda-build git && \
-    mkdir /build_data
-
 COPY requirements.txt /build_data/requirements.txt
 
-RUN /opt/conda/bin/pip install -r /build_data/requirements.txt && \
-    /opt/conda/bin/pip install plotly
+RUN pip install -r /build_data/requirements.txt \
+ && pip install plotly matplotlib bokeh seaborn
 
 WORKDIR /
 

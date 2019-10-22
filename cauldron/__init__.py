@@ -36,7 +36,7 @@ def get_environment_info() -> dict:
 
 
 def run_shell():
-    """ Starts the cauldron shell environment for console based interaction """
+    """ Starts the cauldron shell environment for console based interaction."""
     from cauldron.cli.shell import CauldronShell
     CauldronShell().cmdloop()
 

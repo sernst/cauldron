@@ -17,7 +17,7 @@ class TestSteps(scaffolds.ResultsTest):
         r = support.run_command('steps add first.py')
         self.assertFalse(r.failed, 'should not have failed')
         self.assertTrue(os.path.exists(
-            os.path.join(project.source_directory, 'S01-first.py')
+            os.path.join(project.source_directory, 'S02-first.py')
         ))
 
     def test_steps_muting(self):
@@ -26,10 +26,10 @@ class TestSteps(scaffolds.ResultsTest):
 
         support.run_command('steps add first.py')
 
-        r = support.run_command('steps mute S01-first.py')
+        r = support.run_command('steps mute S02-first.py')
         self.assertFalse(r.failed, 'should not have failed')
 
-        r = support.run_command('steps unmute S01-first.py')
+        r = support.run_command('steps unmute S02-first.py')
         self.assertFalse(r.failed, 'should nto have failed')
 
     def test_steps_modify(self):
@@ -48,15 +48,15 @@ class TestSteps(scaffolds.ResultsTest):
 
         r = support.run_command('steps add first.py')
         self.assertFalse(r.failed, 'should not have failed')
-        self.assertTrue(os.path.exists(os.path.join(directory, 'S01-first.py')))
+        self.assertTrue(os.path.exists(os.path.join(directory, 'S02-first.py')))
 
-        r = support.run_command('steps modify S01-first.py --name="second.py"')
+        r = support.run_command('steps modify S02-first.py --name="second.py"')
         self.assertFalse(r.failed, 'should not have failed')
         self.assertFalse(
-            os.path.exists(os.path.join(directory, 'S01-first.py'))
+            os.path.exists(os.path.join(directory, 'S02-first.py'))
         )
         self.assertTrue(
-            os.path.exists(os.path.join(directory, 'S01-second.py'))
+            os.path.exists(os.path.join(directory, 'S02-second.py'))
         )
 
     def test_steps_remove(self):
@@ -66,10 +66,10 @@ class TestSteps(scaffolds.ResultsTest):
         r = support.run_command('steps add first.py')
         self.assertFalse(r.failed, 'should not have failed')
 
-        r = support.run_command('steps remove S01-first.py')
+        r = support.run_command('steps remove S02-first.py')
         self.assertFalse(r.failed, 'should not have failed')
 
-        r = support.run_command('steps remove S01-fake.py')
+        r = support.run_command('steps remove S02-fake.py')
         self.assertTrue(r.failed, 'should have failed')
 
     def test_steps_remove_renaming(self):
@@ -91,11 +91,11 @@ class TestSteps(scaffolds.ResultsTest):
             self.assertEqual('S0{}.py'.format(i + 1), step_names[i])
 
     def test_steps_list(self):
-        """Should list steps"""
+        """Should list steps."""
         support.create_project(self, 'angelica')
         r = support.run_command('steps list')
-        self.assertEqual(len(r.data['steps']), 0, Message(
-            'New project should have no steps to list',
+        self.assertEqual(len(r.data['steps']), 1, Message(
+            'New project should have one step to list',
             response=r
         ))
 
@@ -107,7 +107,7 @@ class TestSteps(scaffolds.ResultsTest):
         self.assertFalse(r.failed, 'should not have failed')
 
     def test_autocomplete(self):
-        """Should autocomplete steps command"""
+        """Should autocomplete steps command."""
         support.create_project(self, 'gina')
         support.add_step(self, 'a.py')
         support.add_step(self, 'b.py')
@@ -117,8 +117,8 @@ class TestSteps(scaffolds.ResultsTest):
 
         result = support.autocomplete('steps modify ')
         self.assertEqual(
-            len(result), 2,
-            'there are two steps in {}'.format(result)
+            len(result), 3,
+            'there are three steps in {}'.format(result)
         )
 
         result = support.autocomplete('steps modify a.py --')
@@ -126,7 +126,7 @@ class TestSteps(scaffolds.ResultsTest):
 
         result = support.autocomplete('steps modify fake.py --position=')
         self.assertEqual(
-            len(result), 2,
+            len(result), 3,
             'there are two steps in {}'.format(result)
         )
 
@@ -159,7 +159,7 @@ class TestSteps(scaffolds.ResultsTest):
         ))
 
     def test_remote(self):
-        """Should function remotely"""
+        """Should function remotely."""
         support.create_project(self, 'nails')
         project = cauldron.project.get_internal_project()
 
@@ -174,4 +174,4 @@ class TestSteps(scaffolds.ResultsTest):
             response=added_response
         ))
 
-        self.assertEqual(len(project.steps), 1)
+        self.assertEqual(len(project.steps), 2)

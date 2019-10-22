@@ -10,13 +10,13 @@ class TestDisconnectCommand(scaffolds.ResultsTest):
     """ """
 
     def test_disconnected(self):
-        """ should fail if no url is provided in the command """
+        """Should fail if no url is provided in the command """
 
         r = support.run_command('disconnect')
         self.assertFalse(r.failed)
 
     def test_autocomplete(self):
-        """ should return empty options for autocomplete """
+        """Should return empty options for autocomplete """
 
         result = support.autocomplete('disconnect')
         self.assertEqual(len(result), 0)

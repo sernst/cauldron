@@ -12,7 +12,7 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
     """ """
 
     def test_nameless_step(self):
-        """ should convert float index to integer """
+        """Should convert float index to integer."""
 
         support.create_project(self, 'minneapolis')
         project = cauldron.project.get_internal_project()
@@ -25,7 +25,7 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
 
     @patch('cauldron.cli.commands.steps.renaming.synchronize_step_names')
     def test_sync_failure(self, synchronize_step_names: MagicMock):
-        """ should fail synchronizing step names fails """
+        """Should fail synchronizing step names fails."""
 
         failedResponse = Response().fail(
             'Fake-Fail',

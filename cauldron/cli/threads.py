@@ -1,3 +1,4 @@
+import typing
 import asyncio
 import threading
 import uuid
@@ -16,10 +17,10 @@ class ThreadAbortError(Exception):
 
 
 class CauldronThread(threading.Thread):
+    """..."""
 
     def __init__(self, *args, **kwargs):
         """Create a new Cauldron Thread"""
-
         super(CauldronThread, self).__init__(*args, **kwargs)
 
         self.abort = False
@@ -35,7 +36,7 @@ class CauldronThread(threading.Thread):
         self.exception = None
         self.logs = []
         self._loop = None
-        self.completed_at = None  # datetime
+        self.completed_at = None  # type: typing.Optional[datetime]
         self._has_started = False
 
     @property
@@ -54,7 +55,6 @@ class CauldronThread(threading.Thread):
         computations from locking the main Cauldron thread, which is needed
         to serve and print status information.
         """
-
         async def run_command():
             try:
                 self.result = self.command(
@@ -89,7 +89,6 @@ class CauldronThread(threading.Thread):
         the asyncio library to prevent the stopped execution from destabilizing
         the Python environment.
         """
-
         if not self._loop:
             return False
 
@@ -109,7 +108,6 @@ def abort_thread():
     thread as aborted. It only applies to operations that are run within
     CauldronThreads and not the main thread.
     """
-
     thread = threading.current_thread()
 
     if not isinstance(thread, CauldronThread):

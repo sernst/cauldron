@@ -1,3 +1,5 @@
+import time
+import typing
 from collections import namedtuple
 from datetime import datetime
 from datetime import timedelta
@@ -14,9 +16,43 @@ from cauldron.environ.logger import raw as log_raw
 from cauldron.environ.response import Response
 
 VersionInfo = namedtuple('VersionInfo', ['major', 'minor', 'micro'])
-RemoteConnection = namedtuple('RemoteConnection', ['active', 'url'])
 
-remote_connection = RemoteConnection(False, None)
+
+class RemoteConnection:
+    """Contains remote execution status information."""
+
+    def __init__(self, active: bool = False, url: str = None):
+        self.active = active  # type: bool
+        self.url = url  # type: typing.Optional[str]
+        self._sync_timestamp = 0  # type: int
+        self._sync_active = False  # type: bool
+
+    @property
+    def sync_timestamp(self) -> float:
+        """Last time the sync action to the remote source started."""
+        return self._sync_timestamp
+
+    def serialize(self) -> dict:
+        return {
+            'active': self.active,
+            'url': self.url,
+            'sync': {
+                'timestamp': self._sync_timestamp,
+                'active': self._sync_active,
+            }
+        }
+
+    def sync_starting(self):
+        """..."""
+        self._sync_active = True
+        self._sync_timestamp = time.time()
+
+    def sync_ending(self):
+        """..."""
+        self._sync_active = False
+
+
+remote_connection = RemoteConnection()
 
 start_time = datetime.utcnow()
 

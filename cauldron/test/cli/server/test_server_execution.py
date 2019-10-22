@@ -10,19 +10,19 @@ class TestServerExecution(flask_scaffolds.FlaskResultsTest):
     """ """
 
     def test_execute_sync(self):
-        """ should execute command synchronously """
+        """Should execute command synchronously."""
 
         opened = self.post('/command-sync', {'command': 'open', 'args': ''})
         self.assertEqual(opened.flask.status_code, 200)
 
     def test_execute_get(self):
-        """ should execute using get passed data """
+        """Should execute using get passed data """
 
         opened = self.get('/command-sync?&command=open')
         self.assertEqual(opened.flask.status_code, 200)
 
     def test_execute_wait(self):
-        """ should wait for execution to complete when synchronous """
+        """Should wait for execution to complete when synchronous."""
 
         FakeThread = namedtuple('FakeThread_NT', ['uid', 'join', 'is_alive'])
         thread = FakeThread(
@@ -45,14 +45,14 @@ class TestServerExecution(flask_scaffolds.FlaskResultsTest):
         self.assertFalse(opened.response.failed)
 
     def test_shutdown_not_running(self):
-        """ should abort shutdown of non-running server """
+        """Should abort shutdown of non-running server."""
 
         shutdown = self.get('/shutdown')
         self.assert_has_error_code(shutdown.response, 'NOT_RUNNING_ERROR')
 
     @patch('cauldron.cli.commander.execute')
     def test_execute_failure(self, execute: MagicMock):
-        """ should fail when execution fails """
+        """Should fail when execution fails."""
 
         execute.side_effect = RuntimeError('FAKE ERROR')
         opened = self.get('/command-sync?&command=open&args=+')
@@ -60,7 +60,7 @@ class TestServerExecution(flask_scaffolds.FlaskResultsTest):
         self.assert_has_error_code(opened.response, 'KERNEL_EXECUTION_FAILURE')
 
     def test_shutdown(self):
-        """ should abort the running server """
+        """Should abort the running server."""
 
         shutdown_func = MagicMock()
         shutdown = self.get(
@@ -71,7 +71,7 @@ class TestServerExecution(flask_scaffolds.FlaskResultsTest):
         self.assertFalse(shutdown.response.failed)
 
     def test_shutdown_failed(self):
-        """ should abort the running server """
+        """Should abort the running server."""
 
         shutdown_func = MagicMock()
         shutdown_func.side_effect = RuntimeError('FAKE ERROR')

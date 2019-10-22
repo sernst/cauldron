@@ -59,7 +59,7 @@ def check_connection(url: str, force: bool) -> Response:
     if force:
         return response
 
-    ping = '{}/ping'.format(url)
+    ping = '{}/'.format(url)
 
     response.notify(
         kind='STARTING',
@@ -74,6 +74,8 @@ def check_connection(url: str, force: bool) -> Response:
 
         if result.status_code != 200:
             raise request_exceptions.ConnectionError()
+
+        return Response()
     except request_exceptions.InvalidURL as error:
         return response.fail(
             code='INVALID_URL',
@@ -100,26 +102,27 @@ def check_connection(url: str, force: bool) -> Response:
         ).response
 
 
+def clean_url(url: str) -> str:
+    return '{}{}'.format(
+        '' if url.startswith('http') else 'http://',
+        url.strip().rstrip('/')
+    )
+
+
 def execute(
         context: cli.CommandContext,
         url: str = None,
         force: bool = False
 ) -> Response:
     """ """
-
-    url_clean = '{}{}'.format(
-        '' if url.startswith('http') else 'http://',
-        url.strip().rstrip('/')
-    )
+    url_clean = clean_url(url)
 
     context.response.consume(check_connection(url_clean, force))
     if context.response.failed:
         return context.response
 
-    environ.remote_connection = environ.RemoteConnection(
-        active=True,
-        url=url_clean
-    )
+    environ.remote_connection.url = url_clean
+    environ.remote_connection.active = True
 
     return context.response.update(
         url=url_clean,

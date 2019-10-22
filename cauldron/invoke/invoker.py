@@ -7,6 +7,7 @@ from cauldron import environ
 from cauldron.cli import batcher
 from cauldron.cli.shell import CauldronShell
 from cauldron.cli.server import run as server_run
+from cauldron import ui
 
 
 def in_project_directory() -> bool:
@@ -80,6 +81,12 @@ def run_kernel(args: dict) -> int:
     return 0
 
 
+def run_ui(args: dict) -> int:
+    """Runs the ui sub command"""
+    ui.start(**args)
+    return 0
+
+
 def run(action: str, args: dict) -> int:
     """
     Runs the specified command action and returns the return status code
@@ -97,7 +104,8 @@ def run(action: str, args: dict) -> int:
         shell=run_shell,
         kernel=run_kernel,
         serve=run_kernel,
-        version=run_version
+        version=run_version,
+        ui=run_ui,
     )
 
     if action not in actions:

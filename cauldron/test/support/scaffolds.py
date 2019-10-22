@@ -101,7 +101,7 @@ class ResultsTest(unittest.TestCase):
         ))
 
     def assert_no_errors(self, response: environ.Response):
-        """ asserts that the response object contains no errors """
+        """ asserts that the response object contains no errors."""
 
         self.assertEqual(0, len(response.errors), Message(
             'Errors found',

@@ -1,17 +1,19 @@
+import datetime
 import typing
+import time
 
 import flask
-from requests import Response as HttpResponse
-
 from cauldron import cli
 from cauldron.cli import threads
 from cauldron.environ import logger
+from requests import Response as HttpResponse
 
 ERROR_KIND = 'ERROR'
 WARNING_KIND = 'WARNING'
 
 
-class ResponseMessage(object):
+class ResponseMessage:
+    """..."""
 
     def __init__(
             self,
@@ -23,19 +25,17 @@ class ResponseMessage(object):
             log: str = '',
             data: dict = None
     ):
+        """..."""
         self.index = index
         self.kind = kind
         self.code = code
         self.message = message
-        self.data = data if data else {}
+        self.data = data or {}
         self.response = response
         self.log = log
 
     def serialize(self) -> dict:
-        """
-
-        :return:
-        """
+        """..."""
         return dict(
             kind=self.kind,
             code=self.code,
@@ -46,12 +46,7 @@ class ResponseMessage(object):
         )
 
     def kernel(self, **kwargs) -> 'ResponseMessage':
-        """
-
-        :param kwargs:
-        :return:
-        """
-
+        """..."""
         self.data.update(kwargs)
         return self
 
@@ -67,7 +62,7 @@ class ResponseMessage(object):
             append_to_file: bool = True,
             indent_by: int = 0
     ) -> 'ResponseMessage':
-
+        """..."""
         self.log += logger.header(
             text=text,
             level=level,
@@ -88,15 +83,7 @@ class ResponseMessage(object):
             file_path: str = None,
             append_to_file: bool = True
     ) -> 'ResponseMessage':
-        """
-
-        :param message:
-        :param trace:
-        :param file_path:
-        :param append_to_file:
-        :return:
-        """
-
+        """..."""
         logger.raw(
             message=message,
             trace=trace,
@@ -119,20 +106,7 @@ class ResponseMessage(object):
             append_to_file: bool = True,
             **kwargs
     ) -> 'ResponseMessage':
-        """
-
-        :param message:
-        :param whitespace:
-        :param whitespace_top:
-        :param whitespace_bottom:
-        :param indent_by:
-        :param trace:
-        :param file_path:
-        :param append_to_file:
-        :param kwargs:
-        :return:
-        """
-
+        """..."""
         if not message and self.message:
             message = '[{}]: {}'.format(
                 self.kind,
@@ -153,43 +127,71 @@ class ResponseMessage(object):
         return self
 
     def get_response(self) -> 'Response':
-        """
-
-        :return:
-        """
-
+        """..."""
         return self.response
 
 
-class Response(object):
-    """ """
+class Response:
+    """..."""
 
     def __init__(self, identifier: str = None, failed=False):
-        """ """
-
+        """Creates a new Response object."""
         self.identifier = identifier
         self.data = dict()
-        self.parent = None  # type: Response
+        self.parent = None  # type: typing.Optional[Response]
         self.messages = []  # type: typing.List[ResponseMessage]
         self.errors = []  # type: typing.List[ResponseMessage]
         self.warnings = []  # type: typing.List[ResponseMessage]
         self.ended = False
         self.failed = bool(failed)
-        self.thread = None  # type: threads.CauldronThread
+        self.thread = None  # type: typing.Optional[threads.CauldronThread]
         self.returned = None
-        self.http_response = None  # type: HttpResponse
+        self.http_response = None  # type: typing.Optional[HttpResponse]
+        self._last_updated = time.time()
+
+    @property
+    def last_updated(self) -> float:
+        """
+        Last time the response object was updated as a unix epoch
+        timestamp in seconds. Also includes thread completion time,
+        which may be larger if a running thread ends without modifying
+        the associated response object.
+        """
+        if self.thread and self.thread.completed_at:
+            completed_at = self.thread.completed_at.timestamp()
+        else:
+            completed_at = 0
+        return max(self._last_updated, completed_at)
 
     @property
     def success(self) -> bool:
+        """..."""
         return not self.failed
 
     @property
     def response(self):
+        """..."""
         return self.parent.response if self.parent else self
 
+    def touch(self) -> 'Response':
+        """Updates the last modified timestamp to the current time."""
+        self._last_updated = time.time()
+        return self
+
     def debug_echo(self) -> 'Response':
+        """..."""
         print(self.echo())
         return self
+
+    def returns(self, *args: typing.Any) -> 'Response':
+        """Sets the returned data to send along with the response."""
+        if len(args) == 0:
+            self.returned = None
+        elif len(args) == 1:
+            self.returned = args[0]
+        else:
+            self.returned = args
+        return self.touch()
 
     def join(self, timeout: float = None) -> bool:
         """
@@ -211,8 +213,7 @@ class Response(object):
             return False
 
     def echo(self) -> str:
-        """ """
-
+        """..."""
         if self.parent:
             return self.parent.echo()
 
@@ -266,12 +267,7 @@ class Response(object):
             self,
             other: typing.Union['Response', 'ResponseMessage']
     ) -> 'Response':
-        """
-
-        :param other:
-        :return:
-        """
-
+        """..."""
         if other == self:
             return self
 
@@ -297,21 +293,15 @@ class Response(object):
         self.thread = either(self.thread, source.thread)
 
         source.parent = self
-
-        return self
+        return self.touch()
 
     def update(self, **kwargs) -> 'Response':
-        """
-
-        :param kwargs:
-        :return:
-        """
-
+        """..."""
         if self.parent:
             return self.parent.update(**kwargs)
 
         self.data.update(kwargs)
-        return self
+        return self.touch()
 
     def notify(
             self,
@@ -320,8 +310,7 @@ class Response(object):
             code: str = None,
             **kwargs
     ) -> ResponseMessage:
-        """ """
-
+        """..."""
         if self.parent:
             return self.parent.notify(kind, message, code, **kwargs)
 
@@ -342,16 +331,16 @@ class Response(object):
             self.warnings.append(rm)
         else:
             self.messages.append(rm)
+
+        self.touch()
         return rm
 
     def get_thread_log(self) -> typing.List[str]:
-        """ """
-
+        """..."""
         return getattr(self.thread, 'logs', []) + []
 
     def serialize(self) -> dict:
-        """ """
-
+        """..."""
         return dict(
             logs=self.get_thread_log(),
             id=self.identifier,
@@ -360,12 +349,12 @@ class Response(object):
             warnings=[x.serialize() for x in self.warnings],
             messages=[x.serialize() for x in self.messages],
             ended=self.ended,
-            success=self.success
+            success=self.success,
+            timestamp=datetime.datetime.now().timestamp()
         )
 
     def flask_serialize(self):
-        """ Serializes the response into a flask JSON response """
-
+        """Serializes the response into a flask JSON response."""
         return flask.jsonify(self.serialize())
 
     def fail(
@@ -375,8 +364,7 @@ class Response(object):
             error: Exception = None,
             **kwargs
     ) -> ResponseMessage:
-        """ """
-
+        """..."""
         self.failed = True
 
         stack = logger.get_error_stack() if error else None
@@ -398,14 +386,7 @@ class Response(object):
             code: str = None,
             **kwargs
     ) -> ResponseMessage:
-        """
-
-        :param message:
-        :param code:
-        :param kwargs:
-        :return:
-        """
-
+        """..."""
         return self.notify(
             kind='WARNING',
             message=message,
@@ -414,17 +395,16 @@ class Response(object):
         )
 
     def end(self) -> 'Response':
-        """ """
-
+        """..."""
         if self.parent:
             return self.parent.end()
 
         self.ended = True
+        self.touch()
         return self
 
     def get_notification_log(self, start_index: int = 0) -> str:
-        """ """
-
+        """..."""
         notifications = sorted(
             self.messages + self.warnings + self.errors,
             key=lambda x: x.index
@@ -440,8 +420,7 @@ class Response(object):
             file_path: str = None,
             append_to_file: bool = True
     ) -> str:
-        """ """
-
+        """..."""
         message = self.get_notification_log(start_index)
         logger.raw(
             message=message,
@@ -453,8 +432,7 @@ class Response(object):
 
     @staticmethod
     def deserialize(serial_data: dict) -> 'Response':
-        """ Converts a serialized dictionary response to a Response object """
-
+        """Converts a serialized dictionary response to a Response object."""
         r = Response(serial_data.get('id'))
         r.data.update(serial_data.get('data', {}))
         r.ended = serial_data.get('ended', False)

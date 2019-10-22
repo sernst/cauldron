@@ -1,6 +1,12 @@
 from argparse import ArgumentParser
 
 from cauldron.cli.server import run as server_run
+from cauldron import ui
+
+
+def add_ui_action(sub_parser: ArgumentParser) -> ArgumentParser:
+    """Populates the sub parser with the UI kernel/server arguments."""
+    return ui.create_parser(sub_parser)
 
 
 def add_kernel_action(sub_parser: ArgumentParser) -> ArgumentParser:
@@ -77,6 +83,7 @@ def parse(args: list = None) -> dict:
     sub_parsers.add_parser('shell', aliases=['version'])
     add_shell_action(sub_parsers.add_parser('shell'))
     add_kernel_action(sub_parsers.add_parser('kernel', aliases=['serve']))
+    add_ui_action(sub_parsers.add_parser('ui'))
 
     arguments = vars(parser.parse_args(args=args))
     arguments['parser'] = parser

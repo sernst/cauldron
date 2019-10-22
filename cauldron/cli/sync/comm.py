@@ -1,6 +1,6 @@
 import requests
-from requests import Response as HttpResponse
 from cauldron import environ
+from requests import Response as HttpResponse
 
 
 def assemble_url(

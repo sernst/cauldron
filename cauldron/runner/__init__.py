@@ -61,6 +61,12 @@ def initialize(project: typing.Union[str, Project]):
     if isinstance(project, str):
         project = Project(source_directory=project)
 
+    # When opening a project, if there are any steps in the project, the
+    # first step should be selected by default.
+    has_selected_step = any([s.is_selected for s in project.steps])
+    if not has_selected_step and project.steps:
+        project.steps[0].is_selected = True
+
     cauldron.project.load(project)
     return project
 

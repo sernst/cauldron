@@ -15,7 +15,7 @@ class TestExport(scaffolds.ResultsTest):
     """
 
     def test_exporting(self):
-        """ should successfully export project """
+        """Should successfully export project."""
 
         support.run_command('open @examples:pyplot')
         support.run_command('run')
@@ -33,7 +33,7 @@ class TestExport(scaffolds.ResultsTest):
         )
 
     def test_with_args(self):
-        """ should successfully export project """
+        """Should successfully export project."""
 
         support.create_project(self, 'venus')
         support.run_command('run')
@@ -54,7 +54,7 @@ class TestExport(scaffolds.ResultsTest):
         self.assertEqual(r.errors[0].code, 'ALREADY_EXISTS')
 
     def test_appending(self):
-        """ should successfully append project export """
+        """Should successfully append project export."""
 
         support.create_project(self, 'mars')
         support.run_command('run')
@@ -78,7 +78,7 @@ class TestExport(scaffolds.ResultsTest):
         self.assertTrue(os.path.exists(out_path) and os.path.isdir(out_path))
 
     def test_no_args(self):
-        """ should fail if no path argument """
+        """Should fail if no path argument."""
 
         support.create_project(self, 'mercury')
 

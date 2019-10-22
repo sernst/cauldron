@@ -1,10 +1,9 @@
 import os
 
 from cauldron import cli
-from cauldron import environ
 from cauldron.cli import sync
+from cauldron.cli.commands.sync.syncer import do_synchronize
 from cauldron.environ.response import Response
-from cauldron.environ.response import ResponseMessage
 
 NAME = 'sync'
 DESCRIPTION = """
@@ -13,65 +12,8 @@ DESCRIPTION = """
     """
 
 
-def do_synchronize(
-        context: cli.CommandContext,
-        source_directory: str,
-        newer_than: float
-) -> Response:
-    """ """
-
-    synchronized = []
-
-    def on_progress(message: ResponseMessage):
-        if message.kind == 'SKIP':
-            return
-
-        if len(synchronized) < 1:
-            environ.log_header(
-                text='SYNCHRONIZING',
-                level=2,
-                whitespace=1
-            )
-
-        if message.code == 'STARTED':
-            synchronized.append(message)
-
-        chunk_count = message.data.get('chunk_count', 0)
-
-        if message.code == 'DONE' and chunk_count < 2:
-            return
-
-        message.console()
-
-    sync_response = sync.files.send_all_in(
-        directory=source_directory,
-        remote_connection=context.remote_connection,
-        newer_than=newer_than,
-        progress_callback=on_progress
-    )
-    context.response.consume(sync_response)
-
-    context.response.update(synchronized_count=len(synchronized))
-
-    if len(synchronized) < 1:
-        return context.response
-
-    touch_response = sync.comm.send_request(
-        endpoint='/sync-touch',
-        method='GET',
-        remote_connection=context.remote_connection
-    )
-    context.response.consume(touch_response)
-
-    if not context.response.failed:
-        environ.log('Synchronization Complete', whitespace=1)
-
-    return context.response
-
-
 def execute(context: cli.CommandContext) -> Response:
     """ """
-
     if not context.remote_connection.active:
         return context.response.fail(
             code='NO_REMOTE_CONNECTION',

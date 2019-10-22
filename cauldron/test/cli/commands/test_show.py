@@ -10,7 +10,7 @@ class TestShow(scaffolds.ResultsTest):
     """ """
 
     def test_show_fail(self):
-        """ should fail to show when no project is opened """
+        """Should fail to show when no project is opened """
 
         with patch('webbrowser.open') as func:
             r = support.run_command('show')
@@ -18,7 +18,7 @@ class TestShow(scaffolds.ResultsTest):
             func.assert_not_called()
 
     def test_show(self):
-        """ should show local project """
+        """Should show local project."""
 
         support.run_command('open @examples:hello_cauldron')
         url = cauldron.project.get_internal_project().baked_url
@@ -29,7 +29,7 @@ class TestShow(scaffolds.ResultsTest):
             func.assert_called_once_with(url)
 
     def test_show_remote(self):
-        """ should show remote url """
+        """Should show remote url """
 
         remote_connection = environ.RemoteConnection(
             url='http://my-fake.url',

@@ -37,7 +37,7 @@ function scrollToAnchor(stepName, location, animationSpeed) {
     return 0;
   }
 
-  const body = $('body');
+  const body = $('html, body');
   const aTag = stepDom.find(`a[name='${anchorName}']`);
   const scrollTop = (aTag.offset().top - getOffset()); // + body.scrollTop();
 

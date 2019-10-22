@@ -11,7 +11,7 @@ class TestOpenActions(scaffolds.ResultsTest):
 
     @patch('cauldron.environ.configs.fetch')
     def test_no_last(self, configs_fetch: MagicMock):
-        """ should fail if no last project exist """
+        """Should fail if no last project exist."""
 
         configs_fetch.return_value = []
 
@@ -22,7 +22,7 @@ class TestOpenActions(scaffolds.ResultsTest):
 
     @patch('cauldron.environ.configs.fetch')
     def test_last(self, configs_fetch: MagicMock):
-        """ should return the last project """
+        """Should return the last project."""
 
         configs_fetch.return_value = ['b', 'a', 'c']
 
@@ -33,7 +33,7 @@ class TestOpenActions(scaffolds.ResultsTest):
 
     @patch('cauldron.environ.configs.fetch')
     def test_no_recent(self, configs_fetch: MagicMock):
-        """ should fail if no recent projects exist """
+        """Should fail if no recent projects exist."""
 
         configs_fetch.return_value = []
 
@@ -49,7 +49,7 @@ class TestOpenActions(scaffolds.ResultsTest):
             query_choice: MagicMock,
             configs_fetch: MagicMock
     ):
-        """ should cancel if indicated by user query response """
+        """Should cancel if indicated by user query response """
 
         configs_fetch.return_value = ['a', 'b', 'c']
         query_choice.return_value = (3, None)
@@ -66,7 +66,7 @@ class TestOpenActions(scaffolds.ResultsTest):
             query_choice: MagicMock,
             configs_fetch: MagicMock
     ):
-        """ should return path chosen by user query response """
+        """Should return path chosen by user query response """
 
         configs_fetch.return_value = ['a', 'b', 'c']
         query_choice.return_value = (1, 'b')

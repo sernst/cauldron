@@ -5,6 +5,7 @@ from cauldron import environ
 from cauldron.environ.response import Response
 from cauldron.session import projects
 from cauldron.cli.commands.open import actions as open_actions
+from cauldron import templating
 
 
 def create_definition(
@@ -182,3 +183,42 @@ def write_project_data(project_directory: str, definition: dict) -> Response:
         ).response
 
     return Response()
+
+
+def create_first_step(project_directory: str, project_name: str) -> Response:
+    """
+    Creates the first empty step file so no new project is without a step.
+    """
+    step_name = 'S01.py'
+    path = os.path.join(project_directory, step_name)
+    contents = templating.render_template(
+        'first-step.py',
+        project_name=project_name,
+    )
+
+    try:
+        with open(path, 'w') as f:
+            f.write(contents)
+    except Exception as error:
+        return Response().fail(
+            message=(
+                """
+                Unable to write to the specified project directory.
+                Do you have the necessary write permissions for this
+                location?
+                """
+            ),
+            code='PROJECT_CREATE_FAILED',
+            error=error,
+            directory=project_directory
+        ).console(
+            """
+            [ERROR]: Unable to write project data. Do you have the necessary
+                write permissions in the path:
+
+                "{}"
+            """.format(project_directory),
+            whitespace=1
+        ).response
+
+    return Response().update(step_name=step_name)

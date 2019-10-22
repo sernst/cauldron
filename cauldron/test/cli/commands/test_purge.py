@@ -10,7 +10,7 @@ class TestPurge(scaffolds.ResultsTest):
     """ """
 
     def test_purge_all(self):
-        """ should purge current results directory """
+        """Should purge current results directory."""
 
         response = support.run_command('purge --force --all')
         self.assertFalse(response.failed, Message(
@@ -21,7 +21,7 @@ class TestPurge(scaffolds.ResultsTest):
 
     @patch('cauldron.environ.systems.remove')
     def test_failed_purge(self, remove: MagicMock):
-        """ should fail if unable to remove """
+        """Should fail if unable to remove """
 
         remove.return_value = False
 
@@ -31,7 +31,7 @@ class TestPurge(scaffolds.ResultsTest):
 
     @patch('cauldron.cli.interaction.query.confirm')
     def test_abort(self, confirm: MagicMock):
-        """ should fail if unable to remove """
+        """Should fail if unable to remove """
 
         confirm.return_value = False
 
@@ -40,7 +40,7 @@ class TestPurge(scaffolds.ResultsTest):
         self.assertEqual(r.messages[0].code, 'NO_PURGE')
 
     def test_purge_remote(self):
-        """ should purge current results directory """
+        """Should purge current results directory."""
 
         r = support.run_remote_command('purge --force')
         self.assertFalse(r.failed, 'should not have failed')

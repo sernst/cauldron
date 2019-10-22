@@ -1,0 +1,31 @@
+.RunStripStep {
+  $background: #e0d8ff;
+  $color: #7769bb;
+
+  $background-selected: #7769bb;
+  $color-selected: white;
+
+  &--queued {
+    background-color: $background;
+    color: $color;
+    fill: $color;
+
+    &Selected {
+      background-color: $background-selected;
+      color: $color-selected;
+      fill: $color-selected;
+    }
+  }
+
+  &__overlay--queued {
+    background-color: $background;
+    color: $color;
+    border: 1px solid saturate(darken($background, 10%), 10%);
+
+    &Selected {
+      background-color: $background-selected;
+      color: $color-selected;
+      border: 1px solid saturate(darken($background-selected, 10%), 10%)
+    }
+  }
+}

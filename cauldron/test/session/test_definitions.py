@@ -13,7 +13,7 @@ class TestDefinitions(scaffolds.ResultsTest):
         self.assertTrue(d.slug.startswith('test'))
 
     def test_remove_name(self):
-        """ should remove name if set to None """
+        """Should remove name if set to None """
 
         d = FileDefinition()
         self.assertIsNotNone(d.name)
@@ -22,7 +22,7 @@ class TestDefinitions(scaffolds.ResultsTest):
         self.assertNotEqual(d.name, 'some-name')
 
     def test_remove_folder(self):
-        """ should remove folder if set to None """
+        """Should remove folder if set to None """
 
         d = FileDefinition()
         self.assertIsNone(d.folder)
@@ -31,7 +31,7 @@ class TestDefinitions(scaffolds.ResultsTest):
         self.assertNotEqual(d.folder, 'some-name')
 
     def test_remove_title(self):
-        """ should remove title if set to None """
+        """Should remove title if set to None """
 
         d = FileDefinition()
         self.assertIsNotNone(d.title)
@@ -40,7 +40,7 @@ class TestDefinitions(scaffolds.ResultsTest):
         self.assertNotEqual(d.title, 'some-name')
 
     def test_serialize_simple(self):
-        """ should serialize to string if only a name is set """
+        """Should serialize to string if only a name is set."""
 
         d = FileDefinition()
         d.name = 'some-name'
@@ -49,7 +49,7 @@ class TestDefinitions(scaffolds.ResultsTest):
         self.assertEqual(result, 'some-name')
 
     def test_serialize_advanced(self):
-        """ should serialize to a dictionary if complex data """
+        """Should serialize to a dictionary if complex data """
 
         d = FileDefinition()
         d.name = 'some-name'
@@ -61,7 +61,7 @@ class TestDefinitions(scaffolds.ResultsTest):
         self.assertIn(result['name'], 'some-name')
 
     def test_project_folder_string(self):
-        """ should use project folder string if folder is not set """
+        """Should use project folder string if folder is not set."""
 
         folder_name = 'some-folder'
         d = FileDefinition()
@@ -71,7 +71,7 @@ class TestDefinitions(scaffolds.ResultsTest):
         self.assertEqual(d.folder, folder_name)
 
     def test_project_folder_callable(self):
-        """ should use project folder function if folder is not set """
+        """Should use project folder function if folder is not set."""
 
         folder_name = 'some-folder'
         def get_project_folder():

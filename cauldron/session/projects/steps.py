@@ -42,17 +42,40 @@ class ProjectStep(object):
         self.code = None
         self.is_visible = True
         self.is_running = False
+        self.is_selected = False
         self._is_dirty = True
         self.error = None
         self.is_muted = False
-        self.dom = None  # type: str
+        self.dom = None  # type: typing.Optional[str]
         self.progress_message = None
         self.sub_progress_message = None
         self.progress = 0
         self.sub_progress = 0
-        self.test_locals = None  # type: dict
-        self.start_time = None  # type: datetime
-        self.end_time = None  # type: datetime
+        self.test_locals = None  # type: typing.Optional[dict]
+        self.start_time = None  # type: typing.Optional[datetime]
+        self.end_time = None  # type: typing.Optional[datetime]
+
+    @property
+    def remote_source_path(self) -> typing.Optional[str]:
+        """
+        Path to the step source file on the remote system or None
+        if no remote connection exists.
+        """
+        unavailable = (
+            not self.project
+            or not self.project.remote_source_directory
+            or not self.report
+        )
+        if unavailable:
+            return None
+        return os.path.join(
+            self.project.remote_source_directory,
+            self.filename
+        )
+
+    @property
+    def name(self):
+        return self.definition.name
 
     @property
     def reference_id(self):
@@ -119,12 +142,13 @@ class ProjectStep(object):
         return '{:>02d}:{:>02d}.{:<02d}'.format(minutes, seconds, millis)
 
     def kernel_serialize(self):
-        """ """
+        """..."""
         status = self.status()
         out = dict(
             slug=self.definition.slug,
             index=self.index,
             source_path=self.source_path,
+            remote_source_path=self.remote_source_path,
             status=status,
             exploded_name=naming.explode_filename(
                 self.definition.name,
@@ -135,8 +159,7 @@ class ProjectStep(object):
         return out
 
     def status(self):
-        """ """
-
+        """..."""
         is_dirty = self.is_dirty()
 
         return dict(
@@ -144,10 +167,12 @@ class ProjectStep(object):
             reference_id=self.reference_id,
             name=self.definition.name,
             muted=self.is_muted,
+            selected=self.is_selected,
             last_modified=self.last_modified,
             last_display_update=self.report.last_update_time,
             dirty=is_dirty,
             is_dirty=is_dirty,
+            running=self.is_running,
             run=self.last_modified is not None,
             error=self.error is not None
         )
@@ -177,7 +202,7 @@ class ProjectStep(object):
         self.last_modified = time_adjust if force else self.last_modified
 
     def get_dom(self) -> str:
-        """ Retrieves the current value of the DOM for the step """
+        """ Retrieves the current value of the DOM for the step."""
 
         if self.is_running:
             return self.dumps()

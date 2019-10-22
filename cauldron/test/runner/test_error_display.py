@@ -7,8 +7,7 @@ from cauldron.test.support.messages import Message
 class TestPrinting(scaffolds.ResultsTest):
 
     def test_solo_error(self):
-        """ should display an error """
-
+        """Should display an error."""
         response = support.create_project(self, 'bismark')
         self.assertFalse(
             response.failed,
@@ -28,18 +27,17 @@ class TestPrinting(scaffolds.ResultsTest):
         project = cauldron.project.get_internal_project()
 
         self.assertTrue(
-            project.steps[0].dom.find('cd-CodeError') > 0,
+            project.steps[1].dom.find('cd-CodeError') > 0,
             'should have included error dom'
         )
 
         self.assertTrue(
-            project.steps[0].dom.find('abcdefg') > 0,
+            project.steps[1].dom.find('abcdefg') > 0,
             'should have included error line of code'
         )
 
     def test_standard_error(self):
-        """ should include standard error output """
-
+        """Should include standard error output."""
         response = support.create_project(self, 'bozeman')
         self.assertFalse(
             response.failed,
@@ -64,11 +62,11 @@ class TestPrinting(scaffolds.ResultsTest):
         project = cauldron.project.get_internal_project()
 
         self.assertTrue(
-            project.steps[0].dom.find(error_string) > 0,
+            project.steps[1].dom.find(error_string) > 0,
             'should have included error string'
         )
 
         self.assertTrue(
-            project.steps[0].dom.find('cd-StdErr') > 0,
+            project.steps[1].dom.find('cd-StdErr') > 0,
             'should have included StdErr dom'
         )

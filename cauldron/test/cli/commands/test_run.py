@@ -1,14 +1,14 @@
-from unittest.mock import patch
 from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import cauldron
-from cauldron import environ
-from cauldron.environ.response import Response
 from cauldron import cli
+from cauldron import environ
 from cauldron.cli import commander
 from cauldron.cli.commands import run
-from cauldron.test.support import scaffolds
+from cauldron.environ.response import Response
 from cauldron.test import support
+from cauldron.test.support import scaffolds
 
 
 class TestRun(scaffolds.ResultsTest):
@@ -64,40 +64,34 @@ class TestRun(scaffolds.ResultsTest):
         self.assertFalse(r.failed)
 
     def test_autocomplete_flags(self):
-        """ should return list of short flags """
+        """Should return list of short flags."""
 
         result = support.autocomplete('run S01.py -')
         self.assertGreater(len(result), 2)
         self.assertIn('-', result)
 
     def test_autocomplete_long_flags(self):
-        """ should return list of long flags """
+        """Should return list of long flags."""
 
         result = support.autocomplete('run S01.py --')
         self.assertGreater(len(result), 2)
         self.assertIn('force', result)
 
     def test_autocomplete_nothing(self):
-        """ should return empty autocomplete when no option started """
+        """Should return empty autocomplete when no option started """
 
         result = support.autocomplete('run')
         self.assertEqual(len(result), 0)
 
     def test_autocomplete(self):
-        """ should autocomplete step name """
-
+        """Should autocomplete step name."""
         support.create_project(self, 'crystal')
-        support.add_step(self)
-
         step = cauldron.project.get_internal_project().steps[0]
-
         result = support.autocomplete('run {}'.format(step.filename[:2]))
-        self.assertEqual(len(result), 1)
-        self.assertEqual(result[0], step.filename)
+        self.assertEqual([step.filename], result)
 
     def test_run_no_project(self):
-        """ should abort if no project is open """
-
+        """Should abort if no project is open."""
         r = environ.Response()
         run.execute(context=cli.make_command_context(
             name=run.NAME,
@@ -107,8 +101,7 @@ class TestRun(scaffolds.ResultsTest):
         self.assert_has_error_code(r, 'NO_OPEN_PROJECT')
 
     def test_multiple_steps(self):
-        """ should run multiple named steps """
-
+        """Should run multiple named steps."""
         support.create_project(self, 'robinsdale')
         support.add_step(self)
         support.add_step(self)
@@ -123,13 +116,12 @@ class TestRun(scaffolds.ResultsTest):
         )
 
         self.assertFalse(r.failed)
-        self.assertFalse(project.steps[0].is_dirty())
-        self.assertFalse(project.steps[1].is_dirty())
-        self.assertTrue(project.steps[2].is_dirty())
+        for s in project.steps[:-1]:
+            self.assertFalse(s.is_dirty())
+        self.assertTrue(project.steps[-1].is_dirty())
 
     def test_single_step(self):
-        """ should run single step only """
-
+        """Should run single step only."""
         support.create_project(self, 'white-bear-lake')
         support.add_step(self)
         support.add_step(self)
@@ -144,8 +136,8 @@ class TestRun(scaffolds.ResultsTest):
 
         self.assertFalse(r.failed)
         self.assertFalse(project.steps[0].is_dirty())
-        self.assertTrue(project.steps[1].is_dirty())
-        self.assertTrue(project.steps[2].is_dirty())
+        for s in project.steps[1:]:
+            self.assertTrue(s.is_dirty())
 
         r = run.execute(
             context=cli.make_command_context(name=run.NAME),
@@ -155,11 +147,11 @@ class TestRun(scaffolds.ResultsTest):
         self.assertFalse(r.failed)
         self.assertFalse(project.steps[0].is_dirty())
         self.assertFalse(project.steps[1].is_dirty())
-        self.assertTrue(project.steps[2].is_dirty())
+        for s in project.steps[2:]:
+            self.assertTrue(s.is_dirty())
 
     def test_run_count(self):
-        """ should run single step only """
-
+        """Should run single step only."""
         support.create_project(self, 'eagan')
         support.add_step(self)
         support.add_step(self)
@@ -173,12 +165,13 @@ class TestRun(scaffolds.ResultsTest):
         )
 
         self.assertFalse(r.failed)
-        self.assertFalse(project.steps[0].is_dirty())
-        self.assertFalse(project.steps[1].is_dirty())
+        for s in project.steps[:2]:
+            self.assertFalse(s.is_dirty())
+        for s in project.steps[2:]:
+            self.assertTrue(s.is_dirty())
 
     def test_repeats(self):
-        """ should not repeat run multiple named steps in a single run """
-
+        """Should not repeat run multiple named steps in a single run."""
         support.create_project(self, 'eden-prairie')
         support.add_step(self)
         support.add_step(self)
@@ -194,15 +187,13 @@ class TestRun(scaffolds.ResultsTest):
         )
 
         self.assertFalse(r.failed)
-        self.assertFalse(project.steps[0].is_dirty())
-        self.assertFalse(project.steps[1].is_dirty())
-        self.assertTrue(project.steps[2].is_dirty())
+        for s in project.steps[:-1]:
+            self.assertFalse(s.is_dirty())
+        self.assertTrue(project.steps[-1].is_dirty())
 
     def test_repeat_additions(self):
-        """ should not repeat run multiple named steps in a single run """
-
+        """Should not repeat run multiple named steps in a single run."""
         support.create_project(self, 'plymouth')
-        support.add_step(self)
         support.add_step(self)
         support.add_step(self)
 
@@ -219,13 +210,17 @@ class TestRun(scaffolds.ResultsTest):
         )
 
         self.assertFalse(r.failed)
-        self.assertFalse(project.steps[0].is_dirty())
-        self.assertTrue(project.steps[1].is_dirty())
-        self.assertTrue(project.steps[2].is_dirty())
+        for s in project.steps[:1]:
+            self.assertFalse(s.is_dirty(), """
+                Expect "{}" step not to be dirty
+                """.format(s.filename))
+        for s in project.steps[1:]:
+            self.assertTrue(s.is_dirty(), """
+                Expect "{}" step to be dirty
+                """.format(s.filename))
 
     def test_no_such_step(self):
-        """ should fail if unable to find a step """
-
+        """Should fail if unable to find a step."""
         support.create_project(self, 'fairfield')
         support.add_step(self)
         support.add_step(self)
@@ -242,8 +237,7 @@ class TestRun(scaffolds.ResultsTest):
         self.assert_has_error_code(r, 'MISSING_STEP')
 
     def test_run_remote(self):
-        """ should successfully run remote project """
-
+        """Should successfully run remote project."""
         support.create_project(self, 'rhino')
         support.add_step(self, contents='print("hello!")')
 
@@ -261,7 +255,7 @@ class TestRun(scaffolds.ResultsTest):
 
     @patch('cauldron.cli.commands.sync.execute')
     def test_run_remote_sync_fail(self, sync_execute: MagicMock):
-        """ should fail if the remote sync was not successful """
+        """Should fail if the remote sync was not successful """
 
         sync_execute.return_value = Response().fail().response
 

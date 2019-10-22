@@ -16,7 +16,7 @@ class TestSyncOpen(FlaskResultsTest):
     """ """
 
     def test_no_args(self):
-        """ should error without arguments """
+        """Should error without arguments."""
 
         opened = self.post('/sync-open')
         self.assertEqual(opened.flask.status_code, 200)
@@ -25,7 +25,7 @@ class TestSyncOpen(FlaskResultsTest):
         self.assert_has_error_code(response, 'INVALID_ARGS')
 
     def test_missing_definition(self):
-        """ should error without cauldron.json definition argument """
+        """Should error without cauldron.json definition argument."""
 
         opened = self.post('/sync-open', {'source_directory': 'abc'})
 
@@ -33,7 +33,7 @@ class TestSyncOpen(FlaskResultsTest):
         self.assert_has_error_code(response, 'INVALID_ARGS')
 
     def test_missing_source_directory(self):
-        """ should error without source directory argument """
+        """Should error without source directory argument."""
 
         opened = self.post('/sync-open', {'definition': 'abc'})
 
@@ -41,7 +41,7 @@ class TestSyncOpen(FlaskResultsTest):
         self.assert_has_error_code(response, 'INVALID_ARGS')
 
     def test_open(self):
-        """ should open project remotely """
+        """Should open project remotely."""
 
         source_directory = os.path.join(
             EXAMPLE_PROJECTS_DIRECTORY,

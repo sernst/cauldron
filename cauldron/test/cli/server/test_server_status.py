@@ -20,7 +20,7 @@ class TestServerStatus(flask_scaffolds.FlaskResultsTest):
 
     @patch('cauldron.session.projects.Project.status')
     def test_failed_status(self, project_status):
-        """ should fail if unable to test project status """
+        """Should fail if unable to test project status."""
 
         support.create_project(self, 'mario')
 
@@ -34,7 +34,7 @@ class TestServerStatus(flask_scaffolds.FlaskResultsTest):
         self.assert_has_error_code(response, 'PROJECT_STATUS_ERROR')
 
     def test_clean_step_no_project(self):
-        """ should fail when no project is open """
+        """Should fail when no project is open."""
 
         cleaned = self.get('/clean-step/fake')
         self.assertEqual(cleaned.flask.status_code, 200)
@@ -44,7 +44,7 @@ class TestServerStatus(flask_scaffolds.FlaskResultsTest):
         self.assert_has_error_code(response, 'PROJECT_FETCH_ERROR')
 
     def test_clean_step_no_step(self):
-        """ should fail when no such step exists """
+        """Should fail when no such step exists."""
 
         support.create_project(self, 'luigi')
 
@@ -56,7 +56,7 @@ class TestServerStatus(flask_scaffolds.FlaskResultsTest):
         self.assert_has_error_code(response, 'STEP_FETCH_ERROR')
 
     def test_clean_step(self):
-        """ should succeed in cleaning step """
+        """Should succeed in cleaning step."""
 
         support.create_project(self, 'luigi')
         support.add_step(self)

@@ -14,7 +14,7 @@ class TestCreate(scaffolds.ResultsTest):
     """ """
 
     def test_create_no_args(self):
-        """ should fail with no args """
+        """Should fail with no args."""
 
         r = support.create_project(self, '', '', confirm=False)
         self.assertTrue(r.failed, 'should have failed')
@@ -142,7 +142,7 @@ class TestCreate(scaffolds.ResultsTest):
         )
 
     def test_folders(self):
-        """ should create libs and assets folders in project """
+        """Should create libs and assets folders in project."""
 
         libs_folder = 'libs_folder'
         assets_folder = 'assets_folder'
@@ -172,7 +172,7 @@ class TestCreate(scaffolds.ResultsTest):
         self.assertEqual(assets_folder, data['asset_folders'][0])
 
     def test_write_fail(self):
-        """ should fail if directory cannot be written """
+        """Should fail if directory cannot be written."""
 
         target = 'cauldron.cli.commands.create.actions.write_project_data'
         with patch(target) as func:
@@ -182,7 +182,7 @@ class TestCreate(scaffolds.ResultsTest):
         self.assertTrue(result.failed)
 
     def test_create_fail(self):
-        """ should fail if directory cannot be created """
+        """Should fail if directory cannot be created """
 
         target = '.'.join([
             'cauldron.cli.commands.create',
@@ -195,27 +195,27 @@ class TestCreate(scaffolds.ResultsTest):
         self.assertTrue(result.failed)
 
     def test_autocomplete_absolute_path(self):
-        """ should properly autocomplete an alias """
+        """Should properly autocomplete an alias."""
 
         directory = os.path.dirname(os.path.realpath(__file__))
         result = support.autocomplete('create fake "{}"'.format(directory))
         self.assertIsNotNone(result)
 
     def test_autocomplete_empty(self):
-        """ should properly autocomplete an alias """
+        """Should properly autocomplete an alias."""
 
         result = support.autocomplete('create')
         self.assertEqual(len(result), 0)
 
     def test_incomplete_alias(self):
-        """ should properly autocomplete an incomplete alias """
+        """Should properly autocomplete an incomplete alias."""
 
         result = support.autocomplete('create fake @ho')
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0], 'home:')
 
     def test_create_project_directory(self):
-        """ should abort if directory already exists """
+        """Should abort if directory already exists."""
 
         path = self.get_temp_path('test-create', 'project-directory-1')
         os.makedirs(path)
@@ -224,7 +224,7 @@ class TestCreate(scaffolds.ResultsTest):
         self.assertTrue(response.success)
 
     def test_create_project_directory_fail(self):
-        """ should fail if directory cannot be created """
+        """Should fail if directory cannot be created """
 
         path = self.get_temp_path('test-create', 'project-directory-2')
 
@@ -238,7 +238,7 @@ class TestCreate(scaffolds.ResultsTest):
 
     @patch('cauldron.cli.commands.open.remote.sync_open')
     def test_remote(self, sync_open: MagicMock):
-        """ should successfully open project remotely """
+        """Should successfully open project remotely."""
 
         sync_open.return_value = environ.Response()
 
@@ -253,7 +253,7 @@ class TestCreate(scaffolds.ResultsTest):
         self.assertGreater(sync_open.call_count, 0)
 
     def test_write_project_data_failure(self):
-        """ should fail when unable to write definition file """
+        """Should fail when unable to write definition file """
 
         with patch('builtins.open') as func:
             func.side_effect = IOError('FAKE ERROR')

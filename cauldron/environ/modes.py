@@ -44,7 +44,7 @@ def remove(mode_id: str) -> bool:
 
 
 class ExposedModes:
-    """ Exposed class for checking the status of the currently active modes """
+    """ Exposed class for checking the status of the currently active modes."""
 
     INTERACTIVE = INTERACTIVE
     TESTING = TESTING
