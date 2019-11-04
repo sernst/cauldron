@@ -173,7 +173,7 @@ class ProjectStep(object):
             dirty=is_dirty,
             is_dirty=is_dirty,
             running=self.is_running,
-            run=self.last_modified is not None,
+            run=self.last_modified > 0,
             error=self.error is not None
         )
 
@@ -182,7 +182,7 @@ class ProjectStep(object):
         if self._is_dirty:
             return self._is_dirty
 
-        if self.last_modified is None:
+        if self.last_modified < 1:
             return True
         p = self.source_path
         if not p:

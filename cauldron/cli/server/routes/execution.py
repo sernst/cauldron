@@ -169,6 +169,7 @@ def execute(asynchronous: bool = False):
 def abort():
     """..."""
     uid_list = list(server_runner.active_execution_responses.keys())
+    step_changes = []
 
     while len(uid_list) > 0:
         uid = uid_list.pop()
@@ -196,15 +197,14 @@ def abort():
         except Exception:
             pass
 
-    project = cd.project.internal_project
-
+    project = cd.project.get_internal_project(0.1)
     if project and project.current_step:
         step = project.current_step
         if step.is_running:
             step.is_running = False
             step.progress = 0
             step.progress_message = None
-            step.dumps()
+            step_changes.append(step.dumps())
 
         # Make sure this is called prior to printing response information to
         # the console or that will come along for the ride
@@ -218,7 +218,7 @@ def abort():
 
     return flask.jsonify(
         Response()
-        .update(project=project_data)
+        .update(project=project_data, step_changes=step_changes)
         .serialize()
     )
 

@@ -1,4 +1,5 @@
 import flask
+import requests
 
 import cauldron
 from cauldron.runner import redirection
@@ -47,6 +48,26 @@ def command_async():
 @blueprint.route('/command/abort', methods=['POST'])
 def abort():
     """..."""
+    try:
+        # When connected remotely, the abort should be sent to the remote
+        # kernel and handled there.
+        if environ.remote_connection.active:
+            return flask.jsonify(requests.get(
+                '{}/abort'.format(environ.remote_connection.url),
+            ).json())
+    except ConnectionError as error:
+        return (
+            environ.Response()
+            .fail(
+                code='REMOTE_CONNECTION_FAILED',
+                message='Unable to communicate with the remote kernel.',
+                error=error
+            )
+            .console(whitespace=1)
+            .response
+            .flask_serialize()
+        )
+
     step_changes = []
     response = ui_configs.ACTIVE_EXECUTION_RESPONSE
     ui_configs.ACTIVE_EXECUTION_RESPONSE = None

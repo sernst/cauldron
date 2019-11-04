@@ -83,7 +83,10 @@ def start(
     # Either used the specified port for the UI if one was given or
     # find the first available port in the given range and use that
     # one instead.
-    ui_port = port or launcher.find_open_port(host, range(8899, 9999))
+    ui_port = port or launcher.find_open_port(
+        host=host or 'localhost',
+        ports=range(8899, 9999)
+    )
 
     # Launches the UI in a web browser once the server has started.
     if not configs.LAUNCH_THREAD and not debug:

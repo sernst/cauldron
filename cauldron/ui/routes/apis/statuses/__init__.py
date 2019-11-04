@@ -55,4 +55,8 @@ def status():
         remote_status.get('project')
     )
 
-    return flask.jsonify(status)
+    # We care about the local remote connection, which is active,
+    # not the remote one.
+    remote_status['remote'] = environ.remote_connection.serialize()
+
+    return flask.jsonify(remote_status)

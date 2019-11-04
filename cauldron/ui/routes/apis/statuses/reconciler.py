@@ -17,7 +17,7 @@ def _mark_dirty_after(step_data: dict, timestamp: float) -> dict:
 
     is_dirty = (
         status.get('dirty', False)
-        or not not os.path.exists(path)
+        or not os.path.exists(path)
         or timestamp < os.path.getmtime(path)
     )
     step_data['dirty'] = is_dirty
