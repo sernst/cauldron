@@ -53,7 +53,7 @@ class TestRunner(scaffolds.ResultsTest):
         self.assertTrue(r.failed, 'should have failed')
 
     def test_library(self):
-        """Should refresh the local project library with the updated value """
+        """Should refresh the local project library with the updated value."""
         support.create_project(self, 'jack')
         project = cd.project.get_internal_project()
 

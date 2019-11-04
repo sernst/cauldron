@@ -10,7 +10,7 @@ class TestShow(scaffolds.ResultsTest):
     """ """
 
     def test_show_fail(self):
-        """Should fail to show when no project is opened """
+        """Should fail to show when no project is opened."""
 
         with patch('webbrowser.open') as func:
             r = support.run_command('show')

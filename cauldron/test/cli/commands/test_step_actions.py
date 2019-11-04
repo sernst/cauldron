@@ -31,7 +31,7 @@ class TestStepActions(scaffolds.ResultsTest):
         self.assertEqual(result, 42)
 
     def test_index_from_location_bad_string(self):
-        """Should return default value if bad string is supplied """
+        """Should return default value if bad string is supplied."""
 
         support.create_project(self, 'ray')
         project = cauldron.project.get_internal_project()
@@ -40,7 +40,7 @@ class TestStepActions(scaffolds.ResultsTest):
         self.assertEqual(result, 42)
 
     def test_index_from_location_step_name(self):
-        """Should return index from step name if supplied """
+        """Should return index from step name if supplied."""
 
         support.create_project(self, 'bradbury')
         support.add_step(self)

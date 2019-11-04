@@ -17,7 +17,14 @@ def send_chunk(
         remote_connection: 'environ.RemoteConnection' = None,
         sync_time: float = -1
 ):
-    """ """
+    """
+    Sends a chunk of the specified file to the remote kernel specified
+    by the remote_connection argument. The remote kernel that receives
+    these responses appends the data to the remote file location as
+    successive calls to this function effectively stream the contents
+    of the file to the remote system. For small files there will be only
+    a single chunk.
+    """
     return sync.comm.send_request(
         endpoint='/sync-file',
         method='POST',
@@ -43,14 +50,10 @@ def send(
         progress_callback=None,
         sync_time: float = -1
 ) -> Response:
-    """ """
+    """Sends the local file contents to the remote kernel."""
     response = Response()
     sync_time = time.time() if sync_time < 0 else sync_time
-    callback = (
-        progress_callback
-        if progress_callback else
-        (lambda x: x)
-    )
+    callback = progress_callback or (lambda x: x)
 
     modified_time = os.path.getmtime(file_path)
     if modified_time < newer_than:
@@ -147,7 +150,7 @@ def send_all_in(
         progress_callback=None,
         sync_time: float = -1
 ) -> Response:
-    """ """
+    """..."""
     sync_time = time.time() if sync_time < 0 else sync_time
 
     glob_end = ('**', '*') if recursive else ('*',)
@@ -159,11 +162,17 @@ def send_all_in(
         directory
     ).rstrip(os.path.sep)
 
-    # Only send files that have non-zero size
+    # Only send files that have non-zero size that are not cauldron
+    # reader files and wheels and ignore hidden files that start with a
+    # dot. Also, ignore __pycache__ folders.
     file_paths = (
         p
         for p in glob.iglob(glob_path, recursive=True)
-        if os.path.isfile(p) and os.path.getsize(p) > 0
+        if os.path.isfile(p)
+        and os.path.getsize(p) > 0
+        and not p.endswith(('.cauldron', '.whl'))
+        and not p.startswith('.')
+        and '__pycache__' not in p
     )
     for file_path in file_paths:
         relative_path = file_path[len(root_path):].lstrip(os.path.sep)

@@ -49,7 +49,7 @@ class TestOpenActions(scaffolds.ResultsTest):
             query_choice: MagicMock,
             configs_fetch: MagicMock
     ):
-        """Should cancel if indicated by user query response """
+        """Should cancel if indicated by user query response."""
 
         configs_fetch.return_value = ['a', 'b', 'c']
         query_choice.return_value = (3, None)
@@ -66,7 +66,7 @@ class TestOpenActions(scaffolds.ResultsTest):
             query_choice: MagicMock,
             configs_fetch: MagicMock
     ):
-        """Should return path chosen by user query response """
+        """Should return path chosen by user query response."""
 
         configs_fetch.return_value = ['a', 'b', 'c']
         query_choice.return_value = (1, 'b')

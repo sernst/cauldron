@@ -30,7 +30,7 @@ class RemoteConnection:
     @property
     def sync_timestamp(self) -> float:
         """Last time the sync action to the remote source started."""
-        return self._sync_timestamp
+        return max(0, self._sync_timestamp - 2)
 
     def serialize(self) -> dict:
         return {
@@ -69,10 +69,6 @@ abort_thread = threads.abort_thread
 
 
 def run_time() -> timedelta:
-    """
-
-    :return:
-    """
-
+    """..."""
     delta = start_time if start_time else datetime.utcnow()
     return datetime.utcnow() - delta

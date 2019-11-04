@@ -31,21 +31,21 @@ class TestRenderEncoding(unittest.TestCase):
         self.assertIsInstance(output, str)
 
     def test_date(self):
-        """Should serialize datetime.date """
+        """Should serialize datetime.date."""
 
         source = dict(key=datetime.date(2016, 1, 1))
         output = json.dumps(source, cls=ComplexJsonEncoder)
         self.assertIsInstance(output, str)
 
     def test_datetime(self):
-        """Should serialize datetime.datetime """
+        """Should serialize datetime.datetime."""
 
         source = dict(key=datetime.datetime(2007, 7, 16))
         output = json.dumps(source, cls=ComplexJsonEncoder)
         self.assertIsInstance(output, str)
 
     def test_time(self):
-        """Should serialize datetime.time """
+        """Should serialize datetime.time."""
 
         source = dict(key=datetime.time(8, 7, 16))
         output = json.dumps(source, cls=ComplexJsonEncoder)

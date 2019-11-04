@@ -182,7 +182,7 @@ class TestCreate(scaffolds.ResultsTest):
         self.assertTrue(result.failed)
 
     def test_create_fail(self):
-        """Should fail if directory cannot be created """
+        """Should fail if directory cannot be created."""
 
         target = '.'.join([
             'cauldron.cli.commands.create',
@@ -224,7 +224,7 @@ class TestCreate(scaffolds.ResultsTest):
         self.assertTrue(response.success)
 
     def test_create_project_directory_fail(self):
-        """Should fail if directory cannot be created """
+        """Should fail if directory cannot be created."""
 
         path = self.get_temp_path('test-create', 'project-directory-2')
 
@@ -253,7 +253,7 @@ class TestCreate(scaffolds.ResultsTest):
         self.assertGreater(sync_open.call_count, 0)
 
     def test_write_project_data_failure(self):
-        """Should fail when unable to write definition file """
+        """Should fail when unable to write definition file."""
 
         with patch('builtins.open') as func:
             func.side_effect = IOError('FAKE ERROR')

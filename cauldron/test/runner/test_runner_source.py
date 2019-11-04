@@ -23,7 +23,7 @@ class TestRunnerSource(scaffolds.ResultsTest):
         self.assertEqual(step, result)
 
     def test_get_missing_step(self):
-        """Should get None for a fictional step name """
+        """Should get None for a fictional step name."""
 
         support.create_project(self, 'george')
         support.add_step(self)
@@ -82,7 +82,7 @@ class TestRunnerSource(scaffolds.ResultsTest):
         self.assertTrue(result)
 
     def test_run_step_execution_error(self):
-        """Should fail when running a step that fails to execute """
+        """Should fail when running a step that fails to execute."""
 
         support.create_project(self, 'quincy')
         support.add_step(self)
@@ -96,7 +96,7 @@ class TestRunnerSource(scaffolds.ResultsTest):
         self.assertFalse(result)
 
     def test_status_of_muted_step(self):
-        """Should have a skip status if the step is muted """
+        """Should have a skip status if the step is muted."""
 
         support.create_project(self, 'madison')
         support.add_step(self)
@@ -108,7 +108,7 @@ class TestRunnerSource(scaffolds.ResultsTest):
         self.assertEqual(status, source.SKIP_STATUS)
 
     def test_status_of_missing_step_file(self):
-        """Should have an error status if the step has no file """
+        """Should have an error status if the step has no file."""
 
         support.create_project(self, 'james')
         support.add_step(self)

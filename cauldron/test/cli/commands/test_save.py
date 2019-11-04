@@ -33,7 +33,7 @@ class TestSave(scaffolds.ResultsTest):
         self.assertEqual(r.errors[0].code, 'WRITE_SAVE_ERROR')
 
     def test_save_directory_success(self):
-        """Should write a cauldron file """
+        """Should write a cauldron file."""
 
         support.create_project(self, 'triceratops')
         path = self.get_temp_path('save-success-1')
@@ -47,7 +47,7 @@ class TestSave(scaffolds.ResultsTest):
         )
 
     def test_save_file_no_extension_success(self):
-        """Should write a cauldron file """
+        """Should write a cauldron file."""
 
         support.create_project(self, 'tyrannosaurus')
         path = self.get_temp_path('save-success-2', 'project')
@@ -58,7 +58,7 @@ class TestSave(scaffolds.ResultsTest):
         self.assertTrue(r.data['path'].endswith('project.cauldron'))
 
     def test_save_file_success(self):
-        """Should write a cauldron file """
+        """Should write a cauldron file."""
 
         support.create_project(self, 'apatosaurus')
         path = self.get_temp_path(

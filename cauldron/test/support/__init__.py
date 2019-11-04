@@ -14,7 +14,7 @@ from cauldron.test.support.messages import Message
 
 try:
   import readline
-except ImportError:
+except ImportError:  # pragma: no cover
   import pyreadline as readline
 
 
@@ -22,7 +22,7 @@ def run_remote_command(
         command: str,
         app=None,
         remote_connection: 'environ.RemoteConnection' = None,
-        mock_send_request=None
+        mock_send_request=None,
 ) -> 'environ.Response':
     """
     Simulates the execution of a remote command in the local environment,

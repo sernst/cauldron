@@ -38,7 +38,7 @@ class ProjectStep(object):
         self.project = project
         self.report = Report(self)
 
-        self.last_modified = None
+        self.last_modified = 0  # type: typing.Optional[float]
         self.code = None
         self.is_visible = True
         self.is_running = False
@@ -190,20 +190,13 @@ class ProjectStep(object):
         return os.path.getmtime(p) >= self.last_modified
 
     def mark_dirty(self, value: bool, force: bool = False):
-        """
-
-        :param value:
-        :param force:
-        """
-
+        """..."""
         self._is_dirty = bool(value)
-
         time_adjust = 0 if value else time.time()
         self.last_modified = time_adjust if force else self.last_modified
 
     def get_dom(self) -> str:
         """ Retrieves the current value of the DOM for the step."""
-
         if self.is_running:
             return self.dumps()
 

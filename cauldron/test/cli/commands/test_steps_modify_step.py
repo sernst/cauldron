@@ -54,7 +54,7 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
         self.assert_has_error_code(r, 'NO_SUCH_STEP')
 
     def test_no_existing_source_file(self):
-        """Should succeed even if the step has no source file """
+        """Should succeed even if the step has no source file."""
 
         support.create_project(self, 'richfield')
         support.add_step(self, 'first')
@@ -108,7 +108,7 @@ class TestStepsCreateStep(scaffolds.ResultsTest):
         self.assertFalse(r.failed)
 
     def test_change_title(self):
-        """Should change title """
+        """Should change title."""
 
         support.create_project(self, 'blaine')
         support.add_step(self)

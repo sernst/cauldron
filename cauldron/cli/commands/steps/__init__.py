@@ -137,7 +137,7 @@ def execute_remote(
         keep: bool = False,
 ) -> Response:
     """..."""
-    modification_start_timestamp = time.time()
+    # modification_start_timestamp = time.time()
 
     if action in ['list', 'clean', 'select']:
         thread = sync.send_remote_command(
@@ -181,7 +181,7 @@ def execute_remote(
         ),
         source_directory=source_directory,
         # newer_than=status_response.data.get('sync_time', 0)
-        newer_than=modification_start_timestamp
+        newer_than=context.remote_connection.sync_timestamp
     )
 
     return context.response.consume(sync_response)

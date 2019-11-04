@@ -13,7 +13,7 @@ class TestDefinitions(scaffolds.ResultsTest):
         self.assertTrue(d.slug.startswith('test'))
 
     def test_remove_name(self):
-        """Should remove name if set to None """
+        """Should remove name if set to None."""
 
         d = FileDefinition()
         self.assertIsNotNone(d.name)
@@ -22,7 +22,7 @@ class TestDefinitions(scaffolds.ResultsTest):
         self.assertNotEqual(d.name, 'some-name')
 
     def test_remove_folder(self):
-        """Should remove folder if set to None """
+        """Should remove folder if set to None."""
 
         d = FileDefinition()
         self.assertIsNone(d.folder)
@@ -31,7 +31,7 @@ class TestDefinitions(scaffolds.ResultsTest):
         self.assertNotEqual(d.folder, 'some-name')
 
     def test_remove_title(self):
-        """Should remove title if set to None """
+        """Should remove title if set to None."""
 
         d = FileDefinition()
         self.assertIsNotNone(d.title)

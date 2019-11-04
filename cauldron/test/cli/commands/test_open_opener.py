@@ -37,7 +37,7 @@ class TestOpenOpener(scaffolds.ResultsTest):
     @patch('time.sleep')
     @patch(opener_package('project_exists'), return_value=True)
     def test_not_loadable_open(self, *args):
-        """Should fail when project does not load """
+        """Should fail when project does not load."""
         response = opener.open_project(INVALID_PATH, forget=True)
         self.assertTrue(response.failed)
 
@@ -46,7 +46,7 @@ class TestOpenOpener(scaffolds.ResultsTest):
     @patch(opener_package('load_project'), return_value=True)
     @patch(opener_package('update_recent_paths'), return_value=False)
     def test_not_update(self, *args):
-        """Should fail when project does not load """
+        """Should fail when project does not load."""
         response = opener.open_project(INVALID_PATH, forget=False)
         self.assertTrue(response.failed)
 

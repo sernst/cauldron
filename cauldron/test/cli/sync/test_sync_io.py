@@ -4,7 +4,7 @@ from cauldron.cli import sync
 
 
 class TestSyncIo(scaffolds.ResultsTest):
-    """ Tests for the cauldron.cli.sync.sync_io module """
+    """ Tests for the cauldron.cli.sync.sync_io module."""
 
     def test_packing(self):
         """Should pack and then unpack a string successfully."""
@@ -15,7 +15,7 @@ class TestSyncIo(scaffolds.ResultsTest):
         self.assertEqual(source, unpacked)
 
     def test_reading_chunks(self):
-        """Should read this file and write an identical file """
+        """Should read this file and write an identical file."""
 
         path = os.path.realpath(__file__)
         out = self.get_temp_path('test_reading_chunks', 'test.py')

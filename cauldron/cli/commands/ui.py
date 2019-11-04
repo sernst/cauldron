@@ -5,6 +5,7 @@ from cauldron import cli
 from cauldron import ui
 from cauldron.cli.interaction import autocompletion
 from cauldron.environ import Response
+from cauldron.ui import configs
 
 NAME = 'ui'
 DESCRIPTION = (
@@ -25,7 +26,7 @@ def populate(
 
 def execute(
         context: cli.CommandContext,
-        port: int = ui.configs.DEFAULT_PORT,
+        port: int = configs.DEFAULT_PORT,
         debug: bool = False,
         host: str = None,
         public: bool = False

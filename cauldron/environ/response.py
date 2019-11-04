@@ -106,7 +106,10 @@ class ResponseMessage:
             append_to_file: bool = True,
             **kwargs
     ) -> 'ResponseMessage':
-        """..."""
+        """
+        Logs the ResponseMessage to the stdout with optional formatting
+        specified by the arguments.
+        """
         if not message and self.message:
             message = '[{}]: {}'.format(
                 self.kind,

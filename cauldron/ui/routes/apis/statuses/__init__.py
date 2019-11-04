@@ -24,18 +24,35 @@ def status():
     last_timestamp = args.get('last_timestamp', 0)
     force = args.get('force', False)
 
-    if environ.remote_connection.active:
-        status = requests.post(
+    if not environ.remote_connection.active:
+        results = ui_statuses.get_status(last_timestamp, force)
+        return flask.jsonify(results)
+
+    # When connected remotely, get the status from the remote kernel and
+    # then merge it with local information that may not have been synced
+    # to the remote kernel yet.
+    try:
+        remote_status = requests.post(
             '{}/ui-status'.format(environ.remote_connection.url),
             json=args
         ).json()
-
-        # Steps modified locally should be identified as dirty
-        # or the status display.
-        status['project'] = reconciler.localize_dirty_steps(
-            status.get('project')
+    except ConnectionError as error:
+        return (
+            environ.Response()
+            .fail(
+                code='REMOTE_CONNECTION_FAILED',
+                message='Unable to communicate with the remote kernel.',
+                error=error
+            )
+            .console(whitespace=1)
+            .response
+            .flask_serialize()
         )
-        return flask.jsonify(status)
 
-    results = ui_statuses.get_status(last_timestamp, force)
-    return flask.jsonify(results)
+    # Steps modified locally should be identified as dirty
+    # or the status display.
+    remote_status['project'] = reconciler.localize_dirty_steps(
+        remote_status.get('project')
+    )
+
+    return flask.jsonify(status)

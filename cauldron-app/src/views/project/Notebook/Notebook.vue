@@ -70,6 +70,7 @@ function onLoaded() {
 }
 
 function mounted() {
+  this.isLoading = true;
   this.$emit('loaded', { value: false });
 
   // Don't return this promise because we don't want the resolution process to be

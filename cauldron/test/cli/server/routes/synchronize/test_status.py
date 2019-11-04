@@ -22,7 +22,7 @@ class TestStatus(scaffolds.ResultsTest):
         self.assertEqual(result['path'], path)
 
     def test_of_file(self):
-        """Should return valid result for my file """
+        """Should return valid result for my file."""
 
         result = status.of_file(MY_PATH)
         self.assertNotEqual(result['modified'], -1)

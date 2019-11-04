@@ -18,7 +18,6 @@ def command_sync():
     """
     Returns the current status of the cauldron kernel application, which is
     used to keep the
-    :return:
     """
     return runner.execute(False)
 

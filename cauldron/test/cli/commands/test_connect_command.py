@@ -15,7 +15,7 @@ class TestConnectCommand(scaffolds.ResultsTest):
     """ """
 
     def test_no_url(self):
-        """Should fail if no url is provided in the command """
+        """Should fail if no url is provided in the command."""
 
         r = support.run_command('connect')
         self.assertTrue(r.failed, support.Message(
@@ -26,7 +26,7 @@ class TestConnectCommand(scaffolds.ResultsTest):
 
     @patch('requests.get')
     def test_invalid_url_error(self, requests_get: MagicMock):
-        """Should fail if the url is not valid """
+        """Should fail if the url is not valid."""
 
         requests_get.side_effect = request_exceptions.InvalidURL('Fake')
 
@@ -53,7 +53,7 @@ class TestConnectCommand(scaffolds.ResultsTest):
 
     @patch('requests.get')
     def test_bad_status_code(self, requests_get: MagicMock):
-        """Should fail if the get request does not have a 200 status code """
+        """Should fail if the get request does not have a 200 status code."""
 
         requests_get.return_value = MockResponse(status_code=500)
 
@@ -86,7 +86,7 @@ class TestConnectCommand(scaffolds.ResultsTest):
         support.run_command('disconnect')
 
     def test_autocomplete(self):
-        """Should return empty options for autocomplete """
+        """Should return empty options for autocomplete."""
 
         result = support.autocomplete('connect')
         self.assertEqual(len(result), 0)

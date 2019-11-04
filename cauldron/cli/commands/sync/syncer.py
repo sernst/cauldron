@@ -37,8 +37,8 @@ def do_synchronize(
         source_directory: str,
         newer_than: float
 ) -> Response:
-    """ """
-    environ.remote_connection.sync_starting()
+    """..."""
+    context.remote_connection.sync_starting()
 
     synchronized = []
     sync_response = sync.files.send_all_in(
@@ -49,6 +49,7 @@ def do_synchronize(
             _on_progress,
             synchronized=synchronized
         ),
+        sync_time=context.remote_connection.sync_timestamp
     )
     context.response.consume(sync_response)
     context.response.update(synchronized_count=len(synchronized))
@@ -66,5 +67,5 @@ def do_synchronize(
     if not context.response.failed:
         environ.log('Synchronization Complete', whitespace=1)
 
-    environ.remote_connection.sync_ending()
+    context.remote_connection.sync_ending()
     return context.response

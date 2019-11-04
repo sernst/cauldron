@@ -78,7 +78,7 @@ class TestRun(scaffolds.ResultsTest):
         self.assertIn('force', result)
 
     def test_autocomplete_nothing(self):
-        """Should return empty autocomplete when no option started """
+        """Should return empty autocomplete when no option started."""
 
         result = support.autocomplete('run')
         self.assertEqual(len(result), 0)

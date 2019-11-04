@@ -2,10 +2,9 @@ import hashlib
 import json
 import typing
 
-import cauldron
 from cauldron import environ
-from cauldron.session import projects
 from cauldron.render.encoding import ComplexJsonEncoder
+from cauldron.session import projects
 from cauldron.session import writing
 
 
@@ -23,29 +22,23 @@ def get_digest_hash(response: environ.Response) -> str:
     return hashlib.blake2b(serialized.encode()).hexdigest()
 
 
-def get_running_step_changes(write: bool = False) -> list:
+def _get_step_changes(
+        project: 'projects.Project',
+        step: 'projects.ProjectStep',
+        write_running: bool
+) -> typing.Dict[str, typing.Any]:
     """..."""
-    project = cauldron.project.get_internal_project()
+    step_data = writing.step_writer.serialize(step)
 
-    running_steps = list(filter(
-        lambda step: step.is_running,
-        project.steps
-    ))
+    if write_running and step.is_running:
+        writing.save(project, step_data.file_writes)
 
-    def get_changes(step):
-        step_data = writing.step_writer.serialize(step)
-
-        if write:
-            writing.save(project, step_data.file_writes)
-
-        return dict(
-            name=step.definition.name,
-            action='updated',
-            step=step_data._asdict(),
-            written=write
-        )
-
-    return [get_changes(step) for step in running_steps]
+    return dict(
+        name=step.definition.name,
+        action='updated',
+        step=step_data._asdict(),
+        written=write_running and step.is_running
+    )
 
 
 def get_step_changes_after(
@@ -54,22 +47,9 @@ def get_step_changes_after(
         write_running: bool = False
 ) -> typing.List[dict]:
     """..."""
-    modified_steps = list(filter(
-        lambda step: step.report.last_update_time >= timestamp,
-        project.steps
-    ))
-
-    def get_changes(step):
-        step_data = writing.step_writer.serialize(step)
-        write = write_running and step.is_running
-        if write:
-            writing.save(project, step_data.file_writes)
-
-        return dict(
-            name=step.definition.name,
-            action='updated',
-            step=step_data._asdict(),
-            written=write
-        )
-
-    return [get_changes(step) for step in modified_steps]
+    return [
+        _get_step_changes(project, step, write_running)
+        for step in project.steps
+        if step.report.last_update_time >= timestamp
+        or (step.last_modified or 0) >= timestamp
+    ]

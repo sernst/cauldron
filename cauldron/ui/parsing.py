@@ -17,7 +17,11 @@ def create_parser(
         '-p', '--port',
         dest='port',
         type=int,
-        default=8899
+        default=None,
+        help=(
+            'Port on which the UI should interact. If not specified '
+            'an open port will be found and used instead.'
+        )
     )
 
     parser.add_argument(

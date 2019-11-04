@@ -7,11 +7,11 @@ from cauldron.test.support import scaffolds
 
 
 class TestSyncThreading(scaffolds.ResultsTest):
-    """ Tests for the cauldron.cli.sync.sync_comm module """
+    """ Tests for the cauldron.cli.sync.sync_comm module."""
 
     @patch('cauldron.cli.sync.comm.send_request')
     def test_remote_command(self, send_request: MagicMock):
-        """Should execute the command and finish the thread """
+        """Should execute the command and finish the thread."""
 
         response = environ.Response().update(
             run_status='complete'

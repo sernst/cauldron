@@ -10,12 +10,12 @@ class TestRunnerRedirection(scaffolds.ResultsTest):
     """ """
 
     def test_already_restored(self):
-        """Should not cause an exception when already defaulted """
+        """Should not cause an exception when already defaulted."""
 
         redirection.restore_default_configuration()
 
     def test_restore(self):
-        """Should restore from an enabled state """
+        """Should restore from an enabled state."""
 
         support.create_project(self, 'percy')
         support.add_step(self)

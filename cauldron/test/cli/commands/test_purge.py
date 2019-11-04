@@ -21,7 +21,7 @@ class TestPurge(scaffolds.ResultsTest):
 
     @patch('cauldron.environ.systems.remove')
     def test_failed_purge(self, remove: MagicMock):
-        """Should fail if unable to remove """
+        """Should fail if unable to remove."""
 
         remove.return_value = False
 
@@ -31,7 +31,7 @@ class TestPurge(scaffolds.ResultsTest):
 
     @patch('cauldron.cli.interaction.query.confirm')
     def test_abort(self, confirm: MagicMock):
-        """Should fail if unable to remove """
+        """Should fail if unable to remove."""
 
         confirm.return_value = False
 

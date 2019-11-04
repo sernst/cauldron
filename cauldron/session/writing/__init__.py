@@ -39,7 +39,10 @@ def save(
         raise
 
     environ.systems.remove(project.output_directory)
-    os.makedirs(project.output_directory)
+    try:
+        os.makedirs(project.output_directory)
+    except FileExistsError:
+        pass
 
     file_io.deploy(writes)
     return writes

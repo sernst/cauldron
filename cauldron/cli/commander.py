@@ -196,7 +196,7 @@ def print_module_help() -> Response:
 
 
 def show_help(command_name: str = None, raw_args: str = '') -> Response:
-    """ Prints the basic command help to the console """
+    """ Prints the basic command help to the console."""
 
     response = Response()
 

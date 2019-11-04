@@ -10,7 +10,7 @@ class TestServer(FlaskResultsTest):
     """ """
 
     def test_execute(self):
-        """Should execute the command """
+        """Should execute the command."""
 
         posted = self.post('/', {'command': 'open', 'args': ''})
         self.assertEqual(posted.flask.status_code, 200)
@@ -30,7 +30,7 @@ class TestServer(FlaskResultsTest):
         self.assert_has_error_code(posted.response, 'INVALID_COMMAND')
 
     def test_ping(self):
-        """Should successfully ping backend """
+        """Should successfully ping backend."""
 
         posted = self.post('/ping')
         self.assertEqual(posted.flask.status_code, 200)
@@ -65,7 +65,7 @@ class TestServer(FlaskResultsTest):
         self.assert_no_errors(project_status.response)
 
     def test_run_status(self):
-        """Should return unknown run status for invalid run uid """
+        """Should return unknown run status for invalid run uid."""
 
         run_status = self.get('/run-status/fake-uid')
         response = run_status.response

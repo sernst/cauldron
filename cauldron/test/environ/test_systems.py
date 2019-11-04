@@ -13,21 +13,21 @@ class TestSystems(scaffolds.ResultsTest):
     """ """
 
     def test_end_success(self):
-        """Should end quietly with a success exit code """
+        """Should end quietly with a success exit code."""
 
         with patch('sys.exit') as sys_exit:
             systems.end(0)
             sys_exit.assert_called_with(0)
 
     def test_end_fail(self):
-        """Should end in error with non-success exit code """
+        """Should end in error with non-success exit code."""
 
         with patch('sys.exit') as sys_exit:
             systems.end(1)
             sys_exit.assert_called_with(1)
 
     def test_remove_no_path(self):
-        """Should abort removal if path is None """
+        """Should abort removal if path is None."""
 
         self.assertFalse(systems.remove(None))
 
@@ -125,7 +125,7 @@ class TestSystems(scaffolds.ResultsTest):
         self.assertIsNone(result)
 
     def test_module_to_package_data_submodule(self):
-        """Should return None if the module is a submodule """
+        """Should return None if the module is a submodule."""
 
         result = systems.module_to_package_data('cauldron.environ', None)
         self.assertIsNone(result)

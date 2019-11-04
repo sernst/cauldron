@@ -12,15 +12,28 @@ DESCRIPTION = """
     """
 
 
+def _on_failure(
+        context: cli.CommandContext,
+        code: str,
+        message: str
+) -> Response:
+    """Convenience function for handling failures."""
+    return (
+        context.response
+        .fail(code=code, message=message)
+        .console(whitespace=1)
+        .response
+    )
+
+
 def execute(context: cli.CommandContext) -> Response:
-    """ """
+    """Runs the sync command."""
     if not context.remote_connection.active:
-        return context.response.fail(
+        return _on_failure(
+            context,
             code='NO_REMOTE_CONNECTION',
-            message='No active remote connection is available. Nothing to sync.'
-        ).console(
-            whitespace=1
-        ).response
+            message='No active remote connection. Nothing to sync.'
+        )
 
     status_response = sync.comm.send_request(
         endpoint='/sync-status',
@@ -28,30 +41,24 @@ def execute(context: cli.CommandContext) -> Response:
         remote_connection=context.remote_connection
     )
     source_directory = status_response.data.get('remote_source_directory')
-    source_path = os.path.join(
-        source_directory if source_directory else '',
-        'cauldron.json'
-    )
 
     if status_response.failed or not source_directory:
         status_response.log_notifications()
         return context.response.consume(status_response)
 
+    source_path = os.path.join(source_directory, 'cauldron.json')
     directory_exists = os.path.exists(source_directory)
     definition_exists = os.path.exists(source_path)
 
     if not directory_exists or not definition_exists:
-        return context.response.fail(
+        return _on_failure(
+            context,
             code='NO_PROJECT',
             message='No project exists locally at: {}'.format(source_directory)
-        ).console(
-            whitespace=1
-        ).response
+        )
 
-    sync_response = do_synchronize(
+    return context.response.consume(do_synchronize(
         context=context,
         source_directory=source_directory,
-        newer_than=status_response.data.get('sync_time', 0)
-    )
-
-    return context.response.consume(sync_response)
+        newer_than=context.remote_connection.sync_timestamp
+    ))

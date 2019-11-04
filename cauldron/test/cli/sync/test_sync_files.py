@@ -8,7 +8,7 @@ from cauldron.cli import sync
 
 
 class TestSyncFiles(scaffolds.ResultsTest):
-    """ Tests for the cauldron.cli.sync.files module """
+    """ Tests for the cauldron.cli.sync.files module."""
 
     @patch('os.path.getmtime')
     @patch('cauldron.cli.sync.files.send_chunk')
@@ -17,7 +17,7 @@ class TestSyncFiles(scaffolds.ResultsTest):
             send_chunk: MagicMock,
             getmtime: MagicMock
     ):
-        """Should not sync file if it does not need to be synced """
+        """Should not sync file if it does not need to be synced."""
 
         file_path = 'fake.path'
         getmtime.return_value = 900
