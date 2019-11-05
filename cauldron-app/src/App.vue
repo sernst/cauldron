@@ -3,7 +3,7 @@
     router-view.App__routerView
     warning-overlay(v-if="warning" :warning="warning" @close="onDismissWarning")
     error-overlay(v-if="error" :error="error" @close="onDismissError")
-    lost-connection-overlay(v-if="lostConnection")
+    lost-connection-overlay(v-if="showLostConnection")
 </template>
 
 <script>
@@ -13,6 +13,10 @@ import ErrorOverlay from './components/errorOverlay/ErrorOverlay.vue';
 import exceptions from './exceptions';
 import LostConnectionOverlay from './components/lostConnectionOverlay/LostConnectionOverlay.vue';
 import utils from './utils';
+
+const SUCCESS = 'success';
+const FAILED = 'failure';
+const LOST = 'lost';
 
 function warning() {
   const { warnings } = this.$store.getters;
@@ -35,6 +39,9 @@ function error() {
   return errors.length < 1 ? null : errors[0];
 }
 
+/**
+ *
+ */
 function onDismissError() {
   const errors = this.$store.getters.errors.concat();
 
@@ -44,6 +51,14 @@ function onDismissError() {
 
   errors.shift();
   this.$store.commit('errors', errors);
+}
+
+function recordResponse(kind, responseOrError) {
+  this.recentResponses.push({ kind, responseOrError, success: kind === SUCCESS });
+  if (this.recentResponses.length > 50) {
+    this.recentResponses.shift();
+  }
+  return responseOrError;
 }
 
 function updateStatusLoop() {
@@ -56,32 +71,43 @@ function updateStatusLoop() {
   const debounce = this.$store.getters.running ? 500 : 1000;
   return http.updateStatus(isStatusDirty ? 0 : debounce)
     .then((response) => {
-      this.lostConnection = !response.data.data.version;
-
-      if (!response.data.success) {
-        console.error('Failed update response', response.data);
+      if (response.data.success) {
+        this.recordResponse(SUCCESS, response);
+        return response;
       }
 
+      const codes = response.data.errors.map(e => e.code);
+      if (codes.indexOf('LOST_REMOTE_CONNECTION') !== -1) {
+        return this.recordResponse(LOST, response);
+      }
+
+      this.recordResponse(FAILED, response);
+      console.error('Failed update response', response.data);
       return response;
     })
     .catch((e) => {
       // https://github.com/axios/axios#handling-errors
       if (!e.request) {
+        this.recordResponse(FAILED, e);
         exceptions.addError({
           code: 'UNKNOWN_ERROR',
-          message: 'Malformed request attempt made has halted communication with the kernel.',
+          message: 'Malformed request attempt has halted communication with the kernel.',
         });
         console.warn(e);
         return Promise.resolve();
       }
 
-      if (!e.response) {
-        this.lostConnection = true;
-        return utils.thenWait(1000);
+      if (e.code === 'ECONNABORTED' || (e.response || {}).status === 408) {
+        this.recordResponse(LOST, e);
+        return utils.thenWait(200);
       }
 
-      this.lostConnection = false;
-      console.error(e);
+      if (!e.response) {
+        this.recordResponse(LOST, e);
+        return utils.thenWait(500);
+      }
+
+      this.recordResponse(FAILED, e);
       return utils.thenWait(200);
     })
     .finally(() => {
@@ -101,10 +127,18 @@ function updateStatusLoop() {
     });
 }
 
+function showLostConnection() {
+  if (this.recentResponses.length === 0) {
+    return false;
+  }
+  const lastResponseKind = this.recentResponses.slice(-1)[0].kind;
+  return (lastResponseKind === LOST);
+}
+
 function data() {
   return {
-    lostConnection: false,
     timeoutHandle: null,
+    recentResponses: [],
   };
 }
 
@@ -120,10 +154,15 @@ export default {
   name: 'App',
   components: { LostConnectionOverlay, ErrorOverlay, WarningOverlay },
   data,
-  computed: { warning, error },
+  computed: { warning, error, showLostConnection },
   mounted,
   beforeDestroy,
-  methods: { updateStatusLoop, onDismissWarning, onDismissError },
+  methods: {
+    recordResponse,
+    updateStatusLoop,
+    onDismissWarning,
+    onDismissError,
+  },
 };
 </script>
 

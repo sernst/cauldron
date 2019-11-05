@@ -13,11 +13,11 @@
         .Home__buttonBox
           .button.Home__button.tooltip(
             data-tooltip="A new notebook project"
-            @click.stop="createProject"
+            @click="createProject"
           ) Create
           .button.Home__button.tooltip(
             data-tooltip="An existing notebook project from a local directory"
-            @click.stop="openProjectBrowser"
+            @click="openProjectBrowser"
           ) Open
 
       // Floating buttons

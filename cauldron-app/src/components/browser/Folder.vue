@@ -1,5 +1,5 @@
 <template lang="pug">
-  .Folder(@click.stop="onClick")
+  .Folder(@click="onClick")
     i.Folder__icon.material-icons.md-14 {{ icon }}
     .Folder__label {{ value.folder }}
 </template>

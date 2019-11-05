@@ -25,12 +25,12 @@
             ) {{ location.label }}
       .StepSettingsModal__buttonBox
         .StepSettingsModal__button.button.is-small.is-danger(
-          @click.stop="onDelete"
+          @click="onDelete"
           v-if="allowDelete"
         ) Remove
         .StepSettingsModal__spacer
         .StepSettingsModal__button.button.is-small(@click="onCancel") Cancel
-        .StepSettingsModal__button.button.is-small.is-success(@click.stop="onApply") Apply
+        .StepSettingsModal__button.button.is-small.is-success(@click="onApply") Apply
 
     delete-confirmation(
       v-if="confirmingDelete && !loadingMessage"

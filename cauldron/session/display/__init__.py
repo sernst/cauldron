@@ -188,7 +188,14 @@ def table(
         include_index: bool = False,
         max_rows: int = 500,
         sample_rows: typing.Optional[int] = None,
-        formats: typing.Union[str, typing.Dict[str, str]] = None
+        formats: typing.Union[
+            str,
+            typing.Callable[[typing.Any], str],
+            typing.Dict[
+                str,
+                typing.Union[str, typing.Callable[[typing.Any], str]]
+            ]
+        ] = None
 ):
     """
     Adds the specified data frame to the display in a nicely formatted

@@ -2,7 +2,7 @@
   .StandardPathButton(
     :content="value.label"
     v-tippy="{ placement: 'top' }"
-    @click.stop="onClick"
+    @click="onClick"
   )
     i.StandardPathButton__icon.material-icons.md-14(v-if="icon") {{ icon }}
     .StandardPathButton__label(v-if="!icon") {{ firstCharacter }}

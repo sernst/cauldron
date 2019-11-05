@@ -53,6 +53,13 @@ function scrollToStep(stepName, position) {
   cauldron.scrollToAnchor(targets[0].name, position || defaultPosition);
 }
 
+/**
+ *
+ * @param renames
+ * @param changes
+ * @param stepName
+ * @returns {Promise<void>|Promise<T>}
+ */
 function applyStepModifications(renames, changes, stepName) {
   const isUnmodified = (
     Object.keys(renames || {}).length === 0

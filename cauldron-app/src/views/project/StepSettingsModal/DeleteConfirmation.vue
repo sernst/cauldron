@@ -11,10 +11,10 @@
     .DeleteConfirmation__buttonBox
       .DeleteConfirmation__spacer
       .DeleteConfirmation__button.button.is-small(
-        @click.stop="onConfirm(false, $event)"
+        @click="onConfirm(false, $event)"
       ) Cancel
       .DeleteConfirmation__button.button.is-small.is-danger(
-        @click.stop="onConfirm(true, $event)"
+        @click="onConfirm(true, $event)"
       ) Delete
 </template>
 

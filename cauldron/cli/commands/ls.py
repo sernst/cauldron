@@ -23,7 +23,7 @@ def populate(
         assigned_args: dict
 ):
     """Populate the argument parser for the ls command invocation."""
-    parser.add_argument('directory', default=None)
+    parser.add_argument('directory', default=None, nargs='?')
 
 
 def _shorten_path(path: str) -> str:

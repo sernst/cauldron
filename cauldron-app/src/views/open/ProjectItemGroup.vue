@@ -1,6 +1,6 @@
 <template lang="pug">
   .ProjectItemGroup
-    .ProjectItemGroup__header(@click.stop="onClick")
+    .ProjectItemGroup__header(@click="onClick")
       i.ProjectItemGroup__icon.material-icons.md-14 {{ groupIcon }}
       .ProjectItemGroup__label {{ root }}
     .ProjectItemGroup__children(v-if="!collapsed")

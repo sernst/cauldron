@@ -156,7 +156,7 @@ function updateStatus(debounce = 0, force = false) {
 
       if (!payload) {
         // If there's no payload something went wrong and it's time to abort.
-        throw new Error('Failed to get response from status endpoint.');
+        return Promise.resolve(response);
       }
 
       if (!payload.success) {

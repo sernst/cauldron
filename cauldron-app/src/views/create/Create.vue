@@ -35,7 +35,7 @@
             | in the displayed results.
         .Create__buttonBox
           button.button.is-small.is-success(
-            @click.stop="onCreate"
+            @click="onCreate"
             :disabled="!allowCreate"
           ) Create Project
       .Create__locationBox

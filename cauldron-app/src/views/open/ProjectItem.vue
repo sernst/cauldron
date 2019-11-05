@@ -1,6 +1,6 @@
 <template lang="pug">
   .ProjectItem(
-    v-on:click.stop="openProject"
+    v-on:click="openProject"
   )
     .ProjectItem__leftBox
       i.ProjectItem__icon.material-icons.md-18 folder_open

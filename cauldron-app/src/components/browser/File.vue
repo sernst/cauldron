@@ -1,5 +1,5 @@
 <template lang="pug">
-  .File(@click.stop="onClick")
+  .File(@click="onClick")
     i.File__icon.material-icons.md-14 {{ icon }}
     .File__label {{ value.name }}
 </template>

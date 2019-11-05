@@ -1,6 +1,6 @@
 <template lang="pug">
   .RecentItem(
-    v-on:click.stop="openProject"
+    v-on:click="openProject"
   )
     .RecentItem__leftBox
       .material-icons.RecentItem__icon folder_open

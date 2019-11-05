@@ -337,7 +337,14 @@ def table(
         include_index: bool = False,
         max_rows: int = 500,
         sample_rows: typing.Optional[int] = None,
-        formats: typing.Union[str, typing.Dict[str, str]] = None
+        formats: typing.Union[
+            str,
+            typing.Callable[[typing.Any], str],
+            typing.Dict[
+                str,
+                typing.Union[str, typing.Callable[[typing.Any], str]]
+            ]
+        ] = None
 ) -> str:
     """
 
@@ -380,7 +387,9 @@ def table(
         df_source = df_source.reset_index()
 
     df_source = df_source.assign(**{
-        name: df_source[name].map(format_definition.format)
+        name: df_source[name].map(
+            getattr(format_definition, 'format', format_definition)
+        )
         for name, format_definition in (formats or {}).items()
         if name in df_source
     })

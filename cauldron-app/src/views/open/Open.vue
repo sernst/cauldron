@@ -3,7 +3,11 @@
       .Open__browser
         .Open__titleBox
           .Open__title Open Existing Notebook
-        browser.Open__browserBox(:location="location" @select="onSelectFolder")
+        browser.Open__browserBox(
+          :location="location"
+          :extensions="['.cauldron']"
+          @select="onSelectFolder"
+        )
       // The known section is a vertical list of known projects that
       // can quickly be selected and opened.
       .Open__known(v-if="availableProjects")

@@ -6,7 +6,12 @@
     // Primary modal display
     .Saver__modal(v-if="location && !loadingMessage && !saveComplete && !confirmingOverwrite")
       .Saver__title Save Cauldron Notebook As...
-      browser.Saver__browser(:location="location" @select="onBrowseSelected")
+      browser.Saver__browser(
+        :location="location"
+        :extra-locations="extraLocations"
+        :extensions="['.cauldron']"
+        @select="onBrowseSelected"
+      )
       .Saver__inputBox
         input.Saver__input.input.is-small(type="text" placeholder="File Name" v-model="filename")
         button.Saver__button.button.is-small(@click="onDone") Cancel
@@ -101,6 +106,9 @@ function onBrowseSelected(event) {
 
 function data() {
   return {
+    // Project and other additional locations that should be available for quick
+    // browsing. Initialized on mount.
+    extraLocations: [],
     // Current browser location as specified by a kernel "ls" command.
     location: null,
     // Name of the file to be save, which will be updated at mount time and
@@ -140,11 +148,20 @@ function getOutputPath(short) {
   return `${prefix || ''}${separator}${this.outputFilename}`;
 }
 
+/**
+ * Initializes the display data and calls the `ls` Cauldron command in the kernel
+ * to fetch the location information to display in the folder browser.
+ */
 function mounted() {
   const project = this.$store.getters.project || {};
   this.filename = `${project.title || 'unknown-project'}.cauldron`;
 
-  return http.execute('ls')
+  const directory = project.remote_source_directory || project.source_directory;
+
+  // Add project directory to the list of standard locations for browsing.
+  this.extraLocations = [{ directory, label: 'Project Directory' }];
+
+  return http.execute(`ls "${directory}"`)
     .then((response) => {
       this.location = response.data.data;
     });
