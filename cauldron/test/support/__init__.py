@@ -68,18 +68,13 @@ def run_remote_command(
             name=name,
             raw_args=args,
             remote_connection=remote_connection
-        )
+        ).response
         response.thread.join()
         return response
 
 
 def run_command(command: str) -> 'environ.Response':
-    """
-
-    :param command:
-    :return:
-    """
-
+    """..."""
     cs = CauldronShell()
     cs.default(command)
     return cs.last_response
@@ -105,7 +100,6 @@ def create_project(
     :param kwargs:
     :return:
     """
-
     version = ''.join(['{}'.format(s) for s in sys.version_info])
 
     if path is None:

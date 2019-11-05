@@ -3,10 +3,10 @@ from cauldron.test.support import scaffolds
 
 
 class TestDefinitions(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_empty_slug(self):
-        """ """
+        """..."""
 
         d = FileDefinition()
         d.folder = 'test'

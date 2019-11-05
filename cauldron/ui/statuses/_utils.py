@@ -1,23 +1,21 @@
 import hashlib
 import json
+import time
 import typing
 
-from cauldron import environ
 from cauldron.render.encoding import ComplexJsonEncoder
 from cauldron.session import projects
 from cauldron.session import writing
 
 
-def get_digest_hash(response: environ.Response) -> str:
+def get_digest_hash(response_data: dict, force: bool = False) -> str:
     # We zero out the timestamp here so that it doesn't change the
     # hash every time just because execution time has changed.
-    r = response.serialize()
+    if force:
+        return 'forced-{}'.format(time.time())
+
+    r = response_data.copy()
     r['timestamp'] = None
-
-    data = r['data']
-    if data.get('project') and 'serial_time' in data['project']:
-        data['project']['serial_time'] = None
-
     serialized = json.dumps(r, cls=ComplexJsonEncoder)
     return hashlib.blake2b(serialized.encode()).hexdigest()
 

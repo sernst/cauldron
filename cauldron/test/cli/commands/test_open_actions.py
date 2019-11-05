@@ -7,7 +7,7 @@ from cauldron.test.support import scaffolds
 
 
 class TestOpenActions(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     @patch('cauldron.environ.configs.fetch')
     def test_no_last(self, configs_fetch: MagicMock):

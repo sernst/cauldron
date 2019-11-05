@@ -5,7 +5,7 @@ from cauldron.cli.commands import version
 
 
 class TestVersion(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_version(self):
         """Should retrieve version info """

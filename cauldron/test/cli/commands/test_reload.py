@@ -5,7 +5,7 @@ from cauldron.test.support import scaffolds
 
 
 class TestReload(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_reload(self):
         """Should reload the currently opened project."""

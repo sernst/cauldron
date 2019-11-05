@@ -87,14 +87,14 @@ class TestBatcher(scaffolds.ResultsTest):
         self.run_project('hello-cauldron', '@examples:pyplot')
 
     def test_run_open_fail(self):
-        """Should fail to open a project"""
+        """Should fail to open a project."""
         directory = self.get_temp_path('open-fail')
         run_result = run_project('fake-project-does-not-exist', directory)
         self.assertFalse(run_result.result.success)
 
     @patch('cauldron.cli.commands.run.execute')
     def test_run_fail(self, run_execute: MagicMock):
-        """Should fail to run a project"""
+        """Should fail to run a project."""
 
         run_execute.return_value = Response().fail().response
         directory = self.get_temp_path('run-fail')

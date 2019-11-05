@@ -53,7 +53,7 @@ def populate(
 
 
 def check_connection(url: str, force: bool) -> Response:
-    """ """
+    """..."""
 
     response = Response()
     if force:
@@ -114,7 +114,7 @@ def execute(
         url: str = None,
         force: bool = False
 ) -> Response:
-    """ """
+    """..."""
     url_clean = clean_url(url)
 
     context.response.consume(check_connection(url_clean, force))

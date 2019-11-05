@@ -7,7 +7,7 @@ from cauldron.runner import redirection
 
 
 class TestRunnerRedirection(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_already_restored(self):
         """Should not cause an exception when already defaulted."""

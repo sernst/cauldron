@@ -50,7 +50,7 @@ def execute_remote(
         context: cli.CommandContext,
         target: str = 'browser',
 ) -> Response:
-    """ """
+    """..."""
     if target != 'browser':
         status_response = sync.comm.send_request(
             endpoint='/sync-status',

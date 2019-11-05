@@ -3,10 +3,10 @@ from cauldron.test.support import flask_scaffolds
 
 
 class TestSyncStatus(flask_scaffolds.FlaskResultsTest):
-    """ """
+    """..."""
 
     def test_sync_status_no_project(self):
-        """ """
+        """..."""
 
         sync_status = self.get('/sync-status')
         self.assertEqual(sync_status.flask.status_code, 200)
@@ -15,7 +15,7 @@ class TestSyncStatus(flask_scaffolds.FlaskResultsTest):
         self.assert_has_error_code(response, 'NO_PROJECT')
 
     def test_sync_status_valid(self):
-        """ """
+        """..."""
 
         support.create_project(self, 'angelica')
 

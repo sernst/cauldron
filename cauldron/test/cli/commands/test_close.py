@@ -7,7 +7,7 @@ class TestClose(scaffolds.ResultsTest):
     """Test suite for the close CLI command"""
 
     def test_close_open_project(self):
-        """Should close open project"""
+        """Should close open project."""
         support.run_command('open @examples:hello_cauldron')
         response = support.run_command('close')
         self.assertTrue(response.success, 'should not have failed')

@@ -16,6 +16,10 @@ def clean(path: str) -> str:
     :param path:
         The source path to be cleaned
     """
+    # Remove any potential quotes around the path, which can be common
+    # when paths are entered externally either programmatically or
+    # through CLI input.
+    path = path.strip('"') if path else path
 
     if not path or path == '.':
         path = os.curdir

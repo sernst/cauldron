@@ -87,7 +87,7 @@ def test_attempt_json_write_failed():
 
 
 def test_write_offset_binary():
-    """Should write binary data correctly to the given offset"""
+    """Should write binary data correctly to the given offset."""
     path = tempfile.mkstemp()[-1]
     try:
         writer.write_file(path, b'abc', 'wb')
@@ -109,7 +109,7 @@ def test_write_offset_binary():
 
 
 def test_write_offset_ascii():
-    """Should write string data correctly to the given offset"""
+    """Should write string data correctly to the given offset."""
     path = tempfile.mkstemp()[-1]
     try:
         writer.write_file(path, 'abc', 'w')

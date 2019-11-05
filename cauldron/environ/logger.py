@@ -226,7 +226,7 @@ def raw(
 
 
 def add_to_message(data, indent_level=0) -> list:
-    """Adds data to the message object"""
+    """Adds data to the message object."""
     message = []
 
     if isinstance(data, str):

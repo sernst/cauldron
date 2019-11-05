@@ -11,7 +11,7 @@ from cauldron.test.support import scaffolds
 
 
 class TestStepsCreateStep(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_move_step_later(self):
         """Should move step later in the project."""

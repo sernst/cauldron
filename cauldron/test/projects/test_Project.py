@@ -9,9 +9,7 @@ from cauldron.session.caching import SharedCache
 from cauldron.session.projects import definitions
 
 class TestProject(scaffolds.ResultsTest):
-    """
-
-    """
+    """..."""
 
     def test_file_source_path(self):
         """A file source directory should be a directory"""
@@ -103,7 +101,7 @@ class TestProject(scaffolds.ResultsTest):
         self.assertTrue(project.has_error, 'step should have errored')
 
     def test_get_no_step(self):
-        """Should not find a step that doesn't exist"""
+        """Should not find a step that doesn't exist."""
 
         support.create_project(self, 'luna')
         project = cd.project.get_internal_project()

@@ -16,7 +16,7 @@ except ImportError:  # pragma: no cover
 
 # @pytest.fixture(name='tester')
 # def tester_fixture() -> CauldronTest:
-#     """Create the Cauldron project test environment"""
+#     """Create the Cauldron project test environment."""
 #     tester = CauldronTest(project_path=os.path.dirname(__file__))
 #     tester.setup()
 #     yield tester

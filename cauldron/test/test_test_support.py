@@ -7,8 +7,7 @@ from cauldron.test.support import messages
 class TestTestSupport(unittest.TestCase):
 
     def test_explode_line(self):
-        """
-        """
+        """..."""
 
         r = Response('TEST').update(
             test_info='More test information'

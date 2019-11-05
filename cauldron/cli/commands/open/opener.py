@@ -53,13 +53,8 @@ def load_project(response, path):
     return False
 
 
-def update_recent_paths(response, path):
-    """
-    :param response:
-    :param path:
-    :return:
-    """
-
+def update_recent_paths(response: 'environ.Response', path: str):
+    """..."""
     try:
         recent_paths = environ.configs.fetch('recent_paths', [])
 
@@ -75,8 +70,6 @@ def update_recent_paths(response, path):
             message='Unable to update recently opened projects',
             error=str(error)
         ).console(whitespace=1)
-
-    return True
 
 
 def initialize_results(response: environ.Response, project):
@@ -118,14 +111,7 @@ def open_project(
         forget: bool = False,
         results_path: str = None
 ) -> Response:
-    """
-
-    :param path:
-    :param forget:
-    :param results_path:
-    :return:
-    """
-
+    """..."""
     response = Response()
 
     try:
@@ -148,11 +134,8 @@ def open_project(
             message='Unable to load project data'
         ).console(whitespace=1).response
 
-    if not forget and not update_recent_paths(response, path):
-        return response.fail(
-            code='PROJECT_STATUS_FAILURE',
-            message='Unable to update loaded project status'
-        ).console(whitespace=1).response
+    if not forget:
+        update_recent_paths(response, path)
 
     project = cauldron.project.get_internal_project()
     if results_path:

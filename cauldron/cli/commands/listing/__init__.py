@@ -48,7 +48,7 @@ def execute(
         action: str = 'list',
         **kwargs
 ) -> environ.Response:
-    """ """
+    """..."""
     environ.configs.load()
     if action in ['erase']:
         return _remover.execute_removal(context, kwargs)

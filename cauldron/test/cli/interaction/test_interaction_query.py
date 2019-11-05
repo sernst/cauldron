@@ -5,9 +5,7 @@ from cauldron.test.support import scaffolds
 
 
 class TestRenderTexts(scaffolds.ResultsTest):
-    """
-
-    """
+    """..."""
 
     def test_choice(self):
         """

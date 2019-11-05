@@ -67,7 +67,7 @@ def populate(
 
 
 def remote_purge(context: cli.CommandContext) -> Response:
-    """ """
+    """..."""
 
     thread = sync.send_remote_command(
         command=context.name,

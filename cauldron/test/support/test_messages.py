@@ -7,7 +7,7 @@ from cauldron.test.support import messages
 
 
 class TestMessages(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_message(self):
         """Should echo message when printed."""

@@ -3,7 +3,7 @@ from cauldron.test.support import flask_scaffolds
 
 
 class TestServerDisplay(flask_scaffolds.FlaskResultsTest):
-    """ """
+    """..."""
 
     def test_view_no_project(self):
         """Should fail if no project is open for viewing """

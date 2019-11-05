@@ -72,7 +72,7 @@ def send(
     chunks = sync.io.read_file_chunks(file_path, chunk_size)
 
     def get_progress(complete_count: int = 0) -> typing.Tuple[int, str]:
-        """ """
+        """..."""
 
         if chunk_count < 2:
             return 0, ''

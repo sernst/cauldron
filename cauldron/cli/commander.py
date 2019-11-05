@@ -91,11 +91,7 @@ def execute(
         response: Response = None,
         remote_connection: 'environ.RemoteConnection' = None
 ) -> Response:
-    """
-
-    :return:
-    """
-
+    """..."""
     if not response:
         response = Response(identifier=name)
 

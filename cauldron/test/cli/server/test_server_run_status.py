@@ -12,7 +12,7 @@ FakeThread = namedtuple('FakeThread_NT', ['is_alive', 'uid'])
 
 
 class TestServerRunStatus(flask_scaffolds.FlaskResultsTest):
-    """ """
+    """..."""
 
     def setUp(self):
         super(TestServerRunStatus, self).setUp()

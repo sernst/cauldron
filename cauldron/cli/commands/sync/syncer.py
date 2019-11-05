@@ -55,6 +55,7 @@ def do_synchronize(
     context.response.update(synchronized_count=len(synchronized))
 
     if len(synchronized) < 1:
+        context.remote_connection.sync_ending()
         return context.response
 
     touch_response = sync.comm.send_request(

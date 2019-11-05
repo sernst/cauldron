@@ -94,7 +94,7 @@ def pretty_print(source: dict, depth: int = 0) -> str:
 
 
 def execute_remote(context: cli.CommandContext, **kwargs) -> Response:
-    """ """
+    """..."""
 
     thread = sync.send_remote_command(
         command=context.name,

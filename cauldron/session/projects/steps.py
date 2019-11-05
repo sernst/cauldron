@@ -129,6 +129,15 @@ class ProjectStep(object):
         end = self.end_time or current_time
         return (end - start).total_seconds()
 
+    @property
+    def file_last_modified(self) -> int:
+        """When the source file was modified, or 0 if it does not exist."""
+        return (
+            os.path.getmtime(self.source_path)
+            if self.source_path and os.path.exists(self.source_path)
+            else 0
+        )
+
     def get_elapsed_timestamp(self) -> str:
         """
         A human-readable version of the elapsed time for the last execution
@@ -161,7 +170,6 @@ class ProjectStep(object):
     def status(self):
         """..."""
         is_dirty = self.is_dirty()
-
         return dict(
             uuid=self.uuid,
             reference_id=self.reference_id,
@@ -170,6 +178,7 @@ class ProjectStep(object):
             selected=self.is_selected,
             last_modified=self.last_modified,
             last_display_update=self.report.last_update_time,
+            file_modified=self.file_last_modified,
             dirty=is_dirty,
             is_dirty=is_dirty,
             running=self.is_running,
@@ -178,16 +187,16 @@ class ProjectStep(object):
         )
 
     def is_dirty(self):
-        """ """
-        if self._is_dirty:
-            return self._is_dirty
-
-        if self.last_modified < 1:
-            return True
-        p = self.source_path
-        if not p:
-            return False
-        return os.path.getmtime(p) >= self.last_modified
+        """
+        Whether or not the step is in a state of needing to be rerun
+        because a modification to the step or its source file has invalidated
+        its last run state.
+        """
+        return (
+            self._is_dirty
+            or self.last_modified < 1
+            or self.file_last_modified >= self.last_modified
+        )
 
     def mark_dirty(self, value: bool, force: bool = False):
         """..."""

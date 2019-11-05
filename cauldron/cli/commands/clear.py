@@ -11,7 +11,7 @@ DESCRIPTION = """
 
 
 def execute_remote(context: cli.CommandContext) -> Response:
-    """ """
+    """..."""
 
     thread = sync.send_remote_command(
         command=context.name,

@@ -3,7 +3,7 @@ from cauldron.test.support import scaffolds
 
 
 class TestClear(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_clear(self):
         """Should clear variables successfully."""

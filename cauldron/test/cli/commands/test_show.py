@@ -7,7 +7,7 @@ from cauldron.test.support import scaffolds
 
 
 class TestShow(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_show_fail(self):
         """Should fail to show when no project is opened."""
@@ -29,8 +29,7 @@ class TestShow(scaffolds.ResultsTest):
             func.assert_called_once_with(url)
 
     def test_show_remote(self):
-        """Should show remote url """
-
+        """Should show remote url."""
         remote_connection = environ.RemoteConnection(
             url='http://my-fake.url',
             active=True

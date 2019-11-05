@@ -14,8 +14,7 @@ from cauldron.test.support import scaffolds
 class TestRun(scaffolds.ResultsTest):
 
     def test_run_example(self):
-        """
-        """
+        """..."""
 
         support.open_project(self, '@examples:hello_text')
 
@@ -26,8 +25,7 @@ class TestRun(scaffolds.ResultsTest):
         self.assertFalse(r.failed)
 
     def test_run_step_example(self):
-        """
-        """
+        """..."""
 
         support.open_project(self, '@examples:hello_cauldron')
 
@@ -38,7 +36,7 @@ class TestRun(scaffolds.ResultsTest):
         self.assertFalse(r.failed)
 
     def test_run_in_parts(self):
-        """ """
+        """..."""
 
         support.open_project(self, '@examples:hello_cauldron')
 
@@ -53,7 +51,7 @@ class TestRun(scaffolds.ResultsTest):
         self.assertFalse(r.failed)
 
     def test_run_bokeh(self):
-        """ """
+        """..."""
 
         support.open_project(self, '@examples:bokeh')
 
@@ -255,7 +253,7 @@ class TestRun(scaffolds.ResultsTest):
 
     @patch('cauldron.cli.commands.sync.execute')
     def test_run_remote_sync_fail(self, sync_execute: MagicMock):
-        """Should fail if the remote sync was not successful """
+        """Should fail if the remote sync was not successful."""
 
         sync_execute.return_value = Response().fail().response
 

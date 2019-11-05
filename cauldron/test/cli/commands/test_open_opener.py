@@ -16,7 +16,7 @@ def opener_package(*args) -> str:
 
 
 class TestOpenOpener(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     @patch('time.sleep')
     def test_not_exists(self,  *args):
@@ -39,15 +39,6 @@ class TestOpenOpener(scaffolds.ResultsTest):
     def test_not_loadable_open(self, *args):
         """Should fail when project does not load."""
         response = opener.open_project(INVALID_PATH, forget=True)
-        self.assertTrue(response.failed)
-
-    @patch('time.sleep')
-    @patch(opener_package('project_exists'), return_value=True)
-    @patch(opener_package('load_project'), return_value=True)
-    @patch(opener_package('update_recent_paths'), return_value=False)
-    def test_not_update(self, *args):
-        """Should fail when project does not load."""
-        response = opener.open_project(INVALID_PATH, forget=False)
         self.assertTrue(response.failed)
 
     @patch('time.sleep')
@@ -103,7 +94,7 @@ class TestOpenOpener(scaffolds.ResultsTest):
             initialize_results_path: MagicMock,
             *args
     ):
-        """Should initialize paths for project"""
+        """Should initialize paths for project."""
         response = Response()
         project = MagicMock()
         result = opener.initialize_results(response, project)
@@ -117,7 +108,7 @@ class TestOpenOpener(scaffolds.ResultsTest):
             initialize_results_path: MagicMock,
             *args
     ):
-        """Should fail to initialize paths for project"""
+        """Should fail to initialize paths for project."""
         initialize_results_path.side_effect = ValueError('FAKE')
         response = Response()
         project = MagicMock()

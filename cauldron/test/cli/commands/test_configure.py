@@ -4,7 +4,7 @@ from cauldron.test.support import scaffolds
 
 
 class TestConfigure(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_list_all(self):
         """Should list configurations."""

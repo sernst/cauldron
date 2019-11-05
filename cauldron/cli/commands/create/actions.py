@@ -17,7 +17,7 @@ def create_definition(
         library_folder: str = None,
         assets_folder: str = None
 ) -> dict:
-    """ """
+    """..."""
 
     project_title = (
         title
@@ -44,7 +44,7 @@ def create_definition(
 
 
 def allow_create(project_directory: str) -> Response:
-    """ """
+    """..."""
     project_source_path = os.path.join(project_directory, 'cauldron.json')
     if os.path.exists(project_source_path):
         return Response().fail(
@@ -66,7 +66,7 @@ def allow_create(project_directory: str) -> Response:
 
 
 def resolve_project_directory(directory: str, project_name: str) -> str:
-    """ """
+    """..."""
 
     location = open_actions.fetch_location(Response(), directory)
     project_directory = location if location else directory
@@ -78,7 +78,7 @@ def resolve_project_directory(directory: str, project_name: str) -> str:
 
 
 def make_directory(directory: str) -> Response:
-    """ """
+    """..."""
 
     if os.path.exists(directory):
         return Response()
@@ -115,7 +115,7 @@ def create_project_directories(
         library_folder: str = None,
         assets_folder: str = None
 ) -> Response:
-    """ """
+    """..."""
 
     project_directory = resolve_project_directory(directory, project_name)
     response = allow_create(project_directory)

@@ -13,7 +13,7 @@ EXAMPLE_PROJECTS_DIRECTORY = os.path.realpath(os.path.join(
 
 
 class TestSyncOpen(FlaskResultsTest):
-    """ """
+    """..."""
 
     def test_no_args(self):
         """Should error without arguments."""
@@ -42,7 +42,6 @@ class TestSyncOpen(FlaskResultsTest):
 
     def test_open(self):
         """Should open project remotely."""
-
         source_directory = os.path.join(
             EXAMPLE_PROJECTS_DIRECTORY,
             'hello_text'

@@ -31,7 +31,6 @@ class TestSessionReloading(scaffolds.ResultsTest):
     def test_watch_not_needed(self):
         """Don't reload modules that haven't changed."""
         support.create_project(self, 'betty')
-        support.add_step(self)
         project = cd.project.get_internal_project()
         project.current_step = project.steps[0]
 

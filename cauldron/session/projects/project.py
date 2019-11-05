@@ -20,7 +20,7 @@ StopCondition = namedtuple('StopCondition', ['aborted', 'halt'])
 
 
 class Project:
-    """ """
+    """..."""
 
     def __init__(
             self,
@@ -108,7 +108,7 @@ class Project:
 
     @property
     def asset_directories(self):
-        """ """
+        """..."""
 
         def listify(value):
             return [value] if isinstance(value, str) else list(value)
@@ -121,7 +121,7 @@ class Project:
 
     @property
     def has_error(self):
-        """ """
+        """..."""
 
         for s in self.steps:
             if s.error:
@@ -244,12 +244,10 @@ class Project:
         return '{}/view/project.html?id={}'.format(host, self.uuid)
 
     def kernel_serialize(self):
-        """ """
-
+        """..."""
         return dict(
             uuid=self.uuid,
             stop_condition=self.stop_condition._asdict(),
-            serial_time=time.time(),
             last_modified=self.last_modified,
             remote_source_directory=self.remote_source_directory,
             source_directory=self.source_directory,
@@ -446,7 +444,7 @@ class Project:
         self.last_modified = time.time()
 
     def write(self) -> str:
-        """ """
+        """..."""
 
         writing.save(self)
         return self.url

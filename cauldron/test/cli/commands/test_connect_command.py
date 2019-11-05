@@ -12,7 +12,7 @@ MockResponse = namedtuple('MockResponse', ['status_code'])
 
 
 class TestConnectCommand(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_no_url(self):
         """Should fail if no url is provided in the command."""
@@ -62,7 +62,7 @@ class TestConnectCommand(scaffolds.ResultsTest):
 
     @patch('requests.get')
     def test_valid(self, requests_get: MagicMock):
-        """Should succeed to get ping data from remove cauldron kernel """
+        """Should succeed to get ping data from remove cauldron kernel."""
 
         requests_get.return_value = MockResponse(200)
         url_raw = 'something.com'

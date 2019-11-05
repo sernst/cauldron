@@ -3,7 +3,7 @@ from cauldron.test.support import flask_scaffolds
 
 
 class TestSyncTouch(flask_scaffolds.FlaskResultsTest):
-    """ """
+    """..."""
 
     def test_no_project(self):
         """Should fail if no project is open."""

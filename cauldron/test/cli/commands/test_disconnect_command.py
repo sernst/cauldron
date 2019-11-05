@@ -7,7 +7,7 @@ from cauldron.test.support import scaffolds
 
 
 class TestDisconnectCommand(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_disconnected(self):
         """Should fail if no url is provided in the command."""

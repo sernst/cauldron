@@ -7,7 +7,7 @@ from cauldron.test.support import scaffolds
 
 
 class TestPurge(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_purge_all(self):
         """Should purge current results directory."""

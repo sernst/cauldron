@@ -27,8 +27,7 @@ class TestOpen(scaffolds.ResultsTest):
         self.assertFalse(r.failed, 'should not have failed')
 
     def test_open_example(self):
-        """
-        """
+        """..."""
 
         r = support.open_project(self, '@examples:hello_cauldron')
 
@@ -43,8 +42,7 @@ class TestOpen(scaffolds.ResultsTest):
         )
 
     def test_open_new_project(self):
-        """
-        """
+        """..."""
 
         r = support.create_project(self, 'test_project')
         r = support.open_project(self, r.data['source_directory'])

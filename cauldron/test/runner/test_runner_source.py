@@ -8,7 +8,7 @@ from cauldron.test.support import scaffolds
 
 
 class TestRunnerSource(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_get_step_by_name(self):
         """Should retrieve the step from the step name string """

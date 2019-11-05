@@ -6,10 +6,10 @@ from cauldron.test.support import flask_scaffolds
 
 
 class TestServerStatus(flask_scaffolds.FlaskResultsTest):
-    """ """
+    """..."""
 
     def test_status_no_project(self):
-        """ """
+        """..."""
 
         status = self.get('/status')
         self.assertEqual(status.flask.status_code, 200)
@@ -71,7 +71,7 @@ class TestServerStatus(flask_scaffolds.FlaskResultsTest):
         self.assertIsNotNone(response.data['project'])
 
     def test_no_project(self):
-        """ """
+        """..."""
 
         project_status = self.get('/project')
         self.assertIsNotNone(project_status)
@@ -82,7 +82,7 @@ class TestServerStatus(flask_scaffolds.FlaskResultsTest):
         self.assertIsNone(response.data['project'])
 
     def test_project_error(self):
-        """ """
+        """..."""
 
         support.create_project(self, 'toadie')
 

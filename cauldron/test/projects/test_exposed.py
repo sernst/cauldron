@@ -73,14 +73,14 @@ class TestExposed(scaffolds.ResultsTest):
         ep.stop()
 
     def test_change_title(self):
-        """Title should change through exposed project"""
+        """Title should change through exposed project."""
         test_title = 'Some Title'
         support.create_project(self, 'igor')
         cd.project.title = test_title
         self.assertEqual(cd.project.title, test_title)
 
     def test_no_step_defaults(self):
-        """Exposed step should apply defaults without project"""
+        """Exposed step should apply defaults without project."""
         es = exposed.ExposedStep()
         self.assertIsNone(es._step)
 
@@ -313,7 +313,7 @@ class TestExposed(scaffolds.ResultsTest):
         self.assertEqual({}, render_template.call_args[1]['frame'])
 
     def test_project_path(self):
-        """Should create an absolute path within the project"""
+        """Should create an absolute path within the project."""
         ep = exposed.ExposedProject()
         project = MagicMock()
         project.source_directory = os.path.realpath(os.path.dirname(__file__))

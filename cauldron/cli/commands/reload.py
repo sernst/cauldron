@@ -17,7 +17,7 @@ DESCRIPTION = (
 
 
 def execute_remote(context: cli.CommandContext) -> Response:
-    """ """
+    """..."""
 
     thread = sync.send_remote_command(
         command=context.name,
@@ -32,7 +32,7 @@ def execute_remote(context: cli.CommandContext) -> Response:
 
 
 def execute(context: cli.CommandContext) -> Response:
-    """ """
+    """..."""
 
     response = context.response
     project_before = cauldron.project.internal_project

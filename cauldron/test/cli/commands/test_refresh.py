@@ -6,7 +6,7 @@ from cauldron.test.support import scaffolds
 
 
 class TestRefresh(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_refresh(self):
         """Should refresh """

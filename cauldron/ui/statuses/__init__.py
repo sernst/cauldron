@@ -1,8 +1,7 @@
-import time
-
 import cauldron
 from cauldron import environ
 from cauldron.ui.statuses import _utils
+from cauldron.ui.statuses._reconciler import merge_local_state  # noqa
 
 
 def get_status(last_timestamp: float, force: bool = False):
@@ -27,9 +26,5 @@ def get_status(last_timestamp: float, force: bool = False):
     )
 
     results = response.serialize()
-    if force:
-        results['hash'] = 'forced-{}'.format(time.time())
-    else:
-        results['hash'] = _utils.get_digest_hash(response)
-
+    results['hash'] = _utils.get_digest_hash(results, force)
     return results

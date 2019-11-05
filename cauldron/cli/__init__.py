@@ -25,7 +25,7 @@ def make_command_context(
         response: Response = None,
         remote_connection: 'environ.RemoteConnection' = None
 ) -> CommandContext:
-    """ """
+    """..."""
 
     remote = (
         remote_connection
@@ -44,7 +44,7 @@ def make_command_context(
 
 
 def open_in_browser(project_or_url):
-    """ """
+    """..."""
 
     url = getattr(project_or_url, 'baked_url', project_or_url)
     webbrowser.open(url)

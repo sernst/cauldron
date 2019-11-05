@@ -72,14 +72,14 @@ class TestSave(scaffolds.ResultsTest):
         self.assertTrue(r.data['path'].endswith('project.cauldron'))
 
     def test_remote_save_no_project(self):
-        """ """
+        """..."""
 
         response = support.run_remote_command('save')
         self.assertTrue(response.failed)
 
     @patch('cauldron.cli.sync.comm.download_file')
     def test_remote_download_error(self, download_file: MagicMock):
-        """ """
+        """..."""
 
         download_file.return_value = Response().fail().response
 
@@ -93,7 +93,7 @@ class TestSave(scaffolds.ResultsTest):
 
     @patch('cauldron.cli.sync.comm.download_file')
     def test_remote(self, download_file: MagicMock):
-        """ """
+        """..."""
 
         download_file.return_value = Response()
 
@@ -106,7 +106,7 @@ class TestSave(scaffolds.ResultsTest):
         self.assert_has_success_code(response, 'DOWNLOAD_SAVED')
 
     def test_get_default_path_no_project(self):
-        """ """
+        """..."""
 
         path = save.get_default_path()
         self.assertTrue(os.path.exists(path))

@@ -14,8 +14,7 @@ def sync_open(
         path: str,
         forget: bool = False
 ) -> Response:
-    """ """
-
+    """..."""
     source_directory = environ.paths.clean(path)
     source_path = os.path.join(source_directory, 'cauldron.json')
 
@@ -30,7 +29,7 @@ def sync_open(
             definition=definition,
             source_directory=source_directory,
         )
-    )
+    ).response
     response.log_notifications()
 
     if not forget:

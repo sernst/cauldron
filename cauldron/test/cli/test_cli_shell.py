@@ -10,7 +10,7 @@ from cauldron.test.support import scaffolds
 
 
 class TestCliShell(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_default_empty_line(self):
         """Should abort when an empty line is supplied."""

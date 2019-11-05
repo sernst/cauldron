@@ -10,7 +10,7 @@ from cauldron.test.support import scaffolds
 
 
 class TestSystems(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_end_success(self):
         """Should end quietly with a success exit code."""

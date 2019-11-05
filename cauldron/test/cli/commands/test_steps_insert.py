@@ -4,7 +4,7 @@ from cauldron.test.support import scaffolds
 
 
 class TestStepsInsert(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_before(self):
         """Should properly rename default filenames."""

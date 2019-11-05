@@ -91,7 +91,7 @@ class TestStepTesting(StepTestCase):
         self.assertEqual(directory, result)
 
     def test_find_failed_at_root(self):
-        """Should return None if top-level directory has no project"""
+        """Should return None if top-level directory has no project."""
         directory = os.path.dirname(os.path.realpath(__file__))
         subdirectory = os.path.join(directory, 'fake')
 
@@ -121,7 +121,7 @@ class TestStepTesting(StepTestCase):
         cd.project.load(project)
 
     def test_open_project_fails(self):
-        """Should raise Assertion error after failing to open the project"""
+        """Should raise Assertion error after failing to open the project."""
         with patch('cauldron.steptest.support.open_project') as open_project:
             open_project.side_effect = RuntimeError('FAKE')
             with self.assertRaises(AssertionError):

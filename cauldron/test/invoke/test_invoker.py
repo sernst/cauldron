@@ -61,7 +61,7 @@ class TestInvoker(unittest.TestCase):
 
     @patch('cauldron.cli.batcher.run_project')
     def test_run_batch(self, run_project: MagicMock):
-        """Should run batch project"""
+        """Should run batch project."""
         result = invoker.run_batch({})
         self.assertEqual(0, result)
 

@@ -79,8 +79,7 @@ def fetch_synchronize_status():
 @server_runner.APPLICATION.route('/sync-open', methods=['POST'])
 @authorization.gatekeeper
 def sync_open_project():
-    """ """
-
+    """..."""
     r = Response()
     args = arguments.from_request()
     definition = args.get('definition')
@@ -133,7 +132,7 @@ def sync_open_project():
 @server_runner.APPLICATION.route('/sync-file', methods=['POST'])
 @authorization.gatekeeper
 def sync_source_file():
-    """ """
+    """..."""
 
     r = Response()
     args = arguments.from_request()
@@ -245,7 +244,7 @@ def download_project_file(filename: str):
 @server_runner.APPLICATION.route('/sync-create', methods=['POST'])
 @authorization.gatekeeper
 def sync_create_project():
-    """ """
+    """..."""
 
     r = Response()
     args = arguments.from_request()

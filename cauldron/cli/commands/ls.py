@@ -23,7 +23,7 @@ def populate(
         assigned_args: dict
 ):
     """Populate the argument parser for the ls command invocation."""
-    pass
+    parser.add_argument('directory', default=None)
 
 
 def _shorten_path(path: str) -> str:
@@ -48,11 +48,12 @@ def _pretty_print(child: dict, is_file: bool = False) -> str:
 
 def execute(
         context: cli.CommandContext,
+        directory: str = None
 ) -> Response:
     """Execute listing of current directory."""
     response = context.response
 
-    current_directory = environ.paths.clean(os.curdir)
+    current_directory = environ.paths.clean(directory or os.curdir)
     parent_directory = os.path.dirname(current_directory)
 
     try:

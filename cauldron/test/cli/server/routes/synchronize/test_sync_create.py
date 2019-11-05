@@ -4,7 +4,7 @@ from cauldron.test.support.flask_scaffolds import FlaskResultsTest
 
 
 class TestSyncCreate(FlaskResultsTest):
-    """ """
+    """..."""
 
     def test_no_args(self):
         """Should error without arguments."""

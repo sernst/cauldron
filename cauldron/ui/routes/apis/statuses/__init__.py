@@ -1,10 +1,12 @@
 import flask
 import requests
+from requests import exceptions as requests_exceptions
+from urllib3 import exceptions as url_exceptions
+
 from cauldron import environ
 from cauldron.ui import arguments
 from cauldron.ui import configs as ui_configs
 from cauldron.ui import statuses as ui_statuses
-from cauldron.ui.routes.apis.statuses import reconciler
 
 blueprint = flask.Blueprint(
     name='statuses',
@@ -31,16 +33,22 @@ def status():
     # When connected remotely, get the status from the remote kernel and
     # then merge it with local information that may not have been synced
     # to the remote kernel yet.
+    lost_errors = (
+        ConnectionError,
+        requests_exceptions.ConnectionError,
+        requests_exceptions.ConnectTimeout,
+        url_exceptions.MaxRetryError,
+    )
+
     try:
         remote_status = requests.post(
             '{}/ui-status'.format(environ.remote_connection.url),
             json=args
         ).json()
-    except ConnectionError as error:
+    except lost_errors as error:
         return (
-            environ.Response()
-            .fail(
-                code='REMOTE_CONNECTION_FAILED',
+            environ.Response().fail(
+                code='LOST_REMOTE_CONNECTION',
                 message='Unable to communicate with the remote kernel.',
                 error=error
             )
@@ -49,14 +57,4 @@ def status():
             .flask_serialize()
         )
 
-    # Steps modified locally should be identified as dirty
-    # or the status display.
-    remote_status['project'] = reconciler.localize_dirty_steps(
-        remote_status.get('project')
-    )
-
-    # We care about the local remote connection, which is active,
-    # not the remote one.
-    remote_status['remote'] = environ.remote_connection.serialize()
-
-    return flask.jsonify(remote_status)
+    return flask.jsonify(ui_statuses.merge_local_state(remote_status, force))

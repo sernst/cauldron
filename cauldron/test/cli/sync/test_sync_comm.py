@@ -46,7 +46,7 @@ class TestSyncComm(scaffolds.ResultsTest):
 
     @patch('requests.request')
     def test_send_request_invalid(self, request: MagicMock):
-        """Should fail to send request"""
+        """Should fail to send request."""
         request.side_effect = requests.ConnectionError('Fake Error')
         response = comm.send_request('/fake', method='GET')
         self.assert_has_error_code(response, 'COMMUNICATION_ERROR')
@@ -58,7 +58,7 @@ class TestSyncComm(scaffolds.ResultsTest):
             request: MagicMock,
             parse_http_response: MagicMock
     ):
-        """Should successfully send request"""
+        """Should successfully send request."""
         request.return_value = HttpResponse()
         parse_http_response.return_value = environ.Response('test')
 
@@ -70,7 +70,7 @@ class TestSyncComm(scaffolds.ResultsTest):
         self.assertEqual(response.identifier, 'test')
 
     def test_parse_valid_http_response(self):
-        """Should fail to send request"""
+        """Should fail to send request."""
         source_response = environ.Response().update(test='hello_world')
 
         def json_mock(*args, **kwargs):

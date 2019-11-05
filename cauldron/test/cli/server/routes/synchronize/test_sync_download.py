@@ -7,7 +7,7 @@ from cauldron.test.support.flask_scaffolds import FlaskResultsTest
 
 
 class TestSyncDownload(FlaskResultsTest):
-    """ """
+    """..."""
 
     def test_no_project(self):
         """Should return a 204 status when no project is open."""

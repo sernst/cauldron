@@ -9,7 +9,7 @@ from cauldron.test.support import scaffolds
 
 
 class TestStepsCreateStep(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_nameless_step(self):
         """Should convert float index to integer."""

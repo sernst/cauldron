@@ -21,14 +21,7 @@ def populate(
         raw_args: typing.List[str],
         assigned_args: dict
 ):
-    """
-
-    :param parser:
-    :param raw_args:
-    :param assigned_args:
-    :return:
-    """
-
+    """..."""
     parser.add_argument(
         'path',
         nargs='?',
@@ -108,11 +101,7 @@ def execute(
         forget: bool = False,
         results_path: str = None
 ) -> Response:
-    """
-
-    :return:
-    """
-
+    """..."""
     response = context.response
     path = path.strip('"') if path else None
 

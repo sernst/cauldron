@@ -7,8 +7,7 @@ from cauldron import environ
 class TestTemplating(unittest.TestCase):
 
     def test_id_filter(self):
-        """
-        """
+        """..."""
 
         result = templating.render('{{ "test" | id }}')
         parts = result.split('-', 2)
@@ -22,8 +21,7 @@ class TestTemplating(unittest.TestCase):
         )
 
     def test_latex_filter(self):
-        """
-        """
+        """..."""
 
         result = templating.render('{{ "e = mc^2" | latex }}')
         self.assertNotEqual(result.find('katex'), -1, 'where is katex?')

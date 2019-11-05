@@ -48,7 +48,7 @@ def populate(
 
 
 def get_default_path() -> str:
-    """ """
+    """..."""
 
     project = cauldron.project.internal_project
 
@@ -92,7 +92,7 @@ def create_settings(project: 'projects.Project') -> dict:
 
 
 def make_directory(path: str):
-    """ """
+    """..."""
 
     save_directory = os.path.dirname(path)
     if not os.path.exists(save_directory):
@@ -132,7 +132,7 @@ def write_file(project: 'projects.Project', path: str) -> str:
 
 
 def execute_remote(context: cli.CommandContext, path: str = None) -> Response:
-    """ """
+    """..."""
 
     thread = sync.send_remote_command(
         command='save',

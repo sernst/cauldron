@@ -7,17 +7,17 @@ from cauldron.cli.commands import status
 
 
 class TestStatus(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_status_fail(self):
-        """ """
+        """..."""
 
         r = support.run_command('status')
         self.assertTrue(r.failed, 'should have failed without open project')
         self.assertEqual(r.errors[0].code, 'NO_OPEN_PROJECT')
 
     def test_status(self):
-        """ """
+        """..."""
 
         support.run_command('open @examples:seaborn')
         r = support.run_command('status')
@@ -25,7 +25,7 @@ class TestStatus(scaffolds.ResultsTest):
         self.assertEqual(r.messages[0].code, 'STATUS_CREATED')
 
     def test_status_with_data(self):
-        """ """
+        """..."""
 
         support.run_command('open @examples:hello_text')
         support.run_command('run')
@@ -35,7 +35,7 @@ class TestStatus(scaffolds.ResultsTest):
 
     @patch('cauldron.cli.commands.status.to_console_formatted_string')
     def test_status_failure(self, to_console_formatted_string: MagicMock):
-        """ """
+        """..."""
 
         to_console_formatted_string.side_effect = ValueError('Fake Error')
 
@@ -45,7 +45,7 @@ class TestStatus(scaffolds.ResultsTest):
         self.assertEqual(r.errors[0].code, 'STATUS_ERROR')
 
     def test_console_formatting(self):
-        """ """
+        """..."""
 
         result = status.to_console_formatted_string(dict(
             __cauldron__='SKIP ME',
@@ -58,7 +58,7 @@ class TestStatus(scaffolds.ResultsTest):
         self.assertGreater(result.find('HELLO'), 0)
 
     def test_status_remote(self):
-        """ """
+        """..."""
 
         support.run_command('open @examples:seaborn')
         r = support.run_remote_command('status')

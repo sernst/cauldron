@@ -118,7 +118,7 @@ def populate(
 
 
 def execute_remote(context: cli.CommandContext, **kwargs) -> Response:
-    """ """
+    """..."""
 
     sync_response = sync_command.execute(cli.make_command_context(
         name=sync_command.NAME,

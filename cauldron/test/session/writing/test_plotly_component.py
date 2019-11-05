@@ -6,10 +6,10 @@ from cauldron.test.support import scaffolds
 
 
 class TestPlotlyComponent(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_import_error(self):
-        """ """
+        """..."""
 
         real_import = builtins.__import__
 
@@ -26,7 +26,7 @@ class TestPlotlyComponent(scaffolds.ResultsTest):
         self.assertEqual(len(component.includes), 0)
 
     def test_version_one_import_error(self):
-        """ """
+        """..."""
 
         real_import = builtins.__import__
 
@@ -42,13 +42,13 @@ class TestPlotlyComponent(scaffolds.ResultsTest):
         self.assertIsNone(result)
 
     def test_version_one(self):
-        """ """
+        """..."""
 
         result = plotly_component.get_version_one_path()
         self.assertIsNotNone(result)
 
     def test_version_two_import_error(self):
-        """ """
+        """..."""
 
         real_import = builtins.__import__
 
@@ -64,7 +64,7 @@ class TestPlotlyComponent(scaffolds.ResultsTest):
         self.assertIsNone(result)
 
     def test_version_two(self):
-        """ """
+        """..."""
 
         result = plotly_component.get_version_two_path()
         self.assertIsNotNone(result)

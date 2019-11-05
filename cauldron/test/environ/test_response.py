@@ -64,7 +64,7 @@ class TestResponse(scaffolds.ResultsTest):
         self.assertEqual(child.parent, grandparent)
 
     def test_update_parented(self):
-        """Should update through parent"""
+        """Should update through parent."""
         child = Response()
         parent = Response()
         parent.consume(child)
@@ -73,7 +73,7 @@ class TestResponse(scaffolds.ResultsTest):
         self.assertEqual(parent.data['banana'], 'orange')
 
     def test_notify_parented(self):
-        """Should notify through parent"""
+        """Should notify through parent."""
         child = Response()
         parent = Response()
         parent.consume(child)
@@ -87,7 +87,7 @@ class TestResponse(scaffolds.ResultsTest):
         self.assertEqual(m.message, 'Good Stuff')
 
     def test_end_parented(self):
-        """Should end the parent"""
+        """Should end the parent."""
         child = Response()
         parent = Response()
         parent.consume(child)

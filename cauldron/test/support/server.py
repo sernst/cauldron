@@ -13,7 +13,7 @@ Responses = typing.NamedTuple('TestResponses', [
 
 
 def create_test_app():
-    """ """
+    """..."""
 
     return server.server_run.APPLICATION.test_client()
 
@@ -44,7 +44,7 @@ def post(app, endpoint: str, data=None, **kwargs) -> Responses:
 def deserialize_flask_response(
         flask_response: FlaskResponse
 ) -> 'environ.Response':
-    """ """
+    """..."""
 
     try:
         data = json.loads(flask_response.data.decode('utf-8', 'ignore'))

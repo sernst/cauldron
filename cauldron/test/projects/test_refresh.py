@@ -7,7 +7,7 @@ from cauldron.test.support import scaffolds
 
 
 class TestRefresh(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     @classmethod
     def read_project_file(cls, project: projects.Project = None) -> dict:

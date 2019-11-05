@@ -9,7 +9,7 @@ from cauldron.cli.commands.steps import actions as step_actions
 
 
 class TestStepActions(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_index_from_location_float(self):
         """Should convert float index to integer."""

@@ -7,11 +7,10 @@ from cauldron.test.support.flask_scaffolds import FlaskResultsTest
 
 
 class TestServer(FlaskResultsTest):
-    """ """
+    """..."""
 
     def test_execute(self):
         """Should execute the command."""
-
         posted = self.post('/', {'command': 'open', 'args': ''})
         self.assertEqual(posted.flask.status_code, 200)
 

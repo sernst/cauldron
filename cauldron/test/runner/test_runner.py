@@ -8,7 +8,7 @@ from cauldron.test.support import scaffolds
 
 
 class TestRunner(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_syntax_error(self):
         """Should render a syntax error."""

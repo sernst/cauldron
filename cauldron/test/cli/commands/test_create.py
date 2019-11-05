@@ -11,7 +11,7 @@ from cauldron.test.support import scaffolds
 
 
 class TestCreate(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_create_no_args(self):
         """Should fail with no args."""
@@ -20,15 +20,13 @@ class TestCreate(scaffolds.ResultsTest):
         self.assertTrue(r.failed, 'should have failed')
 
     def test_create_no_path(self):
-        """
-        """
+        """..."""
 
         r = support.create_project(self, 'test_create', '', confirm=False)
         self.assertTrue(r.failed, 'should have failed')
 
     def test_create_simple_success(self):
-        """
-        """
+        """..."""
 
         r = support.create_project(self, 'test_create')
 
@@ -53,7 +51,7 @@ class TestCreate(scaffolds.ResultsTest):
         )
 
     def test_create_twice(self):
-        """ """
+        """..."""
 
         r1 = support.create_project(self, 'test_create')
         r1.identifier = 'First {}'.format(r1.identifier)
@@ -72,8 +70,7 @@ class TestCreate(scaffolds.ResultsTest):
         )
 
     def test_create_full_success(self):
-        """
-        """
+        """..."""
 
         r = support.create_project(
             self,

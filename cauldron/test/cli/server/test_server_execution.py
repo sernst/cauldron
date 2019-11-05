@@ -7,7 +7,7 @@ from cauldron.test.support import flask_scaffolds
 
 
 class TestServerExecution(flask_scaffolds.FlaskResultsTest):
-    """ """
+    """..."""
 
     def test_execute_sync(self):
         """Should execute command synchronously."""
