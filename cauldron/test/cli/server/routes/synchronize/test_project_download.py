@@ -25,13 +25,14 @@ class TestProjectDownload(FlaskResultsTest):
 
     def test_valid(self):
         """Should successfully download file."""
-
         support.create_project(self, 'project-downloader-2')
         support.add_step(self)
         project = cauldron.project.get_internal_project()
         step_name = project.steps[0].filename
 
-        support.run_remote_command('open "{}"'.format(project.source_directory))
+        support.run_remote_command(
+            'open "{}" --forget'.format(project.source_directory)
+        )
         support.run_remote_command('sync')
 
         my_path = os.path.realpath(__file__)

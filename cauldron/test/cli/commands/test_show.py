@@ -20,7 +20,7 @@ class TestShow(scaffolds.ResultsTest):
     def test_show(self):
         """Should show local project."""
 
-        support.run_command('open @examples:hello_cauldron')
+        support.run_command('open @examples:hello_cauldron --forget')
         url = cauldron.project.get_internal_project().baked_url
 
         with patch('webbrowser.open') as func:
@@ -36,7 +36,7 @@ class TestShow(scaffolds.ResultsTest):
         )
 
         support.run_remote_command(
-            command='open @examples:hello_cauldron',
+            command='open @examples:hello_cauldron --forget',
             remote_connection=remote_connection
         )
 

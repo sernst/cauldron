@@ -35,7 +35,7 @@ class TestConnectCommand(scaffolds.ResultsTest):
 
     @patch('requests.get')
     def test_connection_error(self, requests_get: MagicMock):
-        """Should fail if the url cannot be connected to """
+        """Should fail if the url cannot be connected to."""
 
         requests_get.side_effect = request_exceptions.ConnectionError('Fake')
 

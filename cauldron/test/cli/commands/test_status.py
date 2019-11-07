@@ -19,7 +19,7 @@ class TestStatus(scaffolds.ResultsTest):
     def test_status(self):
         """..."""
 
-        support.run_command('open @examples:seaborn')
+        support.run_command('open @examples:seaborn --forget')
         r = support.run_command('status')
         self.assertFalse(r.failed, 'should not have failed')
         self.assertEqual(r.messages[0].code, 'STATUS_CREATED')
@@ -27,7 +27,7 @@ class TestStatus(scaffolds.ResultsTest):
     def test_status_with_data(self):
         """..."""
 
-        support.run_command('open @examples:hello_text')
+        support.run_command('open @examples:hello_text --forget')
         support.run_command('run')
         r = support.run_command('status')
         self.assertFalse(r.failed, 'should not have failed')
@@ -39,7 +39,7 @@ class TestStatus(scaffolds.ResultsTest):
 
         to_console_formatted_string.side_effect = ValueError('Fake Error')
 
-        support.run_command('open @examples:hello_text')
+        support.run_command('open @examples:hello_text --forget')
         r = support.run_command('status')
         self.assertTrue(r.failed, 'should have failed')
         self.assertEqual(r.errors[0].code, 'STATUS_ERROR')
@@ -59,8 +59,7 @@ class TestStatus(scaffolds.ResultsTest):
 
     def test_status_remote(self):
         """..."""
-
-        support.run_command('open @examples:seaborn')
+        support.run_command('open @examples:seaborn --forget')
         r = support.run_remote_command('status')
         self.assertFalse(r.failed, 'should not have failed')
         self.assertEqual(r.messages[0].code, 'STATUS_CREATED')

@@ -11,7 +11,6 @@ class TestSyncDownload(FlaskResultsTest):
 
     def test_no_project(self):
         """Should return a 204 status when no project is open."""
-
         downloaded = self.get('/download/fake')
         self.assertEqual(downloaded.flask.status_code, 204)
 
@@ -25,11 +24,12 @@ class TestSyncDownload(FlaskResultsTest):
 
     def test_valid(self):
         """Should successfully download file."""
-
         support.create_project(self, 'downloader')
         project = cauldron.project.get_internal_project()
 
-        support.run_remote_command('open "{}"'.format(project.source_directory))
+        support.run_remote_command(
+            'open "{}" --forget'.format(project.source_directory)
+        )
 
         my_path = os.path.realpath(__file__)
         with patch('os.path.realpath', return_value=my_path) as func:

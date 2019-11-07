@@ -13,7 +13,7 @@ class TestSync(scaffolds.ResultsTest):
 
     def test_sync_project(self):
         """Should synchronize local files to remote location."""
-        support.run_remote_command('open @examples:hello_cauldron')
+        support.run_remote_command('open @examples:hello_cauldron --forget')
         response = support.run_remote_command('sync')
         self.assertTrue(response.success)
 
@@ -25,7 +25,7 @@ class TestSync(scaffolds.ResultsTest):
 
     def test_sync_project_again(self):
         """Should synchronize files only when needed."""
-        support.run_remote_command('open @examples:hello_cauldron')
+        support.run_remote_command('open @examples:hello_cauldron --forget')
         response = support.run_remote_command('sync')
         self.assertTrue(response.success)
 

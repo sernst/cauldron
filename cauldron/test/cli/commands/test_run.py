@@ -244,7 +244,7 @@ class TestRun(scaffolds.ResultsTest):
         )
 
         opened_response = support.run_remote_command(
-            'open "{}"'.format(source_directory)
+            'open "{}" --forget'.format(source_directory)
         )
         self.assertTrue(opened_response.success)
 
@@ -254,7 +254,6 @@ class TestRun(scaffolds.ResultsTest):
     @patch('cauldron.cli.commands.sync.execute')
     def test_run_remote_sync_fail(self, sync_execute: MagicMock):
         """Should fail if the remote sync was not successful."""
-
         sync_execute.return_value = Response().fail().response
 
         support.create_project(self, 'pig')
@@ -265,7 +264,7 @@ class TestRun(scaffolds.ResultsTest):
         )
 
         opened_response = support.run_remote_command(
-            'open "{}"'.format(source_directory)
+            'open "{}" --forget'.format(source_directory)
         )
         self.assertTrue(opened_response.success)
 

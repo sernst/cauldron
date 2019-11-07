@@ -47,12 +47,11 @@ class TestSyncFile(FlaskResultsTest):
 
     def test_valid(self):
         """Should synchronize file remotely."""
-
         support.create_project(self, 'peter')
         project = cauldron.project.get_internal_project()
 
         response = support.run_remote_command(
-            'open "{}"'.format(project.source_directory)
+            'open "{}" --forget'.format(project.source_directory)
         )
         self.assert_no_errors(response)
         project = cauldron.project.get_internal_project()

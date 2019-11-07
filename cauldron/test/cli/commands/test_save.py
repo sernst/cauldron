@@ -13,7 +13,6 @@ class TestSave(scaffolds.ResultsTest):
 
     def test_fails_no_project(self):
         """Should fail if there is no open project."""
-
         path = self.get_temp_path('save-fail-1')
         r = support.run_command('save "{}"'.format(path))
         self.assertTrue(r.failed)
@@ -80,13 +79,14 @@ class TestSave(scaffolds.ResultsTest):
     @patch('cauldron.cli.sync.comm.download_file')
     def test_remote_download_error(self, download_file: MagicMock):
         """..."""
-
         download_file.return_value = Response().fail().response
 
         support.create_project(self, 'apophis')
         project = cauldron.project.get_internal_project()
 
-        support.run_remote_command('open "{}"'.format(project.source_directory))
+        support.run_remote_command(
+            'open "{}" --forget'.format(project.source_directory)
+        )
 
         response = support.run_remote_command('save')
         self.assertTrue(response.failed)
@@ -94,13 +94,14 @@ class TestSave(scaffolds.ResultsTest):
     @patch('cauldron.cli.sync.comm.download_file')
     def test_remote(self, download_file: MagicMock):
         """..."""
-
         download_file.return_value = Response()
 
         support.create_project(self, 'apophis')
         project = cauldron.project.get_internal_project()
 
-        support.run_remote_command('open "{}"'.format(project.source_directory))
+        support.run_remote_command(
+            'open "{}" --forget'.format(project.source_directory)
+        )
 
         response = support.run_remote_command('save')
         self.assert_has_success_code(response, 'DOWNLOAD_SAVED')

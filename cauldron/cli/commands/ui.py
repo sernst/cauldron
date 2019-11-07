@@ -8,11 +8,10 @@ from cauldron.environ import Response
 from cauldron.ui import configs
 
 NAME = 'ui'
-DESCRIPTION = (
-    """
-    Starts the cauldron ui.
-    """
-)
+DESCRIPTION = 'Starts the cauldron ui.'
+
+#: This command cannot be run in a separate thread. It must be
+#: executed as part of the main thread.
 SYNCHRONOUS = True
 
 
@@ -31,33 +30,27 @@ def execute(
         host: str = None,
         public: bool = False
 ) -> Response:
-    """..."""
-    ui.start(
-        port=port,
-        debug=debug,
-        public=public,
-        host=host,
-        quiet=True
-    )
+    """Runs the ui command, which starts the UI server and runs."""
+    try:
+        ui.start(
+            port=port,
+            debug=debug,
+            public=public,
+            host=host,
+            quiet=True
+        )
+    except KeyboardInterrupt:  # pragma: no cover
+        pass
 
     return context.response.notify(
         kind='SUCCESS',
         code='COMPLETED',
         message='UI session has ended.'
-    ).console(
-        whitespace_bottom=1
-    ).response
+    ).console(whitespace_bottom=1).response
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):
-    """
-
-    :param segment:
-    :param line:
-    :param parts:
-    :return:
-    """
-
+    """..."""
     if parts[-1].startswith('-'):
         return autocompletion.match_flags(
             segment=segment,

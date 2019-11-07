@@ -11,7 +11,7 @@ class TestRefresh(scaffolds.ResultsTest):
     def test_refresh(self):
         """Should refresh """
 
-        r = support.run_command('open @examples:hello_cauldron')
+        r = support.run_command('open @examples:hello_cauldron --forget')
         r = support.run_command('refresh')
         self.assertFalse(r.failed, 'should not have failed')
         self.assertEqual(r.messages[0].code, 'PROJECT_REFRESHED')
@@ -29,7 +29,7 @@ class TestRefresh(scaffolds.ResultsTest):
 
         project_write.side_effect = IOError('Fake Error')
 
-        support.run_command('open @examples:hello_cauldron')
+        support.run_command('open @examples:hello_cauldron --forget')
 
         r = support.run_command('refresh')
         self.assertTrue(r.failed, 'should have failed')
@@ -38,7 +38,7 @@ class TestRefresh(scaffolds.ResultsTest):
     def test_refresh_remote(self):
         """Should refresh """
 
-        support.run_command('open @examples:hello_cauldron')
+        support.run_command('open @examples:hello_cauldron --forget')
         r = support.run_remote_command('refresh')
         self.assertFalse(r.failed, 'should not have failed')
         self.assert_has_success_code(r, 'PROJECT_REFRESHED')

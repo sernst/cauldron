@@ -9,7 +9,6 @@ def create_parser(
     Creates an argument parser populated with the arg formats for the server
     command.
     """
-
     parser = arg_parser or ArgumentParser()
     parser.description = 'Cauldron kernel server'
 

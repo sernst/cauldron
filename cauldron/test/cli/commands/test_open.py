@@ -1,4 +1,6 @@
 import os
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 from cauldron import environ
 from cauldron.test import support
@@ -15,15 +17,15 @@ class TestOpen(scaffolds.ResultsTest):
 
         support.run_command('open --available')
 
-    def test_last(self):
-        """
-
-        :return:
-        """
-
-        support.run_command('open @examples:seaborn')
-        support.run_command('close')
-        r = support.run_command('open -l')
+    @patch('cauldron.cli.commands.open.actions.fetch_last')
+    def test_last(self, fetch_last: MagicMock):
+        """Should open the last opened project."""
+        fetch_last.return_value = os.path.realpath(os.path.join(
+            os.path.dirname(__file__),
+            '..', '..', '..',
+            'resources', 'examples', 'seaborn'
+        ))
+        r = support.run_command('open -l --forget')
         self.assertFalse(r.failed, 'should not have failed')
 
     def test_open_example(self):

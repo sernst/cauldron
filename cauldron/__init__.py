@@ -64,6 +64,7 @@ def run_project(
         logging_path: str = None,
         reader_path: str = None,
         reload_project_libraries: bool = False,
+        forget_project: bool = False,
         **kwargs
 ) -> ExecutionResult:
     """
@@ -105,5 +106,6 @@ def run_project(
         log_path=logging_path,
         reader_path=reader_path,
         reload_project_libraries=reload_project_libraries,
+        forget_project=forget_project,
         shared_data=kwargs
     )

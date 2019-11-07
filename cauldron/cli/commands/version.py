@@ -4,12 +4,12 @@ from argparse import ArgumentParser
 from collections import OrderedDict
 
 from cauldron import cli
-from cauldron.cli import sync
 from cauldron import environ
+from cauldron.cli import sync
 from cauldron.environ import Response
 
 NAME = 'version'
-DESCRIPTION = 'Displays Cauldron\'s version information'
+DESCRIPTION = 'Display Cauldron version information'
 
 
 def populate(

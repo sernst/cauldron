@@ -1,5 +1,4 @@
 import typing
-import time
 from argparse import ArgumentParser
 
 import cauldron
@@ -32,14 +31,7 @@ def populate(
         raw_args: typing.List[str],
         assigned_args: dict
 ):
-    """
-
-    :param parser:
-    :param raw_args:
-    :param assigned_args:
-    :return:
-    """
-
+    """..."""
     if len(raw_args) < 1:
         assigned_args['action'] = 'list'
         return
@@ -180,7 +172,6 @@ def execute_remote(
             remote_connection=context.remote_connection
         ),
         source_directory=source_directory,
-        # newer_than=status_response.data.get('sync_time', 0)
         newer_than=context.remote_connection.sync_timestamp
     )
 
@@ -197,11 +188,7 @@ def execute(
         keep: bool = False,
         project: 'projects.Project' = None
 ) -> Response:
-    """
-
-    :return:
-    """
-
+    """..."""
     response = context.response
 
     project = (
@@ -247,7 +234,7 @@ def execute(
         )
 
     if action == 'modify':
-        actions.modify_step(
+        return actions.modify_step(
             response=response,
             project=project,
             name=step_name,
@@ -255,7 +242,6 @@ def execute(
             title=title,
             position=position
         )
-        return response
 
     if action == 'remove':
         return removal.remove_step(

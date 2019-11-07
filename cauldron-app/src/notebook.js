@@ -1,13 +1,15 @@
 import utils from './utils';
 import store from './store';
 
+let cacheBuster = Math.round((new Date()).getTime() / 1000);
+
 /**
  * The URL to load as part of displaying the project.
  */
 function getUrl() {
   const { origin } = window.location;
   const myPath = window.location.pathname.replace('app/project', 'notebook');
-  return `${origin}${myPath}/display.html`;
+  return `${origin}${myPath}/display.html?no-cache=${cacheBuster}`;
 }
 
 function getIframe() {
@@ -15,6 +17,7 @@ function getIframe() {
 }
 
 function refresh() {
+  cacheBuster = Math.round((new Date()).getTime() / 1000);
   const iframe = getIframe();
   if (iframe) {
     iframe.contentWindow.location.reload();
@@ -103,13 +106,22 @@ function onLoaded() {
     // This first phase waits until the page has loaded to the point of
     // the html script tag having run, which sets up the CAULDRON obect
     // for initial use.
+    let waitCount = 0;
     let retryCount = 0;
     const interval = setInterval(
       () => {
         const cauldron = getCauldronObject();
 
-        // Wait until the cauldron object first becomes available.
+        // Wait until the cauldron object first becomes available and refresh if
+        // it doesn't become available in a reasonable amount of time.
         if (!cauldron || !cauldron.on || !cauldron.on.ready) {
+          waitCount += 1;
+          if (waitCount > 10) {
+            waitCount = 0;
+            console.warn('Notebook load wait timeout reached. Refreshing...');
+            refresh();
+          }
+
           return;
         }
 
@@ -127,6 +139,7 @@ function onLoaded() {
         retryCount += 1;
         if (retryCount > 10) {
           retryCount = 0;
+          console.warn('Notebook load running timeout reached. Refreshing...');
           refresh();
         }
       },

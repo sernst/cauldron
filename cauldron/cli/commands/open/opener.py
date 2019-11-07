@@ -62,7 +62,7 @@ def update_recent_paths(response: 'environ.Response', path: str):
             recent_paths.remove(path)
 
         recent_paths.insert(0, path)
-        environ.configs.put(recent_paths=recent_paths[:10], persists=True)
+        environ.configs.put(recent_paths=recent_paths[:40], persists=True)
         environ.configs.save()
     except Exception as error:  # pragma: no cover
         response.warn(
@@ -138,6 +138,10 @@ def open_project(
         update_recent_paths(response, path)
 
     project = cauldron.project.get_internal_project()
+    if project.steps:
+        # Always select the first step when a project is opened.
+        project.select_step(0)
+
     if results_path:
         project.results_path = results_path
 

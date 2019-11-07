@@ -15,7 +15,7 @@ class TestExport(scaffolds.ResultsTest):
     def test_exporting(self):
         """Should successfully export project."""
 
-        support.run_command('open @examples:pyplot')
+        support.run_command('open @examples:pyplot --forget')
         support.run_command('run')
 
         path = self.get_temp_path('exporting')

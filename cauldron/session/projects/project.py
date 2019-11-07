@@ -230,6 +230,33 @@ class Project:
 
         return os.path.join(self.output_directory, 'results.js')
 
+    def select_step(
+            self,
+            step_name_or_index: typing.Union[str, int, 'steps.ProjectStep']
+    ) -> typing.Optional['steps.ProjectStep']:
+        """
+        Selects the specified step by step object, step name or index if
+        such a step exists and returns that step if it does.
+        """
+        if isinstance(step_name_or_index, steps.ProjectStep):
+            step = (
+                step_name_or_index
+                if step_name_or_index in self.steps
+                else None
+            )
+        elif isinstance(step_name_or_index, int):
+            index = min(len(self.steps) - 1, step_name_or_index)
+            step = self.steps[index]
+        else:
+            step = self.get_step(step_name_or_index or '')
+
+        if not step:
+            return None
+
+        for s in self.steps:
+            s.is_selected = (s == step)
+        return step
+
     def make_remote_url(self, host: str = None):
         """
 
@@ -314,13 +341,8 @@ class Project:
         self.last_modified = time.time()
         return True
 
-    def get_step(self, name: str) -> typing.Union['steps.ProjectStep', None]:
-        """
-
-        :param name:
-        :return:
-        """
-
+    def get_step(self, name: str) -> typing.Optional['steps.ProjectStep']:
+        """Returns the step by name or None if no such step is found."""
         for s in self.steps:
             if s.definition.name == name:
                 return s
@@ -331,12 +353,7 @@ class Project:
             self,
             reference_id: str
     ) -> typing.Union['steps.ProjectStep', None]:
-        """
-
-        :param reference_id:
-        :return:
-        """
-
+        """Returns the step by its ID or None if no such step is found."""
         for s in self.steps:
             if s.reference_id == reference_id:
                 return s

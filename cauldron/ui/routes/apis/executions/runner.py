@@ -21,7 +21,7 @@ def parse_command_args(response: 'Response') -> typing.Tuple[str, str]:
     :param response:
         The response object to modify with status or error data
     :return:
-        A tuple where the first element if the name of the command
+        A tuple where the first element is the name of the command
         to execute, and the second is a string representing the arguments
         to apply to that command.
     """

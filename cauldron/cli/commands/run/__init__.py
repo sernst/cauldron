@@ -5,15 +5,15 @@ from collections import OrderedDict
 
 import cauldron
 from cauldron import cli
-from cauldron.cli import sync
 from cauldron import environ
 from cauldron import runner
-from cauldron.cli.commands.run import actions as run_actions
+from cauldron.cli import sync
 from cauldron.cli.commands import sync as sync_command
+from cauldron.cli.commands.run import actions as run_actions
 from cauldron.cli.interaction import autocompletion
-from cauldron.session import writing
 from cauldron.environ import Response
 from cauldron.session import projects
+from cauldron.session import writing
 
 NAME = 'run'
 DESCRIPTION = cli.reformat(
@@ -28,14 +28,7 @@ def populate(
         raw_args: typing.List[str],
         assigned_args: dict
 ):
-    """
-
-    :param parser:
-    :param raw_args:
-    :param assigned_args:
-    :return:
-    """
-
+    """..."""
     parser.add_argument(
         'step',
         nargs='*',
@@ -119,7 +112,6 @@ def populate(
 
 def execute_remote(context: cli.CommandContext, **kwargs) -> Response:
     """..."""
-
     sync_response = sync_command.execute(cli.make_command_context(
         name=sync_command.NAME,
         remote_connection=context.remote_connection

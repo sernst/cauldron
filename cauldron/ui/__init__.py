@@ -1,7 +1,7 @@
 import json
 import logging
 
-from flask import Flask
+import flask
 
 from cauldron import environ
 from cauldron import templating
@@ -46,13 +46,6 @@ def start(
     if host is None and public:
         host = '0.0.0.0'
 
-    configs.UI_APP_DATA.update(
-        host=host,
-        port=port,
-        debug=debug,
-        id=environ.start_time.isoformat(),
-    )
-
     if not debug:
         log = logging.getLogger('werkzeug')
         log.setLevel(logging.ERROR)
@@ -71,7 +64,7 @@ def start(
     has_interactive = environ.modes.has(environ.modes.INTERACTIVE)
     environ.modes.add(environ.modes.INTERACTIVE)
 
-    app = Flask('Cauldron-Application')
+    app = flask.Flask('Cauldron-Application')
     app.json_encoder = ComplexFlaskJsonEncoder
 
     app.register_blueprint(routes.blueprint)
@@ -93,6 +86,13 @@ def start(
         thread = launcher.OpenUiOnStart(host=host, port=ui_port)
         configs.LAUNCH_THREAD = thread
         thread.start()
+
+    configs.UI_APP_DATA.update(
+        host=host,
+        port=ui_port,
+        debug=debug,
+        id=environ.start_time.isoformat(),
+    )
 
     app.run(port=ui_port, debug=debug, host=host)
 

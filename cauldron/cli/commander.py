@@ -73,7 +73,6 @@ def get_command_from_module(
     :param remote_connection:
     :return:
     """
-
     use_remote = (
         remote_connection.active and
         hasattr(command_module, 'execute_remote')

@@ -46,7 +46,8 @@ def run_project(
         log_path: str = None,
         shared_data: dict = None,
         reader_path: str = None,
-        reload_project_libraries: bool = False
+        reload_project_libraries: bool = False,
+        forget_project: bool = False
 ) -> ExecutionResult:
     """
     Opens, executes and closes a Cauldron project in a single command in
@@ -71,8 +72,20 @@ def run_project(
         Whether or not to reload all project libraries prior to execution of
         the project. By default this is False, but can be enabled in cases
         where refreshing the project libraries before execution is needed.
+    :param forget_project:
+        Whether or not to remember this project was opened by the `open`
+        command in the future. Normally this is useful, but sometimes when
+        running lots of projects in batch mode it can be undesirable to
+        clutter the recently opened project list with those projects in which
+        case setting this to True will prevent that from happening.
+    :param forget_project:
+        Whether or not to remember this project was opened by the `open`
+        command in the future. Normally this is useful, but sometimes when
+        running lots of projects in batch mode it can be undesirable to
+        clutter the recently opened project list with those projects in which
+        case setting this to True will prevent that from happening.
     :return:
-        The response result from the project execution
+        The response result from the project execution.
     """
     log_path = initialize_logging_path(log_path)
     logger.add_output_path(log_path)
@@ -96,7 +109,8 @@ def run_project(
     open_response = open_command.execute(
         context=cli.make_command_context(open_command.NAME),
         path=project_directory,
-        results_path=output_directory
+        results_path=output_directory,
+        forget=forget_project
     )
     if open_response.failed:
         return on_complete(

@@ -120,11 +120,7 @@ def execute(
         library_folder: str = None,
         assets_folder: str = None
 ):
-    """
-
-    :return:
-    """
-
+    """..."""
     response = context.response
 
     response.consume(create_actions.create_project_directories(
@@ -163,7 +159,11 @@ def execute(
         return response
 
     if context.remote_connection.active:
-        opened = remote_project_opener.sync_open(context, source_directory)
+        opened = remote_project_opener.sync_open(
+            context=context,
+            path=source_directory,
+            forget=forget
+        )
     else:
         opened = project_opener.open_project(
             source_directory,

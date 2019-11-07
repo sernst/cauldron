@@ -42,7 +42,7 @@ class ProjectStep(object):
         self.code = None
         self.is_visible = True
         self.is_running = False
-        self.is_selected = False
+        self._is_selected = False
         self._is_dirty = True
         self.error = None
         self.is_muted = False
@@ -54,6 +54,20 @@ class ProjectStep(object):
         self.test_locals = None  # type: typing.Optional[dict]
         self.start_time = None  # type: typing.Optional[datetime]
         self.end_time = None  # type: typing.Optional[datetime]
+
+    @property
+    def is_selected(self) -> bool:
+        return self._is_selected
+
+    @is_selected.setter
+    def is_selected(self, value: bool):
+        previous_value = self._is_selected
+        self._is_selected = bool(value)
+        if self._is_selected != previous_value:
+            # This does not need to be forced because the DOM isn't
+            # changing. The UI will highlight the step without a
+            # DOM update.
+            self.mark_dirty(True)
 
     @property
     def remote_source_path(self) -> typing.Optional[str]:
@@ -199,7 +213,11 @@ class ProjectStep(object):
         )
 
     def mark_dirty(self, value: bool, force: bool = False):
-        """..."""
+        """
+        Steps that are forced to be dirty will be updated in the UI
+        via step change dom responses. Not forcing will only update
+        the settings dirty flag.
+        """
         self._is_dirty = bool(value)
         time_adjust = 0 if value else time.time()
         self.last_modified = time_adjust if force else self.last_modified

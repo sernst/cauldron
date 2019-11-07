@@ -9,7 +9,7 @@ class TestReload(scaffolds.ResultsTest):
 
     def test_reload(self):
         """Should reload the currently opened project."""
-        support.run_command('open @examples:hello_cauldron')
+        support.run_command('open @examples:hello_cauldron --forget')
         r = support.run_command('reload')
         self.assertFalse(r.failed, 'should not have failed')
 
@@ -22,7 +22,7 @@ class TestReload(scaffolds.ResultsTest):
     @patch('time.sleep')
     def test_missing_project_path(self, *args):
         """Should fail if the project directory does not exist."""
-        support.run_command('open @examples:hello_cauldron')
+        support.run_command('open @examples:hello_cauldron --forget')
 
         with patch('os.path.exists') as path_exists:
             path_exists.return_value = False
@@ -34,7 +34,7 @@ class TestReload(scaffolds.ResultsTest):
     @patch('time.sleep')
     def test_initialize_failure(self, *args):
         """Should fail if cannot initialize project."""
-        support.run_command('open @examples:hello_cauldron')
+        support.run_command('open @examples:hello_cauldron --forget')
 
         with patch('cauldron.runner.initialize') as runner_initialize:
             runner_initialize.side_effect = FileNotFoundError('Fake Error')
@@ -45,6 +45,6 @@ class TestReload(scaffolds.ResultsTest):
 
     def test_reload_remote(self):
         """Should reload the currently opened project."""
-        support.run_command('open @examples:hello_cauldron')
+        support.run_command('open @examples:hello_cauldron --forget')
         r = support.run_remote_command('reload')
         self.assertFalse(r.failed, 'should not have failed')

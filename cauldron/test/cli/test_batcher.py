@@ -43,7 +43,8 @@ def run_project(
         project_directory=project_directory,
         output_directory=results_directory,
         logging_path=logging_path,
-        reader_path=reader_path
+        reader_path=reader_path,
+        forget_project=True
     )
 
     return RunResult(

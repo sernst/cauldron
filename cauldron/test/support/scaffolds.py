@@ -28,11 +28,7 @@ class ResultsTest(unittest.TestCase):
         self.temp_directories = dict()
 
     def trace(self, *args):
-        """
-        Traces the results to a temporary buffer that is setup
-        :return:
-        """
-
+        """Traces the results to a temporary buffer that is setup."""
         buffer = ' '.join(['{}'.format(arg) for arg in args])
         sys.__stderr__.write('{}\n'.format(buffer))
         sys.__stderr__.flush()
