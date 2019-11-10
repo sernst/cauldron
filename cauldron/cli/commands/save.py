@@ -25,14 +25,7 @@ def populate(
         raw_args: typing.List[str],
         assigned_args: dict
 ):
-    """
-
-    :param parser:
-    :param raw_args:
-    :param assigned_args:
-    :return:
-    """
-
+    """..."""
     parser.add_argument(
         'path',
         default=None,
@@ -49,7 +42,6 @@ def populate(
 
 def get_default_path() -> str:
     """..."""
-
     project = cauldron.project.internal_project
 
     if not project or not project.remote_source_directory:
@@ -66,6 +58,7 @@ def get_default_path() -> str:
 
 
 def clean_path(project_title: str, path: str) -> str:
+    """..."""
     cleaned = environ.paths.clean(path)
 
     if os.path.isdir(cleaned):
@@ -78,22 +71,20 @@ def clean_path(project_title: str, path: str) -> str:
 
 
 def create_settings(project: 'projects.Project') -> dict:
-    """
-
-    :param project:
-    :return:
-    """
-
+    """..."""
     return dict(
         title=project.title,
         version=environ.notebook_version,
-        timestamp=datetime.now().isoformat()
+        timestamp=datetime.now().isoformat(),
+        steps=[
+            {'name': s.name, 'title': s.definition.title}
+            for s in project.steps
+        ]
     )
 
 
 def make_directory(path: str):
     """..."""
-
     save_directory = os.path.dirname(path)
     if not os.path.exists(save_directory):
         os.makedirs(save_directory)
@@ -106,7 +97,6 @@ def write_file(project: 'projects.Project', path: str) -> str:
     :param path:
     :return:
     """
-
     save_path = path if path else get_default_path()
     save_path = clean_path(project.title, save_path)
     make_directory(save_path)
@@ -133,7 +123,6 @@ def write_file(project: 'projects.Project', path: str) -> str:
 
 def execute_remote(context: cli.CommandContext, path: str = None) -> Response:
     """..."""
-
     thread = sync.send_remote_command(
         command='save',
         remote_connection=context.remote_connection,
@@ -167,7 +156,7 @@ def execute_remote(context: cli.CommandContext, path: str = None) -> Response:
             kind='SAVED',
             code='DOWNLOAD_SAVED',
             message='Project has been saved to: {}'.format(save_path)
-        )
+        ).console(whitespace=1)
 
     return context.response.consume(download_response)
 
@@ -180,9 +169,7 @@ def execute(context: cli.CommandContext, path: str = None) -> Response:
         return response.fail(
             code='NO_PROJECT',
             message='No project is open. Nothing to save'
-        ).console(
-            whitespace=1
-        ).response
+        ).console(whitespace=1).response
 
     try:
         saved_path = write_file(project, path)
@@ -191,9 +178,7 @@ def execute(context: cli.CommandContext, path: str = None) -> Response:
             code='WRITE_SAVE_ERROR',
             message='Unable to write the Cauldron file output',
             error=error
-        ).console(
-            whitespace=1
-        ).response
+        ).console(whitespace=1).response
 
     return response.update(
         path=saved_path,
@@ -201,7 +186,5 @@ def execute(context: cli.CommandContext, path: str = None) -> Response:
     ).notify(
         kind='SUCCESS',
         code='SAVED',
-        message='The project has been saved to: {}'.format(saved_path)
-    ).console(
-        whitespace=1
-    ).response
+        message='The project has been saved to: {}'.format(saved_path),
+    ).console(whitespace=1).response

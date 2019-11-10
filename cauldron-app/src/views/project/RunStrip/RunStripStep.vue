@@ -6,7 +6,7 @@
     )
       .RunStripStep__box(
         @click.left.exact="focusOnStep"
-        @click.left.ctrl.exact="queueStepToRun"
+        @click.left.shift.exact="queueStepToRun"
         @dblclick="queueStepToRun"
       )
         i.material-icons.md-14.RunStripStep__icon(
@@ -74,7 +74,7 @@ function onToggleShow(showState) {
   clearTimeout(this.delayTimeout);
   this.delayTimeout = setTimeout(() => {
     this.show = showState;
-  }, 150);
+  }, showState ? 0 : 150);
 }
 
 function stepId() {
@@ -88,7 +88,7 @@ function stepId() {
  */
 function focusOnStep() {
   this.$emit('focus', { step: this.step, index: this.index });
-  this.show = false;
+  this.show = !this.show;
 
   // If this step is already selected then just refocus on it and
   // skip the network activity.

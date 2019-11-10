@@ -49,8 +49,7 @@ def run_version(args: dict) -> int:
 
 
 def run_batch(args: dict) -> int:
-    """Runs a batch operation for the given arguments"""
-
+    """Runs a batch operation for the given arguments."""
     batcher.run_project(
         project_directory=args.get('project_directory'),
         log_path=args.get('logging_path'),
@@ -61,8 +60,7 @@ def run_batch(args: dict) -> int:
 
 
 def run_shell(args: dict) -> int:
-    """Run the shell sub command"""
-
+    """Run the shell sub command."""
     if args.get('project_directory'):
         return run_batch(args)
 
@@ -87,6 +85,13 @@ def run_ui(args: dict) -> int:
     return 0
 
 
+def run_view(args: dict) -> int:
+    """Runs the view sub command."""
+    shell = CauldronShell()
+    shell.default('view open "{}"'.format(args['path']))
+    return 0
+
+
 def run(action: str, args: dict) -> int:
     """
     Runs the specified command action and returns the return status code
@@ -106,6 +111,7 @@ def run(action: str, args: dict) -> int:
         serve=run_kernel,
         version=run_version,
         ui=run_ui,
+        view=run_view,
     )
 
     if action not in actions:

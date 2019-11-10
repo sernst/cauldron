@@ -61,13 +61,13 @@ class ProjectStep(object):
 
     @is_selected.setter
     def is_selected(self, value: bool):
-        previous_value = self._is_selected
+        # previous_value = self._is_selected
         self._is_selected = bool(value)
-        if self._is_selected != previous_value:
-            # This does not need to be forced because the DOM isn't
-            # changing. The UI will highlight the step without a
-            # DOM update.
-            self.mark_dirty(True)
+        # if self._is_selected != previous_value:
+        #     # This does not need to be forced because the DOM isn't
+        #     # changing. The UI will highlight the step without a
+        #     # DOM update.
+        #     self.mark_dirty(True)
 
     @property
     def remote_source_path(self) -> typing.Optional[str]:
@@ -233,6 +233,16 @@ class ProjectStep(object):
         dom = self.dumps()
         self.dom = dom
         return dom
+
+    def clear_dom(self) -> str:
+        """
+        Empties the current dom of all display body elements
+        and returns the empty dom.
+        """
+        self.report.body = []
+        self.dom = self.dumps()
+        self.mark_dirty(True)
+        return self.dom
 
     def dumps(self) -> str:
         """Writes the step information to an HTML-formatted string"""

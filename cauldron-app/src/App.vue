@@ -112,14 +112,20 @@ function updateStatusLoop() {
     })
     .finally(() => {
       const { path } = this.$router.currentRoute;
-      const { project } = this.$store.getters;
+      const { project, view } = this.$store.getters;
 
-      if (project === null && path.startsWith('/project')) {
-        // Go home on reload if there is no open project.
-        this.$router.push('/');
-      } else if (project && !path.startsWith('/project')) {
+      if (view && !path.startsWith('/view')) {
+        // Go to the view screen if a reader file is loaded and not in a view route.
+        this.$router.push('/view');
+      } else if (!view && project && !path.startsWith('/project')) {
         // Go to the project screen if a project is loaded and not in a project route.
         this.$router.push('/project');
+      } else if (project === null && path.startsWith('/project')) {
+        // Go home on reload if there is no open project.
+        this.$router.push('/');
+      } else if (view === null && path.startsWith('/view')) {
+        // Go home on reload if there is no open view.
+        this.$router.push('/');
       }
 
       clearTimeout(this.timeoutHandle);

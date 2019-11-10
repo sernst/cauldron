@@ -1,17 +1,22 @@
 <template lang="pug">
   .Notebook
-    iframe.Notebook__frame(v-if="$store.getters.project" :src="notebookUrl")
+    iframe.Notebook__frame(v-if="showIframe" :src="notebookUrl")
 </template>
 
 <script>
-import notebook from '../../../notebook';
-import emitter from '../../../emitter';
+import notebook from '../../notebook';
+import emitter from '../../emitter';
+
+function showIframe() {
+  const { project, view } = this.$store.getters;
+  return (this.viewer ? view : project) !== null;
+}
 
 /**
  * The URL to load as part of displaying the project.
  */
 function notebookUrl() {
-  return notebook.getUrl();
+  return this.viewer ? notebook.getViewUrl() : notebook.getUrl();
 }
 
 function selectedStep() {
@@ -66,7 +71,9 @@ function onLoaded() {
     .then(() => {
       this.isLoading = false;
       this.$emit('loaded', { value: true });
-    });
+    })
+    // Ignore errors caused by loading delays.
+    .catch(() => null);
 }
 
 function mounted() {
@@ -78,17 +85,23 @@ function mounted() {
   this.onLoaded()
     .then(() => {
       emitter.$on('refresh-notebook', this.refresh);
-    });
+    })
+    // Ignore errors caused by loading delays.
+    .catch(() => null);
 }
 
 export default {
   name: 'Notebook',
+  props: {
+    viewer: { type: Boolean, default: false },
+  },
   data,
   computed: {
     notebookUrl,
     selectedStep,
     isInitialized,
     isRunning,
+    showIframe,
   },
   watch: { selectedStep: watchSelectedStep },
   mounted,
@@ -97,7 +110,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  @import '../../../Variables';
+  @import '../../Variables';
 
   .Notebook {
     background-color: white;

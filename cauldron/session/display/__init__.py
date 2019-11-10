@@ -2,7 +2,6 @@ import json as _json_io
 import textwrap
 import typing
 from datetime import timedelta
-import os as _os
 
 import cauldron as _cd
 from cauldron import environ

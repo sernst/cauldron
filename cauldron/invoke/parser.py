@@ -4,6 +4,12 @@ from cauldron.cli.server import run as server_run
 from cauldron import ui
 
 
+def add_view_action(sub_parser: ArgumentParser) -> ArgumentParser:
+    """Populates the sub parser with the view arguments."""
+    sub_parser.add_argument('path')
+    return sub_parser
+
+
 def add_ui_action(sub_parser: ArgumentParser) -> ArgumentParser:
     """Populates the sub parser with the UI kernel/server arguments."""
     return ui.create_parser(sub_parser)
@@ -16,7 +22,6 @@ def add_kernel_action(sub_parser: ArgumentParser) -> ArgumentParser:
 
 def add_shell_action(sub_parser: ArgumentParser) -> ArgumentParser:
     """Populates the sub parser with the shell arguments"""
-
     sub_parser.add_argument(
         '-p', '--project',
         dest='project_directory',
@@ -57,14 +62,7 @@ def parse(args: list = None) -> dict:
         The command line arguments to parse. If None, the system command line
         arguments will be used instead.
     """
-
     parser = ArgumentParser(description='Cauldron command')
-    parser.add_argument(
-        'command',
-        nargs='?',
-        default='shell',
-        help='The Cauldron command action to execute'
-    )
 
     parser.add_argument(
         '-v', '--version',
@@ -84,7 +82,8 @@ def parse(args: list = None) -> dict:
     add_shell_action(sub_parsers.add_parser('shell'))
     add_kernel_action(sub_parsers.add_parser('kernel', aliases=['serve']))
     add_ui_action(sub_parsers.add_parser('ui'))
+    add_view_action(sub_parsers.add_parser('view'))
 
-    arguments = vars(parser.parse_args(args=args))
+    arguments = vars(parser.parse_args(args=args or ['shell']))
     arguments['parser'] = parser
     return arguments

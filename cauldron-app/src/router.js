@@ -28,5 +28,10 @@ export default new Router({
       name: 'open',
       component: () => import(/* webpackChunkName: "create" */ './views/open/Open.vue'),
     },
+    {
+      path: '/view',
+      name: 'viewer',
+      component: () => import(/* webpackChunkName: "create" */ './views/viewer/Viewer.vue'),
+    },
   ],
 });

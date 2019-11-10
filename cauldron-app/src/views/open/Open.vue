@@ -6,6 +6,7 @@
         browser.Open__browserBox(
           :location="location"
           :extensions="['.cauldron']"
+          :project-selection="true"
           @select="onSelectFolder"
         )
       // The known section is a vertical list of known projects that
@@ -47,13 +48,16 @@ function onProjectClick(event) {
 }
 
 function onSelectFolder(event) {
-  if (event.type === 'file') {
-    return Promise.resolve();
+  if (event.type === 'project') {
+    return this.onProjectClick({ item: event.value.spec });
   }
 
-  const { spec } = event.value;
-  if (spec) {
-    return this.onProjectClick({ item: spec });
+  if (event.type === 'file') {
+    this.loadingMessage = 'Loading view file';
+    return http.execute(`view open "${event.value.path}"`)
+      .then(() => {
+        this.$store.commit('isStatusDirty', true);
+      });
   }
 
   this.loadingMessage = 'Opening selected directory';

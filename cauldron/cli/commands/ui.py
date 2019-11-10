@@ -42,6 +42,9 @@ def execute(
     except KeyboardInterrupt:  # pragma: no cover
         pass
 
+    # Clear out the launch thread once the ui has closed.
+    configs.LAUNCH_THREAD = None
+
     return context.response.notify(
         kind='SUCCESS',
         code='COMPLETED',

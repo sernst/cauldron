@@ -26,3 +26,4 @@ from cauldron.cli.commands import connect  # noqa
 from cauldron.cli.commands import disconnect  # noqa
 from cauldron.cli.commands import sync  # noqa
 from cauldron.cli.commands import ui  # noqa
+from cauldron.cli.commands import view  # noqa

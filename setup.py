@@ -109,9 +109,16 @@ setup(
     ],
     extras_require={
         'plotly': ['plotly'],
-        'matplotlib': ['matplotlib'],
+        'matplotlib': ['matplotlib', 'beautifulsoup4'],
         'bokeh': ['bokeh'],
-        'seaborn': ['seaborn']
+        'seaborn': ['seaborn'],
+        'plotting': [
+            'plotly',
+            'matplotlib',
+            'beautifulsoup4',
+            'bokeh',
+            'seaborn',
+        ],
     },
     setup_requires=['pytest-runner'],
     tests_require=['pytest', 'pytest-cov']

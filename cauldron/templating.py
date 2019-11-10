@@ -38,9 +38,8 @@ def get_id(context: Context, prefix: str) -> str:
     :param prefix:
         Prefix string that indicates which uid is being created within a step
     :return:
-        A uniquely identifying string
+        A uniquely identifying string.
     """
-
     return 'cdi-{}-{}'.format(
         prefix,
         context['cauldron_template_uid']
@@ -49,13 +48,7 @@ def get_id(context: Context, prefix: str) -> str:
 
 @contextfilter
 def get_latex(content:Context, prefix: str) -> str:
-    """
-
-    :param content:
-    :param prefix:
-    :return:
-    """
-
+    """..."""
     return '\n\n{}\n\n'.format(render_template(
         'katex.html',
         source=utils.format_latex(prefix)
@@ -63,11 +56,7 @@ def get_latex(content:Context, prefix: str) -> str:
 
 
 def make_template_uid() -> str:
-    """
-
-    :return:
-    """
-
+    """..."""
     return '{}-{}'.format(
         format(int(1000.0 * (time.time() - BASE_TIME)), 'x'),
         ''.join(random.choice(string.ascii_lowercase) for x in range(8))
@@ -78,10 +67,7 @@ def get_environment() -> Environment:
     """
     Returns the jinja2 templating environment updated with the most recent
     cauldron environment configurations
-
-    :return:
     """
-
     env = JINJA_ENVIRONMENT
 
     loader = env.loader
@@ -110,9 +96,8 @@ def render(template: typing.Union[str, Template], **kwargs):
     :param kwargs:
         Any named arguments to pass to Jinja2 for use in rendering
     :return:
-        The rendered template string
+        The rendered template string.
     """
-
     if not hasattr(template, 'render'):
         template = get_environment().from_string(textwrap.dedent(template))
 
@@ -133,9 +118,8 @@ def render_file(path: str, **kwargs):
     :param kwargs:
         Named arguments that should be passed to Jinja2 for rendering
     :return:
-        The rendered template string
+        The rendered template string.
     """
-
     with open(path, 'r') as f:
         contents = f.read()
 
@@ -156,9 +140,8 @@ def render_template(template_name: str, **kwargs):
     :param kwargs:
         Any elements passed to Jinja2 for rendering the template
     :return:
-        The rendered string
+        The rendered string.
     """
-
     return get_environment().get_template(template_name).render(
         cauldron_template_uid=make_template_uid(),
         **kwargs

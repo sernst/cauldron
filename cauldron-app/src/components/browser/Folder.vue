@@ -21,6 +21,7 @@ export default {
   name: 'Folder',
   props: {
     value: { type: Object, default: () => {} },
+    highlightProject: { type: Boolean, default: false },
   },
   data,
   computed: { icon },
@@ -30,12 +31,12 @@ export default {
 
 <style scoped lang="scss">
   .Folder {
-    color: #444;
     display: flex;
     padding: 0.2em;
     align-items: center;
     user-select: none;
     cursor: pointer;
+    color: #444;
 
     &:hover {
       background-color: #EFEFEF;

@@ -462,7 +462,6 @@ class Project:
 
     def write(self) -> str:
         """..."""
-
         writing.save(self)
         return self.url
 

@@ -60,5 +60,8 @@ def merge_local_state(remote_status: dict, force: bool) -> dict:
     # not the remote one.
     remote_status['data']['remote'] = environ.remote_connection.serialize()
 
+    # We care about the local viewer, not the remote one.
+    remote_status['data']['view'] = environ.view
+
     remote_status['hash'] = _utils.get_digest_hash(remote_status, force)
     return remote_status

@@ -1,13 +1,19 @@
+import typing
 import json
 import json.decoder as json_decoder
 import os
 from collections import namedtuple
 
-from cauldron.environ.logger import log
 from cauldron.environ import paths
+from cauldron.environ.logger import log
 
 
 class Configuration(object):
+    """
+    Manages configuration settings for both session and persistent
+    storage cases in a combined fashion.
+    """
+
     NO_VALUE = namedtuple('NO_VALUE_NT', [])()
 
     def __init__(self, source_path: str = None):
@@ -21,31 +27,40 @@ class Configuration(object):
 
     @property
     def path(self) -> str:
+        """Path to the persistent configuration file."""
         return self._source_path
 
     @property
     def session(self) -> dict:
-        return self._session
+        """
+        Current session configuration values, which will not persist
+        into future sessions. They will be garbage collected when the
+        running Cauldron process ends. This returns a copy of the
+        session variables object and should not be modified directly.
+        """
+        return self._session.copy()
 
     @property
     def persistent(self) -> dict:
+        """
+        Currently loaded persistent storage values. These values were
+        loaded from the persistent configuration file. This returns a
+        copy of the session variables object and should not be
+        modified directly.
+        """
         return self._persistent if self._persistent != self.NO_VALUE else None
 
-    def fetch_all(self):
-        out = {}
-        out.update(**self.load().persistent)
-        out.update(**self.session)
-        return out
-
-    def load(self, source_path: str = None):
+    def fetch_all(self) -> typing.Dict[str, typing.Any]:
         """
-
-        :return:
+        Returns a dictionary containing all of the configuration
+        settings as a merging of the session and persistent values.
+        Where there are overlaps, session values override persistent
+        ones.
         """
+        return {**self.load()._persistent, **self._session}
 
-        if self.persistent is not None:
-            return self
-
+    def load(self, source_path: str = None) -> 'Configuration':
+        """..."""
         path = source_path if source_path else self._source_path
         if not os.path.exists(path):
             self._persistent = {}
@@ -77,21 +92,13 @@ class Configuration(object):
             )
         return self
 
-    def fetch_session(self, key: str, default_value=None):
-        """
-
-        :param key:
-        :param default_value:
-        :return:
-        """
-
     def fetch(
             self,
             key: str,
             default_value=None,
             use_session: bool = True,
             use_persistent: bool = True
-    ):
+    ) -> typing.Any:
         """
 
         :param key:
@@ -100,55 +107,50 @@ class Configuration(object):
         :param use_persistent:
         :return:
         """
-
         if use_session:
-            out = self.session.get(key, self.NO_VALUE)
+            out = self._session.get(key, self.NO_VALUE)
             if out != self.NO_VALUE:
                 return out
         if use_persistent:
             if not self.persistent:
                 self.load()
-            out = self.persistent.get(key, self.NO_VALUE)
+            out = self._persistent.get(key, self.NO_VALUE)
             if out != self.NO_VALUE:
                 return out
 
         return default_value
 
-    def put(self, persists: bool = False, **kwargs):
-        """
-
-        :param persists:
-        :return:
-        """
+    def put(self, persists: bool = False, **kwargs) -> 'Configuration':
+        """..."""
         if persists:
-            self.load().persistent.update(**kwargs)
+            self.load()._persistent.update(**kwargs)
             self.save()
         else:
-            self.session.update(**kwargs)
+            self._session.update(**kwargs)
 
-    def remove(self, *args, include_persists: bool = True):
+        return self
+
+    def remove(self, *args, include_persists: bool = True) -> 'Configuration':
         """
 
         :param args:
         :param include_persists:
         :return:
         """
-
         for key in args:
-            if key in self.session:
-                del self.session[key]
-            if include_persists and key in self.load().persistent:
-                del self.persistent[key]
+            if key in self._session:
+                del self._session[key]
+            if include_persists and key in self.load()._persistent:
+                del self._persistent[key]
+
+        return self
 
     def save(self) -> 'Configuration':
         """
         Saves the configuration settings object to the current user's home
-        directory
-
-        :return:
+        directory.
         """
-
-        data = self.load().persistent
+        data = self._persistent
         if data is None:
             return self
 
@@ -162,8 +164,8 @@ class Configuration(object):
 
         return self
 
-    def make_path(self, *args, override_key: str = None):
-
+    def make_path(self, *args, override_key: str = None) -> str:
+        """..."""
         override_root_path = None
         if override_key is not None:
             override_root_path = self.fetch(override_key)

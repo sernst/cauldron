@@ -22,7 +22,8 @@ def get_status(last_timestamp: float, force: bool = False):
         version=environ.version,
         remote=environ.remote_connection.serialize(),
         project=project_data,
-        step_changes=step_changes
+        step_changes=step_changes,
+        view=environ.view,
     )
 
     results = response.serialize()

@@ -31,7 +31,7 @@ def test_start_defaults(
     ui.start()
 
     expected = {'port': 1234, 'debug': False, 'host': None}
-    assert expected == app.run.call_args[1], """
+    assert {'threaded': True, **expected} == app.run.call_args[1], """
         Expect app run configuration to be {}
         """.format(expected)
     assert all(
@@ -72,7 +72,7 @@ def test_start_customized(
     ui.start(port=4321, debug=True, public=True)
 
     expected = {'port': 4321, 'debug': True, 'host': '0.0.0.0'}
-    assert expected == app.run.call_args[1], """
+    assert {'threaded': True, **expected} == app.run.call_args[1], """
         Expect app run configuration to be {}
         """.format(expected)
     assert all(
@@ -116,7 +116,7 @@ def test_start_remote_connection(
     ui.start(port=4321, debug=True, host='bar', connection_url='foo:8080')
 
     expected = {'port': 4321, 'debug': True, 'host': 'bar'}
-    assert expected == app.run.call_args[1], """
+    assert {'threaded': True, **expected} == app.run.call_args[1], """
         Expect app run configuration to be {}
         """.format(expected)
     assert all(

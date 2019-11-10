@@ -20,7 +20,7 @@ import http from '../../http';
 import Loader from '../../components/loader/Loader.vue';
 import RunStrip from './RunStrip/RunStrip.vue';
 import MenuStrip from './MenuStrip/MenuStrip.vue';
-import Notebook from './Notebook/Notebook.vue';
+import Notebook from '../../components/Notebook/Notebook.vue';
 import StepSettingsModal from './StepSettingsModal/StepSettingsModal.vue';
 import Saver from '../../components/saver/Saver.vue';
 

@@ -105,11 +105,17 @@ def execute(
         {'label': 'Home Directory', 'directory': '~'}
     ]
 
+    rc = environ.remote_connection
     project = cauldron.project.get_internal_project(0.1)
     if project:
         standard_locations.append({
             'label': 'Project Directory',
             'directory': project.source_directory
+        })
+    elif rc.active and rc.local_project_directory:
+        standard_locations.append({
+            'label': 'Project Directory',
+            'directory': rc.local_project_directory
         })
 
     if os.name == 'nt':
@@ -133,6 +139,7 @@ def execute(
                 if parent_directory != current_directory else
                 None
             ),
+            spec=specio.get_project_info(current_directory),
             current_directory=current_directory,
             shortened_directory=_shorten_path(current_directory),
             children=children,

@@ -12,6 +12,18 @@ function getUrl() {
   return `${origin}${myPath}/display.html?no-cache=${cacheBuster}`;
 }
 
+function getViewUrl() {
+  const { view } = store.getters;
+  if (!view) {
+    return '';
+  }
+
+  const { origin } = window.location;
+  const myPath = window.location.pathname.replace('/app', '');
+  const dataRoot = encodeURIComponent(`${myPath}/cache/${view.id}`);
+  return `${origin}${myPath}/notebook/project.html?no-cache=${cacheBuster}&data_root=${dataRoot}`;
+}
+
 function getIframe() {
   return document.querySelector('.Notebook__frame');
 }
@@ -74,6 +86,9 @@ function applyStepModifications(renames, changes, stepName) {
   }
 
   const cauldron = getCauldronObject();
+  if (!cauldron) {
+    return Promise.resolve();
+  }
 
   return cauldron.processStepRenames(renames || {})
     .then(() => {
@@ -102,7 +117,7 @@ function applyStepModifications(renames, changes, stepName) {
 }
 
 function onLoaded() {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     // This first phase waits until the page has loaded to the point of
     // the html script tag having run, which sets up the CAULDRON obect
     // for initial use.
@@ -111,6 +126,13 @@ function onLoaded() {
     const interval = setInterval(
       () => {
         const cauldron = getCauldronObject();
+        const { project, view } = store.getters;
+
+        if (!project && !view) {
+          clearInterval(interval);
+          reject();
+          return;
+        }
 
         // Wait until the cauldron object first becomes available and refresh if
         // it doesn't become available in a reasonable amount of time.
@@ -129,7 +151,7 @@ function onLoaded() {
         // has been called, move onto the next on-ready phase.
         if (cauldron.RUNNING) {
           clearInterval(interval);
-          resolve(cauldron);
+          cauldron.on.ready.then(() => resolve(cauldron));
           return;
         }
 
@@ -145,13 +167,13 @@ function onLoaded() {
       },
       200,
     );
-  })
-    .then(cauldron => cauldron.on.ready);
+  });
 }
 
 export default {
   applyStepModifications,
   getUrl,
+  getViewUrl,
   getCauldronObject,
   getIframe,
   refresh,

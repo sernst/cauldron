@@ -26,6 +26,12 @@
       .Browser__folders(v-if="showFolders")
         folder(v-if="location.parent_directory" :value="parentFolder" @select="onSelect")
         folder(v-for="child in foldersToShow" :value="child" @select="onSelect")
+        // Project display
+        project-folder(
+          v-if="projectSelection && location.spec"
+          :location="location"
+          @select="onSelect"
+        )
 
       // File display
       .Browser__files(v-if="showFiles")
@@ -35,6 +41,7 @@
 
 <script>
 import Folder from './Folder.vue';
+import ProjectFolder from './ProjectFolder.vue';
 import File from './File.vue';
 import StandardPathButton from './StandardPathButton.vue';
 
@@ -104,13 +111,19 @@ function watchLocation() {
 
 export default {
   name: 'Browser',
-  components: { StandardPathButton, Folder, File },
+  components: {
+    StandardPathButton,
+    Folder,
+    ProjectFolder,
+    File,
+  },
   props: {
     location: { type: Object, default: () => {} },
     showFiles: { type: Boolean, default: true },
     showFolders: { type: Boolean, default: true },
     extraLocations: { type: Array, default: () => [] },
     extensions: { type: Array, default: () => [] },
+    projectSelection: { type: Boolean, default: false },
   },
   computed: { parentFolder, foldersToShow, filesToShow },
   watch: {

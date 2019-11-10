@@ -136,7 +136,7 @@ def run_step(
         )
 
     step.end_time = datetime.utcnow()
-    os.chdir(os.path.expanduser('~'))
+    os.chdir(environ.configs.fetch('directory', os.path.expanduser('~')))
 
     step.mark_dirty(not result['success'])
     step.error = result.get('html_message')

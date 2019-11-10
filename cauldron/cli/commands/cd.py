@@ -52,4 +52,8 @@ def execute(
             .response
         )
 
+    # Update the directory that is used for general reference
+    # within the application state.
+    environ.configs.put(persists=False, directory=clean_directory)
+
     return ls.execute(context)

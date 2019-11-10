@@ -16,6 +16,7 @@ def sync_open(
 ) -> Response:
     """..."""
     source_directory = environ.paths.clean(path)
+    environ.remote_connection.local_project_directory = source_directory
     source_path = os.path.join(source_directory, 'cauldron.json')
 
     with open(source_path, 'r') as f:

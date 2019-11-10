@@ -132,7 +132,6 @@ def execute(
         response=response,
         remote_connection=connection
     )
-    response.update(remote_connection=connection.serialize())
 
     if not context.remote_connection.active and name == 'run':
         preload()

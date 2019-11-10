@@ -1,5 +1,8 @@
 import os
 
+#: Directory where cauldron was launched from.
+INITIAL_DIRECTORY = os.path.realpath(os.curdir)
+
 
 def join(*args: str) -> str:
     """ Creates an absolute and cleaned path from the arguments."""
@@ -39,7 +42,6 @@ def package(*args: str) -> str:
         Zero or more relative path elements that describe a file or folder
         within the reporting
     """
-
     return clean(os.path.join(os.path.dirname(__file__), '..', *args))
 
 
@@ -53,7 +55,6 @@ def resources(*args: str) -> str:
     :return:
         The absolute path
     """
-
     return package('resources', *args)
 
 
@@ -67,7 +68,6 @@ def user(*args: str) -> str:
     :return:
         The absolute path
     """
-
     return clean(os.path.join('~', '.cauldron', *args))
 
 
@@ -81,5 +81,4 @@ def results(*args: str) -> str:
     :return:
         The absolute path
     """
-
     return user('results', *args)

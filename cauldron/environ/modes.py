@@ -1,9 +1,9 @@
 
 TESTING = 'testing'
-
 SINGLE_RUN = 'single_run'
-
 INTERACTIVE = 'interactive'
+SERVER = 'server'
+UI = 'ui'
 
 _current_modes = []
 
@@ -13,7 +13,6 @@ def has(mode_id: str) -> bool:
     Returns whether or not the specified mode identifier is currently active
     or not.
     """
-
     return bool(mode_id in _current_modes)
 
 
@@ -22,7 +21,6 @@ def add(mode_id: str) -> list:
     Adds the specified mode identifier to the list of active modes and returns
     a copy of the currently active modes list.
     """
-
     if not has(mode_id):
         _current_modes.append(mode_id)
     return _current_modes.copy()
@@ -34,7 +32,6 @@ def remove(mode_id: str) -> bool:
     whether or not a remove operation was carried out. If the mode identifier
     is not in the currently active modes, it does need to be removed.
     """
-
     had_mode = has(mode_id)
 
     if had_mode:
@@ -49,6 +46,8 @@ class ExposedModes:
     INTERACTIVE = INTERACTIVE
     TESTING = TESTING
     SINGLE_RUN = SINGLE_RUN
+    SERVER = SERVER
+    UI = UI
 
     @staticmethod
     def has_mode(mode_id) -> bool:
@@ -65,3 +64,11 @@ class ExposedModes:
     @staticmethod
     def is_single_run() -> bool:
         return has(SINGLE_RUN)
+
+    @staticmethod
+    def is_server() -> bool:
+        return has(SERVER)
+
+    @staticmethod
+    def is_ui() -> bool:
+        return has(UI)

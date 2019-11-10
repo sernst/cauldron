@@ -15,6 +15,7 @@ from cauldron.ui.routes import apps as apps_routes
 from cauldron.ui.routes import notebooks as notebooks_routes
 from cauldron.ui.routes.apis import executions as executions_routes
 from cauldron.ui.routes.apis import statuses as statuses_routes
+from cauldron.ui.routes import viewers as viewers_routes
 
 
 def start(
@@ -61,8 +62,9 @@ def start(
             )
         ))
 
-    has_interactive = environ.modes.has(environ.modes.INTERACTIVE)
+    was_interactive = environ.modes.has(environ.modes.INTERACTIVE)
     environ.modes.add(environ.modes.INTERACTIVE)
+    environ.modes.add(environ.modes.UI)
 
     app = flask.Flask('Cauldron-Application')
     app.json_encoder = ComplexFlaskJsonEncoder
@@ -72,6 +74,7 @@ def start(
     app.register_blueprint(statuses_routes.blueprint)
     app.register_blueprint(executions_routes.blueprint)
     app.register_blueprint(notebooks_routes.blueprint)
+    app.register_blueprint(viewers_routes.blueprint)
 
     # Either used the specified port for the UI if one was given or
     # find the first available port in the given range and use that
@@ -94,7 +97,8 @@ def start(
         id=environ.start_time.isoformat(),
     )
 
-    app.run(port=ui_port, debug=debug, host=host)
+    app.run(port=ui_port, debug=debug, host=host, threaded=True)
 
-    if not has_interactive:
+    environ.modes.remove(environ.modes.UI)
+    if not was_interactive:
         environ.modes.remove(environ.modes.INTERACTIVE)

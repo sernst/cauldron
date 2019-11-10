@@ -8,7 +8,6 @@ sys.path.append(my_directory)
 
 def run_build():
     """Builds the Cauldron container image"""
-
     os.chdir(my_directory)
 
     cmd = [

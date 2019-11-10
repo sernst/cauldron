@@ -1,9 +1,10 @@
 <template lang="pug">
     .MenuStripItem(
-      @mouseover="onToggleShow(true, $event)"
-      @mouseleave="onToggleShow(false, $event)"
+      @click="onToggleShow(null, 0)"
+      @mouseover="onMouseOver"
+      @mouseleave="onToggleShow(false, 300)"
     )
-      .MenuStripItem__box
+      .MenuStripItem__box(:class="boxClasses")
         i.material-icons.md-18 {{ icon }}
       .MenuStripItem__overlay(v-if="show")
         .MenuStripItem__titleBox
@@ -20,11 +21,27 @@ function data() {
   };
 }
 
-function onToggleShow(state) {
+function boxClasses() {
+  const blockElement = 'MenuStripItem__box';
+  const modifier = this.show ? 'opened' : 'closed';
+  return `${blockElement}--${modifier}`;
+}
+
+function onMouseOver() {
+  if (this.show) {
+    // If the menu is currently showing, a mouse over should keep it showing.
+    // This deals with the situation where a user briefly mouses out but comes
+    // back before the timeout to hide the overlay is reached.
+    clearTimeout(this.delayTimeout);
+  }
+}
+
+function onToggleShow(state, delay) {
+  const newState = state === null ? !this.show : state;
   clearTimeout(this.delayTimeout);
   this.delayTimeout = setTimeout(() => {
-    this.show = state;
-  }, 150);
+    this.show = newState;
+  }, delay);
 }
 
 export default {
@@ -34,7 +51,8 @@ export default {
     title: { type: String, default: 'Menu' },
   },
   data,
-  methods: { onToggleShow },
+  computed: { boxClasses },
+  methods: { onToggleShow, onMouseOver },
 };
 </script>
 
@@ -45,15 +63,29 @@ export default {
     position: relative;
 
     &__box {
-      color: #333;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding-bottom: 1em;
+      padding: 0.75em 0;
       cursor: pointer;
 
-      &:hover {
-        opacity: 0.7;
+      &--closed {
+        color: #333;
+
+        &:hover {
+          opacity: 0.7;
+          background-color: rgba(0, 0, 0, 0.1);
+        }
+      }
+
+      &--opened {
+        color: #EEE;
+        background-color: #444;
+
+        &:hover {
+          opacity: 0.7;
+          background-color: #777;
+        }
       }
     }
 

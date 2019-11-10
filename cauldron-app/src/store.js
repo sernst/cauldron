@@ -63,5 +63,6 @@ export default new Vuex.Store({
     runningStepName: state => state.runningStepName,
     savingFile: state => state.savingFile,
     status: state => state.status,
+    view: state => ((state.status || {}).data || {}).view || null,
   },
 });

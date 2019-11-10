@@ -24,6 +24,7 @@ class RemoteConnection:
     def __init__(self, active: bool = False, url: str = None):
         self.active = active  # type: bool
         self.url = url  # type: typing.Optional[str]
+        self.local_project_directory = None  # type: typing.Optional[str]
         self._sync_timestamp = 0  # type: int
         self._sync_active = False  # type: bool
 
@@ -56,7 +57,10 @@ remote_connection = RemoteConnection()
 
 start_time = datetime.utcnow()
 
-configs = Configuration()
+configs = Configuration().put(
+    persists=False,
+    directory=paths.INITIAL_DIRECTORY,
+)
 
 package_settings = systems.get_package_data()
 
@@ -66,6 +70,11 @@ notebook_version = package_settings.get('notebookVersion', 'v0')
 version_info = VersionInfo(*[int(x) for x in version.split('.')])
 
 abort_thread = threads.abort_thread
+
+#: Holds information about open viewer (reader) files
+#: and is None when no such file has been opened for
+#: viewing.
+view = None  # type: typing.Optional[dict]
 
 
 def run_time() -> timedelta:

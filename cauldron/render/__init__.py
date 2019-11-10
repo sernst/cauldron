@@ -246,9 +246,13 @@ def image(
 
 def json(**kwargs) -> str:
     """
+    Adds the specified data to the the output display window with the
+    specified key. This allows the user to make available arbitrary
+    JSON-compatible data to the display for runtime use.
 
     :param kwargs:
-    :return:
+        Each keyword argument is added to the CD.data object with the
+        specified key and value.
     """
     environ.abort_thread()
 
@@ -258,14 +262,14 @@ def json(**kwargs) -> str:
     )
 
 
-def html(content) -> str:
+def html(content: str) -> str:
     """
+    A string containing a valid HTML snippet.
 
     :param content:
-    :return:
+        The HTML string rendered for display.
     """
     environ.abort_thread()
-
     return templating.render(
         '<div class="box">{{content}}</div>',
         content=content
@@ -280,13 +284,25 @@ def plotly(
         static: bool = False
 ) -> str:
     """
+    Creates a Plotly plot in the display with the specified data and
+    layout.
 
     :param data:
+        The Plotly trace data to be plotted.
     :param layout:
+        The layout data used for the plot.
     :param scale:
+        The display scale with units of fractional screen height. A value
+        of 0.5 constrains the output to a maximum height equal to half the
+        height of browser window when viewed. Values below 1.0 are usually
+        recommended so the entire output can be viewed without scrolling.
     :param figure:
+        In cases where you need to create a figure instead of separate data
+        and layout information, you can pass the figure here and leave the
+        data and layout values as None.
     :param static:
-    :return:
+        If true, the plot will be created without interactivity.
+        This is useful if you have a lot of plots in your notebook.
     """
     environ.abort_thread()
 

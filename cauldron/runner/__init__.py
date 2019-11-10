@@ -73,7 +73,7 @@ def initialize(project: typing.Union[str, Project]):
 
 def close():
     """..."""
-    os.chdir(os.path.expanduser('~'))
+    os.chdir(environ.configs.fetch('directory', os.path.expanduser('~')))
     project = cauldron.project.internal_project
     if not project:
         return False

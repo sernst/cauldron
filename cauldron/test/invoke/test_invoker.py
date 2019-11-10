@@ -8,8 +8,7 @@ from cauldron.invoke import invoker
 
 def run_command(command: str) -> int:
     """Executes the specified command by parsing the args and running them"""
-    full_command = 'cauldron {}'.format(command).strip()
-    args = parser.parse(full_command.split(' '))
+    args = parser.parse(command.split(' '))
     return invoker.run(args.get('command'), args)
 
 
