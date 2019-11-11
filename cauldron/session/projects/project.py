@@ -38,7 +38,6 @@ class Project:
             [optional] The shared data cache used to store project data when
             run
         """
-
         source_directory = environ.paths.clean(source_directory)
         if os.path.isfile(source_directory):
             source_directory = os.path.dirname(source_directory)
@@ -109,7 +108,6 @@ class Project:
     @property
     def asset_directories(self):
         """..."""
-
         def listify(value):
             return [value] if isinstance(value, str) else list(value)
         folders = listify(self.settings.fetch('asset_folders', ['assets']))
@@ -122,7 +120,6 @@ class Project:
     @property
     def has_error(self):
         """..."""
-
         for s in self.steps:
             if s.error:
                 return True
@@ -193,7 +190,6 @@ class Project:
         Returns the URL that will open this project results file in the browser
         :return:
         """
-
         return 'file://{path}?id={id}'.format(
             path=os.path.join(self.results_path, 'project.html'),
             id=self.uuid
@@ -207,7 +203,6 @@ class Project:
         parameters are needed to view it, which is needed on platforms like
         windows
         """
-
         return 'file://{path}'.format(
             path=os.path.join(self.results_path, 'display.html'),
             id=self.uuid
@@ -218,7 +213,6 @@ class Project:
         """
         Returns the directory where the project results files will be written
         """
-
         return os.path.join(self.results_path, 'reports', self.uuid, 'latest')
 
     @property
@@ -227,7 +221,6 @@ class Project:
         Returns the full path to where the results.js file will be written
         :return:
         """
-
         return os.path.join(self.output_directory, 'results.js')
 
     def select_step(
@@ -258,17 +251,9 @@ class Project:
         return step
 
     def make_remote_url(self, host: str = None):
-        """
-
-        :param host:
-        """
-
-        if host:
-            host = host.rstrip('/')
-        else:
-            host = ''
-
-        return '{}/view/project.html?id={}'.format(host, self.uuid)
+        """..."""
+        clean_host = (host or '').rstrip('/')
+        return '{}/view/project.html?id={}'.format(clean_host, self.uuid)
 
     def kernel_serialize(self):
         """..."""

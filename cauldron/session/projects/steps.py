@@ -110,13 +110,11 @@ class ProjectStep(object):
         if not self.project:
             return []
 
-        out = []
-        for fn in self.definition.get('web_includes', []):
-            out.append(os.path.join(
-                self.definition.get('folder', ''),
-                fn.replace('/', os.sep)
-            ))
-        return out
+        folder = self.definition.get('folder', '')
+        return [
+            os.path.join(folder, fn.replace('/', os.sep))
+            for fn in self.definition.get('web_includes', [])
+        ]
 
     @property
     def index(self) -> int:

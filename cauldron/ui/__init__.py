@@ -2,7 +2,6 @@ import json
 import logging
 
 import flask
-
 from cauldron import environ
 from cauldron import templating
 from cauldron.cli.commands import connect
@@ -13,9 +12,9 @@ from cauldron.ui import routes
 from cauldron.ui.parsing import create_parser  # noqa
 from cauldron.ui.routes import apps as apps_routes
 from cauldron.ui.routes import notebooks as notebooks_routes
+from cauldron.ui.routes import viewers as viewers_routes
 from cauldron.ui.routes.apis import executions as executions_routes
 from cauldron.ui.routes.apis import statuses as statuses_routes
-from cauldron.ui.routes import viewers as viewers_routes
 
 
 def start(
@@ -28,9 +27,7 @@ def start(
         connection_url: str = None,
         **kwargs
 ):
-    """
-    Starts the application UI.
-    """
+    """Starts the application UI."""
     if version:
         environ.log('VERSION: {}'.format(environ.version))
         return environ.systems.end(0)

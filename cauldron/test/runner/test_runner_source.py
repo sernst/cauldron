@@ -1,3 +1,4 @@
+from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import cauldron as cd
@@ -130,3 +131,17 @@ class TestRunnerSource(scaffolds.ResultsTest):
 
         status = source.check_status(Response(), project, step)
         self.assertEqual(status, source.SKIP_STATUS)
+
+
+def test_execute_step():
+    """Should fail to run the step with an unknown extension."""
+    step = MagicMock()
+    step.source_path = 'foo.fake'
+    step.index = 0
+
+    project = MagicMock()
+    project.steps = [step, MagicMock()]
+
+    result = source._execute_step(project, step)
+    assert not result['success']
+    project.steps[-1].mark_dirty.assert_called_once_with(True)

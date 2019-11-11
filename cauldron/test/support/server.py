@@ -20,7 +20,6 @@ def create_test_app():
 
 def get(app, endpoint: str, **kwargs) -> Responses:
     """ send get request to the test flask application."""
-
     flask_response = app.get(endpoint, **kwargs)
     response = deserialize_flask_response(flask_response)
     return Responses(flask_response, response)
@@ -28,7 +27,6 @@ def get(app, endpoint: str, **kwargs) -> Responses:
 
 def post(app, endpoint: str, data=None, **kwargs) -> Responses:
     """ send post request to the test flask application."""
-
     args = json.dumps(data) if data else None
     flask_response = app.post(
         endpoint,

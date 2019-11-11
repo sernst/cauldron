@@ -1,5 +1,6 @@
 import re
 import sys
+import typing
 from unittest.mock import patch
 
 import cauldron
@@ -11,6 +12,9 @@ from cauldron.cli.shell import CauldronShell
 from cauldron.test.support import scaffolds
 from cauldron.test.support import server
 from cauldron.test.support.messages import Message
+from cauldron.test.support.functional \
+    import make_project_lifecycle_fixture  # noq
+from cauldron.test.support.functional import ProjectLifecycleTester  # noqa
 
 try:
   import readline
@@ -37,6 +41,7 @@ def run_remote_command(
             active=True
         )
 
+    # Create a test server to handle the remote command request.
     app = app if app else server.create_test_app()
 
     def default_mock_send_request(
@@ -60,10 +65,8 @@ def run_remote_command(
         default_mock_send_request
     )
 
-    with patch(
-            'cauldron.cli.sync.comm.send_request',
-            side_effect=side_effect
-    ):
+    target_path = 'cauldron.cli.sync.comm.send_request'
+    with patch(target_path, side_effect=side_effect):
         response = commander.execute(
             name=name,
             raw_args=args,
@@ -136,7 +139,7 @@ def create_project(
 
 
 def open_project(
-        tester: scaffolds.ResultsTest,
+        tester: typing.Union[ProjectLifecycleTester, scaffolds.ResultsTest],
         path: str
 ) -> 'environ.Response':
     """..."""
@@ -199,3 +202,34 @@ def add_step(
         f.write(contents)
 
     return step_path
+
+
+def has_error_code(response: environ.Response, code: str) -> bool:
+    """..."""
+    assert response.failed, Message(
+        'Expected a failed response',
+        'Response should have failed if expecting an error',
+        response=response
+    )
+
+    assert 0 < len(response.errors), Message(
+        'Expected to find errors',
+        'There should have been an error in the response',
+        response=response
+    )
+
+    codes = [error.code for error in response.errors]
+
+    return code in codes
+
+
+def has_success_code(response: environ.Response, code: str):
+    """..."""
+    assert response.success, Message(
+        'Expected a successful response',
+        'Response should have succeeded.',
+        response=response
+    )
+
+    codes = [message.code for message in response.messages]
+    return code in codes

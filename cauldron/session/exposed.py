@@ -22,7 +22,7 @@ class ExposedProject(object):
     """
 
     def __init__(self):
-        self._project = None  # type: projects.Project
+        self._project = None  # type: typing.Optional[projects.Project]
 
     @property
     def internal_project(self) -> typing.Union[projects.Project, None]:

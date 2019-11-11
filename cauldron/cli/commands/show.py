@@ -1,10 +1,11 @@
+import os
 import subprocess
 import sys
-import os
 import typing
 from argparse import ArgumentParser
 
 import cauldron
+from cauldron import  environ
 from cauldron import cli
 from cauldron.cli import sync
 from cauldron.environ import Response
@@ -18,13 +19,7 @@ def populate(
         raw_args: typing.List[str],
         assigned_args: dict
 ):
-    """
-
-    :param parser:
-    :param raw_args:
-    :param assigned_args:
-    :return:
-    """
+    """..."""
     parser.add_argument(
         'target', nargs='?', default='browser',
         help=cli.reformat(
@@ -42,7 +37,6 @@ def open_folder(path: str):
     elif sys.platform == 'linux2':
         subprocess.check_call(['xdg-open', '--', path])
     elif sys.platform == 'win32':
-        # subprocess.check_call(['explorer', path])
         os.startfile(path)
 
 
@@ -52,14 +46,11 @@ def execute_remote(
 ) -> Response:
     """..."""
     if target != 'browser':
-        status_response = sync.comm.send_request(
-            endpoint='/sync-status',
-            method='GET',
-            remote_connection=context.remote_connection
-        )
-        source_directory = status_response.data.get('remote_source_directory')
-        open_folder(source_directory)
-        return context.response
+        open_folder(environ.remote_connection.local_project_directory)
+        return context.response.notify(
+            kind='SUCCESS',
+            code='SHOWN'
+        ).response
 
     response = sync.comm.send_request(
         endpoint='/status',
@@ -76,7 +67,10 @@ def execute_remote(
 
         cli.open_in_browser(url)
 
-    return context.response.consume(response)
+    return context.response.consume(response).notify(
+        kind='SUCCESS',
+        code='SHOWN'
+    ).response
 
 
 def execute(
@@ -88,7 +82,7 @@ def execute(
     :return:
     """
     response = context.response
-    project = cauldron.project.internal_project
+    project = cauldron.project.get_internal_project()
     if not project:
         return response.fail(
             code='NO_OPEN_PROJECT',
@@ -106,4 +100,7 @@ def execute(
     else:
         open_folder(project.source_directory)
 
-    return response
+    return response.notify(
+        kind='SUCCESS',
+        code='SHOWN'
+    ).response

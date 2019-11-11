@@ -27,6 +27,18 @@ class TestPurge(scaffolds.ResultsTest):
         ))
         self.assertEqual(1, remove.call_count)
 
+    @patch('cauldron.environ.systems.remove')
+    def test_purge_all_fails(self, remove: MagicMock):
+        """Should fail to purge current results directory."""
+        remove.return_value = False
+        response = support.run_command('purge --yes --all')
+        self.assertFalse(response.success, Message(
+            'PURGED ALL',
+            'should not have purged all in results directory',
+            response=response
+        ))
+        self.assertEqual(1, remove.call_count)
+
     @patch('cauldron.cli.commands.purge.opener.initialize_results')
     @patch('cauldron.project.get_internal_project')
     @patch('cauldron.environ.systems.remove')

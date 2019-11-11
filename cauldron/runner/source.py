@@ -72,7 +72,8 @@ def _execute_step(project: Project, step: ProjectStep) -> dict:
         return html_file.run(project, step)
 
     # Mark the downstream steps as dirty because this one has run
-    [x.mark_dirty(True) for x in project.steps[(step.index + 1):]]
+    for s in project.steps[(step.index + 1):]:
+        s.mark_dirty(True)
 
     if has_extension(step.source_path, 'py'):
         return python_file.run(project, step)
