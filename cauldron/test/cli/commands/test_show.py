@@ -64,10 +64,10 @@ def test_show_remote(
 
 
 @patch('subprocess.check_call')
-@patch('os.startfile')
+@patch('cauldron.cli.commands.show.os')
 @mark.parametrize('platform', ['darwin', 'linux2', 'win32'])
 def test_show_files(
-        start_file: MagicMock,
+        os_module: MagicMock,
         check_call: MagicMock,
         platform: str,
         tester: support.ProjectLifecycleTester
@@ -81,14 +81,14 @@ def test_show_files(
     assert support.has_success_code(response, 'SHOWN'), """
         Expect show to run without error.
         """
-    assert 1 == (start_file.call_count + check_call.call_count)
+    assert 1 == (os_module.startfile.call_count + check_call.call_count)
 
 
 @patch('subprocess.check_call')
-@patch('os.startfile')
+@patch('cauldron.cli.commands.show.os')
 @mark.parametrize('platform', ['darwin', 'linux2', 'win32'])
 def test_show_files_remote(
-        start_file: MagicMock,
+        os_module: MagicMock,
         check_call: MagicMock,
         platform: str,
         tester: support.ProjectLifecycleTester
@@ -102,4 +102,4 @@ def test_show_files_remote(
     assert support.has_success_code(response, 'SHOWN'), """
         Expect show to run without error.
         """
-    assert 1 == (start_file.call_count + check_call.call_count)
+    assert 1 == (os_module.startfile.call_count + check_call.call_count)

@@ -5,7 +5,7 @@ import typing
 from argparse import ArgumentParser
 
 import cauldron
-from cauldron import  environ
+from cauldron import environ
 from cauldron import cli
 from cauldron.cli import sync
 from cauldron.environ import Response
