@@ -125,6 +125,7 @@ def execute(
         path = p if p else path
 
     if context.remote_connection.active:
+        environ.remote_connection.reset_sync_time()
         response.consume(remote_opener.sync_open(
             context=context,
             path=path,

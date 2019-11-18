@@ -136,10 +136,10 @@ def json(**kwargs):
 
 
 def plotly(
-        data: typing.Union[dict, list] = None,
-        layout: dict = None,
+        data: typing.Union[dict, list, typing.Any] = None,
+        layout: typing.Union[dict, typing.Any] = None,
         scale: float = 0.5,
-        figure: dict = None,
+        figure: typing.Union[dict, typing.Any] = None,
         static: bool = False
 ):
     """

@@ -4,6 +4,7 @@
     warning-overlay(v-if="warning" :warning="warning" @close="onDismissWarning")
     error-overlay(v-if="error" :error="error" @close="onDismissError")
     lost-connection-overlay(v-if="showLostConnection")
+    loader(v-if="loadingMessage.id", :message="loadingMessage.message")
 </template>
 
 <script>
@@ -13,10 +14,16 @@ import ErrorOverlay from './components/errorOverlay/ErrorOverlay.vue';
 import exceptions from './exceptions';
 import LostConnectionOverlay from './components/lostConnectionOverlay/LostConnectionOverlay.vue';
 import utils from './utils';
+import Loader from './components/loader/Loader.vue';
 
 const SUCCESS = 'success';
 const FAILED = 'failure';
 const LOST = 'lost';
+
+function loadingMessage() {
+  const items = this.$store.getters.loading || [];
+  return items.length > 0 ? items.splice(-1)[0] : {};
+}
 
 function warning() {
   const { warnings } = this.$store.getters;
@@ -158,9 +165,19 @@ function beforeDestroy() {
 
 export default {
   name: 'App',
-  components: { LostConnectionOverlay, ErrorOverlay, WarningOverlay },
+  components: {
+    Loader,
+    LostConnectionOverlay,
+    ErrorOverlay,
+    WarningOverlay,
+  },
   data,
-  computed: { warning, error, showLostConnection },
+  computed: {
+    warning,
+    error,
+    showLostConnection,
+    loadingMessage,
+  },
   mounted,
   beforeDestroy,
   methods: {

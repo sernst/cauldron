@@ -43,6 +43,13 @@ class RemoteConnection:
             }
         }
 
+    def reset_sync_time(self):
+        """
+        Reverts the sync time to 0, which is needed when a sync state
+        needs to be rewound, e.g. when closing a project.
+        """
+        self._sync_timestamp = 0
+
     def sync_starting(self):
         """..."""
         self._sync_active = True

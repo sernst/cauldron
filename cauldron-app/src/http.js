@@ -99,6 +99,7 @@ function handleStepRunningError(response) {
 
   if (hasRunningStepError) {
     stepper.clearQueue();
+    store.commit('running', false);
   }
 
   return hasRunningStepError;
@@ -165,7 +166,7 @@ function updateStatus(debounce = 0, force = false) {
         statusCache.lastInvocationTimestamp = 0;
       }
 
-      const { project } = payload.data;
+      const { project, remote } = payload.data;
       const steps = (project || {}).steps || [];
       const hasRunningStepError = handleStepRunningError(response);
       const lastHash = (store.getters.status || {}).hash || '';
@@ -179,10 +180,16 @@ function updateStatus(debounce = 0, force = false) {
 
       const runningSteps = steps.filter(s => s.status.running);
       const running = !hasRunningStepError && runningSteps.length > 0;
+      const syncing = ((remote || {}).sync || {}).active;
 
       store.commit('status', payload);
       store.commit('project', project);
-      store.commit('running', running || store.getters.queuedStepsToRun.length > 0);
+      store.commit(
+        'running',
+        syncing
+        || running
+        || store.getters.queuedStepsToRun.length > 0,
+      );
 
       return notebook
         .applyStepModifications(
@@ -191,7 +198,7 @@ function updateStatus(debounce = 0, force = false) {
         )
         .then(() => {
           // If there's a running queue, go ahead and process the next step.
-          if (!running && store.getters.queuedStepsToRun.length > 0) {
+          if (!syncing && !running && store.getters.queuedStepsToRun.length > 0) {
             const stepName = store.getters.queuedStepsToRun[0];
             store.commit('queuedStepsToRun', store.getters.queuedStepsToRun.slice(1));
             return runStep(stepName);

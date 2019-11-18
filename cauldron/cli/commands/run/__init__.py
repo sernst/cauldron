@@ -16,11 +16,7 @@ from cauldron.session import projects
 from cauldron.session import writing
 
 NAME = 'run'
-DESCRIPTION = cli.reformat(
-    """
-    Runs one or more steps within the currently opened project
-    """
-)
+DESCRIPTION = 'Runs one or more steps within the currently opened project.'
 
 
 def populate(
@@ -166,9 +162,7 @@ def execute(
         return context.response.fail(
             code='NO_OPEN_PROJECT',
             message='No project is open. Unable to execute run command.'
-        ).console(
-            whitespace=1
-        ).response
+        ).console(whitespace=1).response
 
     run_actions.preload_project(context.response, project)
 
@@ -322,7 +316,6 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
     :param parts:
     :return:
     """
-
     if len(parts) < 1:
         return []
 

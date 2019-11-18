@@ -55,6 +55,7 @@ def test_move_failure(
         """
 
 
+@patch('os.utime')
 @patch('os.path.exists')
 @patch('os.chdir')
 @patch('shutil.move')
@@ -66,6 +67,7 @@ def test_move_git(
         shutil_move: MagicMock,
         os_chdir: MagicMock,
         path_exists: MagicMock,
+        utime: MagicMock,
 ):
     """Should move the file using git."""
     path_exists.return_value = True
@@ -97,8 +99,13 @@ def test_move_git(
         Expect 3 calls to probe git version control and
         then 4 more calls during the git move attempts.
         """
+    assert 0 < utime.call_count, """
+        Expect that the moved file gets touched to a new uptime so
+        that cauldron can see that the file has changed.
+        """
 
 
+@patch('os.utime')
 @patch('os.path.exists')
 @patch('os.chdir')
 @patch('shutil.move')
@@ -110,6 +117,7 @@ def test_move_no_git(
         shutil_move: MagicMock,
         os_chdir: MagicMock,
         path_exists: MagicMock,
+        utime: MagicMock,
 ):
     """Should move the file with shutil.move."""
     path_exists.return_value = True
@@ -138,4 +146,8 @@ def test_move_no_git(
         """
     assert 3 == os_chdir.call_count, """
         Expect 3 calls to probe git version control.
+        """
+    assert 0 < utime.call_count, """
+        Expect that the moved file gets touched to a new uptime so
+        that cauldron can see that the file has changed.
         """

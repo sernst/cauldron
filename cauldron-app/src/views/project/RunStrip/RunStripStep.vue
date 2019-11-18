@@ -74,7 +74,7 @@ function onToggleShow(showState) {
   clearTimeout(this.delayTimeout);
   this.delayTimeout = setTimeout(() => {
     this.show = showState;
-  }, showState ? 0 : 150);
+  }, showState ? 0 : 50);
 }
 
 function stepId() {
@@ -134,12 +134,8 @@ function isQueued() {
  */
 function queueStepToRun() {
   this.show = false;
-
-  if (!this.$store.getters.running) {
-    return http.runStep(this.step.name);
-  }
-
   stepper.queueStepToRun(this.step.name);
+  http.markStatusDirty();
   return Promise.resolve();
 }
 
@@ -307,7 +303,7 @@ export default {
     &__overlay {
       /* See stateStyles for additional styling */
       position: absolute;
-      top: -0.5em;
+      top: -1em;
       left: 3.2em;
       min-width: 240px;
       z-index: $menu-z-index;

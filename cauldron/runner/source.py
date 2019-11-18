@@ -141,7 +141,6 @@ def run_step(
 
     step.mark_dirty(not result['success'])
     step.error = result.get('html_message')
-    # step.last_modified = time.time() if result['success'] else 0.0
     step.last_modified = time.time()
     step.is_running = False
     step.progress = 0

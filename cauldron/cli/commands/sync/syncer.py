@@ -35,14 +35,16 @@ def _on_progress(
 def do_synchronize(
         context: cli.CommandContext,
         source_directory: str,
-        newer_than: float
+        newer_than: float,
+        library_folders: typing.List[str] = None,
 ) -> Response:
     """..."""
     context.remote_connection.sync_starting()
 
     synchronized = []
-    sync_response = sync.files.send_all_in(
-        directory=source_directory,
+    sync_directory = functools.partial(
+        sync.files.send_all_in,
+        project_directory=source_directory,
         remote_connection=context.remote_connection,
         newer_than=newer_than,
         progress_callback=functools.partial(
@@ -51,10 +53,18 @@ def do_synchronize(
         ),
         sync_time=context.remote_connection.sync_timestamp
     )
-    context.response.consume(sync_response)
+
+    directories_to_sync = ['.'] + (library_folders or [])
+    for directory in directories_to_sync:
+        context.response.consume(sync_directory(
+            relative_directory=directory
+        ))
+        if context.response.failed:
+            break
+
     context.response.update(synchronized_count=len(synchronized))
 
-    if len(synchronized) < 1:
+    if context.response.failed or len(synchronized) < 1:
         context.remote_connection.sync_ending()
         return context.response
 

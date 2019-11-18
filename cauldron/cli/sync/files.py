@@ -2,6 +2,7 @@ import glob
 import os
 import time
 import typing
+import pathlib
 
 from cauldron import environ
 from cauldron.cli import sync
@@ -15,7 +16,8 @@ def send_chunk(
         relative_path: str,
         file_kind: str = '',
         remote_connection: 'environ.RemoteConnection' = None,
-        sync_time: float = -1
+        sync_time: float = -1,
+        location: str = 'project'
 ):
     """
     Sends a chunk of the specified file to the remote kernel specified
@@ -35,7 +37,8 @@ def send_chunk(
             offset=offset,
             type=file_kind,
             index=index,
-            sync_time=time.time() if sync_time < 0 else sync_time
+            sync_time=time.time() if sync_time < 0 else sync_time,
+            location=location,
         )
     )
 
@@ -48,7 +51,8 @@ def send(
         remote_connection: 'environ.RemoteConnection' = None,
         newer_than: float = 0,
         progress_callback=None,
-        sync_time: float = -1
+        sync_time: float = -1,
+        location: str = 'project'
 ) -> Response:
     """Sends the local file contents to the remote kernel."""
     response = Response()
@@ -73,7 +77,6 @@ def send(
 
     def get_progress(complete_count: int = 0) -> typing.Tuple[int, str]:
         """..."""
-
         if chunk_count < 2:
             return 0, ''
 
@@ -102,7 +105,8 @@ def send(
             relative_path=relative_path,
             file_kind=file_kind,
             remote_connection=remote_connection,
-            sync_time=sync_time
+            sync_time=sync_time,
+            location=location
         )
         offset += len(chunk)
 
@@ -140,8 +144,8 @@ def send(
 
 
 def send_all_in(
-        directory: str,
-        relative_root_path: str = None,
+        project_directory: str,
+        relative_directory: str = '.',
         files_kind: str = '',
         chunk_size: int = sync.io.DEFAULT_CHUNK_SIZE,
         recursive: bool = True,
@@ -153,14 +157,14 @@ def send_all_in(
     """..."""
     sync_time = time.time() if sync_time < 0 else sync_time
 
-    glob_end = ('**', '*') if recursive else ('*',)
-    glob_path = os.path.join(directory, *glob_end)
+    project_directory = environ.paths.clean(project_directory)
+    root_directory = os.path.realpath(os.path.join(
+        project_directory,
+        relative_directory
+    )).rstrip(os.path.sep)
 
-    root_path = (
-        relative_root_path
-        if relative_root_path else
-        directory
-    ).rstrip(os.path.sep)
+    glob_end = ('**', '*') if recursive else ('*',)
+    glob_path = os.path.join(root_directory, *glob_end)
 
     # Only send files that have non-zero size that are not cauldron
     # reader files and wheels and ignore hidden files that start with a
@@ -174,9 +178,10 @@ def send_all_in(
         and not p.startswith('.')
         and '__pycache__' not in p
     )
-    for file_path in file_paths:
-        relative_path = file_path[len(root_path):].lstrip(os.path.sep)
 
+    for file_path in file_paths:
+        relative_path = file_path[len(root_directory):].strip(os.path.sep)
+        within_project = root_directory.startswith(project_directory)
         response = send(
             file_path=file_path,
             relative_path=relative_path,
@@ -185,7 +190,8 @@ def send_all_in(
             remote_connection=remote_connection,
             newer_than=newer_than,
             progress_callback=progress_callback,
-            sync_time=sync_time
+            sync_time=sync_time,
+            location='project' if within_project else 'shared'
         )
 
         if response.failed:

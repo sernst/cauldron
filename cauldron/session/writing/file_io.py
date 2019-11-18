@@ -149,6 +149,8 @@ def move(copy_entry: FILE_COPY_ENTRY):
                 stderr=subprocess.PIPE
             )
             result.check_returncode()
+            # Touch the file's updated timestamp.
+            os.utime(output_path, None)
             return
         except Exception:
             time.sleep(0.5)
@@ -158,6 +160,8 @@ def move(copy_entry: FILE_COPY_ENTRY):
     for i in range(3):
         try:
             shutil.move(source_path, output_path)
+            # Touch the file's updated timestamp.
+            os.utime(output_path, None)
             return
         except Exception:
             time.sleep(0.5)

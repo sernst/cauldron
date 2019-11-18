@@ -4,6 +4,7 @@ from cauldron import cli
 from cauldron.cli import sync
 from cauldron.cli.commands.sync.syncer import do_synchronize
 from cauldron.environ.response import Response
+from cauldron.session.projects import specio
 
 NAME = 'sync'
 DESCRIPTION = """
@@ -46,11 +47,8 @@ def execute(context: cli.CommandContext) -> Response:
         status_response.log_notifications()
         return context.response.consume(status_response)
 
-    source_path = os.path.join(source_directory, 'cauldron.json')
-    directory_exists = os.path.exists(source_directory)
-    definition_exists = os.path.exists(source_path)
-
-    if not directory_exists or not definition_exists:
+    project_spec = specio.get_project_info(source_directory)
+    if project_spec is None:
         return _on_failure(
             context,
             code='NO_PROJECT',
@@ -60,5 +58,6 @@ def execute(context: cli.CommandContext) -> Response:
     return context.response.consume(do_synchronize(
         context=context,
         source_directory=source_directory,
-        newer_than=context.remote_connection.sync_timestamp
+        newer_than=context.remote_connection.sync_timestamp,
+        library_folders=project_spec.get('library_folders', ['libs'])
     ))

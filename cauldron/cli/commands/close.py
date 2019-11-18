@@ -20,6 +20,7 @@ def execute_remote(context: cli.CommandContext) -> Response:
 
     thread.join()
     environ.remote_connection.local_project_directory = None
+    environ.remote_connection.reset_sync_time()
     response = thread.responses[0]
     return context.response.consume(response)
 

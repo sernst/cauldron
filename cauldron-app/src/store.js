@@ -19,6 +19,7 @@ export default new Vuex.Store({
     runningStepName: null,
     savingFile: false,
     status: createEmptyStatus(),
+    loading: [],
   },
   mutations: {
     followSteps(state, value) {
@@ -51,6 +52,9 @@ export default new Vuex.Store({
     status(state, value) {
       state.status = value || createEmptyStatus();
     },
+    loading(state, value) {
+      state.loading = value || [];
+    },
   },
   getters: {
     followSteps: state => state.followSteps,
@@ -64,5 +68,6 @@ export default new Vuex.Store({
     savingFile: state => state.savingFile,
     status: state => state.status,
     view: state => ((state.status || {}).data || {}).view || null,
+    loading: state => state.loading,
   },
 });

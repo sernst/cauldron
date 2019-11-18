@@ -165,15 +165,11 @@ def execute_remote(
     if context.response.failed:
         return context.response
 
-    sync_response = sync_command.do_synchronize(
-        context=cli.make_command_context(
-            name='sync',
-            response=context.response,
-            remote_connection=context.remote_connection
-        ),
-        source_directory=source_directory,
-        newer_than=context.remote_connection.sync_timestamp
-    )
+    sync_response = sync_command.execute(cli.make_command_context(
+        name=sync_command.NAME,
+        remote_connection=context.remote_connection
+    ))
+    sync_response.join()
 
     return context.response.consume(sync_response)
 

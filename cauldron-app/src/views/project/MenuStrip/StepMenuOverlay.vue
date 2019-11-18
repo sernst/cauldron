@@ -15,6 +15,7 @@
 import http from '../../../http';
 import MenuButton from './MenuButton.vue';
 import notebook from '../../../notebook';
+import loading from '../../../loading';
 
 function data() {
   return {};
@@ -38,6 +39,7 @@ function cleanStepStatuses() {
  * property.
  */
 function insertStep(location) {
+  loading.show('INSERT_STEP', 'Adding new step');
   this.$parent.show = false;
   const { steps } = this.$store.getters.project;
   const selectedIndex = steps.reduce((result, step, index) => {
@@ -57,7 +59,10 @@ function insertStep(location) {
         payload.data.step_changes,
       );
     })
-    .then(() => http.markStatusDirty());
+    .then(() => {
+      http.markStatusDirty();
+      loading.hide('INSERT_STEP');
+    });
 }
 
 export default {

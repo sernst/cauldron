@@ -317,4 +317,5 @@ class ProjectStep(object):
 
         if not self.is_running:
             self.dom = dom
+            self.last_modified = time.time()
         return dom
