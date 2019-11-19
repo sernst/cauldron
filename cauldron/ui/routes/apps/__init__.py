@@ -1,11 +1,8 @@
 import mimetypes
 import os
-import requests
-
-import flask
 
 import cauldron
-from cauldron import environ
+import flask
 from cauldron.ui import configs as ui_configs
 
 blueprint = flask.Blueprint(

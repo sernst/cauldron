@@ -48,7 +48,27 @@ def notebook(route: str):
     Retrieves the contents of the file specified by the view route if it
     exists.
     """
-    if environ.remote_connection.active:
+    is_remote = environ.remote_connection.active
+    load_from_resources = (
+        route.startswith('assets')
+        or (
+            is_remote
+            and route in ['project.css', 'project.js']
+        )
+    )
+
+    if load_from_resources:
+        # If a local version of the asset exists, send that from the
+        # resources directory instead of the results directory.
+        local_asset_path = environ.paths.resources('web', route)
+        if os.path.exists(local_asset_path):
+            return flask.send_file(
+                local_asset_path,
+                mimetype=mimetypes.guess_type(local_asset_path)[0],
+                cache_timeout=-1
+            )
+
+    if is_remote:
         return get_remote_view(route)
 
     project = cauldron.project.get_internal_project()

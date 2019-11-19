@@ -13,12 +13,23 @@ import ProjectMenuOverlay from './ProjectMenuOverlay.vue';
 import StepMenuOverlay from './StepMenuOverlay.vue';
 import MenuStripItem from './MenuStripItem.vue';
 
+/**
+ * Bubbles events from children up to the parent Project view for event handling.
+ */
 function onAction(event) {
   this.$emit(event.action, event);
 }
 
+/**
+ * Whether or not the application is in a running state, which is determined either
+ * by a queued step or the running state being true. This is used to disable the
+ * project menu to prevent collisions with the running state.
+ *
+ * @returns {boolean}
+ */
 function running() {
-  return this.$store.getters.running;
+  const queuedStepsToRun = this.$store.getters.queuedStepsToRun || [];
+  return (this.$store.getters.running || queuedStepsToRun.length > 0);
 }
 
 export default {

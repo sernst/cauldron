@@ -1,7 +1,7 @@
 <template lang="pug">
     .Viewer
       view-menu-strip(@close="closeViewer")
-      notebook(@loaded="onNotebookLoaded" :viewer="true")
+      notebook(v-if="!isClosing" @loaded="onNotebookLoaded" :viewer="true")
       loader(v-if="loadingMessage" :message="loadingMessage")
 </template>
 
@@ -15,12 +15,11 @@ import ViewMenuStrip from './ViewMenuStrip/ViewMenuStrip.vue';
  * Closes the currently opened Viewer and returns to the home screen.
  */
 function closeViewer() {
+  this.isClosing = true;
   document.title = 'Cauldron';
   this.loadingMessage = 'Closing Viewer';
   return http.execute('view close')
-    .then(() => {
-      this.$store.commit('isStatusDirty', true);
-    });
+    .then(() => http.markStatusDirty());
 }
 
 function onNotebookLoaded(event) {
@@ -30,6 +29,7 @@ function onNotebookLoaded(event) {
 function data() {
   return {
     loadingMessage: null,
+    isClosing: false,
   };
 }
 

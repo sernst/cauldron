@@ -89,7 +89,7 @@ def get_cached_data(
 def make_cache_write_entry(
         step: 'projects.ProjectStep',
         step_data: STEP_DATA
-) -> file_io.FILE_WRITE_ENTRY:
+) -> typing.Optional[file_io.FILE_WRITE_ENTRY]:
     """
 
     :param step:

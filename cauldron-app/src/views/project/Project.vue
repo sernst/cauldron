@@ -8,7 +8,7 @@
         @settings="onEditStepSettings"
       )
       .Project__verticalSeparator
-      notebook(@loaded="onNotebookLoaded")
+      notebook(v-if="$store.getters.project" @loaded="onNotebookLoaded")
 
       step-settings-modal(v-if="stepToEdit" :step="stepToEdit" @close="onStepSettingsChange")
       saver(v-if="$store.getters.savingFile")
@@ -44,7 +44,10 @@ function closeProject() {
   document.title = 'Cauldron';
   this.loadingMessage = 'Closing Project';
   return http.execute('close')
-    .then(() => this.$router.push('/'));
+    .then(() => {
+      this.$store.commit('project', null);
+      http.markStatusDirty();
+    });
 }
 
 function onAbortingRun(event) {
@@ -56,6 +59,7 @@ function onAbortedRun() {
 }
 
 function onNotebookLoaded(event) {
+  console.log('Project.onNotebookLoaded', event);
   this.loadingMessage = event.value ? null : 'Refreshing notebook';
 }
 

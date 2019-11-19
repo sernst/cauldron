@@ -69,10 +69,19 @@ function recordResponse(kind, responseOrError) {
 }
 
 function updateStatusLoop() {
-  const { isStatusDirty } = this.$store.getters;
+  const { isStatusDirty, isNotebookLoading } = this.$store.getters;
 
   if (isStatusDirty) {
     this.$store.commit('isStatusDirty', false);
+  }
+
+  // If the notebook display is in the process of loading, don't update status
+  // as that just competes with the notebook loading process and UI state
+  // can't change while the notebook display is loading anyway.
+  if (isNotebookLoading) {
+    clearTimeout(this.timeoutHandle);
+    this.timeoutHandle = setTimeout(this.updateStatusLoop, 200);
+    return Promise.resolve();
   }
 
   const debounce = this.$store.getters.running ? 500 : 1000;

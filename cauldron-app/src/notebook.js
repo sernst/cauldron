@@ -12,6 +12,11 @@ function getUrl() {
   return `${origin}${myPath}/display.html?no-cache=${cacheBuster}`;
 }
 
+/**
+ * The URL to display for showing viewer files within the UI.
+ *
+ * @returns {string}
+ */
 function getViewUrl() {
   const { view } = store.getters;
   if (!view) {
@@ -47,6 +52,10 @@ function getCauldronObject() {
 
 function scrollToStep(stepName, position) {
   const cauldron = getCauldronObject();
+  if (!cauldron) {
+    return;
+  }
+
   if (stepName) {
     cauldron.scrollToAnchor(stepName, position);
     return;

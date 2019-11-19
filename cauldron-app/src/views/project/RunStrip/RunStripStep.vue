@@ -69,6 +69,7 @@
 import http from '../../../http';
 import stepper from '../../../stepper';
 import notebook from '../../../notebook';
+import utils from '../../../utils';
 
 function onToggleShow(showState) {
   clearTimeout(this.delayTimeout);
@@ -90,20 +91,23 @@ function focusOnStep() {
   this.$emit('focus', { step: this.step, index: this.index });
   this.show = !this.show;
 
+  // Scroll to the step.
+  notebook.scrollToStep(this.step.name);
+
   // If this step is already selected then just refocus on it and
   // skip the network activity.
   const selectedStep = stepper.getSelectedStep();
   if (selectedStep && selectedStep.name === this.step.name) {
-    return notebook.scrollToStep(this.step.name);
+    return Promise.resolve();
   }
 
   this.warmingSelected = true;
   return http
     .execute(`steps select "${this.step.name}`)
-    .then((response) => {
-      this.$store.commit('project', response.data.data.project);
+    .then(() => http.markStatusDirty())
+    .then(() => utils.thenWait(1000))
+    .then(() => {
       this.warmingSelected = false;
-      http.markStatusDirty();
     });
 }
 

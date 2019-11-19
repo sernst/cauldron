@@ -172,24 +172,30 @@ function updateStatus(debounce = 0, force = false) {
       const lastHash = (store.getters.status || {}).hash || '';
       const hash = payload.hash || '';
 
-      if (lastHash === hash) {
-        // Abort updating status information if no status information has
-        // changed since the last update.
-        return response;
-      }
-
       const runningSteps = steps.filter(s => s.status.running);
       const running = !hasRunningStepError && runningSteps.length > 0;
       const syncing = ((remote || {}).sync || {}).active;
 
-      store.commit('status', payload);
-      store.commit('project', project);
-      store.commit(
-        'running',
-        syncing
-        || running
-        || store.getters.queuedStepsToRun.length > 0,
-      );
+      // Only update status information if the information has
+      // changed since the last update.
+      if (lastHash !== hash) {
+        store.commit('status', payload);
+        store.commit('project', project);
+      }
+
+      // Update running status if needed.
+      const wasRunning = store.getters.running;
+      const shouldBeRunning = syncing || running || store.getters.queuedStepsToRun.length > 0;
+      if (wasRunning !== shouldBeRunning) {
+        store.commit('running', shouldBeRunning);
+      }
+
+      // Update the running step name if necessary.
+      const previousRunningStepName = store.getters.runningStepName;
+      const newRunningStepName = running ? runningSteps[0].name : null;
+      if (previousRunningStepName !== newRunningStepName) {
+        store.commit('runningStepName', newRunningStepName);
+      }
 
       return notebook
         .applyStepModifications(
@@ -204,7 +210,6 @@ function updateStatus(debounce = 0, force = false) {
             return runStep(stepName);
           }
 
-          store.commit('runningStepName', running ? runningSteps[0].name : null);
           return response;
         });
     });

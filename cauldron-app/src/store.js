@@ -20,6 +20,7 @@ export default new Vuex.Store({
     savingFile: false,
     status: createEmptyStatus(),
     loading: [],
+    isNotebookLoading: false,
   },
   mutations: {
     followSteps(state, value) {
@@ -55,6 +56,9 @@ export default new Vuex.Store({
     loading(state, value) {
       state.loading = value || [];
     },
+    isNotebookLoading(state, value) {
+      state.isNotebookLoading = value || false;
+    },
   },
   getters: {
     followSteps: state => state.followSteps,
@@ -69,5 +73,6 @@ export default new Vuex.Store({
     status: state => state.status,
     view: state => ((state.status || {}).data || {}).view || null,
     loading: state => state.loading,
+    isNotebookLoading: state => state.isNotebookLoading,
   },
 });

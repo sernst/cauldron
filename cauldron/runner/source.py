@@ -141,7 +141,6 @@ def run_step(
 
     step.mark_dirty(not result['success'])
     step.error = result.get('html_message')
-    step.last_modified = time.time()
     step.is_running = False
     step.progress = 0
     step.progress_message = None
@@ -162,9 +161,6 @@ def run_step(
             step.get_elapsed_timestamp()
         ))
     else:
-        # Update the display timestamp so that the final error message
-        # assigned above will be included in interactive display updates.
-        step.report.update_last_modified()
         response.fail(
             message='Step execution error',
             code='EXECUTION_ERROR',
@@ -172,6 +168,10 @@ def run_step(
             step_name=step.definition.name
         ).console_raw(result['message'])
 
+    # Update the step timestamps so that the final dom changes
+    # will be included in interactive display updates.
+    step.report.update_last_modified()
+    step.last_modified = time.time()
     return result['success']
 
 

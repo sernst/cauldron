@@ -6,6 +6,7 @@
 <script>
 import notebook from '../../notebook';
 import emitter from '../../emitter';
+import http from '../../http';
 
 function showIframe() {
   const { project, view } = this.$store.getters;
@@ -40,8 +41,10 @@ function data() {
 }
 
 function refresh() {
+  console.log('Notebook.refresh');
   this.isLoading = true;
-  this.$emit('loaded', { value: false });
+  this.$store.commit('isNotebookLoading', true);
+  this.$emit('loaded', { value: false, source: 'Notebook.refresh' });
   notebook.refresh();
   return this.onLoaded();
 }
@@ -70,7 +73,9 @@ function onLoaded() {
   return notebook.onLoaded()
     .then(() => {
       this.isLoading = false;
-      this.$emit('loaded', { value: true });
+      this.$store.commit('isNotebookLoading', false);
+      this.$emit('loaded', { value: true, source: 'Notebook.onLoaded' });
+      http.markStatusDirty();
     })
     // Ignore errors caused by loading delays.
     .catch(() => null);
@@ -78,7 +83,8 @@ function onLoaded() {
 
 function mounted() {
   this.isLoading = true;
-  this.$emit('loaded', { value: false });
+  this.$store.commit('isNotebookLoading', true);
+  this.$emit('loaded', { value: false, source: 'Notebook.mounted' });
 
   // Don't return this promise because we don't want the resolution process to be
   // blocking.

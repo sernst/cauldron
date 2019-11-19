@@ -36,7 +36,18 @@ def _mark_dirty_after(step_data: dict, timestamp: float) -> dict:
 
 
 def localize_dirty_steps(project_data: dict) -> dict:
-    """..."""
+    """
+    Will mark steps as dirty, even if the remote status says they
+    are not if the local files have been modified more recently
+    than the remote sync timestamp, i.e. a step needs to be synced
+    to the remote.
+
+    :param project_data:
+        Remote response kernel-serialized project data in which
+        step data exists to localize.
+    :return:
+        The modified kernel-serialized project data.
+    """
     if not project_data:
         return project_data
 
@@ -49,7 +60,18 @@ def localize_dirty_steps(project_data: dict) -> dict:
 
 
 def merge_local_state(remote_status: dict, force: bool) -> dict:
-    """..."""
+    """
+    When proxying a remote status through a local cauldron process,
+    it's necessary to merge in local state values as part of the
+    proxy process given that not all remote state is the important
+    state to be reporting to the UI.
+
+    :param remote_status:
+        The remote status payload to merge local state into.
+    :param force:
+        Whether or not to force the hash of the finalized status
+        to ensure that the state is updated when returned to the UI.
+    """
     # Steps modified locally should be identified as dirty
     # or the status display.
     remote_status['data']['project'] = localize_dirty_steps(
