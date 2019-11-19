@@ -29,7 +29,8 @@ def get_digest_hash(response_data: dict, force: bool = False) -> str:
     r = response_data.copy()
     r['timestamp'] = None
     serialized = json.dumps(r, cls=ComplexJsonEncoder)
-    return hashlib.blake2b(serialized.encode()).hexdigest()
+    func = getattr(hashlib, 'blake2b', hashlib.sha256)
+    return func(serialized.encode()).hexdigest()
 
 
 def _get_step_changes(
