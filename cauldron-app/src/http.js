@@ -190,6 +190,13 @@ function updateStatus(debounce = 0, force = false) {
         store.commit('running', shouldBeRunning);
       }
 
+      // If running has just stopped mark status dirty to capture any post step changes
+      // made after the running state change. This helps prevent the final dom updates
+      // from mysteriously not appearing in the results.
+      if (wasRunning && !shouldBeRunning) {
+        markStatusDirty();
+      }
+
       // Update the running step name if necessary.
       const previousRunningStepName = store.getters.runningStepName;
       const newRunningStepName = running ? runningSteps[0].name : null;

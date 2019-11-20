@@ -41,7 +41,6 @@ function data() {
 }
 
 function refresh() {
-  console.log('Notebook.refresh');
   this.isLoading = true;
   this.$store.commit('isNotebookLoading', true);
   this.$emit('loaded', { value: false, source: 'Notebook.refresh' });

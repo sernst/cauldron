@@ -9,11 +9,7 @@ from cauldron.environ import Response
 from cauldron.session.projects import specio
 
 NAME = 'ls'
-DESCRIPTION = (
-    """
-    Displays current directory information to help with navigation.
-    """
-)
+DESCRIPTION = 'Displays current directory information to help with navigation.'
 SYNCHRONOUS = True
 
 

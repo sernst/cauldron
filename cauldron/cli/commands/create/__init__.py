@@ -18,14 +18,7 @@ def populate(
         raw_args: typing.List[str],
         assigned_args: dict
 ):
-    """
-
-    :param parser:
-    :param raw_args:
-    :param assigned_args:
-    :return:
-    """
-
+    """..."""
     parser.add_argument(
         'project_name',
         type=str,
@@ -174,14 +167,7 @@ def execute(
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):
-    """
-
-    :param segment:
-    :param line:
-    :param parts:
-    :return:
-    """
-
+    """..."""
     if len(parts) < 2:
         return []
 

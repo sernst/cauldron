@@ -1,12 +1,13 @@
 import json
 import os
 import typing
+import zlib
 from collections import namedtuple
 
 from cauldron import environ
 from cauldron.session import projects
-from cauldron.session.writing import file_io
 from cauldron.session.writing import components
+from cauldron.session.writing import file_io
 
 STEP_DATA = namedtuple('STEP_DATA', [
     'name',
@@ -16,7 +17,8 @@ STEP_DATA = namedtuple('STEP_DATA', [
     'data',
     'includes',
     'cauldron_version',
-    'file_writes'
+    'file_writes',
+    'body_checksum'
 ])
 
 
@@ -35,12 +37,12 @@ def create_data(step: 'projects.ProjectStep') -> STEP_DATA:
         This is essentially a "blank" step dictionary, which is what the step
         would look like if it had not yet run
     """
-
     return STEP_DATA(
         name=step.definition.name,
         status=step.status(),
         has_error=False,
         body=None,
+        body_checksum=-1,
         data=dict(),
         includes=[],
         cauldron_version=list(environ.version_info),
@@ -63,7 +65,6 @@ def get_cached_data(
         Either a step data structure containing the cached step data or None
         if no cached data exists for the step
     """
-
     cache_path = step.report.results_cache_path
     if not os.path.exists(cache_path):
         return None
@@ -86,17 +87,11 @@ def get_cached_data(
         ._replace(file_writes=file_writes)
 
 
-def make_cache_write_entry(
+def _make_cache_write_entry(
         step: 'projects.ProjectStep',
         step_data: STEP_DATA
 ) -> typing.Optional[file_io.FILE_WRITE_ENTRY]:
-    """
-
-    :param step:
-    :param step_data:
-    :return:
-    """
-
+    """..."""
     cache_path = step.report.results_cache_path
     if not cache_path:
         return None
@@ -111,13 +106,8 @@ def make_cache_write_entry(
     )
 
 
-def populate_data(step: 'projects.ProjectStep') -> STEP_DATA:
-    """
-
-    :param step:
-    :return:
-    """
-
+def _populate_data(step: 'projects.ProjectStep') -> STEP_DATA:
+    """..."""
     step_data = create_data(step)
     report = step.report
 
@@ -129,9 +119,13 @@ def populate_data(step: 'projects.ProjectStep') -> STEP_DATA:
     file_writes = step_data.file_writes.copy()
     file_writes.extend(component.files)
 
+    body = step.get_dom()
+    checksum = zlib.adler32(body.encode())
+
     return step_data._replace(
         has_error=step.error,
-        body=step.get_dom(),
+        body=body,
+        body_checksum=checksum,
         data=(
             step_data.data
             .copy()
@@ -143,12 +137,7 @@ def populate_data(step: 'projects.ProjectStep') -> STEP_DATA:
 
 
 def serialize(step: 'projects.ProjectStep') -> STEP_DATA:
-    """
-
-    :param step:
-    :return:
-    """
-
+    """..."""
     def disable_caching():
         return step.is_running or step.last_modified or step.error
 
@@ -159,10 +148,10 @@ def serialize(step: 'projects.ProjectStep') -> STEP_DATA:
     if step.is_muted:
         return create_data(step)
 
-    step_data = populate_data(step)
+    step_data = _populate_data(step)
 
     # Add cache of step data to the file writes list
     file_writes = step_data.file_writes.copy()
-    file_writes.append(make_cache_write_entry(step, step_data))
+    file_writes.append(_make_cache_write_entry(step, step_data))
 
     return step_data._replace(file_writes=file_writes)

@@ -59,7 +59,6 @@ function onAbortedRun() {
 }
 
 function onNotebookLoaded(event) {
-  console.log('Project.onNotebookLoaded', event);
   this.loadingMessage = event.value ? null : 'Refreshing notebook';
 }
 

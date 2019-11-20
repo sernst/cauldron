@@ -141,10 +141,9 @@ def run_step(
 
     step.mark_dirty(not result['success'])
     step.error = result.get('html_message')
-    step.is_running = False
     step.progress = 0
     step.progress_message = None
-    step.dumps()
+    step.dumps(running_override=False)
 
     # Make sure this is called prior to printing response information to the
     # console or that will come along for the ride
@@ -172,6 +171,13 @@ def run_step(
     # will be included in interactive display updates.
     step.report.update_last_modified()
     step.last_modified = time.time()
+
+    # Wait until all of the step changes have been applied before
+    # marking the step as no longer running to help prevent race
+    # conditions with the dom output and running states when polled
+    # by the UI or other external source in the main thread.
+    step.is_running = False
+
     return result['success']
 
 

@@ -41,9 +41,16 @@ class ProjectStep(object):
         self.last_modified = 0  # type: typing.Optional[float]
         self.code = None
         self.is_visible = True
-        self.is_running = False
-        self._is_selected = False
+        self._is_running = False
+        self.is_selected = False
         self._is_dirty = True
+
+        # Whether or not the step has ever been executed. Setting the
+        # step.is_running property to True will cause this to become
+        # True and will stay true for the remainder of the step's
+        # lifetime.
+        self._has_run = False
+
         self.error = None
         self.is_muted = False
         self.dom = None  # type: typing.Optional[str]
@@ -56,18 +63,14 @@ class ProjectStep(object):
         self.end_time = None  # type: typing.Optional[datetime]
 
     @property
-    def is_selected(self) -> bool:
-        return self._is_selected
+    def is_running(self) -> bool:
+        """Whether or not the step code is currently being executed."""
+        return self._is_running
 
-    @is_selected.setter
-    def is_selected(self, value: bool):
-        # previous_value = self._is_selected
-        self._is_selected = bool(value)
-        # if self._is_selected != previous_value:
-        #     # This does not need to be forced because the DOM isn't
-        #     # changing. The UI will highlight the step without a
-        #     # DOM update.
-        #     self.mark_dirty(True)
+    @is_running.setter
+    def is_running(self, value: bool):
+        self._has_run = self._has_run or bool(value)
+        self._is_running = bool(value)
 
     @property
     def remote_source_path(self) -> typing.Optional[str]:
@@ -176,7 +179,10 @@ class ProjectStep(object):
                 self.project.naming_scheme
             )
         )
+
+        # Eventually this should be removed. It exists for legacy reasons.
         out.update(status)
+
         return out
 
     def status(self):
@@ -194,7 +200,7 @@ class ProjectStep(object):
             dirty=is_dirty,
             is_dirty=is_dirty,
             running=self.is_running,
-            run=self.last_modified > 0,
+            run=self._has_run,
             error=self.error is not None
         )
 
@@ -242,8 +248,14 @@ class ProjectStep(object):
         self.mark_dirty(True)
         return self.dom
 
-    def dumps(self) -> str:
+    def dumps(self, running_override: bool = None) -> str:
         """Writes the step information to an HTML-formatted string"""
+        is_running = (
+            self.is_running
+            if running_override is None
+            else running_override
+        )
+
         code_file_path = os.path.join(
             self.project.source_directory,
             self.filename
@@ -254,7 +266,7 @@ class ProjectStep(object):
             code=render.code_file(code_file_path)
         )
 
-        if not self.is_running:
+        if not is_running:
             # If no longer running, make sure to flush the stdout buffer so
             # any print statements at the end of the step get included in
             # the body
@@ -263,7 +275,7 @@ class ProjectStep(object):
         # Create a copy of the body for dumping
         body = self.report.body[:]
 
-        if self.is_running:
+        if is_running:
             # If still running add a temporary copy of anything not flushed
             # from the stdout buffer to the copy of the body for display. Do
             # not flush the buffer though until the step is done running or
@@ -285,13 +297,13 @@ class ProjectStep(object):
 
         std_err = (
             self.report.read_stderr()
-            if self.is_running else
+            if is_running else
             self.report.flush_stderr()
         ).strip('\n').rstrip()
 
         # The step will be visible in the display if any of the following
         # conditions are true.
-        is_visible = self.is_visible or self.is_running or self.error
+        is_visible = self.is_visible or is_running or self.error
 
         dom = templating.render_template(
             'step-body.html',
@@ -306,7 +318,7 @@ class ProjectStep(object):
             summary=self.report.summary,
             error=self.error,
             index=self.index,
-            is_running=self.is_running,
+            is_running=is_running,
             is_visible=is_visible,
             progress_message=self.progress_message,
             progress=int(round(max(0, min(100, 100 * self.progress)))),
@@ -315,7 +327,7 @@ class ProjectStep(object):
             std_err=std_err
         )
 
-        if not self.is_running:
+        if not is_running:
             self.dom = dom
             self.last_modified = time.time()
         return dom

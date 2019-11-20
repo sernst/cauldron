@@ -11,10 +11,11 @@ from cauldron.cli import parse
 from cauldron.cli.shell import CauldronShell
 from cauldron.test.support import scaffolds
 from cauldron.test.support import server
-from cauldron.test.support.messages import Message
-from cauldron.test.support.functional \
-    import make_project_lifecycle_fixture  # noq
 from cauldron.test.support.functional import ProjectLifecycleTester  # noqa
+from cauldron.test.support.functional \
+    import make_project_lifecycle_fixture  # noqa
+from cauldron.test.support.messages import Message
+from cauldron.test.support.mocking import populate_open_mock  # noqa
 
 try:
   import readline
