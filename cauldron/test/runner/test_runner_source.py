@@ -145,3 +145,21 @@ def test_execute_step():
     result = source._execute_step(project, step)
     assert not result['success']
     project.steps[-1].mark_dirty.assert_called_once_with(True)
+
+
+@patch('cauldron.runner.source.time.sleep')
+@patch('cauldron.runner.source.os.path.exists')
+def test_check_exists(exists: MagicMock, sleep: MagicMock):
+    """Should exist on third attempt."""
+    exists.side_effect = [False, False, True]
+    assert source._check_exists('foo', retry_count=3)
+    assert 3 == sleep.call_count, 'Expect to be called with each attempt.'
+
+
+@patch('cauldron.runner.source.time.sleep')
+@patch('cauldron.runner.source.os.path.exists')
+def test_check_exists_failed(exists: MagicMock, sleep: MagicMock):
+    """Should not exist after three attempts."""
+    exists.side_effect = [False, False, False, False]
+    assert not source._check_exists('foo', retry_count=4)
+    assert 4 == sleep.call_count, 'Expect to be called with each attempt.'

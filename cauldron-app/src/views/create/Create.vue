@@ -44,16 +44,33 @@
           .Create__locationSubtitle
             | The parent directory in which your notebook folder will be created.
         browser(:location="location" @select="onSelectFolder" :show-files="false")
+
+      alert-dialog(
+        v-if="alterMessage"
+        :message="alertMessage.message"
+        :title="alertMessage.title"
+        :ok-label="alertMessage.buttonLabel"
+        @ok="onDismissAlert"
+      )
 </template>
 
 <script>
 import Browser from '../../components/browser/Browser.vue';
+import AlertDialog from '../../components/alertDialog/AlertDialog.vue';
 import http from '../../http';
+
+function onDismissAlert() {
+  this.alertMessage = null;
+}
 
 function onSelectFolder(event) {
   const { spec } = event.value;
   if (spec) {
-    return this.onProjectClick({ item: spec });
+    this.alertMessage = {
+      title: 'Not Allowed',
+      message: 'Cannot create notebooks within other notebook folders.',
+    };
+    return Promise.resolve();
   }
 
   this.loadingMessage = 'Opening selected directory';
@@ -91,6 +108,7 @@ function data() {
     autoName: true,
     addLibraryDirectory: false,
     addAssetsDirectory: false,
+    alertMessage: null,
   };
 }
 
@@ -108,11 +126,11 @@ function allowCreate() {
 
 export default {
   name: 'Create',
-  components: { Browser },
+  components: { AlertDialog, Browser },
   data,
   computed: { allowCreate },
   mounted,
-  methods: { onSelectFolder, onCreate },
+  methods: { onSelectFolder, onCreate, onDismissAlert },
 };
 </script>
 

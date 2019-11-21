@@ -91,14 +91,21 @@ function filterStepChanges(changes) {
   const { previousStepChanges } = store.getters;
 
   return changes.filter((c) => {
-    const previous = previousStepChanges[c.name] || { step: { body: '' } };
+    const previous = previousStepChanges[c.name] || {};
 
-    return (
-      c.step.body !== previous.step.body
-      // Older Cauldron versions did not all have timestamps in changes, so we
-      // use defaults here just in case.
-      && (c.timestamp || 1) > (previous.timestamp || 0)
-    );
+    const newBody = (c.step || {}).body || '';
+    const oldBody = (previous.step || {}).body || '';
+
+    // Older Cauldron versions did not all have timestamps in changes, so we
+    // use defaults here just in case.
+    const newTimestamp = c.timestamp || 1;
+    const oldTimestamp = previous.timestamp || 0;
+
+    // If there is no step it's a remove operation and should be handled.
+    // Otherwise, make sure the update is meaningful.
+    return c.action === 'added'
+      || c.action === 'removed'
+      || (newBody !== oldBody && newTimestamp > oldTimestamp);
   });
 }
 

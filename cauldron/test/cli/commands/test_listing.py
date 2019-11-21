@@ -63,6 +63,17 @@ def test_list_recent(configs: MagicMock):
         """
 
 
+@patch('cauldron.environ.configs')
+def test_list_recent_none_available(configs: MagicMock):
+    """Should list no recent projects when none are available."""
+    configs.fetch.side_effect = {}.get
+    response = support.run_command('list recent')
+
+    assert response.success, 'Expect command to succeed.'
+    assert support.has_success_code(response, 'PROJECT_HISTORY')
+    assert response.messages[0].message == 'No recent projects found.'
+
+
 ERASE_SCENARIOS = [
     {'args': '', 'code': 'NO_IDENTIFIER_SET', 'success': False},
     {'args': 'a', 'code': 'NO_MATCH_FOUND', 'success': False},
@@ -94,3 +105,16 @@ def test_list_erase(
         assert support.has_error_code(response, scenario['code'])
 
     assert configs.put.called == (scenario['code'] == 'REMOVED')
+
+
+AUTO_COMPLETE_SCENARIOS = [
+    {'args': '', 'expected': {'all', 'erase', 'recent'}},
+    {'args': 'r', 'expected': {'recent'}},
+]
+
+
+@mark.parametrize('scenario', AUTO_COMPLETE_SCENARIOS)
+def test_autocomplete(scenario):
+    """Should return expected autocompletes based on scenario."""
+    result = support.autocomplete('list {}'.format(scenario['args']))
+    assert scenario['expected'] == set(result)

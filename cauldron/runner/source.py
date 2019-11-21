@@ -181,28 +181,34 @@ def run_step(
     return result['success']
 
 
+def _check_exists(path: str, retry_count: int = 3) -> bool:
+    """
+    Checks multiple times to see if a file exists, with a bit of
+    a delay between calls to make sure that any race conditions
+    will be avoided before making the call.
+    """
+    for index in range(retry_count):
+        time.sleep(0.05 * min(4, index))
+        if os.path.exists(path):
+            return True
+
+    return False
+
+
 def check_status(
         response: Response,
         project: Project,
         step: ProjectStep,
         force: bool = False
 ) -> str:
-    """
-
-    :param response:
-    :param project:
-    :param step:
-    :param force:
-    :return:
-    """
-
+    """..."""
     path = step.source_path
 
     if step.is_muted:
         environ.log('[{}]: Muted (skipped)'.format(step.definition.name))
         return SKIP_STATUS
 
-    if not os.path.exists(path):
+    if not _check_exists(path):
         response.fail(
             code='MISSING_SOURCE_FILE',
             message='Source file not found "{}"'.format(path),

@@ -30,7 +30,7 @@ def get_status(last_timestamp: float, force: bool = False) -> dict:
         project_data = project.kernel_serialize()
         step_changes = _utils.get_step_changes_after(
             project=project,
-            timestamp=last_timestamp - 0.2,
+            timestamp=last_timestamp - 1,
             write_running=True
         )
     else:

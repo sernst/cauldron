@@ -118,6 +118,10 @@ def execute_remote(context: cli.CommandContext, **kwargs) -> Response:
     if sync_response.failed:
         return context.response
 
+    # Give a little time after the sync for the remote kernel to finish
+    # IO to prevent race conditions.
+    time.sleep(1)
+
     environ.log('[STARTED]: Remote run execution', whitespace=1)
 
     thread = sync.send_remote_command(

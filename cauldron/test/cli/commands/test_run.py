@@ -234,7 +234,8 @@ class TestRun(scaffolds.ResultsTest):
 
         self.assert_has_error_code(r, 'MISSING_STEP')
 
-    def test_run_remote(self):
+    @patch('cauldron.cli.commands.run.time.sleep')
+    def test_run_remote(self, sleep: MagicMock):
         """Should successfully run remote project."""
         support.create_project(self, 'rhino')
         support.add_step(self, contents='print("hello!")')
@@ -250,6 +251,7 @@ class TestRun(scaffolds.ResultsTest):
 
         run_response = support.run_remote_command('run')
         self.assertTrue(run_response.success)
+        assert sleep.called
 
     @patch('cauldron.cli.commands.sync.execute')
     def test_run_remote_sync_fail(self, sync_execute: MagicMock):
