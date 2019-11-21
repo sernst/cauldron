@@ -46,6 +46,7 @@ function closeProject() {
   return http.execute('close')
     .then(() => {
       this.$store.commit('project', null);
+      this.$store.commit('previousStepChanges', {});
       http.markStatusDirty();
     });
 }

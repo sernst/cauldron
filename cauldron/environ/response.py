@@ -311,6 +311,7 @@ class Response:
             kind: str = None,
             message: str = None,
             code: str = None,
+            level: str = None,
             **kwargs
     ) -> ResponseMessage:
         """..."""
@@ -328,9 +329,9 @@ class Response:
             data=kwargs
         )
 
-        if kind == 'ERROR':
+        if 'ERROR' in (kind, level):
             self.errors.append(rm)
-        elif kind == 'WARNING':
+        elif 'WARNING' in (kind, level):
             self.warnings.append(rm)
         else:
             self.messages.append(rm)
@@ -365,6 +366,7 @@ class Response:
             message: str = None,
             code: str = None,
             error: Exception = None,
+            kind: str = 'ERROR',
             **kwargs
     ) -> ResponseMessage:
         """..."""
@@ -374,12 +376,13 @@ class Response:
         error = '{}'.format(error) if error else None
 
         return self.notify(
-            kind='ERROR',
+            kind=kind,
             message=cli.as_single_line(message),
             code=code,
             failed=True,
             stack=stack,
             error=error,
+            level='ERROR',
             **kwargs
         )
 
@@ -387,13 +390,15 @@ class Response:
             self,
             message: str = None,
             code: str = None,
+            kind: str = 'WARNING',
             **kwargs
     ) -> ResponseMessage:
         """..."""
         return self.notify(
-            kind='WARNING',
+            kind=kind,
             message=message,
             code=code,
+            level='WARNING',
             **kwargs
         )
 

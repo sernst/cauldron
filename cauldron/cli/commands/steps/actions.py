@@ -1,4 +1,5 @@
 import os
+import time
 import typing
 
 from cauldron.cli.commands.steps import renaming as step_support
@@ -151,6 +152,7 @@ def create_step(
         name=result.definition.name,
         filename=result.filename,
         action='added',
+        timestamp=time.time(),
         step=writing.step_writer.serialize(result)._asdict(),
         after=None if index < 1 else project.steps[index - 1].definition.name
     )]
@@ -262,6 +264,7 @@ def modify_step(
         name=new_step.definition.name,
         filename=new_step.filename,
         action='modified',
+        timestamp=time.time(),
         after=before_step
     )]
 

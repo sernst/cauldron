@@ -46,7 +46,7 @@ def execute_removal(
     if identifier is None:
         return (
             context.response
-            .notify(
+            .fail(
                 kind='ABORTED',
                 code='NO_IDENTIFIER_SET',
                 message='No project identifier specified for removal.'
@@ -61,7 +61,7 @@ def execute_removal(
     if not match:
         return (
             context.response
-            .notify(
+            .fail(
                 kind='ABORTED',
                 code='NO_MATCH_FOUND',
                 message='No matching project found to remove.'

@@ -106,7 +106,7 @@ def args(
 
     try:
         parsed_args = parser.parse_args(args_list)
-    except TypeError:  # pragma: no-cover
+    except TypeError:  # pragma: no cover
         parsed_args = None
 
     if response.failed:

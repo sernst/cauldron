@@ -63,6 +63,7 @@ def _get_step_changes(
         name=step.definition.name,
         action='updated',
         step=step_data._asdict(),
+        timestamp=time.time(),
         written=write_running and step.is_running
     )
 

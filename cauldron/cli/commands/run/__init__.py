@@ -1,4 +1,5 @@
 import re
+import time
 import typing
 from argparse import ArgumentParser
 from collections import OrderedDict
@@ -297,6 +298,7 @@ def run_local(
         step_changes.append(dict(
             name=ps.definition.name,
             action='updated',
+            timestamp=time.time(),
             step=writing.step_writer.serialize(ps)._asdict()
         ))
 

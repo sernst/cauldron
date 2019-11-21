@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import d3 from 'd3/dist/d3.min';
+import * as d3 from 'd3';
 import Handsontable from 'handsontable';
 import katex from 'katex';
 import jstree from 'jstree';

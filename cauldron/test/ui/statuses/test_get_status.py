@@ -6,6 +6,7 @@ from unittest.mock import patch
 from cauldron.ui import statuses
 
 
+@patch('time.time')
 @patch('cauldron.session.writing.step_writer.serialize')
 @patch('cauldron.session.writing.save')
 @patch('cauldron.project.get_internal_project')
@@ -13,8 +14,10 @@ def test_get_status(
         get_internal_project: MagicMock,
         writing_save: MagicMock,
         step_writer_serialize: MagicMock,
+        time_time: MagicMock,
 ):
     """Should return dict-serialized status information."""
+    time_time.return_value = 123123
     step = MagicMock()
     step.last_modified = time.time() + 1000
     step.report.last_update_time = time.time() + 1000
@@ -49,6 +52,7 @@ def test_get_status(
         'name': 'bar',
         'action': 'updated',
         'step': {'name': 'bar'},
+        'timestamp': 123123,
         'written': True
     }]
     assert expected == step_changes

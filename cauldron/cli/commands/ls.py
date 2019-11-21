@@ -46,7 +46,7 @@ def execute(
         context: cli.CommandContext,
         directory: str = None
 ) -> Response:
-    """Execute listing of current directory."""
+    """Execute listing of the specified directory."""
     response = context.response
 
     current_directory = environ.paths.clean(directory or os.curdir)

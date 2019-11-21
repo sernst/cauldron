@@ -330,7 +330,7 @@ def plotly(
     dom_id = found.group('id')
 
     # Plotly < 4.0 requires manually inserting the static value.
-    if static and dom.find('"staticPlot": ') < 0:  # pragma: no-cover
+    if static and dom.find('"staticPlot": ') < 0:  # pragma: no cover
         insert_index = dom.index('"showLink":')
         dom = ''.join([
             dom[:insert_index],

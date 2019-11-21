@@ -1,4 +1,5 @@
 import os
+import time
 import uuid
 
 from cauldron.cli.commands.steps import renaming as step_support
@@ -54,6 +55,7 @@ def remove_step(
     step_changes = [dict(
         name=removed_name,
         filename=step.filename,
+        timestamp=time.time(),
         action='removed'
     )]
 

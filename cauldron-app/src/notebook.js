@@ -78,6 +78,31 @@ function scrollToStep(stepName, position) {
 }
 
 /**
+ * We're only interested in step changes that are actually changes and that
+ * occur more recently than the previous one. This filters down the source
+ * changes into only significant and meaningful ones.
+ *
+ * @param changes
+ *    The source changes to filter down to meaningful ones.
+ * @returns {*}
+ *    An array containing the significant changes.
+ */
+function filterStepChanges(changes) {
+  const { previousStepChanges } = store.getters;
+
+  return changes.filter((c) => {
+    const previous = previousStepChanges[c.name] || { step: { body: '' } };
+
+    return (
+      c.step.body !== previous.step.body
+      // Older Cauldron versions did not all have timestamps in changes, so we
+      // use defaults here just in case.
+      && (c.timestamp || 1) > (previous.timestamp || 0)
+    );
+  });
+}
+
+/**
  *
  * @param renames
  * @param changes
@@ -85,9 +110,10 @@ function scrollToStep(stepName, position) {
  * @returns {Promise<void>|Promise<T>}
  */
 function applyStepModifications(renames, changes, stepName) {
+  const newChanges = filterStepChanges(changes || []);
   const isUnmodified = (
     Object.keys(renames || {}).length === 0
-    && (changes || []).length === 0
+    && (newChanges || []).length === 0
   );
 
   if (isUnmodified) {
@@ -101,8 +127,18 @@ function applyStepModifications(renames, changes, stepName) {
 
   return cauldron.processStepRenames(renames || {})
     .then(() => {
-      cauldron.processStepUpdates(changes || []);
-      return utils.thenWait(500);
+      cauldron.processStepUpdates(newChanges);
+
+      // Update changes in the store for future reference to prevent insignificant
+      // changes to steps where the body does not change from updating the dom and
+      // wasting rendering resources.
+      const { previousStepChanges } = store.getters;
+      const updatedChanges = newChanges
+        .reduce((all, c) => Object.assign(all, { [c.name]: c }), {});
+      const combinedChanges = Object.assign({}, previousStepChanges, updatedChanges);
+      store.commit('previousStepChanges', combinedChanges);
+
+      return utils.thenWait(300);
     })
     .then(() => {
       if (!stepName && !store.getters.followSteps) {

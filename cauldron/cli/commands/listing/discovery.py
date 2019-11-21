@@ -5,25 +5,8 @@ from cauldron.environ import Response
 from cauldron.session.projects import specio
 
 
-def print_path_group(header, paths):
-    if not paths:
-        return
-
-    environ.log_header(header, level=6, indent_by=2)
-    entries = []
-    for p in paths:
-        parts = p.rstrip(os.sep).split(os.sep)
-        name = parts[-1]
-        if name.startswith('@'):
-            name = name.split(':', 1)[-1]
-        entries.append(
-            '* "{name}" -> {path}'.format(name=name, path=p)
-        )
-
-    environ.log('\n'.join(entries), indent_by=4)
-
-
 def get_known_root_paths():
+    """..."""
     aliases = environ.configs.fetch('folder_aliases', {})
     root_paths = list(set(
         [os.path.dirname(p) for p in environ.configs.fetch('recent_paths', [])]
@@ -47,10 +30,7 @@ def get_known_root_paths():
 
 
 def echo_known_projects(response: Response) -> Response:
-    """
-
-    :return:
-    """
+    """..."""
     environ.configs.load()
     project_specs = specio.ProjectSpecsReader()
 

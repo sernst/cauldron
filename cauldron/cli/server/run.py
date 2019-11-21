@@ -2,16 +2,16 @@ import json
 import logging
 import os
 import site
+import time
 import typing
 from argparse import ArgumentParser
-
-from flask import Flask
 
 import cauldron as cd
 from cauldron import environ
 from cauldron import templating
 from cauldron.render.encoding import ComplexFlaskJsonEncoder
 from cauldron.session import writing
+from flask import Flask
 
 APPLICATION = Flask('Cauldron')
 APPLICATION.json_encoder = ComplexFlaskJsonEncoder
@@ -69,6 +69,7 @@ def get_running_step_changes(write: bool = False) -> list:
             name=step.definition.name,
             action='updated',
             step=step_data._asdict(),
+            timestamp=time.time(),
             written=write
         )
 

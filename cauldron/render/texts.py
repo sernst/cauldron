@@ -252,8 +252,13 @@ def markdown(
         font_size=font_size
     )
 
-    pattern = re.compile('src="(?P<url>[^"]+)"')
+    pattern = re.compile(r'src="(?P<url>[^"]+)"')
     body = pattern.sub(r'data-src="\g<url>"', body)
+
+    # Force all links to open in new windows/tabs
+    pattern = re.compile(r'href="(?P<url>[^"]+)"')
+    body = pattern.sub(r'href="\g<url>" target="_blank"', body)
+
     return dict(
         body=body,
         library_includes=library_includes,

@@ -59,13 +59,7 @@ def execute(
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):
-    """
-
-    :param segment:
-    :param line:
-    :param parts:
-    :return:
-    """
+    """..."""
     if len(parts) < 2:
         return autocompletion.matches(
             segment,
