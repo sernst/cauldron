@@ -1,10 +1,9 @@
 import mimetypes
 import os
 
+import cauldron
 import flask
 import requests
-
-import cauldron
 from cauldron import environ
 from cauldron.ui import configs as ui_configs
 
@@ -15,7 +14,7 @@ blueprint = flask.Blueprint(
 )
 
 
-def get_remote_view(route: str) -> flask.Response:
+def _get_remote_view(route: str) -> flask.Response:
     endpoint = route.lstrip('/')
     request = flask.request
     response = requests.request(
@@ -69,7 +68,7 @@ def notebook(route: str):
             )
 
     if is_remote:
-        return get_remote_view(route)
+        return _get_remote_view(route)
 
     project = cauldron.project.get_internal_project()
     results_path = project.results_path if project else None

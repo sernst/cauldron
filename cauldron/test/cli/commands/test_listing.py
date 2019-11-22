@@ -110,6 +110,7 @@ def test_list_erase(
 AUTO_COMPLETE_SCENARIOS = [
     {'args': '', 'expected': {'all', 'erase', 'recent'}},
     {'args': 'r', 'expected': {'recent'}},
+    {'args': 'recent ', 'expected': set()},
 ]
 
 

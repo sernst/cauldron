@@ -12,7 +12,7 @@ blueprint = flask.Blueprint(
 )
 
 
-def get_app_path(route: str) -> str:
+def _get_app_path(route: str) -> str:
     """Returns application resource path."""
     return os.path.realpath(os.path.join(
         os.path.dirname(cauldron.__file__),
@@ -27,7 +27,7 @@ def view(route: str):
     Retrieves the contents of the file specified by the view route if it
     exists.
     """
-    path = get_app_path(route)
+    path = _get_app_path(route)
     if not os.path.exists(path):
         return '', 204
 
