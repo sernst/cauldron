@@ -223,24 +223,16 @@ function updateStatus(debounce = 0, force = false) {
 }
 
 function abortExecution() {
+  stepper.clearQueue();
+
   return post('/command/abort')
     .then((response) => {
       addErrors(response);
       addWarnings(response);
 
-      const payload = response.data;
-      store.commit('project', payload.data.project);
       store.commit('running', false);
-
-      return notebook
-        .applyStepModifications(
-          payload.data.step_renames,
-          payload.data.step_changes,
-        )
-        .then(() => {
-          markStatusDirty();
-          return response;
-        });
+      markStatusDirty();
+      return response;
     });
 }
 
@@ -251,6 +243,5 @@ export default {
   execute,
   executeAsync,
   updateStatus,
-  runStep,
   markStatusDirty,
 };

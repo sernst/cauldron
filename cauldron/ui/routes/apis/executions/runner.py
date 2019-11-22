@@ -3,8 +3,11 @@ import typing
 import flask
 from flask import request
 
+import cauldron
+from cauldron import environ
 from cauldron.cli import commander
 from cauldron.environ.response import Response
+from cauldron.runner import redirection
 from cauldron.ui import arguments
 from cauldron.ui import configs as ui_configs
 
@@ -17,6 +20,7 @@ ParsedCommand = typing.NamedTuple('COMMAND_CONTEXT', [
 
 def parse_command_args(response: 'Response') -> typing.Tuple[str, str]:
     """
+    Parse arguments for command executions.
 
     :param response:
         The response object to modify with status or error data
@@ -57,20 +61,15 @@ def parse_command_args(response: 'Response') -> typing.Tuple[str, str]:
     return name, args
 
 
-def execute(asynchronous: bool = False, parsed: ParsedCommand = None):
+def execute(asynchronous: bool = False):
     """
     :param asynchronous:
         Whether or not to allow asynchronous command execution that returns
         before the command is complete with a run_uid that can be used to
         track the continued execution of the command until completion.
     """
-    if parsed:
-        r = parsed.response
-        cmd = parsed.command
-        args = parsed.args
-    else:
-        r = Response()
-        cmd, args = parse_command_args(r)
+    r = Response()
+    cmd, args = parse_command_args(r)
 
     if r.failed:
         return flask.jsonify(r.serialize())
@@ -83,7 +82,7 @@ def execute(asynchronous: bool = False, parsed: ParsedCommand = None):
         if not asynchronous:
             r.thread.join()
 
-        ui_configs.ACTIVE_EXECUTION_RESPONSES = r
+        ui_configs.ACTIVE_EXECUTION_RESPONSE = r
 
         # Watch the thread for a bit to see if the command finishes in
         # that time. If it does the command result will be returned directly
@@ -106,7 +105,7 @@ def execute(asynchronous: bool = False, parsed: ParsedCommand = None):
                 .serialize()
             )
 
-        ui_configs.ACTIVE_EXECUTION_RESPONSES = None
+        ui_configs.ACTIVE_EXECUTION_RESPONSE = None
         r.update(
             run_log=r.get_thread_log(),
             run_status='complete',
@@ -122,3 +121,47 @@ def execute(asynchronous: bool = False, parsed: ParsedCommand = None):
         )
 
     return r.flask_serialize()
+
+
+def abort() -> environ.Response:
+    step_changes = []
+    response = ui_configs.ACTIVE_EXECUTION_RESPONSE
+    ui_configs.ACTIVE_EXECUTION_RESPONSE = None
+
+    should_abort = (
+        response is not None
+        and response.thread
+        and response.thread.is_alive()
+    )
+
+    if should_abort:
+        # Try to stop the thread gracefully first.
+        response.thread.abort = True
+        response.thread.join(2)
+
+        try:
+            # Force stop the thread explicitly
+            if response.thread.is_alive():
+                response.thread.abort_running()
+        except Exception:
+            pass
+
+    project = cauldron.project.get_internal_project()
+    if project and project.current_step:
+        step = project.current_step
+        if step.is_running:
+            step.mark_dirty(True)
+            step.progress = 0
+            step.progress_message = None
+            step.dumps(False)
+            step.is_running = False
+
+        # Make sure this is called prior to printing response information to
+        # the console or that will come along for the ride
+        redirection.disable(step)
+
+    # Make sure no print redirection will survive the abort process regardless
+    # of whether an active step was found or not (prevents race conditions)
+    redirection.restore_default_configuration()
+
+    return environ.Response()

@@ -1,8 +1,6 @@
 import flask
-import requests
 
-import cauldron
-from cauldron.runner import redirection
+import requests
 from cauldron import environ
 from cauldron.ui import configs as ui_configs
 from cauldron.ui.routes.apis.executions import runner
@@ -16,21 +14,23 @@ blueprint = flask.Blueprint(
 
 @blueprint.route('/command/sync', methods=['POST'])
 def command_sync():
-    """
-    Returns the current status of the cauldron kernel application, which is
-    used to keep the
-    """
+    """Executes a synchronous command."""
     return runner.execute(False)
 
 
 @blueprint.route('/command/async', methods=['POST'])
 def command_async():
-    """
-    Returns the current status of the cauldron kernel application, which is
-    used to keep the
-    :return:
-    """
+    """Executes an asynchronous command."""
     r = ui_configs.ACTIVE_EXECUTION_RESPONSE
+
+    # If a thread was running, wait a bit to see if it is nearly
+    # complete. There's a small window of time between a step
+    # finishing running and the execution thread completing and
+    # this helps prevent an aggressive UI calling run on the nex
+    # step from triggering an unnecessary error response.
+    if r is not None and r.thread and r.thread.is_alive():
+        r.thread.join(0.5)
+
     if r is not None and r.thread and r.thread.is_alive():
         return (
             environ.Response()
@@ -47,7 +47,7 @@ def command_async():
 
 @blueprint.route('/command/abort', methods=['POST'])
 def abort():
-    """..."""
+    """Aborts the currently running async command."""
     try:
         # When connected remotely, the abort should be sent to the remote
         # kernel and handled there.
@@ -68,50 +68,4 @@ def abort():
             .flask_serialize()
         )
 
-    step_changes = []
-    response = ui_configs.ACTIVE_EXECUTION_RESPONSE
-    ui_configs.ACTIVE_EXECUTION_RESPONSE = None
-
-    should_abort = (
-        response is not None
-        and response.thread
-        and response.thread.is_alive()
-    )
-
-    if should_abort:
-        # Try to stop the thread gracefully first.
-        response.thread.abort = True
-        response.thread.join(2)
-
-        try:
-            # Force stop the thread explicitly
-            if response.thread.is_alive():
-                response.thread.abort_running()
-        except Exception:
-            pass
-
-    project = cauldron.project.internal_project
-
-    if project and project.current_step:
-        step = project.current_step
-        if step.is_running:
-            step.is_running = False
-            step.progress = 0
-            step.progress_message = None
-            step_changes.append(step.dumps())
-
-        # Make sure this is called prior to printing response information to
-        # the console or that will come along for the ride
-        redirection.disable(step)
-
-    # Make sure no print redirection will survive the abort process regardless
-    # of whether an active step was found or not (prevents race conditions)
-    redirection.restore_default_configuration()
-
-    project_data = project.kernel_serialize() if project else None
-
-    return (
-        environ.Response()
-        .update(project=project_data, step_changes=step_changes)
-        .flask_serialize()
-    )
+    return runner.abort().flask_serialize()

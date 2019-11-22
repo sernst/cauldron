@@ -117,10 +117,11 @@ function abortStep() {
     return Promise.resolve();
   }
 
-  stepper.clearQueue();
   this.$emit('aborting', { step: this.step, index: this.index });
   return http.abortExecution()
-    .then(response => this.$emit('aborted', { response, step: this.step, index: this.index }));
+    .then((response) => {
+      this.$emit('aborted', { response, step: this.step, index: this.index });
+    });
 }
 
 /**
@@ -146,17 +147,15 @@ function queueStepToRun() {
 function runStepsFromStart() {
   this.show = false;
   const steps = (this.$store.getters.project || {}).steps || [];
-  const runPromise = http.runStep(steps[0].name);
-  stepper.addToQueue(steps.slice(1, this.index + 1).map(s => s.name));
-  return runPromise;
+  stepper.addToQueue(steps.slice(0, this.index + 1).map(s => s.name));
+  http.markStatusDirty();
 }
 
 function runStepsFromHere() {
   this.show = false;
   const steps = (this.$store.getters.project || {}).steps || [];
-  const runPromise = http.runStep(this.step.name);
-  stepper.addToQueue(steps.slice(this.index + 1).map(s => s.name));
-  return runPromise;
+  stepper.addToQueue(steps.slice(this.index).map(s => s.name));
+  http.markStatusDirty();
 }
 
 function state() {

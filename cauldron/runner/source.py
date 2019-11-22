@@ -165,7 +165,7 @@ def run_step(
             code='EXECUTION_ERROR',
             project=project.kernel_serialize(),
             step_name=step.definition.name
-        ).console_raw(result['message'])
+        ).console_raw(result.get('message') or '')
 
     # Update the step timestamps so that the final dom changes
     # will be included in interactive display updates.
