@@ -103,8 +103,9 @@ def check_connection(url: str, force: bool) -> Response:
 
 
 def clean_url(url: str) -> str:
-    return '{}{}'.format(
+    return '{}{}{}'.format(
         '' if url.startswith('http') else 'http://',
+        '127.0.0.1' if url.startswith(':') else '',
         url.strip().rstrip('/')
     )
 

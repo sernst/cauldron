@@ -1,5 +1,3 @@
-import os
-
 from cauldron import cli
 from cauldron.cli import sync
 from cauldron.cli.commands.sync.syncer import do_synchronize

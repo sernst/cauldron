@@ -112,7 +112,7 @@ def execute(
         no_naming_scheme: bool = False,
         library_folder: str = None,
         assets_folder: str = None
-):
+) -> environ.Response:
     """..."""
     response = context.response
 

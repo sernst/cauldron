@@ -15,7 +15,7 @@ blueprint = flask.Blueprint(
 @blueprint.route('/command/sync', methods=['POST'])
 def command_sync():
     """Executes a synchronous command."""
-    return runner.execute(False)
+    return runner.execute(False).flask_serialize()
 
 
 @blueprint.route('/command/async', methods=['POST'])
@@ -29,7 +29,7 @@ def command_async():
     # this helps prevent an aggressive UI calling run on the nex
     # step from triggering an unnecessary error response.
     if r is not None and r.thread and r.thread.is_alive():
-        r.thread.join(0.5)
+        r.thread.join(2)
 
     if r is not None and r.thread and r.thread.is_alive():
         return (
@@ -42,7 +42,7 @@ def command_async():
             .flask_serialize()
         )
 
-    return runner.execute(True)
+    return runner.execute(True).flask_serialize()
 
 
 @blueprint.route('/command/abort', methods=['POST'])

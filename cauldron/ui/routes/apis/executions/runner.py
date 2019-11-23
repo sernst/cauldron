@@ -18,7 +18,7 @@ ParsedCommand = typing.NamedTuple('COMMAND_CONTEXT', [
 ])
 
 
-def parse_command_args(response: 'Response') -> typing.Tuple[str, str]:
+def parse_command_args() -> environ.Response:
     """
     Parse arguments for command executions.
 
@@ -29,6 +29,7 @@ def parse_command_args(response: 'Response') -> typing.Tuple[str, str]:
         to execute, and the second is a string representing the arguments
         to apply to that command.
     """
+    response = environ.Response()
     cmd = None
     parts = None
     name = None
@@ -45,7 +46,7 @@ def parse_command_args(response: 'Response') -> typing.Tuple[str, str]:
             args = ' '.join(args)
         args += ' {}'.format(parts[1] if len(parts) > 1 else '').strip()
     except Exception as err:
-        response.fail(
+        return response.fail(
             code='INVALID_COMMAND',
             message='Unable to parse command',
             cmd=cmd if cmd else '',
@@ -56,28 +57,28 @@ def parse_command_args(response: 'Response') -> typing.Tuple[str, str]:
             mime_type='{}'.format(request.mimetype),
             request_data='{}'.format(request.data),
             request_args=request_args
-        )
+        ).response
 
-    return name, args
+    return response.returns(name, args)
 
 
-def execute(asynchronous: bool = False):
+def execute(asynchronous: bool = False) -> environ.Response:
     """
     :param asynchronous:
         Whether or not to allow asynchronous command execution that returns
         before the command is complete with a run_uid that can be used to
         track the continued execution of the command until completion.
     """
-    r = Response()
-    cmd, args = parse_command_args(r)
-
+    r = parse_command_args()
     if r.failed:
-        return flask.jsonify(r.serialize())
+        return r
+
+    cmd, args = r.returned
 
     try:
-        commander.execute(cmd, args, r)
+        r = commander.execute(cmd, args, r)
         if not r.thread:
-            return flask.jsonify(r.serialize())
+            return r
 
         if not asynchronous:
             r.thread.join()
@@ -87,44 +88,35 @@ def execute(asynchronous: bool = False):
         # Watch the thread for a bit to see if the command finishes in
         # that time. If it does the command result will be returned directly
         # to the caller. Otherwise, a waiting command will be issued
-        count = 0
-        while count < 5:
-            count += 1
+        for _ in range(5):
             r.thread.join(0.25)
             if not r.thread.is_alive():
                 break
 
         if r.thread.is_alive():
-            return flask.jsonify(
-                Response()
-                .update(
-                    run_log=r.get_thread_log(),
-                    run_status='running',
-                    run_uid=r.thread.uid,
-                )
-                .serialize()
+            return Response().update(
+                run_log=r.get_thread_log(),
+                run_status='running',
+                run_uid=r.thread.uid,
             )
 
         ui_configs.ACTIVE_EXECUTION_RESPONSE = None
-        r.update(
+        return r.update(
             run_log=r.get_thread_log(),
             run_status='complete',
             run_uid=r.thread.uid
         )
-    except Exception as err:
-        r.fail(
+    except Exception as error:
+        return r.fail(
             code='KERNEL_EXECUTION_FAILURE',
-            message='Unable to execute command',
+            message='Unable to execute command.',
             cmd=cmd,
             args=args,
-            error=err
-        )
-
-    return r.flask_serialize()
+            error=error
+        ).response
 
 
 def abort() -> environ.Response:
-    step_changes = []
     response = ui_configs.ACTIVE_EXECUTION_RESPONSE
     ui_configs.ACTIVE_EXECUTION_RESPONSE = None
 

@@ -3,6 +3,7 @@ import store from './store';
 import stepper from './stepper';
 import notebook from './notebook';
 import exceptions from './exceptions';
+import utils from './utils';
 
 const statusCache = {
   lastInvocationTimestamp: 0,
@@ -190,18 +191,27 @@ function updateStatus(debounce = 0, force = false) {
         store.commit('running', shouldBeRunning);
       }
 
+      // Update the running step name if necessary.
+      const previousRunningStepName = store.getters.runningStepName;
+      const runningStepPossibilities = [
+        // If running, use the running steps name.
+        running ? runningSteps[0].name : null,
+        // If should be running, keep the previous running step name until that
+        // is replaced by a new running step.
+        shouldBeRunning ? previousRunningStepName : null,
+      ];
+      const newRunningStepName = runningStepPossibilities
+        .reduce((choice, name) => name || choice, null);
+
+      if (previousRunningStepName !== newRunningStepName) {
+        store.commit('runningStepName', newRunningStepName);
+      }
+
       // If running has just stopped mark status dirty to capture any post step changes
       // made after the running state change. This helps prevent the final dom updates
       // from mysteriously not appearing in the results.
       if (wasRunning && !shouldBeRunning) {
         markStatusDirty();
-      }
-
-      // Update the running step name if necessary.
-      const previousRunningStepName = store.getters.runningStepName;
-      const newRunningStepName = running ? runningSteps[0].name : null;
-      if (previousRunningStepName !== newRunningStepName) {
-        store.commit('runningStepName', newRunningStepName);
       }
 
       return notebook
@@ -214,7 +224,10 @@ function updateStatus(debounce = 0, force = false) {
           if (!syncing && !running && store.getters.queuedStepsToRun.length > 0) {
             const stepName = store.getters.queuedStepsToRun[0];
             store.commit('queuedStepsToRun', store.getters.queuedStepsToRun.slice(1));
-            return runStep(stepName);
+
+            // Add a little bit of a wait to help prevent race conditions before running
+            // a new step.
+            return utils.thenWait(100).then(() => runStep(stepName));
           }
 
           return response;

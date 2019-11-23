@@ -21,9 +21,7 @@ def execute(context: cli.CommandContext) -> Response:
         kind='SUCCESS',
         code='DISCONNECTED',
         message='Disconnected from remote cauldron'
-    ).console(
-        whitespace=1
-    ).response
+    ).console(whitespace=1).response
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):
