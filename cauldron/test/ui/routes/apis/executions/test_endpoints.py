@@ -48,8 +48,12 @@ def test_command_async_blocked(
     Should abort executing asynchronous command because another is running.
     """
     blocker = MagicMock()
+    blocker.get_thread_log.return_value = 'this is the log.'
+    blocker.thread.uid = 'foo'
+    blocker.thread.kwargs = {}
     blocker.thread.is_alive.return_value = True
     ui_configs.ACTIVE_EXECUTION_RESPONSE = blocker
+    ui_configs.is_active_async.return_value = True
 
     client = test_app.test_client()
     response = client.post(

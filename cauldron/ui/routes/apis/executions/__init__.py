@@ -15,7 +15,7 @@ blueprint = flask.Blueprint(
 @blueprint.route('/command/sync', methods=['POST'])
 def command_sync():
     """Executes a synchronous command."""
-    return runner.execute(False).flask_serialize()
+    return runner.execute(asynchronous=False).flask_serialize()
 
 
 @blueprint.route('/command/async', methods=['POST'])
@@ -28,21 +28,27 @@ def command_async():
     # finishing running and the execution thread completing and
     # this helps prevent an aggressive UI calling run on the nex
     # step from triggering an unnecessary error response.
-    if r is not None and r.thread and r.thread.is_alive():
+    if ui_configs.is_active_async():
         r.thread.join(2)
 
-    if r is not None and r.thread and r.thread.is_alive():
+    if ui_configs.is_active_async():
         return (
             environ.Response()
             .fail(
                 code='ACTION_BLOCKED',
                 message='Another command is currently executing.',
+                run_log=r.get_thread_log(),
+                run_status='running',
+                thread_is_alive=r.thread.is_alive(),
+                run_uid=r.thread.uid,
+                command='{}'.format(r.thread.command),
+                command_args=r.thread.kwargs,
             )
             .response
             .flask_serialize()
         )
 
-    return runner.execute(True).flask_serialize()
+    return runner.execute(asynchronous=True).flask_serialize()
 
 
 @blueprint.route('/command/abort', methods=['POST'])

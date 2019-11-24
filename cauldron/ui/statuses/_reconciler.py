@@ -1,6 +1,7 @@
 import os
 
 from cauldron import environ
+from cauldron.ui import configs as ui_configs
 from cauldron.ui.statuses import _utils
 
 
@@ -84,6 +85,9 @@ def merge_local_state(remote_status: dict, force: bool) -> dict:
 
     # We care about the local viewer, not the remote one.
     remote_status['data']['view'] = environ.view
+
+    # We care about the local UI environment command executions.
+    remote_status['data']['is_active_async'] = ui_configs.is_active_async()
 
     remote_status['hash'] = _utils.get_digest_hash(remote_status, force)
     return remote_status

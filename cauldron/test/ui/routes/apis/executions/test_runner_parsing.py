@@ -39,15 +39,15 @@ def test_parse(
     assert scenario['expected'] == response.returned
 
 
-@patch('cauldron.ui.routes.apis.executions.runner.request')
+@patch('cauldron.ui.routes.apis.executions.runner.flask')
 @patch('cauldron.ui.routes.apis.executions.runner.arguments.from_request')
 def test_parse_failure(
         arguments_from_request: MagicMock,
-        flask_request: MagicMock
+        mock_flask: MagicMock
 ):
     """Should fail to parse arguments when args are of the incorrect type."""
-    flask_request.mime_type = 'fake/foo'
-    flask_request.data = 'this is fake'
+    mock_flask.request.mime_type = 'fake/foo'
+    mock_flask.request.data = 'this is fake'
     arguments_from_request.return_value = {'command': 'foo', 'args': [1, 2]}
 
     response = runner.parse_command_args()

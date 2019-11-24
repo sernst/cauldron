@@ -1,7 +1,6 @@
 import typing
 
 import flask
-from flask import request
 
 import cauldron
 from cauldron import environ
@@ -54,8 +53,8 @@ def parse_command_args() -> environ.Response:
             name=name,
             args=args,
             error=err,
-            mime_type='{}'.format(request.mimetype),
-            request_data='{}'.format(request.data),
+            mime_type='{}'.format(flask.request.mimetype),
+            request_data='{}'.format(flask.request.data),
             request_args=request_args
         ).response
 
@@ -83,8 +82,6 @@ def execute(asynchronous: bool = False) -> environ.Response:
         if not asynchronous:
             r.thread.join()
 
-        ui_configs.ACTIVE_EXECUTION_RESPONSE = r
-
         # Watch the thread for a bit to see if the command finishes in
         # that time. If it does the command result will be returned directly
         # to the caller. Otherwise, a waiting command will be issued
@@ -94,13 +91,13 @@ def execute(asynchronous: bool = False) -> environ.Response:
                 break
 
         if r.thread.is_alive():
+            ui_configs.ACTIVE_EXECUTION_RESPONSE = r
             return Response().update(
                 run_log=r.get_thread_log(),
                 run_status='running',
                 run_uid=r.thread.uid,
             )
 
-        ui_configs.ACTIVE_EXECUTION_RESPONSE = None
         return r.update(
             run_log=r.get_thread_log(),
             run_status='complete',

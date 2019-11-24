@@ -85,10 +85,10 @@ def reload_children(parent_module: types.ModuleType, newer_than: int) -> bool:
 
     parent_name = get_module_name(parent_module)
 
-    children = filter(
+    children = list(filter(
         lambda item: item[0].startswith(parent_name),
         sys.modules.items()
-    )
+    ))
 
     return any([do_reload(item[1], newer_than) for item in children])
 

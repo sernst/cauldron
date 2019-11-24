@@ -16,7 +16,7 @@ install:
 # command to run tests
 script: xvfb-run --server-args="-screen 0 1024x768x24" py.test --cov-report html:htmlcov --cov-report xml:coverage.xml --cov-report term --cov=cauldron ./cauldron/test
 
-after_success:
-    - codecov
-    - coveralls
-    - python-codacy-coverage -r coverage.xml
+#after_success:
+#    - codecov
+#    - coveralls
+#    - python-codacy-coverage -r coverage.xml

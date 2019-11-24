@@ -4,6 +4,7 @@ import cauldron
 from cauldron.test import support
 from cauldron.test.support import scaffolds
 from cauldron.test.support.messages import Message
+from cauldron.test.support import server
 
 
 class TestSteps(scaffolds.ResultsTest):
@@ -161,17 +162,40 @@ class TestSteps(scaffolds.ResultsTest):
     def test_remote(self):
         """Should function remotely."""
         support.create_project(self, 'nails')
-        project = cauldron.project.get_internal_project()
+        directory = cauldron.project.get_internal_project().source_directory
 
-        support.run_remote_command('open "{}" --forget'.format(
-            project.source_directory
+        closed_response = support.run_command('close')
+        closed_response.join()
+        self.assertTrue(closed_response.success, Message(
+            'Expected new project to be closed',
+            response=closed_response,
         ))
-        project = cauldron.project.get_internal_project()
 
-        added_response = support.run_remote_command('steps add')
+        test_app = server.create_test_app()
+
+        opened_response = support.run_remote_command(
+            'open "{}" --forget'.format(directory),
+            app=test_app,
+        )
+        opened_response.join()
+        self.assertTrue(opened_response.success, Message(
+            'Opened Remote Project Failed',
+            response=opened_response,
+        ))
+
+        added_response = support.run_remote_command(
+            'steps add',
+            app=test_app,
+        )
+        added_response.join()
         self.assertTrue(added_response.success, Message(
             'Add Step Failed',
-            response=added_response
+            response=added_response,
         ))
 
-        self.assertEqual(len(project.steps), 2)
+        serialized = added_response.data['project']
+        self.assertEqual(
+            len(serialized['steps']),
+            2,
+            '{}'.format(serialized['steps'])
+        )

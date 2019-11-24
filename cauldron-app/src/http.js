@@ -42,7 +42,7 @@ function createGateway() {
   const root = window.location.origin;
   return axios.create({
     baseURL: `${root}/v1/api/`,
-    timeout: 5000,
+    timeout: 10000,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -168,6 +168,10 @@ function updateStatus(debounce = 0, force = false) {
       }
 
       const { project, remote } = payload.data;
+
+      // Whether or not an asynchronous command thread is currently running.
+      const isActiveAsync = payload.data.is_active_async;
+
       const steps = (project || {}).steps || [];
       const hasRunningStepError = handleStepRunningError(response);
       const lastHash = (store.getters.status || {}).hash || '';
@@ -186,7 +190,12 @@ function updateStatus(debounce = 0, force = false) {
 
       // Update running status if needed.
       const wasRunning = store.getters.running;
-      const shouldBeRunning = syncing || running || store.getters.queuedStepsToRun.length > 0;
+      const shouldBeRunning = (
+        syncing
+        || running
+        || isActiveAsync
+        || store.getters.queuedStepsToRun.length > 0
+      );
       if (wasRunning !== shouldBeRunning) {
         store.commit('running', shouldBeRunning);
       }
@@ -221,13 +230,23 @@ function updateStatus(debounce = 0, force = false) {
         )
         .then(() => {
           // If there's a running queue, go ahead and process the next step.
-          if (!syncing && !running && store.getters.queuedStepsToRun.length > 0) {
+          const shouldRunNextStep = (
+            !syncing
+            && !running
+            && !isActiveAsync
+            && store.getters.queuedStepsToRun.length > 0
+          );
+
+          if (shouldRunNextStep) {
             const stepName = store.getters.queuedStepsToRun[0];
             store.commit('queuedStepsToRun', store.getters.queuedStepsToRun.slice(1));
 
             // Add a little bit of a wait to help prevent race conditions before running
             // a new step.
-            return utils.thenWait(100).then(() => runStep(stepName));
+            return utils.thenWait(100)
+              .then(() => runStep(stepName))
+              .then(() => utils.thenWait(100))
+              .then(() => response);
           }
 
           return response;

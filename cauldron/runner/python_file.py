@@ -53,7 +53,6 @@ def get_file_contents(source_path: str) -> str:
     :param source_path:
         Path of the step file to load.
     """
-
     open_funcs = [
         functools.partial(codecs.open, source_path, encoding='utf-8'),
         functools.partial(open, source_path, 'r')

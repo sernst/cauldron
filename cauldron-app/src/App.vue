@@ -69,10 +69,25 @@ function recordResponse(kind, responseOrError) {
 }
 
 function updateStatusLoop() {
-  const { isStatusDirty, isNotebookLoading } = this.$store.getters;
+  const {
+    isStatusDirty,
+    isNotebookLoading,
+    errors,
+    warnings,
+  } = this.$store.getters;
 
-  if (isStatusDirty) {
-    this.$store.commit('isStatusDirty', false);
+  // If an error or a warning is being displayed in the UI, do not continue with
+  // the status update. This prevents background UI behaviors from going on while
+  // the error or warnings are being displayed. Notably, the continuing of running
+  // future steps in the queue.
+  if (errors.length > 0 || warnings.length > 0) {
+    if (!isStatusDirty) {
+      this.$store.commit('isStatusDirty', true);
+    }
+
+    clearTimeout(this.timeoutHandle);
+    this.timeoutHandle = setTimeout(this.updateStatusLoop, 100);
+    return Promise.resolve();
   }
 
   // If the notebook display is in the process of loading, don't update status
@@ -82,6 +97,11 @@ function updateStatusLoop() {
     clearTimeout(this.timeoutHandle);
     this.timeoutHandle = setTimeout(this.updateStatusLoop, 200);
     return Promise.resolve();
+  }
+
+  // Clear the dirty status if it is set as part of this update operation.
+  if (isStatusDirty) {
+    this.$store.commit('isStatusDirty', false);
   }
 
   const debounce = this.$store.getters.running ? 500 : 1000;

@@ -20,3 +20,12 @@ UI_APP_DATA = dict(
     test=1,
     pid=os.getpid()
 )
+
+
+def is_active_async() -> bool:
+    """
+    Determines whether or not an async command execution is currently
+    underway within the UI execution environment.
+    """
+    r = ACTIVE_EXECUTION_RESPONSE
+    return r is not None and r.thread and r.thread.is_alive()

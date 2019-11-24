@@ -1,0 +1,79 @@
+stages:
+  - check
+  - broadcast
+
+pytest-py35:
+  image: python:3.5
+  stage: check
+  script:
+    - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+    - pip install -r requirements.txt
+    - >
+      py.test
+      --cov-report term
+      --cov=cauldron
+      .
+
+pytest-py36:
+  image: python:3.6
+  stage: check
+  script:
+    - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+    - pip install -r requirements.txt
+    - >
+      py.test
+      --cov-report term
+      --cov=cauldron
+      .
+
+pytest-py37:
+  image: python:3.7
+  stage: check
+  coverage: '/^TOTAL.*\s+\d+\s+\d+\s+(\d+)%/'
+  script:
+    - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+    - pip install -r requirements.txt
+    - pip install codecov coveralls codacy-coverage
+    - >
+      py.test
+      --cov-report xml:"$(pwd)/coverage.xml"
+      --cov-report term
+      --cov=cauldron
+      .
+  artifacts:
+    paths:
+      - coverage.xml
+    expire_in: 1 day
+
+pytest-py38:
+  image: python:3.8
+  stage: check
+  script:
+    - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+    - pip install -r requirements.txt
+    - >
+      py.test
+      --cov-report term
+      --cov=cauldron
+      .
+
+codecov:
+  image: python:3.7
+  stage: broadcast
+  script:
+    - pip install codecov
+    - codecov
+
+coveralls:
+  image: python:3.7
+  stage: broadcast
+  script:
+    - pip install coveralls
+    - coveralls
+
+codacy:
+  image: python:3.7
+  stage: broadcast
+  script:
+    - pip install codacy-coverage
+    - python-codacy-coverage -r coverage.xml

@@ -1,9 +1,9 @@
-from flask import request as flask_request
+import flask
 
 
 def from_request(request=None) -> dict:
     """ Fetches the arguments for the current Flask application request."""
-    request = request if request else flask_request
+    request = request if request else flask.request
 
     try:
         json_args = request.get_json(silent=True)

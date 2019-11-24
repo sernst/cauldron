@@ -167,9 +167,7 @@ def create_step(
         kind='CREATED',
         code='STEP_CREATED',
         message='"{}" step has been created'.format(result.definition.name)
-    ).console(
-        whitespace=1
-    ).response
+    ).console(whitespace=1).response
 
 
 def modify_step(

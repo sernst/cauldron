@@ -2,6 +2,7 @@ import cauldron
 from cauldron import environ
 from cauldron.ui.statuses import _utils
 from cauldron.ui.statuses._reconciler import merge_local_state  # noqa
+from cauldron.ui import configs as ui_configs
 
 
 def get_status(last_timestamp: float, force: bool = False) -> dict:
@@ -43,6 +44,7 @@ def get_status(last_timestamp: float, force: bool = False) -> dict:
         project=project_data,
         step_changes=step_changes,
         view=environ.view,
+        is_active_async=ui_configs.is_active_async(),
     )
 
     results = response.serialize()
