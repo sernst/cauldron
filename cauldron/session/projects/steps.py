@@ -51,7 +51,7 @@ class ProjectStep(object):
         # lifetime.
         self._has_run = False
 
-        self.error = None
+        self.error = None  # type: typing.Optional[str]
         self.is_muted = False
         self.dom = None  # type: typing.Optional[str]
         self.progress_message = None

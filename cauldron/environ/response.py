@@ -94,6 +94,37 @@ class ResponseMessage:
         self.log += message
         return self
 
+    def console_if(
+            self,
+            display_condition: bool,
+            message: typing.Union[str, typing.List[str]] = None,
+            whitespace: int = 0,
+            whitespace_top: int = 0,
+            whitespace_bottom: int = 0,
+            indent_by: int = 0,
+            trace: bool = True,
+            file_path: str = None,
+            append_to_file: bool = True,
+            **kwargs
+    ):
+        """
+        Logs the ResponseMessage to the stdout with optional formatting
+        specified by the arguments if the "display_condition" argument
+        is True. Useful for stateful display.
+        """
+        if display_condition:
+            return self.console(
+                message=message,
+                whitespace=whitespace,
+                whitespace_top=whitespace_top,
+                whitespace_bottom=whitespace_bottom,
+                indent_by=indent_by,
+                trace=trace,
+                file_path=file_path,
+                append_to_file=append_to_file,
+                **kwargs,
+            )
+
     def console(
             self,
             message: typing.Union[str, typing.List[str]] = None,

@@ -1,4 +1,5 @@
 import os
+from unittest.mock import MagicMock
 
 import cauldron
 from cauldron.environ.response import Response
@@ -79,3 +80,36 @@ class TestStepActions(scaffolds.ResultsTest):
         r = Response()
         step_actions.toggle_muting(r, project, step.filename)
         self.assertFalse(step.is_muted)
+
+
+def test_echo_steps_empty():
+    """Should successfully echo no steps."""
+    project = MagicMock()
+    project.steps = []
+    response = Response()
+    step_actions.echo_steps(response, project)
+    assert support.has_success_code(response, 'ECHO_STEPS')
+
+
+def test_clean_steps():
+    """Should clean all steps in project."""
+    should_clean_step = MagicMock()
+    should_clean_step.is_dirty.return_value = True
+    should_clean_step.last_modified = 123
+
+    should_ignore_step = MagicMock()
+    should_ignore_step.is_dirty.return_value = True
+    should_ignore_step.last_modified = 0
+
+    project = MagicMock()
+    project.steps = [should_clean_step, should_ignore_step]
+
+    response = step_actions.clean_steps(Response(), project)
+
+    assert support.has_success_code(response, 'MARKED_CLEAN')
+    assert should_clean_step.mark_dirty.called, """
+        Expect the step that should be cleaned to be cleaned.
+        """
+    assert not should_ignore_step.mark_dirty.called, """
+        Expect the step that should be ignored to be skipped.
+        """

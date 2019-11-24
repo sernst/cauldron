@@ -95,12 +95,13 @@ function handleStepRunningError(response) {
   const hasRunningStepError = (
     !response.data.success
     || (response.data.errors || []).length > 0
-    || stepChanges.filter(c => c.has_error).length > 0
+    || stepChanges.filter(c => ((c || {}).step || {}).has_error).length > 0
   );
 
   if (hasRunningStepError) {
     stepper.clearQueue();
     store.commit('running', false);
+    markStatusDirty();
   }
 
   return hasRunningStepError;

@@ -21,6 +21,11 @@ UI_APP_DATA = dict(
     pid=os.getpid()
 )
 
+# Count of the number of consecutive UI get status failures.
+# Will reset to zero once a successful status response has
+# been returned. See cauldron/environ/response.py for details.
+status_failures = 0
+
 
 def is_active_async() -> bool:
     """

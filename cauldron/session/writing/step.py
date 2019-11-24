@@ -123,7 +123,7 @@ def _populate_data(step: 'projects.ProjectStep') -> STEP_DATA:
     checksum = zlib.adler32(body.encode())
 
     return step_data._replace(
-        has_error=step.error,
+        has_error=bool(step.error),
         body=body,
         body_checksum=checksum,
         data=(

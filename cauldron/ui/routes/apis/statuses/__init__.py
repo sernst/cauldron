@@ -46,15 +46,20 @@ def status():
             json=args
         ).json()
     except lost_errors as error:
+        ui_configs.status_failures += 1
         return (
             environ.Response().fail(
                 code='LOST_REMOTE_CONNECTION',
                 message='Unable to communicate with the remote kernel.',
                 error=error
             )
-            .console(whitespace=1)
+            .console_if(
+                display_condition=ui_configs.status_failures < 2,
+                whitespace=1
+            )
             .response
             .flask_serialize()
         )
 
+    ui_configs.status_failures = 0
     return flask.jsonify(ui_statuses.merge_local_state(remote_status, force))
