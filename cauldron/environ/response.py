@@ -124,6 +124,7 @@ class ResponseMessage:
                 append_to_file=append_to_file,
                 **kwargs,
             )
+        return self
 
     def console(
             self,

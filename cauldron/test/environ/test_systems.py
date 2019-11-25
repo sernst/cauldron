@@ -132,12 +132,10 @@ class TestSystems(scaffolds.ResultsTest):
 
     def test_get_site_packages_success(self):
         """Should get site packages."""
-
-        def get_site_packages_mock():
-            return []
-
-        if not hasattr(site, 'getsitepackages'):
-            setattr(site, 'getsitepackages', get_site_packages_mock)
+        if not hasattr(site, 'getsitepackages'):  # pragma: no cover
+            # Some versions of python on different systems lacked this
+            # function. Here we enforce its existence for testing.
+            setattr(site, 'getsitepackages', lambda *args, **kwargs: [])
 
         data = [1, 2, 3]
         with patch('site.getsitepackages') as get_site_packages:
@@ -148,12 +146,10 @@ class TestSystems(scaffolds.ResultsTest):
 
     def test_get_site_packages_failed(self):
         """Should return an empty list if unable to get site packages."""
-
-        def get_site_packages_mock():
-            return []
-
-        if not hasattr(site, 'getsitepackages'):
-            setattr(site, 'getsitepackages', get_site_packages_mock)
+        if not hasattr(site, 'getsitepackages'):  # pragma: no cover
+            # Some versions of python on different systems lacked this
+            # function. Here we enforce its existence for testing.
+            setattr(site, 'getsitepackages', lambda *args, **kwargs: [])
 
         with patch('site.getsitepackages') as get_site_packages:
             get_site_packages.side_effect = ValueError('FAKE ERROR')
