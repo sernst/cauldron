@@ -54,7 +54,7 @@ def execute(context: cli.CommandContext) -> Response:
         )
 
     return context.response.consume(do_synchronize(
-        context=context,
+        remote_connection=context.remote_connection,
         source_directory=source_directory,
         newer_than=context.remote_connection.sync_timestamp,
         library_folders=project_spec.get('library_folders', ['libs'])

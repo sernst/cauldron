@@ -38,11 +38,11 @@ function addWarnings(response) {
  * the UI.
  * @returns {AxiosInstance}
  */
-function createGateway() {
+function createGateway(timeout) {
   const root = window.location.origin;
   return axios.create({
     baseURL: `${root}/v1/api/`,
-    timeout: 10000,
+    timeout: timeout || 10000,
     headers: {
       'Content-Type': 'application/json',
     },
@@ -52,10 +52,11 @@ function createGateway() {
 /**
  * Generic GET method endpoint request and response execution.
  * @param endpoint
+ * @param timeout
  * @returns {Promise<AxiosResponse>}
  */
-function get(endpoint) {
-  return createGateway()
+function get(endpoint, timeout) {
+  return createGateway(timeout)
     .get(endpoint)
     .catch((error) => {
       console.error(`FAILED GET::${endpoint}`, error);
@@ -63,8 +64,8 @@ function get(endpoint) {
     });
 }
 
-function post(endpoint, data) {
-  return createGateway()
+function post(endpoint, data, timeout) {
+  return createGateway(timeout)
     .post(endpoint, data || {})
     .catch((error) => {
       console.error(`FAILED POST::${endpoint}`, data, error);
@@ -73,7 +74,7 @@ function post(endpoint, data) {
 }
 
 function execute(command) {
-  return post('/command/sync', { command })
+  return post('/command/sync', { command }, 30000)
     .then((response) => {
       addErrors(response);
       addWarnings(response);

@@ -31,6 +31,7 @@ def send_chunk(
         endpoint='/sync-file',
         method='POST',
         remote_connection=remote_connection,
+        timeout=4,
         data=dict(
             relative_path=relative_path,
             chunk=chunk,

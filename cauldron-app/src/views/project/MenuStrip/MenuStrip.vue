@@ -2,15 +2,11 @@
     .MenuStrip(
       :class="{'MenuStrip--locked': running}"
     )
-      menu-strip-item(icon="folder_open" title="Project")
-        project-menu-overlay(@action="onAction")
-      menu-strip-item(icon="dns" title="Steps")
-        step-menu-overlay(@action="onAction")
+      menu-strip-item(icon="folder_open" title="Project" @action="onAction")
+      menu-strip-item(icon="dns" title="Steps" @action="onAction")
 </template>
 
 <script>
-import ProjectMenuOverlay from './ProjectMenuOverlay.vue';
-import StepMenuOverlay from './StepMenuOverlay.vue';
 import MenuStripItem from './MenuStripItem.vue';
 
 /**
@@ -34,7 +30,7 @@ function running() {
 
 export default {
   name: 'MenuStrip',
-  components: { MenuStripItem, StepMenuOverlay, ProjectMenuOverlay },
+  components: { MenuStripItem },
   computed: { running },
   methods: { onAction },
 };

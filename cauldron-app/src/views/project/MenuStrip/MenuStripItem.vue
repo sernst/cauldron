@@ -1,24 +1,47 @@
 <template lang="pug">
     .MenuStripItem(
-      @click="onToggleShow(null, 0)"
       @mouseover="onMouseOver"
       @mouseleave="onToggleShow(false, 300)"
     )
-      .MenuStripItem__box(:class="boxClasses")
+      .MenuStripItem__box(
+        @click="onToggleShow(null, 0)"
+        :class="boxClasses"
+      )
         i.material-icons.md-18 {{ icon }}
       .MenuStripItem__overlay(v-if="show")
         .MenuStripItem__titleBox
           .MenuStripItem__title {{ title }}
         .MenuStripItem__customBox
-          slot
+          project-menu-overlay(
+            v-if="shouldShowOverlay('Project')"
+            @hide="onHideOverlay"
+            @action="onAction"
+          )
+          step-menu-overlay(
+            v-if="shouldShowOverlay('Steps')"
+            @hide="onHideOverlay"
+            @action="onAction"
+          )
 </template>
 
 <script>
+import ProjectMenuOverlay from './ProjectMenuOverlay.vue';
+import StepMenuOverlay from './StepMenuOverlay.vue';
+
 function data() {
   return {
     show: false,
     delayTimeout: null,
   };
+}
+
+function shouldShowOverlay(identifier) {
+  return this.show && identifier === this.title;
+}
+
+function onHideOverlay() {
+  console.log('onHideOverlay');
+  this.show = false;
 }
 
 function boxClasses() {
@@ -44,15 +67,29 @@ function onToggleShow(state, delay) {
   }, delay);
 }
 
+/**
+ * Bubbles events from children up to the parent Project view for event handling.
+ */
+function onAction(event) {
+  this.$emit('action', event);
+}
+
 export default {
   name: 'MenuStripItem',
+  components: { StepMenuOverlay, ProjectMenuOverlay },
   props: {
     icon: { type: String, default: 'home' },
     title: { type: String, default: 'Menu' },
   },
   data,
   computed: { boxClasses },
-  methods: { onToggleShow, onMouseOver },
+  methods: {
+    onToggleShow,
+    onMouseOver,
+    onAction,
+    onHideOverlay,
+    shouldShowOverlay,
+  },
 };
 </script>
 

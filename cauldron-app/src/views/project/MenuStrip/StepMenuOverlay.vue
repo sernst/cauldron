@@ -22,7 +22,7 @@ function data() {
 }
 
 function cleanStepStatuses() {
-  this.$parent.show = false;
+  this.$emit('hide', {});
   return http.execute('steps clean')
     .then((response) => {
       if (!response.data.success) {
@@ -40,7 +40,7 @@ function cleanStepStatuses() {
  */
 function insertStep(location) {
   loading.show('INSERT_STEP', 'Adding new step');
-  this.$parent.show = false;
+  this.$emit('hide', {});
   const { steps } = this.$store.getters.project;
   const selectedIndex = steps.reduce((result, step, index) => {
     const { selected } = step.status;

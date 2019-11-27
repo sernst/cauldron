@@ -21,7 +21,7 @@ const FAILED = 'failure';
 const LOST = 'lost';
 
 function loadingMessage() {
-  const items = this.$store.getters.loading || [];
+  const items = this.$store.getters.loadingMessages || [];
   return items.length > 0 ? items.splice(-1)[0] : {};
 }
 

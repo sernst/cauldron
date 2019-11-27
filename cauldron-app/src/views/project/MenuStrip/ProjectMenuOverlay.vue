@@ -13,27 +13,27 @@ import emitter from '../../../emitter';
 import http from '../../../http';
 
 function refreshDisplay() {
-  this.show = false;
+  this.$emit('hide', {});
   emitter.$emit('refresh-notebook');
 }
 
 function saveReaderFile() {
-  this.show = false;
+  this.$emit('hide', {});
   this.$store.commit('savingFile', true);
 }
 
 function openDirectory() {
-  this.show = false;
+  console.log('openDirectory');
+  this.$emit('hide', {});
   return http.execute('show files');
 }
 
 function data() {
-  return {
-    show: false,
-  };
+  return {};
 }
 
 function closeProject() {
+  this.$emit('hide', {});
   this.$emit('action', { action: 'close-project' });
 }
 

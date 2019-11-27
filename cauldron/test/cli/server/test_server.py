@@ -39,7 +39,7 @@ class TestServer(FlaskResultsTest):
 
         opened = self.post('/', dict(
             command='open',
-            args='@examples:hello_cauldron'
+            args='@examples:hello_cauldron --forget'
         ))
         self.assertEqual(opened.flask.status_code, 200)
         self.assert_no_errors(opened.response)
@@ -56,7 +56,7 @@ class TestServer(FlaskResultsTest):
 
         opened = self.post('/', dict(
             command='open',
-            args='@examples:hello_cauldron'
+            args='@examples:hello_cauldron --forget'
         ))
         self.assert_no_errors(opened.response)
 

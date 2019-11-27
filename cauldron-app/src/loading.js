@@ -1,14 +1,14 @@
 import store from './store';
 
 function show(id, message) {
-  const current = store.getters.loading || [];
-  store.commit('loading', current.concat([{ message }]));
+  const current = store.getters.loadingMessages || [];
+  store.commit('loadingMessages', current.concat([{ id, message }]));
 }
 
 function hide(id) {
-  const current = store.getters.loading || [];
-  const keeps = current.filter(item => id !== null && id !== item.id);
-  store.commit('loading', keeps);
+  const keeps = (store.getters.loadingMessages || [])
+    .filter(item => id !== null && id !== item.id);
+  store.commit('loadingMessages', keeps);
 }
 
 export default { show, hide };

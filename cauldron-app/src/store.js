@@ -19,7 +19,7 @@ export default new Vuex.Store({
     runningStepName: null,
     savingFile: false,
     status: createEmptyStatus(),
-    loading: [],
+    loadingMessages: [],
     isNotebookLoading: false,
     previousStepChanges: {},
   },
@@ -54,8 +54,8 @@ export default new Vuex.Store({
     status(state, value) {
       state.status = value || createEmptyStatus();
     },
-    loading(state, value) {
-      state.loading = value || [];
+    loadingMessages(state, value) {
+      state.loadingMessages = value || [];
     },
     isNotebookLoading(state, value) {
       state.isNotebookLoading = value || false;
@@ -76,7 +76,7 @@ export default new Vuex.Store({
     savingFile: state => state.savingFile,
     status: state => state.status,
     view: state => ((state.status || {}).data || {}).view || null,
-    loading: state => state.loading,
+    loadingMessages: state => state.loadingMessages,
     isNotebookLoading: state => state.isNotebookLoading,
     previousStepChanges: state => state.previousStepChanges,
   },

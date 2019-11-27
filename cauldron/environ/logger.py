@@ -204,9 +204,9 @@ def raw(
     :param append_to_file:
     :return:
     """
-
     if trace:
         _stdout.write('{}\n'.format(message))
+        _stdout.flush()
 
     # Store the logged information as an entry in the current thread if the
     # thread has as logs variable for such storage. These logs are used to
