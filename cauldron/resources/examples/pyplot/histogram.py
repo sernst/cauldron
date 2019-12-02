@@ -20,7 +20,13 @@ cd.display.markdown(
 )
 
 # Histogram of the data
-n, bins, patches = plt.hist(x, 50, facecolor='green', alpha=0.75)
+n, bins, patches = plt.hist(
+   x=x,
+   bins=50,
+   facecolor='green',
+   alpha=0.75,
+   density=1,
+)
 
 plt.xlabel('Smarts')
 plt.ylabel('Probability')

@@ -121,7 +121,7 @@ def execute(
         discovery.echo_known_projects(response)
         return response
     else:
-        p = actions.fetch_location(response, path)
+        p = actions.fetch_location(path)
         path = p if p else path
 
     if context.remote_connection.active:
@@ -168,7 +168,7 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
             path_segment = value.split(':', 1)[-1]
             return autocompletion.match_path(
                 segment,
-                environ.paths.package('resources', 'examples', path_segment),
+                environ.paths.resources('examples', path_segment),
                 include_files=False
             )
 
@@ -176,9 +176,7 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
             path_segment = value.split(':', 1)[-1]
             return autocompletion.match_path(
                 segment,
-                environ.paths.clean(
-                    os.path.join('~', 'cauldron', path_segment)
-                ),
+                environ.paths.home(path_segment),
                 include_files=False
             )
 

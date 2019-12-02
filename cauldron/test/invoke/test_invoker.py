@@ -2,6 +2,7 @@ from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
+from cauldron import environ
 from cauldron.invoke import invoker
 from cauldron.invoke import parser
 
@@ -9,7 +10,33 @@ from cauldron.invoke import parser
 def run_command(command: str) -> int:
     """Executes the specified command by parsing the args and running them"""
     args = parser.parse(command.split(' '))
-    return invoker.run(args.get('command'), args)
+
+    with patch('cauldron.invoke.invoker._pre_run_updater'):
+        return invoker.run(args.get('command'), args)
+
+
+@patch('cauldron.invoke.invoker.environ.systems.remove')
+@patch('cauldron.invoke.invoker.environ.configs.fetch')
+def test_pre_run_updater_aborted(fetch: MagicMock, remove: MagicMock):
+    """Should update from old version."""
+    fetch.return_value = environ.version
+    invoker._pre_run_updater()
+    assert remove.not_called
+
+
+@patch('cauldron.invoke.invoker.environ.systems.remove')
+@patch('cauldron.invoke.invoker.environ.configs.put')
+@patch('cauldron.invoke.invoker.environ.configs.fetch')
+def test_pre_run_updater(
+        fetch: MagicMock,
+        put: MagicMock,
+        remove: MagicMock
+):
+    """Should update from old version."""
+    fetch.return_value = '0.0.0'
+    invoker._pre_run_updater()
+    assert remove.called
+    assert put.called
 
 
 def test_run_version():

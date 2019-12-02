@@ -33,7 +33,7 @@ def sync_open(
     ).response
     response.log_notifications()
 
-    if not forget:
+    if not forget:  # pragma: no cover
         local_opener.update_recent_paths(response, source_directory)
 
     runner.add_library_path(source_directory)

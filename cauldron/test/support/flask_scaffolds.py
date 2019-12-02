@@ -20,8 +20,3 @@ class FlaskResultsTest(ResultsTest):
     def post(self, endpoint: str, data = None, **kwargs) -> server.Responses:
         """ send post request to the test flask application."""
         return server.post(self.app, endpoint, data, **kwargs)
-
-    @classmethod
-    def read_flask_response(cls, response: FlaskResponse) -> dict:
-        """Loads data from a flask JSON response into a dictionary."""
-        return json.loads(response.data.decode('utf-8', 'ignore'))

@@ -4,8 +4,8 @@ import cauldron
 from cauldron import environ
 from cauldron import runner
 from cauldron import session
-from cauldron.session import projects
 from cauldron.environ import Response
+from cauldron.session import projects
 
 
 def project_exists(response: 'environ.Response', path: str) -> bool:
@@ -134,7 +134,7 @@ def open_project(
             message='Unable to load project data'
         ).console(whitespace=1).response
 
-    if not forget:
+    if not forget:  # pragma: no cover
         update_recent_paths(response, path)
 
     project = cauldron.project.get_internal_project()

@@ -4,8 +4,8 @@ import tempfile
 import unittest
 
 import cauldron
-from cauldron import environ
 from cauldron import cli
+from cauldron import environ
 from cauldron.cli import commander
 from cauldron.cli.commands import close
 from cauldron.test.support.messages import Message
@@ -45,10 +45,10 @@ class ResultsTest(unittest.TestCase):
         environ.systems.remove(self.results_directory)
         self.results_directory = None
 
-        for key, path in self.temp_directories.items():
+        for key, path in self.temp_directories.items():  # pragma: no cover
             environ.systems.remove(path)
 
-        if cauldron.environ.remote_connection.active:
+        if cauldron.environ.remote_connection.active:  # pragma: no cover
             commander.execute('disconnect', '')
 
     def get_temp_path(self, identifier, *args):

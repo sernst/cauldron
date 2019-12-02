@@ -60,7 +60,7 @@ def populate_extra_files():
 setup(
     name='cauldron-notebook',
     version=settings['version'],
-    description='The Unnotebook: Scientific Analysis Environment',
+    description='The Unnotebook: Data Analysis Environment',
     long_description=readme(),
     keywords=[
         'Data', 'Analysis', 'Visualization',

@@ -1,7 +1,8 @@
 import tempfile
 
-import cauldron
 import pytest
+
+import cauldron
 from cauldron import cli
 from cauldron import environ
 from cauldron.cli import commander
@@ -34,23 +35,11 @@ class ProjectLifecycleTester:
         environ.systems.remove(self.results_directory)
         self.results_directory = None
 
-        for key, path in self.temp_directories.items():
+        for key, path in self.temp_directories.items():  # pragma: no cover
             environ.systems.remove(path)
 
-        if cauldron.environ.remote_connection.active:
+        if cauldron.environ.remote_connection.active:  # pragma: no cover
             commander.execute('disconnect', '')
-
-    # def get_temp_path(self, identifier, *args):
-    #     """..."""
-    #     if identifier not in self.temp_directories:
-    #         self.temp_directories[identifier] = tempfile.mkdtemp(
-    #             prefix='cd-test-{}'.format(identifier)
-    #         )
-    #
-    #     return os.path.realpath(os.path.join(
-    #         self.temp_directories[identifier],
-    #         *args
-    #     ))
 
 
 def make_project_lifecycle_fixture(fixture_name: str = 'tester'):

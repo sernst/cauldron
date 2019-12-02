@@ -82,3 +82,16 @@ def results(*args: str) -> str:
         The absolute path
     """
     return user('results', *args)
+
+
+def home(*args: str) -> str:
+    """
+    Creates an absolute path from the specified relative components within the
+    user's Cauldron app data folder.
+
+    :param args:
+        Relative components of the path relative to the root package
+    :return:
+        The absolute path
+    """
+    return clean(os.path.join('~', 'cauldron', *args))

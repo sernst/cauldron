@@ -1,12 +1,12 @@
 import typing
 from collections import namedtuple
-from unittest.mock import patch
 from unittest.mock import MagicMock
+from unittest.mock import patch
 
 from cauldron.cli.server import run as server_runner
 from cauldron.environ.response import Response
-from cauldron.test.support.messages import Message
 from cauldron.test.support import flask_scaffolds
+from cauldron.test.support.messages import Message
 
 FakeThread = namedtuple('FakeThread_NT', ['is_alive', 'uid'])
 
@@ -25,17 +25,13 @@ class TestServerRunStatus(flask_scaffolds.FlaskResultsTest):
     ) -> Response:
         """
         Adds a fake running command execution to the run status list for use
-        in testing
+        in testing.
         """
-
         r = Response(identifier=uid)
-
-        def is_thread_alive():
-            return is_alive
 
         r.thread = MagicMock()
         r.thread.uid = uid
-        r.thread.is_alive = is_thread_alive
+        r.thread.is_alive = lambda: is_alive
         r.thread.is_running = is_alive
         r.thread.logs = []
 

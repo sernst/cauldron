@@ -116,3 +116,20 @@ class TestOpenOpener(scaffolds.ResultsTest):
         self.assertFalse(result)
         self.assertTrue(response.failed)
         self.assertEqual(1, initialize_results_path.call_count)
+
+
+@patch('cauldron.cli.commands.open.opener.environ.configs')
+def test_update_recent_paths(
+    configs: MagicMock,
+):
+    """Should add the path to the recent paths list."""
+    configs.fetch.return_value = ['bar', 'foo']
+    response = Response()
+    opener.update_recent_paths(response, 'foo')
+
+    assert configs.fetch.called
+    assert configs.put.called
+    assert configs.save.called
+
+    expected = {'recent_paths': ['foo', 'bar'], 'persists': True}
+    assert expected == configs.put.call_args[1]

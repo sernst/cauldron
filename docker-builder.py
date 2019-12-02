@@ -12,23 +12,48 @@ BUILDS = [
         'build_args': {'PYTHON_RELEASE': '3.6', 'PYTHON_VERSION': '3.6.9'}
     },
     {
+        'ids': ['ui-standard36'],
+        'dockerfile': 'docker-standard-ui.dockerfile',
+        'build_args': {'PYTHON_RELEASE': '3.6', 'PYTHON_VERSION': '3.6.9'}
+    },
+    {
         'ids': ['standard', 'standard37'],
         'dockerfile': 'docker-standard.dockerfile',
-        'build_args': {'PYTHON_RELEASE': '3.7', 'PYTHON_VERSION': '3.7.4'}
+        'build_args': {'PYTHON_RELEASE': '3.7', 'PYTHON_VERSION': '3.7.5'}
     },
-    # {
-    #     'ids': ['standard38'],
-    #     'dockerfile': 'docker-standard.dockerfile',
-    #     'build_args': {'PYTHON_RELEASE': '3.8', 'PYTHON_VERSION': '3.8.0'}
-    # },
+    {
+        'ids': ['ui-standard', 'ui-standard37'],
+        'dockerfile': 'docker-standard-ui.dockerfile',
+        'build_args': {'PYTHON_RELEASE': '3.7', 'PYTHON_VERSION': '3.7.5'}
+    },
+    {
+        'ids': ['standard38'],
+        'dockerfile': 'docker-standard.dockerfile',
+        'build_args': {'PYTHON_RELEASE': '3.8', 'PYTHON_VERSION': '3.8.0'}
+    },
+    {
+        'ids': ['ui-standard38'],
+        'dockerfile': 'docker-standard-ui.dockerfile',
+        'build_args': {'PYTHON_RELEASE': '3.8', 'PYTHON_VERSION': '3.8.0'}
+    },
     {
         'ids': ['miniconda'],
         'dockerfile': 'docker-miniconda.dockerfile',
         'build_args': {}
     },
     {
+        'ids': ['ui-miniconda'],
+        'dockerfile': 'docker-miniconda-ui.dockerfile',
+        'build_args': {}
+    },
+    {
         'ids': ['conda'],
         'dockerfile': 'docker-conda.dockerfile',
+        'build_args': {}
+    },
+    {
+        'ids': ['ui-conda'],
+        'dockerfile': 'docker-conda-ui.dockerfile',
         'build_args': {}
     },
 ]
@@ -100,6 +125,7 @@ def parse() -> dict:
     """Parse command line arguments"""
     parser = ArgumentParser()
     parser.add_argument('-p', '--publish', action='store_true', default=False)
+    parser.add_argument('-i', '--id', dest='ids', action='append')
     return vars(parser.parse_args())
 
 
@@ -111,6 +137,7 @@ def run():
         build(build_id, spec)
         for spec in BUILDS
         for build_id in spec['ids']
+        if not args['ids'] or build_id in args['ids']
     ]
 
     if not args['publish']:

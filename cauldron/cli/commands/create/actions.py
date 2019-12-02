@@ -67,8 +67,7 @@ def allow_create(project_directory: str) -> Response:
 
 def resolve_project_directory(directory: str, project_name: str) -> str:
     """..."""
-
-    location = open_actions.fetch_location(Response(), directory)
+    location = open_actions.fetch_location(directory)
     project_directory = location if location else directory
     project_directory = environ.paths.clean(project_directory).rstrip(os.sep)
 
@@ -79,7 +78,6 @@ def resolve_project_directory(directory: str, project_name: str) -> str:
 
 def make_directory(directory: str) -> Response:
     """..."""
-
     if os.path.exists(directory):
         return Response()
 

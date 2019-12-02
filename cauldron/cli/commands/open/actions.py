@@ -2,14 +2,13 @@ import os
 import typing
 
 from cauldron import environ
+from cauldron.cli.commands.listing import discovery
 from cauldron.cli.interaction import query
 from cauldron.environ import Response
-from cauldron.cli.commands.listing import discovery
 
 
 def fetch_recent(response: Response) -> typing.Optional[str]:
     """Return recently opened projects."""
-
     recent_paths = environ.configs.fetch('recent_paths', [])
 
     if len(recent_paths) < 1:
@@ -31,13 +30,8 @@ def fetch_recent(response: Response) -> typing.Optional[str]:
     return path
 
 
-def fetch_location(response: Response, path: str) -> typing.Optional[str]:
-    """
-
-    :param path:
-    :return:
-    """
-
+def fetch_location(path: str) -> typing.Optional[str]:
+    """..."""
     if not path or not path.startswith('@'):
         return None
 
@@ -47,7 +41,7 @@ def fetch_location(response: Response, path: str) -> typing.Optional[str]:
     if parts[0] == '@examples':
         return environ.paths.package('resources', 'examples', *segments)
     if parts[0] == '@home':
-        return environ.paths.clean(os.path.join('~', 'cauldron', *segments))
+        return environ.paths.home(*segments)
 
     environ.configs.load()
     aliases = environ.configs.fetch('folder_aliases', {})
