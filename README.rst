@@ -23,9 +23,6 @@ engineering in one data analysis environment
 .. image:: https://gitlab.com/swernst/cauldron/badges/master/coverage.svg
    :target: https://gitlab.com/swernst/cauldron/pipelines
 
-.. image:: https://api.codacy.com/project/badge/Grade/13a05e35d76141e79fbd6b19e6ad937e
-   :target: https://www.codacy.com/app/sernst/cauldron
-
 .. image:: https://img.shields.io/badge/license-MIT-blue.svg
    :target: https://raw.githubusercontent.com/sernst/cauldron/master/LICENSE
 

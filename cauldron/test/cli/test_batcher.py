@@ -26,7 +26,7 @@ def run_project(
     """
     Runs the specified project by setting up temporary directories to store
 
-    :param project_directory: 
+    :param project_directory:
         Directory where the project to run is located
     :param save_directory:
         A temporary directory where the output is saved for test assertions.

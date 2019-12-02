@@ -281,7 +281,7 @@ class TestCreate(scaffolds.ResultsTest):
             Expect create to fail on 'write_project_data' call.
             """
         assert 1 == create_first_step.call_count, """
-            Expect create process to create first default step before 
+            Expect create process to create first default step before
             failing to write project data.
             """
 

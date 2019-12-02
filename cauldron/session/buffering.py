@@ -47,7 +47,7 @@ class RedirectBuffer(io.TextIOWrapper):
 
     def flush_all(self) -> str:
         """
-        
+
         :return:
         """
 

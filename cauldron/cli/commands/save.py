@@ -33,8 +33,8 @@ def populate(
         help=cli.reformat("""
             The file path to the Cauldron file to be saved. If the file
             extension is missing it will be appended to the end of the path's
-            filename. If a directory is specified instead of a file, the 
-            Cauldron file will saved into that directory using the name of the 
+            filename. If a directory is specified instead of a file, the
+            Cauldron file will saved into that directory using the name of the
             project as the filename.
             """)
     )

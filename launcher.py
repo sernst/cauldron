@@ -1,6 +1,5 @@
 import os
 import sys
-from argparse import ArgumentParser
 
 my_directory = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(my_directory)

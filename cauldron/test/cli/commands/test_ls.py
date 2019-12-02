@@ -54,7 +54,7 @@ def test_ls(
     offset = 1 if scenario['active'] or scenario['project'] else 0
     assert 27 + offset == len(data['standard_locations']), """
         Expect home directory, parent directory and one windows root
-        drive location for each letter of the alphabet except Z. 
+        drive location for each letter of the alphabet except Z.
         Also expect one for the project directory if a local or
         remote project is open.
         """

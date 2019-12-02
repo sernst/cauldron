@@ -26,7 +26,7 @@ def test_opener_thread(
         Expect two attempts before it finally succeeds.
         """
     assert 'http://me:123/' == thread.root_url, """
-        Expect the url to be composed of the values passed to the 
+        Expect the url to be composed of the values passed to the
         thread's constructor.
         """
     assert 1 == open_new.call_count, """

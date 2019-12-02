@@ -85,7 +85,7 @@ def test_start_customized(
         Expected no call to end the application execution process.
         """
     assert ui_configs.LAUNCH_THREAD is None, """
-        Expect no launch thread when run in debug mode because 
+        Expect no launch thread when run in debug mode because
         auto-reloading causes problems.
         """
 
@@ -129,7 +129,7 @@ def test_start_remote_connection(
         Expected no call to end the application execution process.
         """
     assert ui_configs.LAUNCH_THREAD is None, """
-        Expect no launch thread when run in debug mode because 
+        Expect no launch thread when run in debug mode because
         auto-reloading causes problems.
         """
     assert remote_connection.url == 'foo'

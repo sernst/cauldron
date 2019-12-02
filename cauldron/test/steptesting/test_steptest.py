@@ -21,7 +21,7 @@ class TestStepTesting(StepTestCase):
         self.assertEqual(error_echo, '')
 
     def test_second_step(self):
-        """ 
+        """
         Should fail without exception because of an exception raised in the
         source but failure is allowed
         """
@@ -32,7 +32,7 @@ class TestStepTesting(StepTestCase):
         self.assertGreater(len(error_echo), 0)
 
     def test_second_step_strict(self):
-        """ 
+        """
         Should fail because of an exception raised in the source when strict
         failure is enforced
         """

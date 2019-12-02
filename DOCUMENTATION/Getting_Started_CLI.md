@@ -8,15 +8,15 @@ The following system requirements must be met for Cauldron to work:
 
   ### Python 3
   Cauldron and uses the latest and greatest Python 3 has to offer and works with the following Python 3 versions:
-  
+
   * 3.5.3+
   * 3.6.3+
   * 3.7 (coming soon)
-  
+
 Python 2 is nearing its end of life and lacks the necessary functionality to be supported.
-  
+
 ### 64 Bit OS
-The desktop application is available for OSX, Windows and multiple Linux distributions, but they must be the 64 bit versions. For instructions on Linux installations see: http://www.unnotebook.com/install/#Deb-Linux-Install. 
+The desktop application is available for OSX, Windows and multiple Linux distributions, but they must be the 64 bit versions. For instructions on Linux installations see: http://www.unnotebook.com/install/#Deb-Linux-Install.
 
 ## Installation
 The latest release of Cauldron is available from both PyPi:
@@ -53,11 +53,11 @@ which must be executed in the root project directory of your local copy of Cauld
 ## Launching Cauldron
 
  You can start Cauldron once the installation is complete with the `cauldron` command:
- 
+
 ```bash
 $ cauldron
 ```
- 
+
 or on Windows using the `cauldron.exe` command:
 
 ```bash
@@ -212,8 +212,8 @@ For more details about the create command, use the Cauldron shell command:
 The create command takes two arguments:
   1. The name of your new project (`hello_cauldron` in the example above)
   2. The absolute path to the directory where the project will be saved. In the example above, the `@home:` argument is a shortcut to Cauldron's default home directory, which is ~/cauldron/.
-  
-When the example create command above is executed, a _hello_cauldron_ project will be created in the directory _~/cauldron/hello_cauldron/_, with the scaffolding for the project already written. The create command also immediately opens the new project in the shell. 
+
+When the example create command above is executed, a _hello_cauldron_ project will be created in the directory _~/cauldron/hello_cauldron/_, with the scaffolding for the project already written. The create command also immediately opens the new project in the shell.
 
 ### Add First Code Step
 
@@ -271,7 +271,7 @@ df = cd.shared.df
 
 for column_name in df.columns:
   plt.plot(df[column_name])
-  
+
 plt.title('Random Plot')
 plt.xlabel('Indexes')
 plt.ylabel('Values')

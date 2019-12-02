@@ -57,7 +57,7 @@ def parse(args: list = None) -> dict:
     """
     Parses the command line arguments and returns a dictionary containing the
     results.
-    
+
     :param args:
         The command line arguments to parse. If None, the system command line
         arguments will be used instead.

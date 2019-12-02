@@ -1,7 +1,7 @@
 import json
 import os
 import typing
-from argparse import ArgumentParser
+from argparse import ArgumentParser  # noqa
 
 from cauldron import environ
 from cauldron.cli import batcher
@@ -115,7 +115,7 @@ def run(action: str, args: dict) -> int:
     """
     Runs the specified command action and returns the return status code
     for exit.
-    
+
     :param action:
         The action to run
     :param args:

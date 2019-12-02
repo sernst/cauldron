@@ -81,7 +81,7 @@ def markdown(
         **kwargs
 ):
     """
-    Renders the specified source string or source file using markdown and 
+    Renders the specified source string or source file using markdown and
     adds the resulting HTML to the notebook display.
 
     :param source:

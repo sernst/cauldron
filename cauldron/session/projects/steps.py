@@ -8,7 +8,7 @@ from cauldron import render
 from cauldron import templating
 from cauldron.session import definitions
 from cauldron.session import naming
-from cauldron.session.projects import project as projects
+from cauldron.session import projects  # noqa
 from cauldron.session.report import Report
 
 

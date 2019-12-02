@@ -166,7 +166,7 @@ def markdown(
     markdown to HTML for display within the notebook.
 
     :param source:
-        A string of markdown text that should be rendered to HTML for 
+        A string of markdown text that should be rendered to HTML for
         notebook display.
     :param source_path:
         The path to a markdown file that should be rendered to HTML for

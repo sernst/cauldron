@@ -46,7 +46,7 @@ def test_merge_local_state(
     dirty_values = [s['status'].get('is_dirty') for s in steps]
     assert [None, False, True] == dirty_values, """
         Expect first step to be None because status is empty,
-        second to be False because is exists and is not recently 
+        second to be False because is exists and is not recently
         modified, and third to be True because the local file does
         not exist.
         """

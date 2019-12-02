@@ -51,7 +51,7 @@ def test_view_close(
         Expect command to succeed in running with the expected output.
         """
     assert 0 == zipfile_constructor.call_count, """
-        Expect close to return before the ZipFile constructor would 
+        Expect close to return before the ZipFile constructor would
         be called.
         """
     assert 1 == systems_remove.call_count, """
@@ -73,7 +73,7 @@ def test_view_close_skipped(
         Expect command to succeed in skipping.
         """
     assert 0 == zipfile_constructor.call_count, """
-        Expect close to return before the ZipFile constructor would 
+        Expect close to return before the ZipFile constructor would
         be called.
         """
     assert 0 == systems_remove.call_count, """
