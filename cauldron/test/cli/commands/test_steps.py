@@ -1,6 +1,10 @@
 import os
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import cauldron
+from cauldron import environ
+from cauldron.cli.commands import steps as steps_command
 from cauldron.test import support
 from cauldron.test.support import scaffolds
 from cauldron.test.support.messages import Message
@@ -199,3 +203,152 @@ class TestSteps(scaffolds.ResultsTest):
             2,
             '{}'.format(serialized['steps'])
         )
+
+
+def test_populate_list_action():
+    """Should return early if action is list."""
+    parser = MagicMock()
+    steps_command.populate(parser, [], {'action': 'list'})
+    assert parser.add_argument.not_called
+
+
+def test_autocomplete_list():
+    """Should return empty list if the action is list."""
+    assert support.autocomplete('steps list ') == []
+
+
+def test_autocomplete_list_flag():
+    """Should return empty list if the action is list."""
+    assert support.autocomplete('steps list -') == []
+
+
+def test_autocomplete_remove_flag():
+    """Should return keep flag completion."""
+    assert support.autocomplete('steps remove foo.py -') == ['k', '-']
+
+
+def test_autocomplete_no_match():
+    """Should return empty list if nothing matched for autocomplete."""
+    assert support.autocomplete('steps remove a.py b.py ,') == []
+
+
+@patch('cauldron.project.get_internal_project')
+def test_execute_no_project(
+        get_internal_project: MagicMock,
+):
+    """Should fail if no project is open."""
+    get_internal_project.return_value = None
+    context = MagicMock(response=environ.Response())
+
+    response = steps_command.execute(context)
+    assert support.has_error_code(response, 'NO_OPEN_PROJECT')
+
+
+@patch('cauldron.cli.commands.steps.actions.clean_steps')
+@patch('cauldron.project.get_internal_project')
+def test_execute_clean_action(
+        get_internal_project: MagicMock,
+        clean_steps: MagicMock,
+):
+    """Should carry out a steps clean action."""
+    get_internal_project.return_value = MagicMock()
+    context = MagicMock(response=environ.Response())
+
+    steps_command.execute(context, action='clean')
+    assert clean_steps.called
+
+
+@patch('cauldron.cli.commands.steps.selection.select_step')
+@patch('cauldron.project.get_internal_project')
+def test_execute_select_action(
+        get_internal_project: MagicMock,
+        select_step: MagicMock,
+):
+    """Should carry out a steps selection action."""
+    get_internal_project.return_value = MagicMock()
+    context = MagicMock(response=environ.Response())
+
+    steps_command.execute(context, action='select', step_name='foo.py')
+    assert select_step.called
+
+
+@patch('cauldron.project.get_internal_project')
+def test_execute_no_step_name(
+        get_internal_project: MagicMock
+):
+    """Should fail if step is not specified for the remove action."""
+    get_internal_project.return_value = MagicMock()
+    context = MagicMock(response=environ.Response())
+
+    response = steps_command.execute(context, action='remove')
+    assert support.has_error_code(response, 'NO_STEP_NAME')
+
+
+@patch('cauldron.cli.commands.steps.sync.send_remote_command')
+def test_execute_remote_list(
+        send_remote_command: MagicMock
+):
+    """Should carry out a remote list command."""
+    thread = MagicMock()
+    thread.responses = [environ.Response().update(foo='bar')]
+    send_remote_command.return_value = thread
+
+    context = MagicMock(response=environ.Response())
+
+    response = steps_command.execute_remote(context, action='list')
+    assert response.data['foo'] == 'bar'
+
+
+@patch('cauldron.cli.commands.steps.sync.comm.send_request')
+def test_execute_remote_sync_failed(
+        send_request: MagicMock
+):
+    """Should fail if sync status command does not succeed."""
+    send_request.return_value = environ.Response().fail(code='FAKE').response
+    context = MagicMock(response=environ.Response())
+
+    response = steps_command.execute_remote(context, action='remove')
+    assert support.has_error_code(response, 'FAKE')
+
+
+@patch('cauldron.cli.commands.steps.execute')
+@patch('cauldron.cli.commands.steps.project_opener.project_exists')
+@patch('cauldron.cli.commands.steps.sync.comm.send_request')
+def test_execute_remote_no_such_project(
+        send_request: MagicMock,
+        project_exists: MagicMock,
+        execute: MagicMock,
+):
+    """Should fail if sync status command does not succeed."""
+    project_exists.return_value = False
+    send_request.return_value = environ.Response().update(
+        remote_source_directory='foo'
+    )
+    context = MagicMock(response=environ.Response())
+
+    steps_command.execute_remote(context, action='remove')
+    assert execute.not_called
+
+
+@patch('cauldron.cli.commands.steps.projects.Project')
+@patch('cauldron.cli.commands.steps.execute')
+@patch('cauldron.cli.commands.steps.project_opener.project_exists')
+@patch('cauldron.cli.commands.steps.sync.comm.send_request')
+def test_execute_remote_fails(
+        send_request: MagicMock,
+        project_exists: MagicMock,
+        execute: MagicMock,
+        project_constructor: MagicMock,
+):
+    """Should fail if local execute command does not succeed."""
+    project_exists.return_value = True
+    send_request.return_value = environ.Response().update(
+        remote_source_directory='foo'
+    )
+    context = MagicMock(response=environ.Response())
+    execute.return_value = environ.Response().fail(code='FAKE').response
+
+    response = steps_command.execute_remote(context, action='remove')
+    assert execute.called
+    assert project_constructor.called
+    assert support.has_error_code(response, 'FAKE')

@@ -180,7 +180,7 @@ def abort():
 
         try:
             del server_runner.active_execution_responses[uid]
-        except Exception:
+        except Exception:  # pragma: no cover
             pass
 
         if not response.thread or not response.thread.is_alive():

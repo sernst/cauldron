@@ -190,7 +190,7 @@ def execute(
     project = (
         project
         if project else
-        cauldron.project.internal_project
+        cauldron.project.get_internal_project()
     )
 
     if not project:

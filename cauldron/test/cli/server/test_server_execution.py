@@ -11,19 +11,16 @@ class TestServerExecution(flask_scaffolds.FlaskResultsTest):
 
     def test_execute_sync(self):
         """Should execute command synchronously."""
-
         opened = self.post('/command-sync', {'command': 'open', 'args': ''})
         self.assertEqual(opened.flask.status_code, 200)
 
     def test_execute_get(self):
         """Should execute using get passed data """
-
         opened = self.get('/command-sync?&command=open')
         self.assertEqual(opened.flask.status_code, 200)
 
     def test_execute_wait(self):
         """Should wait for execution to complete when synchronous."""
-
         FakeThread = namedtuple('FakeThread_NT', ['uid', 'join', 'is_alive'])
         thread = FakeThread(
             uid='FAKE-UID',
@@ -46,14 +43,12 @@ class TestServerExecution(flask_scaffolds.FlaskResultsTest):
 
     def test_shutdown_not_running(self):
         """Should abort shutdown of non-running server."""
-
         shutdown = self.get('/shutdown')
         self.assert_has_error_code(shutdown.response, 'NOT_RUNNING_ERROR')
 
     @patch('cauldron.cli.commander.execute')
     def test_execute_failure(self, execute: MagicMock):
         """Should fail when execution fails."""
-
         execute.side_effect = RuntimeError('FAKE ERROR')
         opened = self.get('/command-sync?&command=open&args=+')
         self.assertEqual(opened.flask.status_code, 200)
@@ -61,7 +56,6 @@ class TestServerExecution(flask_scaffolds.FlaskResultsTest):
 
     def test_shutdown(self):
         """Should abort the running server."""
-
         shutdown_func = MagicMock()
         shutdown = self.get(
             '/shutdown',
@@ -72,7 +66,6 @@ class TestServerExecution(flask_scaffolds.FlaskResultsTest):
 
     def test_shutdown_failed(self):
         """Should abort the running server."""
-
         shutdown_func = MagicMock()
         shutdown_func.side_effect = RuntimeError('FAKE ERROR')
         shutdown = self.get(
@@ -82,3 +75,34 @@ class TestServerExecution(flask_scaffolds.FlaskResultsTest):
         shutdown_func.assert_called_once_with()
 
         self.assert_has_error_code(shutdown.response, 'SHUTDOWN_ERROR')
+
+    @patch('cauldron.cli.server.routes.execution.server_runner')
+    def test_abort_not_a_response(
+            self,
+            server_runner: MagicMock,
+    ):
+        """Should ignore non-response entries during abort."""
+        server_runner.active_execution_responses = {'foo': None}
+        self.get('/abort')
+
+    @patch('cauldron.cli.server.routes.execution.server_runner')
+    def test_abort_no_thread(
+            self,
+            server_runner: MagicMock,
+    ):
+        """Should work when no thread for active response."""
+        active_response = MagicMock()
+        active_response.thread = None
+        server_runner.active_execution_responses = {'foo': active_response}
+        self.get('/abort')
+
+    @patch('cauldron.cli.server.routes.execution.server_runner')
+    def test_abort_cannot_stop(
+            self,
+            server_runner: MagicMock,
+    ):
+        """Should succeed even when thread could not be stopped."""
+        active_response = MagicMock()
+        active_response.thread.abort_running.side_effect = ValueError
+        server_runner.active_execution_responses = {'foo': active_response}
+        self.get('/abort')

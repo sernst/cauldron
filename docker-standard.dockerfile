@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-MAINTAINER swernst@gmail.com
+LABEL maintainer="swernst@gmail.com"
 
 ARG PYTHON_RELEASE
 ARG PYTHON_VERSION

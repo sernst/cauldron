@@ -1,6 +1,6 @@
 FROM continuumio/anaconda3:latest
 
-MAINTAINER swernst@gmail.com
+LABEL maintainer="swernst@gmail.com"
 
 COPY cauldron /cauldron_local/cauldron
 COPY README.rst /cauldron_local/

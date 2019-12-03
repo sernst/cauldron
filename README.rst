@@ -1,15 +1,20 @@
 Cauldron
 ========
 
-The Unnotebook: The dexterity of a notebook and the wisdom of software
-engineering in one data analysis environment
-
+Interactive computing for complex data processing, modeling and analysis
+in Python 3.
 
 .. image:: https://img.shields.io/pypi/v/cauldron-notebook.svg
    :target: https://pypi.python.org/pypi/cauldron-notebook
 
 .. image:: https://anaconda.org/sernst/cauldron/badges/version.svg
    :target: https://anaconda.org/sernst/cauldron
+
+.. image:: https://img.shields.io/pypi/pyversions/cauldron-notebook.svg
+   :target: https://pypi.python.org/pypi/cauldron-notebook
+
+.. image:: https://img.shields.io/badge/license-MIT-blue.svg
+   :target: https://raw.githubusercontent.com/sernst/cauldron/master/LICENSE
 
 .. image:: https://gitlab.com/swernst/cauldron/badges/master/pipeline.svg
    :target: https://gitlab.com/swernst/cauldron/pipelines
@@ -23,15 +28,12 @@ engineering in one data analysis environment
 .. image:: https://gitlab.com/swernst/cauldron/badges/master/coverage.svg
    :target: https://gitlab.com/swernst/cauldron/pipelines
 
-.. image:: https://img.shields.io/badge/license-MIT-blue.svg
-   :target: https://raw.githubusercontent.com/sernst/cauldron/master/LICENSE
-
 .. image:: https://badges.gitter.im/gitterHQ/gitter.svg
    :target: https://gitter.im/cauldron-notebook/Lobby
 
-The rest of this documentation pertains to the Cauldron CLI. For more
-general information about Cauldron, including downloads for the desktop
-application, please visit: http://www.unnotebook.com
+The rest of this documentation pertains to the Cauldron command line
+interface. For more general information about Cauldron, including how
+to use the UI, please visit: http://www.unnotebook.com
 
 
 - `Installation`_
@@ -75,10 +77,9 @@ Getting Started
 ---------------
 
 Cauldron can be used as either through its Command Line Interface (CLI) or with
-the Cauldron desktop application. For more information about the desktop
-application visit http://www.unnotebook.com where you can find the download
-links and documentation. The rest of this README describes using Cauldron
-directly from the command line.
+the Cauldron web-based UI. For more information about the UI visit
+http://www.unnotebook.com for examples and documentation. The rest of this
+README describes using Cauldron directly from the command line.
 
 Cauldron is a shell-based program you start from a terminal. For installations
 that support python script installation you can start Cauldron
@@ -318,25 +319,25 @@ https://hub.docker.com/r/swernst/cauldron/tags/
 
 They are:
 
-- ``standard``: Includes the Python 3.6 distribution in an Ubuntu environment.
-- ``conda``: Includes the full Anaconda distribution of Python 3.6 built upon Anaconda's official docker image.
-- ``miniconda``: Includes the slimmed-down mini Anaconda distribution of Python 3.6 built upon Anaconda's official docker image.
+- ``standard``: Includes the Python 3.6+ distributions in an Ubuntu environment.
+- ``conda``: Includes the full Anaconda distribution of Python 3.6+ built upon Anaconda's official docker image.
+- ``miniconda``: Includes the slimmed-down mini Anaconda distribution of Python 3.6+ built upon Anaconda's official docker image.
 
 In all three cases, Cauldron is pre-installed with dependencies and the default
 command for each container is to start the Cauldron kernel on the exposed port
 5010. One of these containers can be pulled using the docker pull command::
 
-   $ docker pull swernst/cauldron:latest-standard
+   $ docker pull swernst/cauldron:current-standard
 
 If you do not specify a specific tag, the latest standard image will be used.
 Once the image has been pulled, you can start a Cauldron kernel::
 
-   $ docker run -d --rm -p 5010:5010 swernst/cauldron:latest-standard
+   $ docker run -d --rm -p 5010:5010 swernst/cauldron:current-standard
 
 After the container starts, you can access the kernel through the exposed 5010
-port. If you are using the desktop application, you can connect to this
-container locally by specifying the local kernel URL, ``http://127.0.0.1:5010``
-instead of a Python executable path.
+port. If you are using the Cauldron UI, you can connect to this
+container locally by specifying the local kernel URL, ``http://127.0.0.1:5010``,
+as connection argument when starting the ui, .
 
 The Cauldron command shell also allows you drive the kernel by connecting to it
 from a locally running Cauldron shell. To do this, you use the ``connect``

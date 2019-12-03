@@ -4,8 +4,6 @@ import cauldron
 from cauldron.cli.server.routes.synchronize import status
 from cauldron.test import support
 from cauldron.test.support import scaffolds
-from cauldron.test.support.messages import Message
-
 
 MY_PATH = os.path.realpath(__file__)
 MY_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
