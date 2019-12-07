@@ -1,0 +1,37 @@
+CAULDRON UI
+
+The Cauldron UI container will serve the Cauldron UI on port 8899 of
+this container. That port can be mapped to whatever host port is
+desirable. When launched without additional arguments the UI will
+be colocated with the Cauldron kernel and notebook execution will
+also take place inside this container. Additional arguments can be
+supplied when running this container to have the container create
+an SSH tunnel to a remote location and use that remote location as
+the Cauldron kernel instead of a local one within the UI container.
+
+To make local files available to this container it is recommended
+to mount the desired root directory containing the notebook(s) to
+the /notebooks directory in the container. That would look like:
+
+$ docker run \
+    -v /path/to/local/notebooks:/notebooks \
+    swernst/cauldron:current-ui-standard
+
+For remote connections, it's often the case that SSH keys will be
+needed in the container to authorize the SSH tunnel. In those cases
+the folder containing your SSH keys should be mounted to the
+container in the /host_ssh directory in a fashion such as:
+
+$ docker run \
+    -v /path/to/local/notebooks:/notebooks \
+    -v /home/me/.ssh:/host_ssh \
+    swernst/cauldron:current-ui-standard \
+    --remote=ec2-user@ec2-0-0-0-0.compute-1.amazonaws.com:5010 \
+    --ssh-key=my-ssh-key.pem
+
+In the above example the user's .ssh directory is mounted into
+the container's /host_ssh folder. Then the --remote argument is
+specified as user@host:port to define the target of the SSH tunnel
+and the --ssh-key specifies the name of the ssh key to use within
+the /host_ssh directory to authenticate the creation of the ssh
+tunnel.

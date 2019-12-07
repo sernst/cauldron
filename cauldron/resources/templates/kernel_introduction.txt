@@ -5,6 +5,6 @@
     \____/\__,_|\__,_|_|\__,_|_|  \___/|_| |_|
 
                 "The Un-Notebook"
-             Data Analysis Environment
+           Interactive Data Environment
 
 Version: {{ version }}

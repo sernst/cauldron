@@ -1,60 +1,65 @@
 import json
 import os
-import re
+import textwrap
 from argparse import ArgumentParser
 
 HUB_PREFIX = 'swernst/cauldron'
 MY_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
 BUILDS = [
     {
-        'ids': ['standard36'],
-        'dockerfile': 'docker-standard.dockerfile',
-        'build_args': {'PYTHON_RELEASE': '3.6', 'PYTHON_VERSION': '3.6.9'}
+        'ids': ['standard36', 'kernel-standard36'],
+        'build_args': {'PARENT': 'python:3.6', 'TYPE': 'kernel'},
     },
     {
         'ids': ['ui-standard36'],
-        'dockerfile': 'docker-standard-ui.dockerfile',
-        'build_args': {'PYTHON_RELEASE': '3.6', 'PYTHON_VERSION': '3.6.9'}
+        'build_args': {'PARENT': 'python:3.6', 'TYPE': 'ui'},
     },
     {
-        'ids': ['standard', 'standard37'],
-        'dockerfile': 'docker-standard.dockerfile',
-        'build_args': {'PYTHON_RELEASE': '3.7', 'PYTHON_VERSION': '3.7.5'}
+        'ids': [
+            'standard', 'kernel-standard',
+            'standard37', 'kernel-standard37'
+        ],
+        'build_args': {'PARENT': 'python:3.7', 'TYPE': 'kernel'},
     },
     {
         'ids': ['ui-standard', 'ui-standard37'],
-        'dockerfile': 'docker-standard-ui.dockerfile',
-        'build_args': {'PYTHON_RELEASE': '3.7', 'PYTHON_VERSION': '3.7.5'}
+        'build_args': {'PARENT': 'python:3.7', 'TYPE': 'ui'},
     },
     {
-        'ids': ['standard38'],
-        'dockerfile': 'docker-standard.dockerfile',
-        'build_args': {'PYTHON_RELEASE': '3.8', 'PYTHON_VERSION': '3.8.0'}
+        'ids': ['standard38', 'kernel-standard38'],
+        'build_args': {'PARENT': 'python:3.8', 'TYPE': 'kernel'},
     },
     {
         'ids': ['ui-standard38'],
-        'dockerfile': 'docker-standard-ui.dockerfile',
-        'build_args': {'PYTHON_RELEASE': '3.8', 'PYTHON_VERSION': '3.8.0'}
+        'build_args': {'PARENT': 'python:3.8', 'TYPE': 'ui'},
     },
     {
-        'ids': ['miniconda'],
-        'dockerfile': 'docker-miniconda.dockerfile',
-        'build_args': {}
+        'ids': ['miniconda', 'kernel-miniconda'],
+        'build_args': {
+            'PARENT': 'continuumio/miniconda3:latest',
+            'TYPE': 'kernel'
+        },
     },
     {
         'ids': ['ui-miniconda'],
-        'dockerfile': 'docker-miniconda-ui.dockerfile',
-        'build_args': {}
+        'build_args': {
+            'PARENT': 'continuumio/miniconda3:latest',
+            'TYPE': 'ui'
+        },
     },
     {
-        'ids': ['conda'],
-        'dockerfile': 'docker-conda.dockerfile',
-        'build_args': {}
+        'ids': ['conda', 'kernel-conda'],
+        'build_args': {
+            'PARENT': 'continuumio/anaconda3:latest',
+            'TYPE': 'kernel'
+        },
     },
     {
         'ids': ['ui-conda'],
-        'dockerfile': 'docker-conda-ui.dockerfile',
-        'build_args': {}
+        'build_args': {
+            'PARENT': 'continuumio/anaconda3:latest',
+            'TYPE': 'ui'
+        },
     },
 ]
 
@@ -64,36 +69,29 @@ with open(os.path.join(MY_DIRECTORY, 'cauldron', 'settings.json')) as f:
 VERSION = settings['version']
 
 
-def update_base_image(path: str):
-    """Pulls the latest version of the base image"""
-    with open(path, 'r') as file_handle:
-        contents = file_handle.read()
-
-    regex = re.compile(r'from\s+(?P<source>[^\s]+)', re.IGNORECASE)
-    matches = regex.findall(contents)
-
-    if not matches:
-        return None
-
-    match = matches[0]
-    os.system('docker pull {}'.format(match))
-    return match
-
-
-def build(build_id: str, spec: dict) -> dict:
+def build(build_id: str, spec: dict, args: dict) -> dict:
     """Builds the container from the specified docker file path"""
-    path = os.path.join(MY_DIRECTORY, spec['dockerfile'])
-    update_base_image(path)
+    path = os.path.join(
+        MY_DIRECTORY,
+        spec.get('dockerfile', 'docker-common.dockerfile')
+    )
+
+    version = '{}{}'.format(
+        'pre-' if args.get('pre') else '',
+        VERSION,
+    )
+    generic = 'pre' if args.get('pre') else 'latest'
 
     tags = [
-        '{}:{}-{}'.format(HUB_PREFIX, VERSION, build_id),
-        '{}:latest-{}'.format(HUB_PREFIX, build_id),
-        '{}:current-{}'.format(HUB_PREFIX, build_id)
+        '{}:{}-{}'.format(HUB_PREFIX, version, build_id),
+        '{}:{}-{}'.format(HUB_PREFIX, generic, build_id),
     ]
+    if not args.get('pre'):
+        tags.append('{}:current-{}'.format(HUB_PREFIX, build_id))
     if build_id == 'standard':
-        tags.append('{}:latest'.format(HUB_PREFIX))
+        tags.append('{}:{}'.format(HUB_PREFIX, generic))
 
-    command = 'docker build --file "{}" {} {} .'.format(
+    command = 'docker build --pull --file "{}" {} {} .'.format(
         path,
         ' '.join([
             '--build-arg {}={}'.format(key, value)
@@ -103,7 +101,11 @@ def build(build_id: str, spec: dict) -> dict:
     )
 
     print('[BUILDING]:', build_id)
-    os.system(command)
+    if args.get('dry_run'):
+        print('[DRY-RUN]: Skipped building command')
+        print(textwrap.indent(command.replace(' -', '\n   -'), '   '))
+    else:
+        os.system(command)
 
     return dict(
         spec=spec,
@@ -114,18 +116,59 @@ def build(build_id: str, spec: dict) -> dict:
     )
 
 
-def publish(build_entry: dict):
+def publish(build_entry: dict, args: dict):
     """Publishes the specified build entry to docker hub"""
     for tag in build_entry['tags']:
-        print('[PUSHING]:', tag)
-        os.system('docker push {}'.format(tag))
+        if args['dry_run']:
+            print('[DRY-RUN]: Skipped pushing {}'.format(tag))
+        else:
+            print('[PUSHING]:', tag)
+            os.system('docker push {}'.format(tag))
 
 
 def parse() -> dict:
     """Parse command line arguments"""
     parser = ArgumentParser()
-    parser.add_argument('-p', '--publish', action='store_true', default=False)
-    parser.add_argument('-i', '--id', dest='ids', action='append')
+    parser.add_argument(
+        '-p', '--publish',
+        action='store_true',
+        help='Whether or not to publish images after building them.'
+    )
+    parser.add_argument(
+        '-i', '--id',
+        dest='ids',
+        action='append',
+        help=textwrap.dedent(
+            """
+            One or more build identifiers to build. If not specified
+            all images will be built. This flag can be specified multiple
+            times in a single command.
+            """
+        )
+    )
+    parser.add_argument(
+        '--pre',
+        action='store_true',
+        help=textwrap.dedent(
+            """
+            If true images will be built with a "pre" in the version
+            identifier and "current" images will be skipped. This is
+            used to publish images for pre-releases to the hub prior
+            to the official release.
+            """
+        )
+    )
+    parser.add_argument(
+        '--dry-run',
+        action='store_true',
+        help=textwrap.dedent(
+            """
+            When set, the actual build process is skipped and instead
+            the build command is printed showing what would have been
+            executed.
+            """
+        )
+    )
     return vars(parser.parse_args())
 
 
@@ -134,7 +177,7 @@ def run():
     args = parse()
 
     build_results = [
-        build(build_id, spec)
+        build(build_id, spec, args)
         for spec in BUILDS
         for build_id in spec['ids']
         if not args['ids'] or build_id in args['ids']
@@ -144,7 +187,7 @@ def run():
         return
 
     for entry in build_results:
-        publish(entry)
+        publish(entry, args)
 
 
 if __name__ == '__main__':

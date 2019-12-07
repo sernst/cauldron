@@ -1,7 +1,7 @@
-import json
 import logging
 
 import flask
+
 from cauldron import environ
 from cauldron import templating
 from cauldron.cli.commands import connect
@@ -17,7 +17,7 @@ from cauldron.ui.routes.apis import executions as executions_routes
 from cauldron.ui.routes.apis import statuses as statuses_routes
 
 
-def start(
+def create_application(
         port: int = None,
         debug: bool = False,
         public: bool = False,
@@ -26,8 +26,8 @@ def start(
         version: bool = False,
         connection_url: str = None,
         **kwargs
-):
-    """Starts the application UI."""
+) -> dict:
+    """Creates the flask application to run."""
     if version:
         environ.log('VERSION: {}'.format(environ.version))
         return environ.systems.end(0)
@@ -49,15 +49,7 @@ def start(
         log.setLevel(logging.ERROR)
 
     if not quiet:
-        with open(environ.paths.package('settings.json'), 'r') as f:
-            package_data = json.load(f)
-
-        print('\n{}\n'.format(
-            templating.render_template(
-                'kernel_introduction.txt',
-                version=package_data['version']
-            )
-        ))
+        templating.render_splash()
 
     was_interactive = environ.modes.has(environ.modes.INTERACTIVE)
     environ.modes.add(environ.modes.INTERACTIVE)
@@ -92,10 +84,42 @@ def start(
         port=ui_port,
         debug=debug,
         id=environ.start_time.isoformat(),
+        was_interactive=was_interactive,
+        application=app,
+    )
+    return configs.UI_APP_DATA
+
+
+def start(
+        port: int = None,
+        debug: bool = False,
+        public: bool = False,
+        host: str = None,
+        quiet: bool = False,
+        version: bool = False,
+        connection_url: str = None,
+        **kwargs
+):
+    """Starts the application UI."""
+    ui_app_data = create_application(
+        port=port,
+        debug=debug,
+        public=public,
+        host=host,
+        quiet=quiet,
+        version=version,
+        connection_url=connection_url,
+        **kwargs
     )
 
-    app.run(port=ui_port, debug=debug, host=host, threaded=True)
+    app = ui_app_data['application']
+    app.run(
+        port=ui_app_data['port'],
+        debug=ui_app_data['debug'],
+        host=ui_app_data['host'],
+        threaded=True
+    )
 
     environ.modes.remove(environ.modes.UI)
-    if not was_interactive:
+    if not ui_app_data['was_interactive']:
         environ.modes.remove(environ.modes.INTERACTIVE)

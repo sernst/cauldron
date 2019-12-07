@@ -9,4 +9,7 @@ blueprint = flask.Blueprint(
 
 @blueprint.route('/')
 def hello():
-    return flask.redirect('{}/app'.format(ui_configs.ROOT_PREFIX), code=302)
+    return flask.redirect(
+        '{}/app'.format(ui_configs.ROOT_PREFIX),
+        code=302
+    )

@@ -8,3 +8,4 @@ omit =
     /docker-builder.py
     /launcher.py
     *.py.txt
+    /docker/*.py

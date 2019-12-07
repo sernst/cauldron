@@ -15,6 +15,14 @@ def add_ui_action(sub_parser: ArgumentParser) -> ArgumentParser:
     return ui.create_parser(sub_parser)
 
 
+# def add_ui_docker_action(sub_parser: ArgumentParser) -> ArgumentParser:
+#     """Populates the sub parser with the container launch kernel arguments."""
+#     sub_parser.add_argument(
+#         '-c', '--connection', '--connect',
+#         dest='connection_url'
+#     )
+
+
 def add_kernel_action(sub_parser: ArgumentParser) -> ArgumentParser:
     """Populates the sub parser with the kernel/server arguments"""
     return server_run.create_parser(sub_parser)

@@ -1,12 +1,13 @@
-import typing
-import textwrap
-import time
+import json
 import random
 import string
+import textwrap
+import time
+import typing
 
-from jinja2 import Template
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
+from jinja2 import Template
 from jinja2 import contextfilter
 from jinja2.runtime import Context
 
@@ -146,3 +147,16 @@ def render_template(template_name: str, **kwargs):
         cauldron_template_uid=make_template_uid(),
         **kwargs
     )
+
+
+def render_splash():
+    """Renders the CLI splash screen."""
+    with open(environ.paths.package('settings.json'), 'r') as f:
+        package_data = json.load(f)
+
+    print('\n{}\n'.format(
+        render_template(
+            'kernel_introduction.txt',
+            version=package_data['version']
+        )
+    ))
