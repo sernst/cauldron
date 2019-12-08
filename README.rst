@@ -31,6 +31,10 @@ in Python 3.
 .. image:: https://badges.gitter.im/gitterHQ/gitter.svg
    :target: https://gitter.im/cauldron-notebook/Lobby
 
+> Heads up as Cauldron v1.0.0 has just been released with a new web-based
+> user interface. More detailed documentation on how the new UI works can
+> be found at http://www.unnotebook.com
+
 The rest of this documentation pertains to the Cauldron command line
 interface. For more general information about Cauldron, including how
 to use the UI, please visit: http://www.unnotebook.com

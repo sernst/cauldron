@@ -62,6 +62,7 @@ codecov:
   stage: broadcast
   script:
     - pip install codecov
+    - ls -la
     - codecov
 
 coveralls:
@@ -69,4 +70,5 @@ coveralls:
   stage: broadcast
   script:
     - pip install coveralls
-    - coveralls
+    - ls -la
+    - coveralls --verbose
