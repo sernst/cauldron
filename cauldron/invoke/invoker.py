@@ -4,10 +4,11 @@ import typing
 from argparse import ArgumentParser  # noqa
 
 from cauldron import environ
-from cauldron.cli import batcher
-from cauldron.cli.shell import CauldronShell
-from cauldron.cli.server import run as server_run
 from cauldron import ui
+from cauldron.cli import batcher
+from cauldron.cli.server import run as server_run
+from cauldron.cli.shell import CauldronShell
+from cauldron.invoke import containerized
 
 
 def _pre_run_updater():
@@ -130,6 +131,7 @@ def run(action: str, args: dict) -> int:
         serve=run_kernel,
         version=run_version,
         ui=run_ui,
+        uidocker=containerized.run_ui,
         view=run_view,
     )
 

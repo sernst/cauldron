@@ -3,9 +3,7 @@ Python entrypoint for containerized use of the kernel.
 """
 import argparse
 import os
-import shutil
 import textwrap
-import typing
 
 from cauldron import templating
 from cauldron.ui import launcher
@@ -35,6 +33,10 @@ def parse() -> argparse.Namespace:
         help=textwrap.dedent(
             """
             Specifies the port that the kernel should be made available on.
+            It's not likely that this needs to be changed given that it
+            is mapped internally inside the docker container unless using
+            host networking on a linux system or the default port is used
+            for something else within the container.
             """
         )
     )
@@ -68,7 +70,7 @@ def main():
     os.system('nginx -c /launch/kernel-nginx.rendered.conf')
 
     print('[INFO]: Internal proxy port {}'.format(gunicorn_port))
-    print('[INFO]: Kernel listening on port {}'.format(args.port))
+    print('[INFO]: Kernel listening internally on port {}'.format(args.port))
 
     commands = [
         'export {}="{}"'.format(key, value)
@@ -86,6 +88,13 @@ def main():
         'kernel'
     ]))
 
+    print(textwrap.dedent(
+        """
+        [STARTED]: Cauldron kernel available at PORT
+            where PORT is the host port that you mapped the internal
+            container port {port} to with the `-p PORT:{port}` argument.
+        """.format(port=args.port)
+    ))
     print('\n[STARTED]: Cauldron kernel on port {}'.format(args.port))
     os.system('; '.join(commands))
 

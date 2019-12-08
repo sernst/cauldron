@@ -22,7 +22,7 @@ def test_start_defaults(
     """Should start the ui with default configuration."""
     ui_configs.UI_APP_DATA = {}
     ui_configs.LAUNCH_THREAD = None
-    connect.clean_url.return_value = 'foo'
+    connect._clean_url.return_value = 'foo'
     connect.check_connection.return_value = environ.Response().fail().response
     launcher.find_open_port.return_value = 1234
 
@@ -63,7 +63,7 @@ def test_start_customized(
     """Should start the ui with customized configuration."""
     ui_configs.UI_APP_DATA = {}
     ui_configs.LAUNCH_THREAD = None
-    connect.clean_url.return_value = 'foo'
+    connect._clean_url.return_value = 'foo'
     connect.check_connection.return_value = environ.Response().fail().response
     launcher.find_open_port.return_value = 1234
 
@@ -107,7 +107,7 @@ def test_start_remote_connection(
     """Should start the ui with a remote connection."""
     ui_configs.UI_APP_DATA = {}
     ui_configs.LAUNCH_THREAD = None
-    connect.clean_url.return_value = 'foo'
+    connect._clean_url.return_value = 'foo'
     connect.check_connection.return_value = environ.Response()
     launcher.find_open_port.return_value = 1234
 
@@ -153,7 +153,7 @@ def test_start_remote_connection_failed(
     """Should start the ui with a remote connection."""
     ui_configs.UI_APP_DATA = {}
     ui_configs.LAUNCH_THREAD = None
-    connect.clean_url.return_value = 'foo'
+    connect._clean_url.return_value = 'foo'
     connect.check_connection.return_value = environ.Response().fail().response
     launcher.find_open_port.return_value = 1234
 
@@ -185,7 +185,7 @@ def test_start_version(
     """Should show version information and then exit without error."""
     ui_configs.UI_APP_DATA = {}
     ui_configs.LAUNCH_THREAD = None
-    connect.clean_url.return_value = 'foo'
+    connect._clean_url.return_value = 'foo'
     connect.check_connection.return_value = environ.Response().fail().response
     launcher.find_open_port.return_value = 1234
 

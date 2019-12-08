@@ -33,7 +33,7 @@ def create_application(
         return environ.systems.end(0)
 
     if connection_url:
-        url = connect.clean_url(connection_url)
+        url = connect._clean_url(connection_url)
         response = connect.check_connection(url, False)
         if response.failed:
             return environ.systems.end(1)

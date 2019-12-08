@@ -87,6 +87,10 @@ def parse() -> argparse.Namespace:
         help=textwrap.dedent(
             """
             Specifies the port that the UI should be made available on.
+            It's not likely that this needs to be changed given that it
+            is mapped internally inside the docker container unless using
+            host networking on a linux system or the default port is used
+            for something else within the container.
             """
         )
     )
@@ -134,7 +138,7 @@ def main():
     os.system('nginx -c /launch/ui-nginx.rendered.conf')
 
     print('[INFO]: Internal proxy port {}'.format(gunicorn_port))
-    print('[INFO]: UI listening on port {}'.format(args.port))
+    print('[INFO]: UI listening internally on port {}'.format(args.port))
 
     commands = [
         'export {}="{}"'.format(key, value)
@@ -152,7 +156,13 @@ def main():
         'ui'
     ]))
 
-    print('\n[STARTED]: Cauldron UI at http://localhost:{}'.format(args.port))
+    print(textwrap.dedent(
+        """
+        [STARTED]: Cauldron UI at http://localhost:PORT
+            where PORT is the host port that you mapped the internal
+            container port {port} to with the `-p PORT:{port}` argument.
+        """.format(port=args.port)
+    ))
     os.system('; '.join(commands))
 
 

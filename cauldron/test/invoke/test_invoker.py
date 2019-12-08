@@ -4,15 +4,7 @@ from unittest.mock import patch
 import pytest
 from cauldron import environ
 from cauldron.invoke import invoker
-from cauldron.invoke import parser
-
-
-def run_command(command: str) -> int:
-    """Executes the specified command by parsing the args and running them"""
-    args = parser.parse(command.split(' '))
-
-    with patch('cauldron.invoke.invoker._pre_run_updater'):
-        return invoker.run(args.get('command'), args)
+from cauldron.test.invoke import utils as invoke_utils
 
 
 @patch('cauldron.invoke.invoker.environ.systems.remove')
@@ -41,20 +33,20 @@ def test_pre_run_updater(
 
 def test_run_version():
     """Should run the version command without error."""
-    assert 0 == run_command('version')
+    assert 0 == invoke_utils.run_command('version')
 
 
 @patch('cauldron.cli.server.run.execute')
 def test_run_kernel(server_execute: MagicMock):
     """Should start the kernel."""
-    assert 0 == run_command('kernel')
+    assert 0 == invoke_utils.run_command('kernel')
     assert 1 == server_execute.call_count
 
 
 @patch('cauldron.cli.shell.CauldronShell.cmdloop')
 def test_run_shell(cmdloop: MagicMock):
     """Should run the shell command loop."""
-    assert 0 == run_command('shell')
+    assert 0 == invoke_utils.run_command('shell')
     assert 1 == cmdloop.call_count
 
 
@@ -67,7 +59,7 @@ def test_run_shell_with_open(
     """Should run shell command loop with an open project command."""
     in_project_directory.return_value = True
 
-    assert 0 == run_command('shell')
+    assert 0 == invoke_utils.run_command('shell')
     assert 1 == cmdloop.call_count
 
 
@@ -77,7 +69,7 @@ def test_run_shell_batch(run_batch: MagicMock, cmdloop: MagicMock):
     """Should run batch from shell command."""
     run_batch.return_value = 42
 
-    assert 42 == run_command('shell --project=fake')
+    assert 42 == invoke_utils.run_command('shell --project=fake')
     assert 1 == run_batch.call_count
     assert 0 == cmdloop.call_count
 
@@ -135,7 +127,7 @@ def test_no_such_command():
 @patch('cauldron.invoke.invoker.ui.start')
 def test_run_ui(ui_start: MagicMock):
     """Should start the UI."""
-    assert 0 == run_command('ui --name=123.123.123.123')
+    assert 0 == invoke_utils.run_command('ui --name=123.123.123.123')
     assert 1 == ui_start.call_count
 
 
@@ -144,6 +136,6 @@ def test_run_view(shell_constructor: MagicMock):
     """Should launch a view through the UI."""
     shell = MagicMock()
     shell_constructor.return_value = shell
-    assert 0 == run_command('view foo.cauldron')
+    assert 0 == invoke_utils.run_command('view foo.cauldron')
     assert 1 == shell_constructor.call_count
     assert 1 == shell.default.call_count
