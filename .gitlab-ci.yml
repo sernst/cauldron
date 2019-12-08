@@ -42,6 +42,7 @@ pytest-py37:
       .
   artifacts:
     paths:
+      - .coverage
       - coverage.xml
     expire_in: 1 day
 

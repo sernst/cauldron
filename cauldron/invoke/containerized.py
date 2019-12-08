@@ -39,7 +39,7 @@ def run_ui(args: dict) -> int:
     print('[INFO]: Notebooks directory "{}"'.format(notebooks_directory))
     if remote:
         ssh_directory = environ.paths.clean(
-            args.get('ssh_directory') or '~/.ssh'
+            args['ssh_directory'] or '~/.ssh'
         )
 
         print('[INFO]: SSH directory "{}"'.format(ssh_directory))

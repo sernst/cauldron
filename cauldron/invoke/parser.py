@@ -31,6 +31,19 @@ def add_ui_containerized_action(sub_parser: ArgumentParser) -> ArgumentParser:
             """
         )
     )
+    sub_parser.add_argument(
+        '--ssh-directory',
+        dest='ssh_directory',
+        help=textwrap.dedent(
+            """
+            Specifies the directory to map into the /host_ssh directory of
+            the container to give the container access to SSH keys needed
+            to authenticate the remote SSH tunnel for remote kernel execution.
+            If not specified the current user's ~/.ssh directory will be used
+            instead if the --remote flag is specified.
+            """
+        )
+    )
     sub_parser.add_argument('--remote', help=textwrap.dedent(
         """
         Specifies the remote SSH tunnel to create inside the UI container
