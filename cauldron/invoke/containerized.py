@@ -49,13 +49,13 @@ def run_ui(args: dict) -> int:
 
         cmd += [
             '-v', '{}:/host_ssh'.format(ssh_directory),
-            'swernst/cauldron:pre-ui-standard',
+            'swernst/cauldron:current-ui-standard',
             '--remote={}'.format(remote),
         ]
         if args['ssh_key']:
             cmd.append('--ssh-key={}'.format(args['ssh_key']))
     else:
-        cmd.append('swernst/cauldron:pre-ui-standard')
+        cmd.append('swernst/cauldron:current-ui-standard')
 
     display_command = textwrap.indent(
         ' '.join(cmd).replace(' -', '\n  -').replace('swer', '\n  swer'),
