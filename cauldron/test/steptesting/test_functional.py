@@ -104,7 +104,7 @@ def test_find_in_grandparent_path():
 
 
 def test_find_failed_at_root():
-    """Should raise FileNotFoundError if top-level directory has no project"""
+    """Should raise FileNotFoundError if top-level directory has no project."""
     directory = os.path.dirname(os.path.realpath(__file__))
     subdirectory = os.path.join(directory, 'fake')
 
@@ -138,7 +138,7 @@ def test_no_such_project(tester: steptest.CauldronTest):
 
 
 def test_open_project_fails(tester: steptest.CauldronTest):
-    """Should raise Assertion error after failing to open the project"""
+    """Should raise Assertion error after failing to open the project."""
     with patch('cauldron.steptest.support.open_project') as open_project:
         open_project.side_effect = RuntimeError('FAKE')
         with pytest.raises(AssertionError):

@@ -13,23 +13,15 @@ DESCRIPTION = """
 
 
 def execute(context: cli.CommandContext) -> Response:
-    """
-
-    :return:
-    """
-
-    environ.remote_connection = environ.RemoteConnection(
-        active=False,
-        url=None
-    )
+    """..."""
+    environ.remote_connection.active = False
+    environ.remote_connection.url = None
 
     return context.response.notify(
         kind='SUCCESS',
         code='DISCONNECTED',
         message='Disconnected from remote cauldron'
-    ).console(
-        whitespace=1
-    ).response
+    ).console(whitespace=1).response
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):

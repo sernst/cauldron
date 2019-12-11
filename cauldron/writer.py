@@ -12,7 +12,7 @@ def attempt_file_write(
     """
     Attempts to write the specified contents to a file and returns None if
     successful, or the raised exception if writing failed.
-    
+
     :param path:
         The path to the file that will be written
     :param contents:
@@ -63,7 +63,7 @@ def write_file(
     Writes the specified contents to a file, with retry attempts if the write
     operation fails. This is useful to prevent OS related write collisions with
     files that are regularly written to and read from quickly.
-    
+
     :param path:
         The path to the file that will be written
     :param contents:
@@ -82,7 +82,7 @@ def write_file(
     :return:
         Returns two arguments. The first is a boolean specifying whether or
         not the write operation succeeded. The second is the error result, which
-        is None if the write operation succeeded. Otherwise, it will be the 
+        is None if the write operation succeeded. Otherwise, it will be the
         exception that was raised by the last failed write attempt.
     """
     error = None
@@ -102,14 +102,14 @@ def attempt_json_write(
 ) -> typing.Union[None, Exception]:
     """
     Attempts to write the specified JSON content to file.
-    
-    :param path: 
+
+    :param path:
         The path to the file where the JSON serialized content will be written.
-    :param contents: 
+    :param contents:
         The JSON data to write to the file
-    :param mode: 
+    :param mode:
         The mode used to open the file where the content will be written.
-    :return: 
+    :return:
         None if the write operation succeeded. Otherwise, the exception that
         was raised by the failed write operation.
     """
@@ -128,11 +128,11 @@ def write_json_file(
         retry_count: int = 3
 ) -> typing.Tuple[bool, typing.Union[None, Exception]]:
     """
-    Writes the specified dictionary to a file as a JSON-serialized string, 
-    with retry attempts if the write operation fails. This is useful to prevent 
-    OS related write collisions with files that are regularly written to and 
+    Writes the specified dictionary to a file as a JSON-serialized string,
+    with retry attempts if the write operation fails. This is useful to prevent
+    OS related write collisions with files that are regularly written to and
     read from quickly.
-    
+
     :param path:
         The path to the file that will be written
     :param contents:
@@ -145,7 +145,7 @@ def write_json_file(
     :return:
         Returns two arguments. The first is a boolean specifying whether or
         not the write operation succeeded. The second is the error result, which
-        is None if the write operation succeeded. Otherwise, it will be the 
+        is None if the write operation succeeded. Otherwise, it will be the
         exception that was raised by the last failed write attempt.
     """
     error = None

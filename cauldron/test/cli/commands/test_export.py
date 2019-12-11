@@ -10,14 +10,12 @@ from cauldron.cli.commands import export
 
 
 class TestExport(scaffolds.ResultsTest):
-    """
-
-    """
+    """..."""
 
     def test_exporting(self):
-        """ should successfully export project """
+        """Should successfully export project."""
 
-        support.run_command('open @examples:pyplot')
+        support.run_command('open @examples:pyplot --forget')
         support.run_command('run')
 
         path = self.get_temp_path('exporting')
@@ -33,7 +31,7 @@ class TestExport(scaffolds.ResultsTest):
         )
 
     def test_with_args(self):
-        """ should successfully export project """
+        """Should successfully export project."""
 
         support.create_project(self, 'venus')
         support.run_command('run')
@@ -54,7 +52,7 @@ class TestExport(scaffolds.ResultsTest):
         self.assertEqual(r.errors[0].code, 'ALREADY_EXISTS')
 
     def test_appending(self):
-        """ should successfully append project export """
+        """Should successfully append project export."""
 
         support.create_project(self, 'mars')
         support.run_command('run')
@@ -78,7 +76,7 @@ class TestExport(scaffolds.ResultsTest):
         self.assertTrue(os.path.exists(out_path) and os.path.isdir(out_path))
 
     def test_no_args(self):
-        """ should fail if no path argument """
+        """Should fail if no path argument."""
 
         support.create_project(self, 'mercury')
 
@@ -90,7 +88,7 @@ class TestExport(scaffolds.ResultsTest):
         self.assertEqual(r.errors[0].code, 'MISSING_PATH_ARG')
 
     def test_autocomplete_flags(self):
-        """ """
+        """..."""
 
         result = support.autocomplete('export --f')
         self.assertEqual(result, ['force'])
@@ -99,14 +97,14 @@ class TestExport(scaffolds.ResultsTest):
         self.assertGreater(len(result), 2)
 
     def test_autocomplete(self):
-        """ """
+        """..."""
 
         directory = os.path.dirname(os.path.realpath(__file__))
         result = support.autocomplete('export {}'.format(directory))
         self.assertIsNotNone(result)
 
     def test_autocomplete_empty(self):
-        """ """
+        """..."""
 
         directory = os.path.dirname(os.path.realpath(__file__))
         result = support.autocomplete('export fake ')

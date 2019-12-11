@@ -7,15 +7,15 @@ from cauldron.runner import redirection
 
 
 class TestRunnerRedirection(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_already_restored(self):
-        """ should not cause an exception when already defaulted """
+        """Should not cause an exception when already defaulted."""
 
         redirection.restore_default_configuration()
 
     def test_restore(self):
-        """ should restore from an enabled state """
+        """Should restore from an enabled state."""
 
         support.create_project(self, 'percy')
         support.add_step(self)
@@ -34,7 +34,7 @@ class TestRunnerRedirection(scaffolds.ResultsTest):
         self.assertEqual(sys.stderr, sys.__stderr__)
 
     def test_enable_disable(self):
-        """ should properly enable and disable redirection """
+        """Should properly enable and disable redirection."""
 
         support.create_project(self, 'tonks')
         support.add_step(self)

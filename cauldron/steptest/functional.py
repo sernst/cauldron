@@ -14,17 +14,20 @@ try:
 except ImportError:  # pragma: no cover
     pytest = None
 
-# @pytest.fixture(name='tester')
-# def tester_fixture() -> CauldronTest:
-#     """Create the Cauldron project test environment"""
-#     tester = CauldronTest(project_path=os.path.dirname(__file__))
-#     tester.setup()
-#     yield tester
-#     tester.tear_down()
-
 
 def create_test_fixture(test_file_path: str, fixture_name: str = 'tester'):
-    """..."""
+    """
+    Creates a pytest fixture for step testing within the current project.
+
+    :param test_file_path:
+        Path to the test file being executed, usually `__file__`.
+    :param fixture_name:
+        Name of the fixture to use as the argument in tests. By default
+        this will be `tester`.
+    :return:
+        A pytest fixture that will be scoped to the test module in which
+        it has been created.
+    """
     path = os.path.realpath(
         os.path.dirname(test_file_path)
         if os.path.isfile(test_file_path) else
@@ -43,7 +46,7 @@ def create_test_fixture(test_file_path: str, fixture_name: str = 'tester'):
 
 class CauldronTest:
     """
-    A Dependency injection class for use with the Pytest or similar testing
+    A Dependency injection class for use with Pytest or similar testing
     framework.
     """
 
@@ -176,7 +179,7 @@ class CauldronTest:
             environ.systems.remove(path)
 
         paths_to_remove = [p for p in self._library_paths if p in sys.path]
-        for path in paths_to_remove:
+        for path in paths_to_remove:  # pragma: no cover
             sys.path.remove(path)
 
         environ.modes.remove(environ.modes.TESTING)

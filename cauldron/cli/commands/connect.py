@@ -10,7 +10,7 @@ from cauldron.environ import Response
 
 NAME = 'connect'
 DESCRIPTION = """
-    Connect to a remote cauldron server and drive that server from this shell
+    Connect to a remote cauldron server and drive that server from this shell.
     """
 
 
@@ -26,7 +26,6 @@ def populate(
     :param assigned_args:
     :return:
     """
-
     parser.add_argument(
         'url',
         type=str,
@@ -53,18 +52,17 @@ def populate(
 
 
 def check_connection(url: str, force: bool) -> Response:
-    """ """
-
+    """..."""
     response = Response()
     if force:
         return response
 
-    ping = '{}/ping'.format(url)
+    ping = '{}/'.format(url)
 
     response.notify(
         kind='STARTING',
         code='CONNECTING',
-        message='Establishing connection to: {}'.format(url)
+        message='Establishing remote kernel connection to: {}'.format(url)
     ).console(
         whitespace_top=1
     )
@@ -74,6 +72,12 @@ def check_connection(url: str, force: bool) -> Response:
 
         if result.status_code != 200:
             raise request_exceptions.ConnectionError()
+
+        return response.notify(
+            kind='CONNECTED',
+            code='REMOTE_CONNECTION_ESTABLISHED',
+            message='Remote connection established.'
+        ).console(whitespace=1).response
     except request_exceptions.InvalidURL as error:
         return response.fail(
             code='INVALID_URL',
@@ -100,26 +104,29 @@ def check_connection(url: str, force: bool) -> Response:
         ).response
 
 
+def _clean_url(url: str) -> str:
+    """..."""
+    return '{}{}{}'.format(
+        '' if url.startswith('http') else 'http://',
+        '127.0.0.1' if url.startswith(':') else '',
+        url.strip().rstrip('/')
+    )
+
+
 def execute(
         context: cli.CommandContext,
         url: str = None,
         force: bool = False
 ) -> Response:
-    """ """
-
-    url_clean = '{}{}'.format(
-        '' if url.startswith('http') else 'http://',
-        url.strip().rstrip('/')
-    )
+    """..."""
+    url_clean = _clean_url(url)
 
     context.response.consume(check_connection(url_clean, force))
     if context.response.failed:
         return context.response
 
-    environ.remote_connection = environ.RemoteConnection(
-        active=True,
-        url=url_clean
-    )
+    environ.remote_connection.url = url_clean
+    environ.remote_connection.active = True
 
     return context.response.update(
         url=url_clean,
@@ -134,12 +141,5 @@ def execute(
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):
-    """
-
-    :param segment:
-    :param line:
-    :param parts:
-    :return:
-    """
-
+    """..."""
     return []

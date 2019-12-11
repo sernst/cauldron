@@ -1,7 +1,7 @@
-import json
 import logging
 import os
 import site
+import time
 import typing
 from argparse import ArgumentParser
 
@@ -36,11 +36,7 @@ authorization = {'code': ''}
 
 
 def get_server_data() -> dict:
-    """
-
-    :return:
-    """
-
+    """..."""
     out = dict(
         uptime=environ.run_time().total_seconds(),
         cauldron_settings=environ.package_settings
@@ -69,6 +65,7 @@ def get_running_step_changes(write: bool = False) -> list:
             name=step.definition.name,
             action='updated',
             step=step_data._asdict(),
+            timestamp=time.time(),
             written=write
         )
 
@@ -80,7 +77,6 @@ def parse(
         arg_parser: ArgumentParser = None
 ) -> dict:
     """Parses the arguments for the cauldron server"""
-
     parser = arg_parser or create_parser()
     return vars(parser.parse_args(args))
 
@@ -90,7 +86,6 @@ def create_parser(arg_parser: ArgumentParser = None) -> ArgumentParser:
     Creates an argument parser populated with the arg formats for the server
     command.
     """
-
     parser = arg_parser or ArgumentParser()
     parser.description = 'Cauldron kernel server'
 
@@ -132,23 +127,16 @@ def create_parser(arg_parser: ArgumentParser = None) -> ArgumentParser:
     return parser
 
 
-def execute(
+def create_application(
         port: int = 5010,
         debug: bool = False,
         public: bool = False,
         host=None,
         authentication_code: str = '',
+        quiet: bool = False,
         **kwargs
-):
-    """
-
-    :param port:
-    :param debug:
-    :param public:
-    :param host:
-    :param authentication_code:
-    :return:
-    """
+) -> dict:
+    """..."""
     if kwargs.get('version'):
         environ.log('VERSION: {}'.format(environ.version))
         return environ.systems.end(0)
@@ -167,16 +155,32 @@ def execute(
         log = logging.getLogger('werkzeug')
         log.setLevel(logging.ERROR)
 
-    with open(environ.paths.package('settings.json'), 'r') as f:
-        package_data = json.load(f)
-
-    print('\n{}\n'.format(
-        templating.render_template(
-            'kernel_introduction.txt',
-            version=package_data['version']
-        )
-    ))
+    if not quiet:
+        templating.render_splash()
 
     environ.modes.add(environ.modes.INTERACTIVE)
-    APPLICATION.run(port=port, debug=debug, host=host)
+    return {'application': APPLICATION, **server_data}
+
+
+def execute(
+        port: int = 5010,
+        debug: bool = False,
+        public: bool = False,
+        host=None,
+        authentication_code: str = '',
+        quiet: bool = False,
+        **kwargs
+):
+    """..."""
+    populated_server_data = create_application(
+        port=port,
+        debug=debug,
+        public=public,
+        host=host,
+        authentication_code=authentication_code,
+        quiet=quiet,
+        **kwargs
+    )
+    app = populated_server_data['application']
+    app.run(port=port, debug=debug,host=host)
     environ.modes.remove(environ.modes.INTERACTIVE)

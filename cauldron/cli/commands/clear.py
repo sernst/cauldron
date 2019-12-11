@@ -11,7 +11,7 @@ DESCRIPTION = """
 
 
 def execute_remote(context: cli.CommandContext) -> Response:
-    """ """
+    """..."""
 
     thread = sync.send_remote_command(
         command=context.name,
@@ -26,11 +26,7 @@ def execute_remote(context: cli.CommandContext) -> Response:
 
 
 def execute(context: cli.CommandContext) -> Response:
-    """
-
-    :return:
-    """
-
+    """..."""
     project = cauldron.project.internal_project
 
     if not project:
@@ -44,7 +40,7 @@ def execute(context: cli.CommandContext) -> Response:
     project.shared.clear()
 
     for ps in project.steps:
-        ps.mark_dirty(True)
+        ps.mark_dirty(True, force=True)
 
     return context.response.update(
         project=project.kernel_serialize()

@@ -3,15 +3,15 @@ from argparse import ArgumentParser
 
 import cauldron
 from cauldron import cli
+from cauldron.cli import sync
+from cauldron.cli.commands import sync as sync_command
+from cauldron.cli.commands.open import opener as project_opener
 from cauldron.cli.commands.steps import actions
 from cauldron.cli.commands.steps import removal
+from cauldron.cli.commands.steps import selection
 from cauldron.cli.interaction import autocompletion
 from cauldron.environ import Response
 from cauldron.session import projects
-from cauldron.cli import sync
-from cauldron.cli.commands.open import opener as project_opener
-from cauldron.cli.commands import sync as sync_command
-
 
 NAME = 'steps'
 DESCRIPTION = """
@@ -31,14 +31,7 @@ def populate(
         raw_args: typing.List[str],
         assigned_args: dict
 ):
-    """
-
-    :param parser:
-    :param raw_args:
-    :param assigned_args:
-    :return:
-    """
-
+    """..."""
     if len(raw_args) < 1:
         assigned_args['action'] = 'list'
         return
@@ -57,7 +50,7 @@ def populate(
                 """
             )
         )
-    elif action != 'list':
+    elif action not in ['list', 'clean']:
         parser.add_argument(
             'step_name',
             type=str,
@@ -68,7 +61,7 @@ def populate(
             )
         )
 
-    if action in ['mute', 'unmute']:
+    if action in ['mute', 'unmute', 'select']:
         return
 
     if action in ['add', 'modify']:
@@ -135,6 +128,18 @@ def execute_remote(
         new_name: str = None,
         keep: bool = False,
 ) -> Response:
+    """..."""
+    # modification_start_timestamp = time.time()
+
+    if action in ['list', 'clean', 'select']:
+        thread = sync.send_remote_command(
+            command=context.name,
+            raw_args=context.raw_args,
+            asynchronous=False
+        )
+        thread.join()
+        response = thread.responses[0]
+        return context.response.consume(response)
 
     status_response = sync.comm.send_request(
         endpoint='/sync-status',
@@ -160,15 +165,11 @@ def execute_remote(
     if context.response.failed:
         return context.response
 
-    sync_response = sync_command.do_synchronize(
-        context=cli.make_command_context(
-            name='sync',
-            response=context.response,
-            remote_connection=context.remote_connection
-        ),
-        source_directory=source_directory,
-        newer_than=status_response.data.get('sync_time', 0)
-    )
+    sync_response = sync_command.execute(cli.make_command_context(
+        name=sync_command.NAME,
+        remote_connection=context.remote_connection
+    ))
+    sync_response.join()
 
     return context.response.consume(sync_response)
 
@@ -183,17 +184,13 @@ def execute(
         keep: bool = False,
         project: 'projects.Project' = None
 ) -> Response:
-    """
-
-    :return:
-    """
-
+    """..."""
     response = context.response
 
     project = (
         project
         if project else
-        cauldron.project.internal_project
+        cauldron.project.get_internal_project()
     )
 
     if not project:
@@ -207,6 +204,9 @@ def execute(
     if not action or action == 'list':
         actions.echo_steps(response, project)
         return response
+
+    if action == 'clean':
+        return actions.clean_steps(response, project)
 
     if action == 'add' and not step_name:
             step_name = ''
@@ -230,7 +230,7 @@ def execute(
         )
 
     if action == 'modify':
-        actions.modify_step(
+        return actions.modify_step(
             response=response,
             project=project,
             name=step_name,
@@ -238,7 +238,6 @@ def execute(
             title=title,
             position=position
         )
-        return response
 
     if action == 'remove':
         return removal.remove_step(
@@ -266,6 +265,13 @@ def execute(
         )
         return response
 
+    if action == 'select':
+        return selection.select_step(
+            response=response,
+            project=project,
+            step_name=step_name
+        )
+
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):
     """
@@ -275,13 +281,19 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
     :param parts:
     :return:
     """
+    action_names = [
+        'add',
+        'list',
+        'remove',
+        'modify',
+        'select',
+        'unmute',
+        'mute',
+        'clean'
+    ]
 
     if len(parts) < 2:
-        return autocompletion.matches(
-            segment,
-            parts[0],
-            ['add', 'list', 'remove', 'modify', 'unmute', 'mute']
-        )
+        return autocompletion.matches(segment, parts[0], action_names)
 
     action = parts[0]
     if action == 'list':

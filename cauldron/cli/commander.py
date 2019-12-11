@@ -15,7 +15,7 @@ def preload():
     matplotlib rendering backend.
     """
 
-    # Set a backend that will generally work across platforms and Cauldron does 
+    # Set a backend that will generally work across platforms and Cauldron does
     # not need interactive rendering because it saves plots to image file
     # strings that are included in the web results. The "agg" backend is the
     # most reliable choice across platforms
@@ -73,7 +73,6 @@ def get_command_from_module(
     :param remote_connection:
     :return:
     """
-
     use_remote = (
         remote_connection.active and
         hasattr(command_module, 'execute_remote')
@@ -91,11 +90,7 @@ def execute(
         response: Response = None,
         remote_connection: 'environ.RemoteConnection' = None
 ) -> Response:
-    """
-
-    :return:
-    """
-
+    """..."""
     if not response:
         response = Response(identifier=name)
 
@@ -128,24 +123,32 @@ def execute(
 
     del args.args['show_help']
 
+    connection = remote_connection or environ.remote_connection
     context = cli.make_command_context(
         name=name,
         args=args.args,
         raw_args=raw_args,
         parser=args.parser,
         response=response,
-        remote_connection=remote_connection
+        remote_connection=connection
     )
-    response.update(remote_connection=remote_connection)
 
     if not context.remote_connection.active and name == 'run':
         preload()
 
-    t = CauldronThread()
-    t.command = get_command_from_module(
+    command = get_command_from_module(
         command_module=command_module,
         remote_connection=context.remote_connection
     )
+
+    if getattr(command_module, 'SYNCHRONOUS', False):
+        return command(
+            context=context,
+            **args.args
+        )
+
+    t = CauldronThread()
+    t.command = command
     t.context = context
     t.parser = args.parser
     t.kwargs = args.args
@@ -187,7 +190,7 @@ def print_module_help() -> Response:
 
 
 def show_help(command_name: str = None, raw_args: str = '') -> Response:
-    """ Prints the basic command help to the console """
+    """ Prints the basic command help to the console."""
 
     response = Response()
 

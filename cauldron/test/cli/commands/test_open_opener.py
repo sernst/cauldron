@@ -16,51 +16,42 @@ def opener_package(*args) -> str:
 
 
 class TestOpenOpener(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     @patch('time.sleep')
     def test_not_exists(self,  *args):
-        """ should return False when the project does not exist """
+        """Should return False when the project does not exist."""
         self.assertFalse(opener.project_exists(Response(), INVALID_PATH))
 
     @patch('time.sleep')
     def test_not_exists_load(self, *args):
-        """ should return False when the project does not exist """
+        """Should return False when the project does not exist."""
         self.assertFalse(opener.load_project(Response(), INVALID_PATH))
 
     @patch('time.sleep')
     def test_not_exists_open(self, *args):
-        """ should fail when the project does not exist """
+        """Should fail when the project does not exist."""
         response = opener.open_project(INVALID_PATH, forget=True)
         self.assertTrue(response.failed)
 
     @patch('time.sleep')
     @patch(opener_package('project_exists'), return_value=True)
     def test_not_loadable_open(self, *args):
-        """ should fail when project does not load """
+        """Should fail when project does not load."""
         response = opener.open_project(INVALID_PATH, forget=True)
-        self.assertTrue(response.failed)
-
-    @patch('time.sleep')
-    @patch(opener_package('project_exists'), return_value=True)
-    @patch(opener_package('load_project'), return_value=True)
-    @patch(opener_package('update_recent_paths'), return_value=False)
-    def test_not_update(self, *args):
-        """ should fail when project does not load """
-        response = opener.open_project(INVALID_PATH, forget=False)
         self.assertTrue(response.failed)
 
     @patch('time.sleep')
     @patch(opener_package('initialize_results'), return_value=False)
     def test_bad_initialize_results(self, *args):
-        """ should fail opening when initialization fails """
+        """Should fail opening when initialization fails."""
         response = support.create_project(self, 'minnesota', confirm=False)
         self.assertTrue(response.failed)
 
     @patch('time.sleep')
     @patch(opener_package('write_results'), return_value=False)
     def test_bad_write_results(self, *args):
-        """ should fail opening when writing initial results fails """
+        """Should fail opening when writing initial results fails."""
         response = support.create_project(self, 'iowa', confirm=False)
         self.assertTrue(response.failed)
 
@@ -103,7 +94,7 @@ class TestOpenOpener(scaffolds.ResultsTest):
             initialize_results_path: MagicMock,
             *args
     ):
-        """Should initialize paths for project"""
+        """Should initialize paths for project."""
         response = Response()
         project = MagicMock()
         result = opener.initialize_results(response, project)
@@ -117,7 +108,7 @@ class TestOpenOpener(scaffolds.ResultsTest):
             initialize_results_path: MagicMock,
             *args
     ):
-        """Should fail to initialize paths for project"""
+        """Should fail to initialize paths for project."""
         initialize_results_path.side_effect = ValueError('FAKE')
         response = Response()
         project = MagicMock()
@@ -125,3 +116,20 @@ class TestOpenOpener(scaffolds.ResultsTest):
         self.assertFalse(result)
         self.assertTrue(response.failed)
         self.assertEqual(1, initialize_results_path.call_count)
+
+
+@patch('cauldron.cli.commands.open.opener.environ.configs')
+def test_update_recent_paths(
+    configs: MagicMock,
+):
+    """Should add the path to the recent paths list."""
+    configs.fetch.return_value = ['bar', 'foo']
+    response = Response()
+    opener.update_recent_paths(response, 'foo')
+
+    assert configs.fetch.called
+    assert configs.put.called
+    assert configs.save.called
+
+    expected = {'recent_paths': ['foo', 'bar'], 'persists': True}
+    assert expected == configs.put.call_args[1]

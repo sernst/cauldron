@@ -1,0 +1,11 @@
+Cauldron Kernel
+
+The Cauldron kernel container serves as remote kernel execution environment,
+creating a separation from the Cauldron UI. This makes it possible to work on
+one host while running the notebook code on another. Running the container
+looks like:
+
+$ docker run -p 5010:5010 swernst/cauldron:current-standard
+
+The key is publishing the 5010 container port to the host environment in
+some fashion so that the kernel is accessible from outside of the container.

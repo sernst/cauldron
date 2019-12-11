@@ -1,12 +1,29 @@
 import json
 import os
 import typing
-from argparse import ArgumentParser
+from argparse import ArgumentParser  # noqa
 
 from cauldron import environ
+from cauldron import ui
 from cauldron.cli import batcher
-from cauldron.cli.shell import CauldronShell
 from cauldron.cli.server import run as server_run
+from cauldron.cli.shell import CauldronShell
+from cauldron.invoke import containerized
+
+
+def _pre_run_updater():
+    """
+    Execute update operations prior to starting the desired process
+    action. These operations are used to ensure that the host environment
+    is readied for use.
+    """
+    if environ.configs.fetch('last_version', '0.0.0').startswith('1'):
+        return
+
+    # Remove old results as they will cause issues
+    environ.systems.remove(environ.paths.results())
+
+    environ.configs.put(persists=True, last_version=environ.version)
 
 
 def in_project_directory() -> bool:
@@ -48,8 +65,7 @@ def run_version(args: dict) -> int:
 
 
 def run_batch(args: dict) -> int:
-    """Runs a batch operation for the given arguments"""
-
+    """Runs a batch operation for the given arguments."""
     batcher.run_project(
         project_directory=args.get('project_directory'),
         log_path=args.get('logging_path'),
@@ -60,8 +76,8 @@ def run_batch(args: dict) -> int:
 
 
 def run_shell(args: dict) -> int:
-    """Run the shell sub command"""
-
+    """Run the shell sub command."""
+    _pre_run_updater()
     if args.get('project_directory'):
         return run_batch(args)
 
@@ -76,7 +92,23 @@ def run_shell(args: dict) -> int:
 
 def run_kernel(args: dict) -> int:
     """Runs the kernel sub command"""
+    _pre_run_updater()
     server_run.execute(**args)
+    return 0
+
+
+def run_ui(args: dict) -> int:
+    """Runs the ui sub command"""
+    _pre_run_updater()
+    ui.start(**args)
+    return 0
+
+
+def run_view(args: dict) -> int:
+    """Runs the view sub command."""
+    _pre_run_updater()
+    shell = CauldronShell()
+    shell.default('view open "{}"'.format(args['path']))
     return 0
 
 
@@ -84,7 +116,7 @@ def run(action: str, args: dict) -> int:
     """
     Runs the specified command action and returns the return status code
     for exit.
-    
+
     :param action:
         The action to run
     :param args:
@@ -97,7 +129,10 @@ def run(action: str, args: dict) -> int:
         shell=run_shell,
         kernel=run_kernel,
         serve=run_kernel,
-        version=run_version
+        version=run_version,
+        ui=run_ui,
+        uidocker=containerized.run_ui,
+        view=run_view,
     )
 
     if action not in actions:

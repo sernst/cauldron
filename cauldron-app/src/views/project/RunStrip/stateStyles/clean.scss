@@ -1,0 +1,31 @@
+.RunStripStep {
+  $background: white;
+  $color: #666;
+
+  $background-selected: #4d4d4d;
+  $color-selected: white;
+
+  &--clean {
+    background-color: $background;
+    color: $color;
+    fill: $color;
+
+    &Selected {
+      background-color: $background-selected;
+      color: $color-selected;
+      fill: $color-selected;
+    }
+  }
+
+  &__overlay--clean {
+    background-color: $background;
+    color: $color;
+    border: 1px solid saturate(darken($background, 10%), 10%);
+
+    &Selected {
+      background-color: $background-selected;
+      color: $color-selected;
+      border: 1px solid saturate(darken($background-selected, 10%), 10%)
+    }
+  }
+}

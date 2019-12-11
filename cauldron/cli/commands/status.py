@@ -12,7 +12,7 @@ DESCRIPTION = (
 
 
 def to_console_formatted_string(data: dict) -> str:
-    """ """
+    """..."""
 
     def make_line(key: str) -> str:
         if key.startswith('__cauldron_'):
@@ -42,7 +42,7 @@ def to_console_formatted_string(data: dict) -> str:
 
 
 def execute_remote(context: cli.CommandContext) -> Response:
-    """ """
+    """..."""
 
     thread = sync.send_remote_command(
         command=context.name,

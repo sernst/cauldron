@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import d3 from 'd3/dist/d3.min';
+import * as d3 from 'd3';
 import Handsontable from 'handsontable';
 import katex from 'katex';
 import jstree from 'jstree';
@@ -16,6 +16,7 @@ import './project.scss';
 
 // Global includes
 window.$ = $;
+window.jQuery = $;
 window.d3 = d3;
 window.Handsontable = Handsontable;
 window.katex = katex;
@@ -56,7 +57,7 @@ function start() {
 /**
  * RUN APPLICATION
  */
-$(() => {
+function main() {
   const cauldron = utils.getRoot();
   cauldron.RUNNING = false;
   cauldron.SETTINGS = {};
@@ -82,4 +83,10 @@ $(() => {
   cauldron.resizePlotlyBox = resizer.resizePlotlyBox;
 
   return initializer.initialize().then(start);
+}
+
+document.addEventListener('readystatechange', () => {
+  if (document.readyState === 'complete') {
+    main();
+  }
 });

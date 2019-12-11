@@ -18,14 +18,7 @@ def populate(
         raw_args: typing.List[str],
         assigned_args: dict
 ):
-    """
-
-    :param parser:
-    :param raw_args:
-    :param assigned_args:
-    :return:
-    """
-
+    """..."""
     parser.add_argument(
         'project_name',
         type=str,
@@ -119,12 +112,8 @@ def execute(
         no_naming_scheme: bool = False,
         library_folder: str = None,
         assets_folder: str = None
-):
-    """
-
-    :return:
-    """
-
+) -> environ.Response:
+    """..."""
     response = context.response
 
     response.consume(create_actions.create_project_directories(
@@ -147,11 +136,14 @@ def execute(
     )
 
     source_directory = response.data['source_directory']
-    response.consume(create_actions.write_project_data(
+    response.consume(create_actions.create_first_step(
         source_directory,
-        definition
+        project_name
     ))
+    if response.failed:
+        return response
 
+    definition['steps'].append(response.data['step_name'])
     response.consume(create_actions.write_project_data(
         source_directory,
         definition
@@ -160,7 +152,11 @@ def execute(
         return response
 
     if context.remote_connection.active:
-        opened = remote_project_opener.sync_open(context, source_directory)
+        opened = remote_project_opener.sync_open(
+            context=context,
+            path=source_directory,
+            forget=forget
+        )
     else:
         opened = project_opener.open_project(
             source_directory,
@@ -171,14 +167,7 @@ def execute(
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):
-    """
-
-    :param segment:
-    :param line:
-    :param parts:
-    :return:
-    """
-
+    """..."""
     if len(parts) < 2:
         return []
 

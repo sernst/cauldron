@@ -1,26 +1,23 @@
 import re
+import time
 import typing
 from argparse import ArgumentParser
 from collections import OrderedDict
 
 import cauldron
 from cauldron import cli
-from cauldron.cli import sync
 from cauldron import environ
 from cauldron import runner
-from cauldron.cli.commands.run import actions as run_actions
+from cauldron.cli import sync
 from cauldron.cli.commands import sync as sync_command
+from cauldron.cli.commands.run import actions as run_actions
 from cauldron.cli.interaction import autocompletion
-from cauldron.session import writing
 from cauldron.environ import Response
 from cauldron.session import projects
+from cauldron.session import writing
 
 NAME = 'run'
-DESCRIPTION = cli.reformat(
-    """
-    Runs one or more steps within the currently opened project
-    """
-)
+DESCRIPTION = 'Runs one or more steps within the currently opened project.'
 
 
 def populate(
@@ -28,14 +25,7 @@ def populate(
         raw_args: typing.List[str],
         assigned_args: dict
 ):
-    """
-
-    :param parser:
-    :param raw_args:
-    :param assigned_args:
-    :return:
-    """
-
+    """..."""
     parser.add_argument(
         'step',
         nargs='*',
@@ -65,7 +55,7 @@ def populate(
         action='store_true',
         help=cli.reformat("""
             Whether or not to skip reloading all project libraries prior to
-            execution of the project. By default this is False in which case 
+            execution of the project. By default this is False in which case
             the project libraries are reloaded prior to execution.
             """)
     )
@@ -118,8 +108,7 @@ def populate(
 
 
 def execute_remote(context: cli.CommandContext, **kwargs) -> Response:
-    """ """
-
+    """..."""
     sync_response = sync_command.execute(cli.make_command_context(
         name=sync_command.NAME,
         remote_connection=context.remote_connection
@@ -128,6 +117,10 @@ def execute_remote(context: cli.CommandContext, **kwargs) -> Response:
 
     if sync_response.failed:
         return context.response
+
+    # Give a little time after the sync for the remote kernel to finish
+    # IO to prevent race conditions.
+    time.sleep(1)
 
     environ.log('[STARTED]: Remote run execution', whitespace=1)
 
@@ -174,9 +167,7 @@ def execute(
         return context.response.fail(
             code='NO_OPEN_PROJECT',
             message='No project is open. Unable to execute run command.'
-        ).console(
-            whitespace=1
-        ).response
+        ).console(whitespace=1).response
 
     run_actions.preload_project(context.response, project)
 
@@ -311,6 +302,7 @@ def run_local(
         step_changes.append(dict(
             name=ps.definition.name,
             action='updated',
+            timestamp=time.time(),
             step=writing.step_writer.serialize(ps)._asdict()
         ))
 
@@ -330,7 +322,6 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
     :param parts:
     :return:
     """
-
     if len(parts) < 1:
         return []
 
@@ -346,6 +337,3 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
     project = cauldron.project.internal_project
     step_names = [x.definition.name for x in project.steps]
     return autocompletion.match_in_path_list(segment, value, step_names)
-
-
-

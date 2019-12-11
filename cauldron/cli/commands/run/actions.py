@@ -29,11 +29,5 @@ def get_project(response: Response):
 
 
 def preload_project(response: Response, project: Project):
-    """
-
-    :param response:
-    :param project:
-    :return:
-    """
-
+    """..."""
     session.initialize_results_path(project.results_path)

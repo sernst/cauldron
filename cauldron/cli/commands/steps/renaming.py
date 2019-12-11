@@ -1,6 +1,5 @@
-import functools
 import os
-import tempfile
+import time
 import typing
 import zipfile
 from collections import namedtuple
@@ -27,7 +26,7 @@ def create_rename_entry(
         stash_path: str = None
 ) -> typing.Union[None, STEP_RENAME]:
     """
-    Creates a STEP_RENAME for the given ProjectStep instance
+    Creates a STEP_RENAME for the given ProjectStep instance.
 
     :param step:
         The ProjectStep instance for which the STEP_RENAME will be created
@@ -36,9 +35,7 @@ def create_rename_entry(
         renaming process. Allows files to be renamed prior to the insertion
         of the step to prevent conflicts.
     :param stash_path:
-    :return:
     """
-
     project = step.project
     name = step.definition.name
     name_parts = naming.explode_filename(name, project.naming_scheme)
@@ -60,10 +57,12 @@ def create_rename_entry(
         return None
 
     if not stash_path:
-        fd, stash_path = tempfile.mkstemp(
-            prefix='{}-{}--{}--'.format(step.reference_id, name, new_name)
+        parts = name.rsplit('.', 1)
+        suffix = '{:.3f}'.format(time.time()).replace('.', '')
+        stash_path = os.path.join(
+            project.source_directory,
+            '{}-{}.{}.cauldron-moving'.format(parts[0], suffix, parts[-1])
         )
-        os.close(fd)
 
     return STEP_RENAME(
         id=step.reference_id,
@@ -78,11 +77,10 @@ def create_rename_entry(
 
 def create_backup(project: 'projects.Project') -> str:
     """
-
-    :param project:
-    :return:
+    Creates a backup zip file in the project's source directory of
+    all of the step source files to preserve them in case of a fatal
+    error that causes corruption during the renaming process.
     """
-
     backup_path = os.path.join(
         project.source_directory,
         'rename-backup.tmp.zip'
@@ -97,13 +95,8 @@ def create_backup(project: 'projects.Project') -> str:
 
 
 def stash_source(step_rename: STEP_RENAME) -> STEP_RENAME:
-    """
-
-    :param step_rename:
-    :return:
-    """
-
-    file_io.copy(file_io.FILE_COPY_ENTRY(
+    """..."""
+    file_io.move(file_io.FILE_COPY_ENTRY(
         source=step_rename.old_path,
         destination=step_rename.stash_path
     ))
@@ -113,7 +106,6 @@ def stash_source(step_rename: STEP_RENAME) -> STEP_RENAME:
             'Unable to stash step file {}'.format(step_rename.old_name)
         )
 
-    os.remove(step_rename.old_path)
     if os.path.exists(step_rename.old_path):
         raise FileExistsError(
             'Unable to remove existing step {}'.format(step_rename.old_name)
@@ -123,13 +115,8 @@ def stash_source(step_rename: STEP_RENAME) -> STEP_RENAME:
 
 
 def unstash_source(step_rename: STEP_RENAME) -> STEP_RENAME:
-    """
-
-    :param step_rename:
-    :return:
-    """
-
-    file_io.copy(file_io.FILE_COPY_ENTRY(
+    """..."""
+    file_io.move(file_io.FILE_COPY_ENTRY(
         source=step_rename.stash_path,
         destination=step_rename.new_path
     ))
@@ -139,11 +126,6 @@ def unstash_source(step_rename: STEP_RENAME) -> STEP_RENAME:
             'Failed to rename step file to {}'.format(step_rename.new_path)
         )
 
-    try:
-        os.remove(step_rename.stash_path)
-    except PermissionError:
-        pass
-
     return step_rename
 
 
@@ -151,13 +133,7 @@ def update_steps(
         project: 'projects.Project',
         step_renames: typing.List[STEP_RENAME]
 ) -> dict:
-    """
-
-    :param project:
-    :param step_renames:
-    :return:
-    """
-
+    """..."""
     result = dict()
     for step_rename in step_renames:
         step = project.get_step_by_reference_id(step_rename.id)
@@ -174,45 +150,41 @@ def synchronize_step_names(
         project: 'projects.Project',
         insert_index: int = None
 ) -> Response:
-    """
-    :param project:
-    :param insert_index:
-    """
-
+    """..."""
     response = Response()
     response.returned = dict()
 
     if not project.naming_scheme:
         return response
 
-    create_mapper_func = functools.partial(
-        create_rename_entry,
-        insertion_index=insert_index
-    )
-
-    step_renames = list([create_mapper_func(s) for s in project.steps])
-    step_renames = list(filter(lambda sr: (sr is not None), step_renames))
+    step_renames = list(filter(
+        lambda rename: (rename is not None),
+        [create_rename_entry(s, insert_index) for s in project.steps]
+    ))
 
     if not step_renames:
         return response
 
     try:
         backup_path = create_backup(project)
-    except Exception as err:
+    except Exception as error:
         return response.fail(
             code='RENAME_BACKUP_ERROR',
             message='Unable to create backup name',
-            error=err
+            error=error
         ).response
 
     try:
-        step_renames = list([stash_source(sr) for sr in step_renames])
-        step_renames = list([unstash_source(sr) for sr in step_renames])
-    except Exception as err:
+        for sr in step_renames:
+            stash_source(sr)
+
+        for sr in step_renames:
+            unstash_source(sr)
+    except Exception as error:
         return response.fail(
             code='RENAME_FILE_ERROR',
             message='Unable to rename files',
-            error=err
+            error=error
         ).response
 
     response.returned = update_steps(project, step_renames)

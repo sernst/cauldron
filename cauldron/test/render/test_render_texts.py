@@ -63,7 +63,7 @@ class TestRenderTexts(scaffolds.ResultsTest):
         self.assertTrue(0 < result.find('d\ne\nf'))
 
     def test_head_mock(self):
-        """Should show 3 lines of mock object"""
+        """Should show 3 lines of mock object."""
         target = MagicMock()
         target.head.side_effect = ValueError('FAKE')
         target.__len__.return_value = 10
@@ -72,7 +72,7 @@ class TestRenderTexts(scaffolds.ResultsTest):
         self.assertLess(0, len(result), 'Result should not be empty')
 
     def test_tail_mock(self):
-        """Should show last 3 lines of mock object"""
+        """Should show last 3 lines of mock object."""
         target = MagicMock()
         target.tail.side_effect = ValueError('FAKE')
         target.__len__.return_value = 10
@@ -84,7 +84,7 @@ class TestRenderTexts(scaffolds.ResultsTest):
         )
 
     def test_list(self):
-        """Should render list"""
+        """Should render list."""
         source = [
             {'a': 1, 'b': 'hello', 'c': True, 'd': date(2016, 9, 9)},
             {'a': 1, 'b': 'hello', 'c': True, 'd': date(2016, 9, 9)},
@@ -119,7 +119,7 @@ class TestRenderTexts(scaffolds.ResultsTest):
         self.assertGreater(len(result), 1)
 
     def test_object(self):
-        """Should render object"""
+        """Should render object."""
 
         class TestObject(object):
 

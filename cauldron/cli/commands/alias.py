@@ -17,14 +17,7 @@ def populate(
         raw_args: typing.List[str],
         assigned_args: dict
 ):
-    """
-
-    :param parser:
-    :param raw_args:
-    :param assigned_args:
-    :return:
-    """
-
+    """..."""
     parser.add_argument(
         'command',
         type=str,
@@ -81,12 +74,8 @@ def execute(
         name: str = None,
         path: str = None,
         temporary: bool = False
-):
-    """
-
-    :return:
-    """
-
+) -> environ.Response:
+    """..."""
     response = context.response
 
     if name:
@@ -115,9 +104,7 @@ def execute(
         return response.fail(
             code='MISSING_ARG',
             message='You need to specify the name of the alias'
-        ).console(
-            whitespace=1
-        ).response
+        ).console(whitespace=1).response
 
     if command == 'list':
         items = []
@@ -146,9 +133,7 @@ def execute(
             kind='ADDED',
             code='ALIAS_ADDED',
             message='The alias "{}" has been saved'.format(name)
-        ).console(
-            whitespace=1
-        ).response
+        ).console(whitespace=1).response
 
     if command == 'remove':
         if name in aliases:
@@ -162,16 +147,12 @@ def execute(
             kind='REMOVED',
             code='ALIAS_REMOVED',
             message='The alias "{}" has been removed'.format(name)
-        ).console(
-            whitespace=1
-        ).response
+        ).console(whitespace=1).response
 
     return response.fail(
         code='UNKNOWN_COMMAND',
         message='Unrecognized alias command "{}"'.format(command)
-    ).console(
-        whitespace=1
-    ).response
+    ).console(whitespace=1).response
 
 
 def autocomplete(segment: str, line: str, parts: typing.List[str]):

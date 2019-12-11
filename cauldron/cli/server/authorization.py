@@ -1,7 +1,8 @@
 from functools import wraps
-from flask import request
+
 from flask import Response
 from flask import abort
+from flask import request
 
 from cauldron.cli.server import run as server_runner
 
@@ -12,12 +13,12 @@ def custom_401(*args, **kwargs):
 
 
 def gatekeeper(func):
-    """ 
-    This function is used to handle authorization code authentication of 
-    protected endpoints. This form of authentication is not recommended 
-    because it's not very secure, but can be used in places where SSH 
+    """
+    This function is used to handle authorization code authentication of
+    protected endpoints. This form of authentication is not recommended
+    because it's not very secure, but can be used in places where SSH
     tunneling or similar strong connection security is not possible.
-    
+
     The function looks for a special "Cauldron-Authentication-Code" header
     in the request and confirms that the specified value matches the code
     that was provided by arguments to the Cauldron kernel server. This function

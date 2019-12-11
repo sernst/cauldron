@@ -117,7 +117,7 @@ class TestRender(scaffolds.ResultsTest):
         self.assertTrue(result.find('Render Test') != -1)
 
     def test_code_block_from_string(self):
-        """Should render block of code from string argument"""
+        """Should render block of code from string argument."""
 
         block = '\n'.join([
             'function add(a, b) {',
@@ -171,7 +171,7 @@ class TestRender(scaffolds.ResultsTest):
         self.assertGreater(result.find('cd-ImportError'), 0)
 
     def test_plotly_static(self):
-        """Should create a static Plotly plot"""
+        """Should create a static Plotly plot."""
 
         trace = dict(
             type='scatter',

@@ -2,15 +2,16 @@ from cauldron import cli
 from cauldron import runner
 from cauldron.environ import Response
 from cauldron.cli import sync
+from cauldron import environ
 
 NAME = 'close'
 DESCRIPTION = """
-    Close the currently opened project
+    Close the currently opened project.
     """
 
 
 def execute_remote(context: cli.CommandContext) -> Response:
-    """ """
+    """..."""
     thread = sync.send_remote_command(
         command=context.name,
         raw_args=context.raw_args,
@@ -18,26 +19,23 @@ def execute_remote(context: cli.CommandContext) -> Response:
     )
 
     thread.join()
-
+    environ.remote_connection.local_project_directory = None
+    environ.remote_connection.reset_sync_time()
     response = thread.responses[0]
     return context.response.consume(response)
 
 
 def execute(context: cli.CommandContext) -> Response:
-    """ """
+    """..."""
     if runner.close():
         return context.response.notify(
             kind='SUCCESS',
             code='PROJECT_CLOSED',
             message='Project has been closed'
-        ).console(
-            whitespace=1
-        ).response
+        ).console(whitespace=1).response
 
     return context.response.notify(
         kind='ABORTED',
         code='NO_OPEN_PROJECT',
         message='There was no open project to close'
-    ).console(
-        whitespace=1
-    ).response
+    ).console(whitespace=1).response

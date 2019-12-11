@@ -2,7 +2,7 @@ from flask import request as flask_request
 
 
 def from_request(request=None) -> dict:
-    """ Fetches the arguments for the current Flask application request """
+    """ Fetches the arguments for the current Flask application request."""
 
     request = request if request else flask_request
 

@@ -1,18 +1,18 @@
 import typing
 from collections import namedtuple
-from unittest.mock import patch
 from unittest.mock import MagicMock
+from unittest.mock import patch
 
 from cauldron.cli.server import run as server_runner
 from cauldron.environ.response import Response
-from cauldron.test.support.messages import Message
 from cauldron.test.support import flask_scaffolds
+from cauldron.test.support.messages import Message
 
 FakeThread = namedtuple('FakeThread_NT', ['is_alive', 'uid'])
 
 
 class TestServerRunStatus(flask_scaffolds.FlaskResultsTest):
-    """ """
+    """..."""
 
     def setUp(self):
         super(TestServerRunStatus, self).setUp()
@@ -25,17 +25,13 @@ class TestServerRunStatus(flask_scaffolds.FlaskResultsTest):
     ) -> Response:
         """
         Adds a fake running command execution to the run status list for use
-        in testing
+        in testing.
         """
-
         r = Response(identifier=uid)
-
-        def is_thread_alive():
-            return is_alive
 
         r.thread = MagicMock()
         r.thread.uid = uid
-        r.thread.is_alive = is_thread_alive
+        r.thread.is_alive = lambda: is_alive
         r.thread.is_running = is_alive
         r.thread.logs = []
 
@@ -60,7 +56,7 @@ class TestServerRunStatus(flask_scaffolds.FlaskResultsTest):
         return response
 
     def test_no_uid(self):
-        """ should do nothing if the run uid is unknown """
+        """Should do nothing if the run uid is unknown."""
 
         run_status = self.get('/run-status/test-1')
         self.assertEqual(run_status.flask.status_code, 200)
@@ -71,7 +67,7 @@ class TestServerRunStatus(flask_scaffolds.FlaskResultsTest):
 
     @patch('cauldron.cli.server.run.get_running_step_changes')
     def test_failed_step_changes(self, get_running_step_changes):
-        """ should fail if unable to get changes for the running step """
+        """Should fail if unable to get changes for the running step."""
 
         get_running_step_changes.side_effect = ValueError('Fake Error')
 
@@ -94,7 +90,7 @@ class TestServerRunStatus(flask_scaffolds.FlaskResultsTest):
 
     @patch('cauldron.cli.server.run.get_running_step_changes')
     def test_no_step_changes(self, get_running_step_changes):
-        """ should succeed even without any changes for the running step """
+        """Should succeed even without any changes for the running step."""
 
         get_running_step_changes.return_value = None
         active_response = self.activate_execution('no-step-changes')
@@ -112,7 +108,7 @@ class TestServerRunStatus(flask_scaffolds.FlaskResultsTest):
         self.deactivate_execution(active_response.identifier)
 
     def test_not_running(self):
-        """ should succeed even if the step is no longer running """
+        """Should succeed even if the step is no longer running """
 
         active_response = self.activate_execution('no-step-running', False)
 
@@ -137,7 +133,7 @@ class TestServerRunStatus(flask_scaffolds.FlaskResultsTest):
 
     @patch('cauldron.cli.server.run.get_server_data')
     def test_error(self, get_server_data):
-        """ should succeed even if the step is no longer running """
+        """Should succeed even if the step is no longer running """
 
         get_server_data.side_effect = ValueError('Fake Error')
 

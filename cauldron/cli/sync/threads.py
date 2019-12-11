@@ -15,7 +15,7 @@ def send_remote_command(
         remote_connection: 'environ.RemoteConnection' = None,
         show_logs: bool = True
 ) -> 'AsyncCommandThread':
-    """ """
+    """..."""
 
     thread = AsyncCommandThread(
         command=command,
@@ -64,7 +64,7 @@ class AsyncCommandThread(threading.Thread):
 
     @property
     def is_finished(self) -> bool:
-        """ """
+        """..."""
 
         has_response = len(self.responses) > 0
         has_finished_response = has_response and (
@@ -75,7 +75,7 @@ class AsyncCommandThread(threading.Thread):
         return has_finished_response
 
     def check_status(self) -> Response:
-        """ """
+        """..."""
 
         run_uid = self.responses[-1].data.get('run_uid', '')
         endpoint = '/abort' if self.abort else '/run-status/{}'.format(run_uid)
@@ -87,7 +87,7 @@ class AsyncCommandThread(threading.Thread):
         )
 
     def add_response(self, response: Response) -> Response:
-        """ """
+        """..."""
 
         run_log = response.data.get('run_log', [])
         previous = self.responses + []
@@ -107,7 +107,7 @@ class AsyncCommandThread(threading.Thread):
         return response
 
     def run(self):
-        """ """
+        """..."""
 
         self.is_executing = True
         endpoint = '/command-async' if self.is_async else '/command-sync'

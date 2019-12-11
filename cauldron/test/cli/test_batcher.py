@@ -26,7 +26,7 @@ def run_project(
     """
     Runs the specified project by setting up temporary directories to store
 
-    :param project_directory: 
+    :param project_directory:
         Directory where the project to run is located
     :param save_directory:
         A temporary directory where the output is saved for test assertions.
@@ -43,7 +43,8 @@ def run_project(
         project_directory=project_directory,
         output_directory=results_directory,
         logging_path=logging_path,
-        reader_path=reader_path
+        reader_path=reader_path,
+        forget_project=True
     )
 
     return RunResult(
@@ -87,14 +88,14 @@ class TestBatcher(scaffolds.ResultsTest):
         self.run_project('hello-cauldron', '@examples:pyplot')
 
     def test_run_open_fail(self):
-        """Should fail to open a project"""
+        """Should fail to open a project."""
         directory = self.get_temp_path('open-fail')
         run_result = run_project('fake-project-does-not-exist', directory)
         self.assertFalse(run_result.result.success)
 
     @patch('cauldron.cli.commands.run.execute')
     def test_run_fail(self, run_execute: MagicMock):
-        """Should fail to run a project"""
+        """Should fail to run a project."""
 
         run_execute.return_value = Response().fail().response
         directory = self.get_temp_path('run-fail')

@@ -8,7 +8,7 @@ from cauldron import render
 from cauldron import templating
 from cauldron.session import definitions
 from cauldron.session import naming
-from cauldron.session.projects import project as projects
+from cauldron.session import projects  # noqa
 from cauldron.session.report import Report
 
 
@@ -38,21 +38,61 @@ class ProjectStep(object):
         self.project = project
         self.report = Report(self)
 
-        self.last_modified = None
+        self.last_modified = 0  # type: typing.Optional[float]
         self.code = None
         self.is_visible = True
-        self.is_running = False
+        self._is_running = False
+        self.is_selected = False
         self._is_dirty = True
-        self.error = None
+
+        # Whether or not the step has ever been executed. Setting the
+        # step.is_running property to True will cause this to become
+        # True and will stay true for the remainder of the step's
+        # lifetime.
+        self._has_run = False
+
+        self.error = None  # type: typing.Optional[str]
         self.is_muted = False
-        self.dom = None  # type: str
+        self.dom = None  # type: typing.Optional[str]
         self.progress_message = None
         self.sub_progress_message = None
         self.progress = 0
         self.sub_progress = 0
-        self.test_locals = None  # type: dict
-        self.start_time = None  # type: datetime
-        self.end_time = None  # type: datetime
+        self.test_locals = None  # type: typing.Optional[dict]
+        self.start_time = None  # type: typing.Optional[datetime]
+        self.end_time = None  # type: typing.Optional[datetime]
+
+    @property
+    def is_running(self) -> bool:
+        """Whether or not the step code is currently being executed."""
+        return self._is_running
+
+    @is_running.setter
+    def is_running(self, value: bool):
+        self._has_run = self._has_run or bool(value)
+        self._is_running = bool(value)
+
+    @property
+    def remote_source_path(self) -> typing.Optional[str]:
+        """
+        Path to the step source file on the remote system or None
+        if no remote connection exists.
+        """
+        unavailable = (
+            not self.project
+            or not self.project.remote_source_directory
+            or not self.report
+        )
+        if unavailable:
+            return None
+        return os.path.join(
+            self.project.remote_source_directory,
+            self.filename
+        )
+
+    @property
+    def name(self):
+        return self.definition.name
 
     @property
     def reference_id(self):
@@ -73,13 +113,11 @@ class ProjectStep(object):
         if not self.project:
             return []
 
-        out = []
-        for fn in self.definition.get('web_includes', []):
-            out.append(os.path.join(
-                self.definition.get('folder', ''),
-                fn.replace('/', os.sep)
-            ))
-        return out
+        folder = self.definition.get('folder', '')
+        return [
+            os.path.join(folder, fn.replace('/', os.sep))
+            for fn in self.definition.get('web_includes', [])
+        ]
 
     @property
     def index(self) -> int:
@@ -106,6 +144,15 @@ class ProjectStep(object):
         end = self.end_time or current_time
         return (end - start).total_seconds()
 
+    @property
+    def file_last_modified(self) -> int:
+        """When the source file was modified, or 0 if it does not exist."""
+        return (
+            os.path.getmtime(self.source_path)
+            if self.source_path and os.path.exists(self.source_path)
+            else 0
+        )
+
     def get_elapsed_timestamp(self) -> str:
         """
         A human-readable version of the elapsed time for the last execution
@@ -119,66 +166,68 @@ class ProjectStep(object):
         return '{:>02d}:{:>02d}.{:<02d}'.format(minutes, seconds, millis)
 
     def kernel_serialize(self):
-        """ """
+        """..."""
         status = self.status()
         out = dict(
             slug=self.definition.slug,
             index=self.index,
             source_path=self.source_path,
+            remote_source_path=self.remote_source_path,
             status=status,
             exploded_name=naming.explode_filename(
                 self.definition.name,
                 self.project.naming_scheme
             )
         )
+
+        # Eventually this should be removed. It exists for legacy reasons.
         out.update(status)
+
         return out
 
     def status(self):
-        """ """
-
+        """..."""
         is_dirty = self.is_dirty()
-
         return dict(
             uuid=self.uuid,
             reference_id=self.reference_id,
             name=self.definition.name,
             muted=self.is_muted,
+            selected=self.is_selected,
             last_modified=self.last_modified,
             last_display_update=self.report.last_update_time,
+            file_modified=self.file_last_modified,
             dirty=is_dirty,
             is_dirty=is_dirty,
-            run=self.last_modified is not None,
+            running=self.is_running,
+            run=self._has_run,
             error=self.error is not None
         )
 
     def is_dirty(self):
-        """ """
-        if self._is_dirty:
-            return self._is_dirty
-
-        if self.last_modified is None:
-            return True
-        p = self.source_path
-        if not p:
-            return False
-        return os.path.getmtime(p) >= self.last_modified
+        """
+        Whether or not the step is in a state of needing to be rerun
+        because a modification to the step or its source file has invalidated
+        its last run state.
+        """
+        return (
+            self._is_dirty
+            or self.last_modified < 1
+            or self.file_last_modified >= self.last_modified
+        )
 
     def mark_dirty(self, value: bool, force: bool = False):
         """
-
-        :param value:
-        :param force:
+        Steps that are forced to be dirty will be updated in the UI
+        via step change dom responses. Not forcing will only update
+        the settings dirty flag.
         """
-
         self._is_dirty = bool(value)
-
         time_adjust = 0 if value else time.time()
         self.last_modified = time_adjust if force else self.last_modified
 
     def get_dom(self) -> str:
-        """ Retrieves the current value of the DOM for the step """
-
+        """ Retrieves the current value of the DOM for the step."""
         if self.is_running:
             return self.dumps()
 
@@ -189,8 +238,24 @@ class ProjectStep(object):
         self.dom = dom
         return dom
 
-    def dumps(self) -> str:
+    def clear_dom(self) -> str:
+        """
+        Empties the current dom of all display body elements
+        and returns the empty dom.
+        """
+        self.report.body = []
+        self.dom = self.dumps()
+        self.mark_dirty(True)
+        return self.dom
+
+    def dumps(self, running_override: bool = None) -> str:
         """Writes the step information to an HTML-formatted string"""
+        is_running = (
+            self.is_running
+            if running_override is None
+            else running_override
+        )
+
         code_file_path = os.path.join(
             self.project.source_directory,
             self.filename
@@ -201,7 +266,7 @@ class ProjectStep(object):
             code=render.code_file(code_file_path)
         )
 
-        if not self.is_running:
+        if not is_running:
             # If no longer running, make sure to flush the stdout buffer so
             # any print statements at the end of the step get included in
             # the body
@@ -210,7 +275,7 @@ class ProjectStep(object):
         # Create a copy of the body for dumping
         body = self.report.body[:]
 
-        if self.is_running:
+        if is_running:
             # If still running add a temporary copy of anything not flushed
             # from the stdout buffer to the copy of the body for display. Do
             # not flush the buffer though until the step is done running or
@@ -232,13 +297,13 @@ class ProjectStep(object):
 
         std_err = (
             self.report.read_stderr()
-            if self.is_running else
+            if is_running else
             self.report.flush_stderr()
         ).strip('\n').rstrip()
 
         # The step will be visible in the display if any of the following
         # conditions are true.
-        is_visible = self.is_visible or self.is_running or self.error
+        is_visible = self.is_visible or is_running or self.error
 
         dom = templating.render_template(
             'step-body.html',
@@ -253,7 +318,7 @@ class ProjectStep(object):
             summary=self.report.summary,
             error=self.error,
             index=self.index,
-            is_running=self.is_running,
+            is_running=is_running,
             is_visible=is_visible,
             progress_message=self.progress_message,
             progress=int(round(max(0, min(100, 100 * self.progress)))),
@@ -262,6 +327,7 @@ class ProjectStep(object):
             std_err=std_err
         )
 
-        if not self.is_running:
+        if not is_running:
             self.dom = dom
+            self.last_modified = time.time()
         return dom

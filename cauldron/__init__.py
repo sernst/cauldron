@@ -36,7 +36,7 @@ def get_environment_info() -> dict:
 
 
 def run_shell():
-    """ Starts the cauldron shell environment for console based interaction """
+    """ Starts the cauldron shell environment for console based interaction."""
     from cauldron.cli.shell import CauldronShell
     CauldronShell().cmdloop()
 
@@ -64,6 +64,7 @@ def run_project(
         logging_path: str = None,
         reader_path: str = None,
         reload_project_libraries: bool = False,
+        forget_project: bool = False,
         **kwargs
 ) -> ExecutionResult:
     """
@@ -105,5 +106,6 @@ def run_project(
         log_path=logging_path,
         reader_path=reader_path,
         reload_project_libraries=reload_project_libraries,
+        forget_project=forget_project,
         shared_data=kwargs
     )

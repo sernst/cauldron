@@ -22,7 +22,7 @@ def test_header_infinity(log: MagicMock):
 
 @patch('cauldron.environ.logger.raw')
 def test_log_with_kwargs(raw: MagicMock):
-    """Should include kwargs in log output"""
+    """Should include kwargs in log output."""
     message = logger.log('test', foo=42)
     assert 1 == raw.call_count
     assert 0 < message.find('foo: 42'), """

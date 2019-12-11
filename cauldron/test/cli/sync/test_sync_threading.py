@@ -7,11 +7,11 @@ from cauldron.test.support import scaffolds
 
 
 class TestSyncThreading(scaffolds.ResultsTest):
-    """ Tests for the cauldron.cli.sync.sync_comm module """
+    """ Tests for the cauldron.cli.sync.sync_comm module."""
 
     @patch('cauldron.cli.sync.comm.send_request')
     def test_remote_command(self, send_request: MagicMock):
-        """ should execute the command and finish the thread """
+        """Should execute the command and finish the thread."""
 
         response = environ.Response().update(
             run_status='complete'
@@ -25,7 +25,7 @@ class TestSyncThreading(scaffolds.ResultsTest):
 
     @patch('cauldron.cli.sync.comm.send_request')
     def test_remote_command_error(self, send_request: MagicMock):
-        """ should error while trying to send request """
+        """Should error while trying to send request."""
 
         send_request.side_effect = ValueError('Fake Error')
 
@@ -37,7 +37,7 @@ class TestSyncThreading(scaffolds.ResultsTest):
 
     @patch('cauldron.cli.sync.comm.send_request')
     def test_long_remote_command(self, send_request: MagicMock):
-        """ should successfully handle running longer commands """
+        """Should successfully handle running longer commands."""
 
         running_response = environ.Response().update(run_status='running')
         done_response = environ.Response().update(run_status='complete')

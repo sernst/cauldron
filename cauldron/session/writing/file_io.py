@@ -1,5 +1,6 @@
 import os
 import shutil
+import subprocess
 import time
 import typing
 from collections import namedtuple
@@ -60,7 +61,6 @@ def make_output_directory(output_path: str) -> str:
         The absolute path to the output directory that was created if missing
         or already existed.
     """
-
     output_directory = os.path.dirname(environ.paths.clean(output_path))
 
     if not os.path.exists(output_directory):
@@ -99,3 +99,74 @@ def write(write_entry: FILE_WRITE_ENTRY):
     output_path = environ.paths.clean(write_entry.path)
     make_output_directory(output_path)
     writer.write_file(output_path, write_entry.contents)
+
+
+def move(copy_entry: FILE_COPY_ENTRY):
+    """
+    Moves the specified file from its source location to its destination
+    location.
+    """
+    source_path = environ.paths.clean(copy_entry.source)
+    source_directory = os.path.dirname(source_path)
+    output_path = environ.paths.clean(copy_entry.destination)
+    output_directory = make_output_directory(output_path)
+
+    initial_directory = os.path.realpath(os.curdir)
+    command = ['git', 'rev-parse', '--show-toplevel']
+    os.chdir(source_directory)
+    source_result = subprocess.run(command, stdout=subprocess.PIPE)
+    os.chdir(output_directory)
+    output_result = subprocess.run(command, stdout=subprocess.PIPE)
+    os.chdir(initial_directory)
+
+    # Only use git if the two folders are both under the same root.
+    use_git = (
+        source_result.returncode == 0
+        and output_result.returncode == 0
+        and output_result.stdout == source_result.stdout
+        and os.path.exists(source_result.stdout.decode().strip())
+    )
+
+    for i in range(3 if use_git else 0):
+        root_path = environ.paths.clean(source_result.stdout.decode().strip())
+        src_path = './{}'.format(
+            source_path
+            .replace(root_path, '')
+            .strip(os.sep)
+            .replace(os.sep, '/')
+        )
+        dest_path = './{}'.format(
+            output_path
+            .replace(root_path, '')
+            .strip(os.sep)
+            .replace(os.sep, '/')
+        )
+        try:
+            os.chdir(root_path)
+            result = subprocess.run(
+                ['git', 'mv', '-v', src_path, dest_path],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
+            result.check_returncode()
+            # Touch the file's updated timestamp.
+            os.utime(output_path, None)
+            return
+        except Exception:
+            time.sleep(0.5)
+        finally:
+            os.chdir(initial_directory)
+
+    for i in range(3):
+        try:
+            shutil.move(source_path, output_path)
+            # Touch the file's updated timestamp.
+            os.utime(output_path, None)
+            return
+        except Exception:
+            time.sleep(0.5)
+
+    raise IOError('Unable to move "{source}" to "{destination}"'.format(
+        source=source_path,
+        destination=output_path
+    ))

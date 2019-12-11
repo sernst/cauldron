@@ -166,7 +166,7 @@ def markdown(
     markdown to HTML for display within the notebook.
 
     :param source:
-        A string of markdown text that should be rendered to HTML for 
+        A string of markdown text that should be rendered to HTML for
         notebook display.
     :param source_path:
         The path to a markdown file that should be rendered to HTML for
@@ -252,8 +252,13 @@ def markdown(
         font_size=font_size
     )
 
-    pattern = re.compile('src="(?P<url>[^"]+)"')
+    pattern = re.compile(r'src="(?P<url>[^"]+)"')
     body = pattern.sub(r'data-src="\g<url>"', body)
+
+    # Force all links to open in new windows/tabs
+    pattern = re.compile(r'href="(?P<url>[^"]+)"')
+    body = pattern.sub(r'href="\g<url>" target="_blank"', body)
+
     return dict(
         body=body,
         library_includes=library_includes,

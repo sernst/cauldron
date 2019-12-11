@@ -4,12 +4,12 @@ from argparse import ArgumentParser
 from collections import OrderedDict
 
 from cauldron import cli
-from cauldron.cli import sync
 from cauldron import environ
+from cauldron.cli import sync
 from cauldron.environ import Response
 
 NAME = 'version'
-DESCRIPTION = 'Displays Cauldron\'s version information'
+DESCRIPTION = 'Display Cauldron version information'
 
 
 def populate(
@@ -94,7 +94,7 @@ def pretty_print(source: dict, depth: int = 0) -> str:
 
 
 def execute_remote(context: cli.CommandContext, **kwargs) -> Response:
-    """ """
+    """..."""
 
     thread = sync.send_remote_command(
         command=context.name,

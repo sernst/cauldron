@@ -8,7 +8,7 @@ from cauldron import environ
 def matches(
         segment: str,
         value: str,
-        *args: typing.Tuple[typing.Union[str, list, tuple]],
+        *args: typing.Union[str, list, tuple],
         prefix: str = None
 ) -> list:
     """

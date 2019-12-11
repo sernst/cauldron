@@ -139,6 +139,7 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+cauldron-app
 cauldron-web
 conda-recipe
 
@@ -147,3 +148,10 @@ conda-recipe
 .coveragerc
 .git
 .idea
+.cache
+.eggs
+.pytest_cache
+build
+cauldron-web
+cauldron_notebook.egg-info
+dist

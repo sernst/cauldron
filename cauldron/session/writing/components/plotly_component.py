@@ -18,7 +18,7 @@ PLOTLY_WARNING = cli.reformat(
 )
 
 
-def get_version_one_path() -> typing.Union[str, None]:
+def get_version_one_path() -> typing.Optional[str]:
     try:
         from plotly.offline import offline as plotly_offline
     except Exception:
@@ -30,7 +30,7 @@ def get_version_one_path() -> typing.Union[str, None]:
     )
 
 
-def get_version_two_path() -> typing.Union[str, None]:
+def get_version_two_path() -> typing.Optional[str]:
     try:
         import plotly
     except Exception:

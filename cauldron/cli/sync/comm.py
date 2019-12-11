@@ -1,6 +1,6 @@
 import requests
-from requests import Response as HttpResponse
 from cauldron import environ
+from requests import Response as HttpResponse
 
 
 def assemble_url(
@@ -57,9 +57,7 @@ def parse_http_response(http_response: HttpResponse) -> 'environ.Response':
             code='INVALID_REMOTE_RESPONSE',
             error=error,
             message='Invalid HTTP response from remote connection'
-        ).console(
-            whitespace=1
-        ).response
+        ).console(whitespace=1).response
 
     response.http_response = http_response
     return response
@@ -139,7 +137,7 @@ def download_file(
         save_path: str,
         remote_connection: 'environ.RemoteConnection' = None
 ) -> 'environ.Response':
-    """ """
+    """..."""
 
     url = assemble_url(
         '/download/{}'.format(filename),

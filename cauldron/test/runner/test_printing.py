@@ -1,4 +1,3 @@
-from unittest.mock import patch
 import string
 
 import cauldron
@@ -11,7 +10,7 @@ from cauldron.test.support.messages import Message
 class TestPrinting(scaffolds.ResultsTest):
 
     def test_slow_printing(self):
-        """Should not repeat print statements during slow running steps"""
+        """Should not repeat print statements during slow running steps."""
         response = support.create_project(self, 'duluth')
         self.assertFalse(
             response.failed,
@@ -29,7 +28,7 @@ class TestPrinting(scaffolds.ResultsTest):
         response = commander.execute('run', '-f')
         response.thread.join(2)
 
-        step = cauldron.project.get_internal_project().steps[0]
+        step = cauldron.project.get_internal_project().steps[1]
         dom = step.dumps()
         self.assertEqual(dom.count('BAT'), 1, 'first check failed')
 
@@ -43,7 +42,7 @@ class TestPrinting(scaffolds.ResultsTest):
         self.assertLess(dom.count('SAT'), 2, 'fourth check failed')
 
     def test_print_solo(self):
-        """ should properly print in a step that does nothing but print """
+        """Should properly print in a step that does nothing but print."""
         response = support.create_project(self, 'minneapolis')
         self.assertFalse(
             response.failed,
@@ -66,7 +65,7 @@ class TestPrinting(scaffolds.ResultsTest):
         )
 
         project = cauldron.project.get_internal_project()
-        dom = project.steps[0].dom  # type: str
+        dom = project.steps[1].dom  # type: str
 
         self.assertEqual(
             dom.count(print_string),
@@ -75,8 +74,7 @@ class TestPrinting(scaffolds.ResultsTest):
         )
 
     def test_print_start(self):
-        """ should properly print at the beginning of a step """
-
+        """Should properly print at the beginning of a step."""
         response = support.create_project(self, 'chicago')
         self.assertFalse(
             response.failed,
@@ -100,7 +98,7 @@ class TestPrinting(scaffolds.ResultsTest):
         )
 
         project = cauldron.project.get_internal_project()
-        dom = project.steps[0].dom  # type: str
+        dom = project.steps[1].dom  # type: str
 
         self.assertEqual(
             dom.count(print_string),
@@ -109,8 +107,7 @@ class TestPrinting(scaffolds.ResultsTest):
         )
 
     def test_print_end(self):
-        """ should properly print at the end of step """
-
+        """Should properly print at the end of step."""
         response = support.create_project(self, 'madison')
         self.assertFalse(
             response.failed,
@@ -134,7 +131,7 @@ class TestPrinting(scaffolds.ResultsTest):
         )
 
         project = cauldron.project.get_internal_project()
-        dom = project.steps[0].dom  # type: str
+        dom = project.steps[1].dom  # type: str
 
         self.assertEqual(
             dom.count(print_string),
@@ -143,8 +140,7 @@ class TestPrinting(scaffolds.ResultsTest):
         )
 
     def test_print_multiple(self):
-        """ should properly print multiple times within a step """
-
+        """Should properly print multiple times within a step."""
         response = support.create_project(self, 'omaha')
         self.assertFalse(
             response.failed,
@@ -169,7 +165,7 @@ class TestPrinting(scaffolds.ResultsTest):
         )
 
         project = cauldron.project.get_internal_project()
-        dom = project.steps[0].dom  # type: str
+        dom = project.steps[1].dom  # type: str
 
         self.assertEqual(
             dom.count(string.ascii_lowercase),

@@ -7,7 +7,6 @@ DESCRIPTION = 'Exit the cauldron shell'
 
 
 def execute(context: cli.CommandContext) -> Response:
-    """ """
-
+    """..."""
     environ.configs.save()
     return context.response.end()

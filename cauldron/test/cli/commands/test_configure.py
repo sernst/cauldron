@@ -4,10 +4,10 @@ from cauldron.test.support import scaffolds
 
 
 class TestConfigure(scaffolds.ResultsTest):
-    """ """
+    """..."""
 
     def test_list_all(self):
-        """ should list configurations """
+        """Should list configurations."""
 
         response = support.run_command('configure --list')
         self.assertFalse(response.failed, Message(
@@ -17,19 +17,19 @@ class TestConfigure(scaffolds.ResultsTest):
         ))
 
     def test_print_help(self):
-        """ should print configure help """
+        """Should print configure help."""
 
         r = support.run_command('configure')
         self.assertFalse(r.failed, 'should not have failed')
 
     def test_echo_missing(self):
-        """ should echo does not exist setting """
+        """Should echo does not exist setting """
 
         r = support.run_command('configure __test__')
         self.assertFalse(r.failed, 'should not have failed')
 
     def test_echo_exists(self):
-        """ should echo does not exist setting """
+        """Should echo does not exist setting """
 
         r = support.run_command('configure __test__ hello --forget')
         self.assertFalse(r.failed, 'should not have failed')
@@ -41,7 +41,7 @@ class TestConfigure(scaffolds.ResultsTest):
         self.assertFalse(r.failed, 'should not have failed')
 
     def test_set_forget(self):
-        """ should echo does not exist setting """
+        """Should echo does not exist setting """
 
         r = support.run_command('configure __test__ abc --forget')
         self.assertFalse(r.failed, 'should not have failed')
@@ -50,7 +50,7 @@ class TestConfigure(scaffolds.ResultsTest):
         self.assertFalse(r.failed, 'should not have failed')
 
     def test_set_persists(self):
-        """ should echo does not exist setting """
+        """Should echo does not exist setting """
 
         r = support.run_command('configure __test__ abc')
         self.assertFalse(r.failed, 'should not have failed')
@@ -59,7 +59,7 @@ class TestConfigure(scaffolds.ResultsTest):
         self.assertFalse(r.failed, 'should not have failed')
 
     def test_set_path(self):
-        """ should set a cleaned path"""
+        """Should set a cleaned path"""
 
         r = support.run_command('configure __test_path ~/abc --forget')
         self.assertFalse(r.failed, 'should not have failed')
@@ -68,7 +68,7 @@ class TestConfigure(scaffolds.ResultsTest):
         self.assertFalse(r.failed, 'should not have failed')
 
     def test_set_paths(self):
-        """ should set multiple clean paths """
+        """Should set multiple clean paths."""
 
         r = support.run_command('configure __test_paths ~/abc ~/def --forget')
         self.assertFalse(r.failed, 'should not have failed')

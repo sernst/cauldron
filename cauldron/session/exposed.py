@@ -22,7 +22,7 @@ class ExposedProject(object):
     """
 
     def __init__(self):
-        self._project = None  # type: projects.Project
+        self._project = None  # type: typing.Optional[projects.Project]
 
     @property
     def internal_project(self) -> typing.Union[projects.Project, None]:
@@ -136,6 +136,9 @@ class ExposedProject(object):
             Maximum number of seconds to wait before giving up and returning
             None.
         """
+        if self.internal_project:
+            return self.internal_project
+
         count = int(timeout / 0.1)
         for _ in range(count):
             project = self.internal_project

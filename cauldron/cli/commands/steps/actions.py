@@ -1,5 +1,5 @@
 import os
-import shutil
+import time
 import typing
 
 from cauldron.cli.commands.steps import renaming as step_support
@@ -7,6 +7,7 @@ from cauldron.environ import Response
 from cauldron.session import naming
 from cauldron.session import writing
 from cauldron.session.projects import Project
+from cauldron.session.writing import file_io
 
 
 def index_from_location(
@@ -15,15 +16,7 @@ def index_from_location(
         location: typing.Union[str, int] = None,
         default: int = None
 ) -> int:
-    """
-
-    :param response:
-    :param project:
-    :param location:
-    :param default:
-    :return:
-    """
-
+    """..."""
     if location is None:
         return default
 
@@ -43,13 +36,27 @@ def index_from_location(
     return default
 
 
-def echo_steps(response: Response, project: Project):
-    """
-    :param response:
-    :param project:
-    :return:
-    """
+def clean_steps(response: Response, project: Project) -> Response:
+    """Removes and dirty settings for all steps"""
+    for step in project.steps:
+        if step.is_dirty() and step.last_modified:
+            step.mark_dirty(False, force=True)
 
+    return (
+        response
+        .update(project=project.kernel_serialize())
+        .notify(
+            kind='CLEANED',
+            code='MARKED_CLEAN',
+            message='All steps have been marked as up-to-date'
+        )
+        .console(whitespace=1)
+        .response
+    )
+
+
+def echo_steps(response: Response, project: Project):
+    """..."""
     if len(project.steps) < 1:
         response.update(
             steps=[]
@@ -92,16 +99,7 @@ def create_step(
         position: typing.Union[str, int],
         title: str = None
 ) -> Response:
-    """
-
-    :param response:
-    :param project:
-    :param name:
-    :param position:
-    :param title:
-    :return:
-    """
-
+    """..."""
     name = name.strip('"')
     title = title.strip('"') if title else title
     index = index_from_location(response, project, position)
@@ -147,12 +145,14 @@ def create_step(
     project.save()
     project.write()
 
+    project.select_step(result)
     index = project.steps.index(result)
 
     step_changes = [dict(
         name=result.definition.name,
         filename=result.filename,
         action='added',
+        timestamp=time.time(),
         step=writing.step_writer.serialize(result)._asdict(),
         after=None if index < 1 else project.steps[index - 1].definition.name
     )]
@@ -167,9 +167,7 @@ def create_step(
         kind='CREATED',
         code='STEP_CREATED',
         message='"{}" step has been created'.format(result.definition.name)
-    ).console(
-        whitespace=1
-    ).response
+    ).console(whitespace=1).response
 
 
 def modify_step(
@@ -179,18 +177,8 @@ def modify_step(
         new_name: str = None,
         position: typing.Union[str, int] = None,
         title: str = None
-):
-    """
-
-    :param response:
-    :param project:
-    :param name:
-    :param new_name:
-    :param position:
-    :param title:
-    :return:
-    """
-
+) -> Response:
+    """..."""
     new_name = new_name if new_name else name
     old_index = project.index_of_step(name)
     new_index = index_from_location(response, project, position, old_index)
@@ -204,18 +192,18 @@ def modify_step(
 
     old_step = project.remove_step(name)
     if not old_step:
-        response.fail(
+        return response.fail(
             code='NO_SUCH_STEP',
             message='Unable to modify unknown step "{}"'.format(name)
-        ).console(
-            whitespace=1
-        )
-        return False
+        ).console(whitespace=1).response
 
     source_path = old_step.source_path
     if os.path.exists(source_path):
         temp_path = '{}.cauldron_moving'.format(source_path)
-        shutil.move(source_path, temp_path)
+        file_io.move(file_io.FILE_COPY_ENTRY(
+            source=source_path,
+            destination=temp_path
+        ))
     else:
         temp_path = None
 
@@ -238,19 +226,25 @@ def modify_step(
 
     step_data = {'name': new_name}
     if title is None:
-        if old_step.definition.title:
+        old_title = old_step.definition.title
+        if old_title and old_title != old_step.definition.name:
             step_data['title'] = old_step.definition.title
     else:
         step_data['title'] = title.strip('"')
 
     new_step = project.add_step(step_data, new_index)
-
+    project.select_step(new_step)
     project.save()
 
     if not os.path.exists(new_step.source_path):
         if temp_path and os.path.exists(temp_path):
-            shutil.move(temp_path, new_step.source_path)
+            file_io.move(file_io.FILE_COPY_ENTRY(
+                source=temp_path,
+                destination=new_step.source_path
+            ))
         else:
+            # Create an empty file if no existing source file for the
+            # step exists.
             with open(new_step.source_path, 'w+') as f:
                 f.write('')
 
@@ -268,6 +262,7 @@ def modify_step(
         name=new_step.definition.name,
         filename=new_step.filename,
         action='modified',
+        timestamp=time.time(),
         after=before_step
     )]
 
@@ -280,13 +275,11 @@ def modify_step(
         kind='SUCCESS',
         code='STEP_MODIFIED',
         message='Step modifications complete'
-    ).console(
-        whitespace=1
-    )
+    ).console(whitespace=1)
 
     project.write()
 
-    return True
+    return response
 
 
 def toggle_muting(
@@ -295,15 +288,7 @@ def toggle_muting(
         step_name: str,
         value: bool = None
 ) -> Response:
-    """
-
-    :param response:
-    :param project:
-    :param step_name:
-    :param value:
-    :return:
-    """
-
+    """..."""
     index = project.index_of_step(step_name)
     if index is None:
         return response.fail(

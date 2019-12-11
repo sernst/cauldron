@@ -12,7 +12,7 @@ NOT_OVERRIDEN = namedtuple('NOT_OVERRIDEN', [])
 
 
 def default_override(value: typing.Any):
-    """ """
+    """..."""
 
     if isinstance(value, datetime.date):
         return value.isoformat()

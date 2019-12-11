@@ -85,10 +85,10 @@ def reload_children(parent_module: types.ModuleType, newer_than: int) -> bool:
 
     parent_name = get_module_name(parent_module)
 
-    children = filter(
+    children = list(filter(
         lambda item: item[0].startswith(parent_name),
         sys.modules.items()
-    )
+    ))
 
     return any([do_reload(item[1], newer_than) for item in children])
 
@@ -114,7 +114,6 @@ def reload_module(
         that they have been updated.
     :return:
     """
-
     if isinstance(module, str):
         module = get_module(module)
 
@@ -127,7 +126,7 @@ def reload_module(
     except AttributeError:
         modified = 0
 
-    if modified is None:
+    if not force and (modified is None or modified == 0):
         # If the step has no modified time it hasn't been run yet and
         # a reload won't be needed
         return False
@@ -167,7 +166,6 @@ def refresh(
         True or False depending on whether any modules were refreshed by this
         call.
     """
-
     out = []
     for module in modules:
         out.append(reload_module(module, recursive, force))

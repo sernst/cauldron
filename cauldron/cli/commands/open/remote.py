@@ -14,9 +14,9 @@ def sync_open(
         path: str,
         forget: bool = False
 ) -> Response:
-    """ """
-
+    """..."""
     source_directory = environ.paths.clean(path)
+    environ.remote_connection.local_project_directory = source_directory
     source_path = os.path.join(source_directory, 'cauldron.json')
 
     with open(source_path, 'r') as f:
@@ -30,10 +30,10 @@ def sync_open(
             definition=definition,
             source_directory=source_directory,
         )
-    )
+    ).response
     response.log_notifications()
 
-    if not forget:
+    if not forget:  # pragma: no cover
         local_opener.update_recent_paths(response, source_directory)
 
     runner.add_library_path(source_directory)

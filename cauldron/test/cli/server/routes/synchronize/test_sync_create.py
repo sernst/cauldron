@@ -4,10 +4,10 @@ from cauldron.test.support.flask_scaffolds import FlaskResultsTest
 
 
 class TestSyncCreate(FlaskResultsTest):
-    """ """
+    """..."""
 
     def test_no_args(self):
-        """ should error without arguments """
+        """Should error without arguments."""
 
         opened = self.post('/sync-create')
         self.assertEqual(opened.flask.status_code, 200)
@@ -16,7 +16,7 @@ class TestSyncCreate(FlaskResultsTest):
         self.assert_has_error_code(response, 'INVALID_ARGS')
 
     def test_missing_name(self):
-        """ should error without name argument """
+        """Should error without name argument."""
 
         opened = self.post('/sync-create', {'source_directory': 'abc'})
 
@@ -24,7 +24,7 @@ class TestSyncCreate(FlaskResultsTest):
         self.assert_has_error_code(response, 'INVALID_ARGS')
 
     def test_missing_source_directory(self):
-        """ should error without source directory argument """
+        """Should error without source directory argument."""
 
         opened = self.post('/sync-create', {'name': 'abc'})
 
@@ -32,7 +32,7 @@ class TestSyncCreate(FlaskResultsTest):
         self.assert_has_error_code(response, 'INVALID_ARGS')
 
     def test_create(self):
-        """ should create project remotely """
+        """Should create project remotely."""
 
         name = 'wyoming'
         source_directory = self.get_temp_path(name)

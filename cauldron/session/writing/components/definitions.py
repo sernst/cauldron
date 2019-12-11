@@ -7,7 +7,7 @@ WEB_INCLUDE = namedtuple('WEB_INCLUDE', ['name', 'src'])
 
 
 def merge_components(
-        *components: typing.List[typing.Union[list, tuple, COMPONENT]]
+        *components: typing.Union[list, tuple, COMPONENT]
 ) -> COMPONENT:
     """
     Merges multiple COMPONENT instances into a single one by merging the

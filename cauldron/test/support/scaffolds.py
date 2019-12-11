@@ -4,8 +4,8 @@ import tempfile
 import unittest
 
 import cauldron
-from cauldron import environ
 from cauldron import cli
+from cauldron import environ
 from cauldron.cli import commander
 from cauldron.cli.commands import close
 from cauldron.test.support.messages import Message
@@ -28,11 +28,7 @@ class ResultsTest(unittest.TestCase):
         self.temp_directories = dict()
 
     def trace(self, *args):
-        """
-        Traces the results to a temporary buffer that is setup
-        :return:
-        """
-
+        """Traces the results to a temporary buffer that is setup."""
         buffer = ' '.join(['{}'.format(arg) for arg in args])
         sys.__stderr__.write('{}\n'.format(buffer))
         sys.__stderr__.flush()
@@ -49,10 +45,10 @@ class ResultsTest(unittest.TestCase):
         environ.systems.remove(self.results_directory)
         self.results_directory = None
 
-        for key, path in self.temp_directories.items():
+        for key, path in self.temp_directories.items():  # pragma: no cover
             environ.systems.remove(path)
 
-        if cauldron.environ.remote_connection.active:
+        if cauldron.environ.remote_connection.active:  # pragma: no cover
             commander.execute('disconnect', '')
 
     def get_temp_path(self, identifier, *args):
@@ -101,7 +97,7 @@ class ResultsTest(unittest.TestCase):
         ))
 
     def assert_no_errors(self, response: environ.Response):
-        """ asserts that the response object contains no errors """
+        """ asserts that the response object contains no errors."""
 
         self.assertEqual(0, len(response.errors), Message(
             'Errors found',

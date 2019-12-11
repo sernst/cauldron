@@ -9,9 +9,7 @@ from cauldron.session import projects
 
 
 class TestNaming(scaffolds.ResultsTest):
-    """
-
-    """
+    """..."""
 
     def test_default(self):
         name = naming.find_default_filename(['1.py', '2.py'])

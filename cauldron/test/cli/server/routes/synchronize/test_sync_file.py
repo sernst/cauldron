@@ -7,10 +7,10 @@ from cauldron.test.support.flask_scaffolds import FlaskResultsTest
 
 
 class TestSyncFile(FlaskResultsTest):
-    """ """
+    """..."""
 
     def test_no_args(self):
-        """ should error without arguments """
+        """Should error without arguments."""
 
         opened = self.post('/sync-file')
         self.assertEqual(opened.flask.status_code, 200)
@@ -19,7 +19,7 @@ class TestSyncFile(FlaskResultsTest):
         self.assert_has_error_code(response, 'INVALID_ARGS')
 
     def test_missing_relative_path(self):
-        """ should error without relative_path argument """
+        """Should error without relative_path argument."""
 
         opened = self.post('/sync-file', {'chunk': 'abc'})
 
@@ -27,7 +27,7 @@ class TestSyncFile(FlaskResultsTest):
         self.assert_has_error_code(response, 'INVALID_ARGS')
 
     def test_missing_chunk(self):
-        """ should error without source directory argument """
+        """Should error without source directory argument."""
 
         opened = self.post('/sync-file', {'relative_path': 'abc'})
 
@@ -35,7 +35,7 @@ class TestSyncFile(FlaskResultsTest):
         self.assert_has_error_code(response, 'INVALID_ARGS')
 
     def test_no_project(self):
-        """ should error without source directory argument """
+        """Should error without source directory argument."""
 
         opened = self.post('/sync-file', {
             'relative_path': 'abc',
@@ -46,13 +46,12 @@ class TestSyncFile(FlaskResultsTest):
         self.assert_has_error_code(response, 'NO_OPEN_PROJECT')
 
     def test_valid(self):
-        """ should synchronize file remotely """
-
+        """Should synchronize file remotely."""
         support.create_project(self, 'peter')
         project = cauldron.project.get_internal_project()
 
         response = support.run_remote_command(
-            'open "{}"'.format(project.source_directory)
+            'open "{}" --forget'.format(project.source_directory)
         )
         self.assert_no_errors(response)
         project = cauldron.project.get_internal_project()

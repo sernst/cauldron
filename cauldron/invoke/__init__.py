@@ -50,6 +50,6 @@ def run(arguments: typing.List[str] = None):
     from cauldron.invoke import parser
     from cauldron.invoke import invoker
 
-    args = parser.parse(arguments)
+    args = parser.parse(arguments or sys.argv[1:])
     exit_code = invoker.run(args.get('command'), args)
     sys.exit(exit_code)

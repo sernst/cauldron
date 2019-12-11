@@ -2,7 +2,6 @@ import json as _json_io
 import textwrap
 import typing
 from datetime import timedelta
-import os as _os
 
 import cauldron as _cd
 from cauldron import environ
@@ -82,7 +81,7 @@ def markdown(
         **kwargs
 ):
     """
-    Renders the specified source string or source file using markdown and 
+    Renders the specified source string or source file using markdown and
     adds the resulting HTML to the notebook display.
 
     :param source:
@@ -137,10 +136,10 @@ def json(**kwargs):
 
 
 def plotly(
-        data: typing.Union[dict, list] = None,
-        layout: dict = None,
+        data: typing.Union[dict, list, typing.Any] = None,
+        layout: typing.Union[dict, typing.Any] = None,
         scale: float = 0.5,
-        figure: dict = None,
+        figure: typing.Union[dict, typing.Any] = None,
         static: bool = False
 ):
     """
@@ -188,7 +187,14 @@ def table(
         include_index: bool = False,
         max_rows: int = 500,
         sample_rows: typing.Optional[int] = None,
-        formats: typing.Union[str, typing.Dict[str, str]] = None
+        formats: typing.Union[
+            str,
+            typing.Callable[[typing.Any], str],
+            typing.Dict[
+                str,
+                typing.Union[str, typing.Callable[[typing.Any], str]]
+            ]
+        ] = None
 ):
     """
     Adds the specified data frame to the display in a nicely formatted
@@ -579,16 +585,34 @@ def status(
         assigned section progress value will be retained.
     """
     environ.abort_thread()
+    r = _get_report()
     step = _cd.project.get_internal_project().current_step
 
-    if message is not None:
+    changes = 0
+    has_changed = step.progress_message != message
+    if message is not None and has_changed:
+        changes += 1
         step.progress_message = message
-    if progress is not None:
+
+    has_changed = step.progress_message != max(0, min(1, progress or 0))
+    if progress is not None and has_changed:
+        changes += 1
         step.progress = max(0.0, min(1.0, progress))
-    if section_message is not None:
+
+    has_changed = step.sub_progress_message != section_message
+    if section_message is not None and has_changed:
+        changes += 1
         step.sub_progress_message = section_message
-    if section_progress is not None:
+
+    has_changed = step.sub_progress != max(0, min(1, section_progress or 0))
+    if section_progress is not None and has_changed:
+        changes += 1
         step.sub_progress = section_progress
+
+    if changes > 0:
+        # update the timestamp to inform rendering that a status
+        # has changed and should be re-rendered into the step.
+        r.update_last_modified()
 
 
 def code_block(

@@ -1,9 +1,14 @@
 import os
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import cauldron
+from cauldron import environ
+from cauldron.cli.commands import steps as steps_command
 from cauldron.test import support
 from cauldron.test.support import scaffolds
 from cauldron.test.support.messages import Message
+from cauldron.test.support import server
 
 
 class TestSteps(scaffolds.ResultsTest):
@@ -17,7 +22,7 @@ class TestSteps(scaffolds.ResultsTest):
         r = support.run_command('steps add first.py')
         self.assertFalse(r.failed, 'should not have failed')
         self.assertTrue(os.path.exists(
-            os.path.join(project.source_directory, 'S01-first.py')
+            os.path.join(project.source_directory, 'S02-first.py')
         ))
 
     def test_steps_muting(self):
@@ -26,10 +31,10 @@ class TestSteps(scaffolds.ResultsTest):
 
         support.run_command('steps add first.py')
 
-        r = support.run_command('steps mute S01-first.py')
+        r = support.run_command('steps mute S02-first.py')
         self.assertFalse(r.failed, 'should not have failed')
 
-        r = support.run_command('steps unmute S01-first.py')
+        r = support.run_command('steps unmute S02-first.py')
         self.assertFalse(r.failed, 'should nto have failed')
 
     def test_steps_modify(self):
@@ -48,15 +53,15 @@ class TestSteps(scaffolds.ResultsTest):
 
         r = support.run_command('steps add first.py')
         self.assertFalse(r.failed, 'should not have failed')
-        self.assertTrue(os.path.exists(os.path.join(directory, 'S01-first.py')))
+        self.assertTrue(os.path.exists(os.path.join(directory, 'S02-first.py')))
 
-        r = support.run_command('steps modify S01-first.py --name="second.py"')
+        r = support.run_command('steps modify S02-first.py --name="second.py"')
         self.assertFalse(r.failed, 'should not have failed')
         self.assertFalse(
-            os.path.exists(os.path.join(directory, 'S01-first.py'))
+            os.path.exists(os.path.join(directory, 'S02-first.py'))
         )
         self.assertTrue(
-            os.path.exists(os.path.join(directory, 'S01-second.py'))
+            os.path.exists(os.path.join(directory, 'S02-second.py'))
         )
 
     def test_steps_remove(self):
@@ -66,10 +71,10 @@ class TestSteps(scaffolds.ResultsTest):
         r = support.run_command('steps add first.py')
         self.assertFalse(r.failed, 'should not have failed')
 
-        r = support.run_command('steps remove S01-first.py')
+        r = support.run_command('steps remove S02-first.py')
         self.assertFalse(r.failed, 'should not have failed')
 
-        r = support.run_command('steps remove S01-fake.py')
+        r = support.run_command('steps remove S02-fake.py')
         self.assertTrue(r.failed, 'should have failed')
 
     def test_steps_remove_renaming(self):
@@ -91,11 +96,11 @@ class TestSteps(scaffolds.ResultsTest):
             self.assertEqual('S0{}.py'.format(i + 1), step_names[i])
 
     def test_steps_list(self):
-        """Should list steps"""
+        """Should list steps."""
         support.create_project(self, 'angelica')
         r = support.run_command('steps list')
-        self.assertEqual(len(r.data['steps']), 0, Message(
-            'New project should have no steps to list',
+        self.assertEqual(len(r.data['steps']), 1, Message(
+            'New project should have one step to list',
             response=r
         ))
 
@@ -107,7 +112,7 @@ class TestSteps(scaffolds.ResultsTest):
         self.assertFalse(r.failed, 'should not have failed')
 
     def test_autocomplete(self):
-        """Should autocomplete steps command"""
+        """Should autocomplete steps command."""
         support.create_project(self, 'gina')
         support.add_step(self, 'a.py')
         support.add_step(self, 'b.py')
@@ -117,8 +122,8 @@ class TestSteps(scaffolds.ResultsTest):
 
         result = support.autocomplete('steps modify ')
         self.assertEqual(
-            len(result), 2,
-            'there are two steps in {}'.format(result)
+            len(result), 3,
+            'there are three steps in {}'.format(result)
         )
 
         result = support.autocomplete('steps modify a.py --')
@@ -126,7 +131,7 @@ class TestSteps(scaffolds.ResultsTest):
 
         result = support.autocomplete('steps modify fake.py --position=')
         self.assertEqual(
-            len(result), 2,
+            len(result), 3,
             'there are two steps in {}'.format(result)
         )
 
@@ -159,19 +164,191 @@ class TestSteps(scaffolds.ResultsTest):
         ))
 
     def test_remote(self):
-        """Should function remotely"""
+        """Should function remotely."""
         support.create_project(self, 'nails')
-        project = cauldron.project.get_internal_project()
+        directory = cauldron.project.get_internal_project().source_directory
 
-        support.run_remote_command('open "{}" --forget'.format(
-            project.source_directory
+        closed_response = support.run_command('close')
+        closed_response.join()
+        self.assertTrue(closed_response.success, Message(
+            'Expected new project to be closed',
+            response=closed_response,
         ))
-        project = cauldron.project.get_internal_project()
 
-        added_response = support.run_remote_command('steps add')
+        test_app = server.create_test_app()
+
+        opened_response = support.run_remote_command(
+            'open "{}" --forget'.format(directory),
+            app=test_app,
+        )
+        opened_response.join()
+        self.assertTrue(opened_response.success, Message(
+            'Opened Remote Project Failed',
+            response=opened_response,
+        ))
+
+        added_response = support.run_remote_command(
+            'steps add',
+            app=test_app,
+        )
+        added_response.join()
         self.assertTrue(added_response.success, Message(
             'Add Step Failed',
-            response=added_response
+            response=added_response,
         ))
 
-        self.assertEqual(len(project.steps), 1)
+        serialized = added_response.data['project']
+        self.assertEqual(
+            len(serialized['steps']),
+            2,
+            '{}'.format(serialized['steps'])
+        )
+
+
+def test_populate_list_action():
+    """Should return early if action is list."""
+    parser = MagicMock()
+    steps_command.populate(parser, [], {'action': 'list'})
+    assert parser.add_argument.not_called
+
+
+def test_autocomplete_list():
+    """Should return empty list if the action is list."""
+    assert support.autocomplete('steps list ') == []
+
+
+def test_autocomplete_list_flag():
+    """Should return empty list if the action is list."""
+    assert support.autocomplete('steps list -') == []
+
+
+def test_autocomplete_remove_flag():
+    """Should return keep flag completion."""
+    assert support.autocomplete('steps remove foo.py -') == ['k', '-']
+
+
+def test_autocomplete_no_match():
+    """Should return empty list if nothing matched for autocomplete."""
+    assert support.autocomplete('steps remove a.py b.py ,') == []
+
+
+@patch('cauldron.project.get_internal_project')
+def test_execute_no_project(
+        get_internal_project: MagicMock,
+):
+    """Should fail if no project is open."""
+    get_internal_project.return_value = None
+    context = MagicMock(response=environ.Response())
+
+    response = steps_command.execute(context)
+    assert support.has_error_code(response, 'NO_OPEN_PROJECT')
+
+
+@patch('cauldron.cli.commands.steps.actions.clean_steps')
+@patch('cauldron.project.get_internal_project')
+def test_execute_clean_action(
+        get_internal_project: MagicMock,
+        clean_steps: MagicMock,
+):
+    """Should carry out a steps clean action."""
+    get_internal_project.return_value = MagicMock()
+    context = MagicMock(response=environ.Response())
+
+    steps_command.execute(context, action='clean')
+    assert clean_steps.called
+
+
+@patch('cauldron.cli.commands.steps.selection.select_step')
+@patch('cauldron.project.get_internal_project')
+def test_execute_select_action(
+        get_internal_project: MagicMock,
+        select_step: MagicMock,
+):
+    """Should carry out a steps selection action."""
+    get_internal_project.return_value = MagicMock()
+    context = MagicMock(response=environ.Response())
+
+    steps_command.execute(context, action='select', step_name='foo.py')
+    assert select_step.called
+
+
+@patch('cauldron.project.get_internal_project')
+def test_execute_no_step_name(
+        get_internal_project: MagicMock
+):
+    """Should fail if step is not specified for the remove action."""
+    get_internal_project.return_value = MagicMock()
+    context = MagicMock(response=environ.Response())
+
+    response = steps_command.execute(context, action='remove')
+    assert support.has_error_code(response, 'NO_STEP_NAME')
+
+
+@patch('cauldron.cli.commands.steps.sync.send_remote_command')
+def test_execute_remote_list(
+        send_remote_command: MagicMock
+):
+    """Should carry out a remote list command."""
+    thread = MagicMock()
+    thread.responses = [environ.Response().update(foo='bar')]
+    send_remote_command.return_value = thread
+
+    context = MagicMock(response=environ.Response())
+
+    response = steps_command.execute_remote(context, action='list')
+    assert response.data['foo'] == 'bar'
+
+
+@patch('cauldron.cli.commands.steps.sync.comm.send_request')
+def test_execute_remote_sync_failed(
+        send_request: MagicMock
+):
+    """Should fail if sync status command does not succeed."""
+    send_request.return_value = environ.Response().fail(code='FAKE').response
+    context = MagicMock(response=environ.Response())
+
+    response = steps_command.execute_remote(context, action='remove')
+    assert support.has_error_code(response, 'FAKE')
+
+
+@patch('cauldron.cli.commands.steps.execute')
+@patch('cauldron.cli.commands.steps.project_opener.project_exists')
+@patch('cauldron.cli.commands.steps.sync.comm.send_request')
+def test_execute_remote_no_such_project(
+        send_request: MagicMock,
+        project_exists: MagicMock,
+        execute: MagicMock,
+):
+    """Should fail if sync status command does not succeed."""
+    project_exists.return_value = False
+    send_request.return_value = environ.Response().update(
+        remote_source_directory='foo'
+    )
+    context = MagicMock(response=environ.Response())
+
+    steps_command.execute_remote(context, action='remove')
+    assert execute.not_called
+
+
+@patch('cauldron.cli.commands.steps.projects.Project')
+@patch('cauldron.cli.commands.steps.execute')
+@patch('cauldron.cli.commands.steps.project_opener.project_exists')
+@patch('cauldron.cli.commands.steps.sync.comm.send_request')
+def test_execute_remote_fails(
+        send_request: MagicMock,
+        project_exists: MagicMock,
+        execute: MagicMock,
+        project_constructor: MagicMock,
+):
+    """Should fail if local execute command does not succeed."""
+    project_exists.return_value = True
+    send_request.return_value = environ.Response().update(
+        remote_source_directory='foo'
+    )
+    context = MagicMock(response=environ.Response())
+    execute.return_value = environ.Response().fail(code='FAKE').response
+
+    response = steps_command.execute_remote(context, action='remove')
+    assert execute.called
+    assert project_constructor.called
+    assert support.has_error_code(response, 'FAKE')

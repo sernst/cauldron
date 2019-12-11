@@ -92,26 +92,29 @@ def args(
         :param message:
             The error message from the parser
         """
-
-        response.fail(
-            code='INVALID_ARGUMENTS',
-            message=message
-        ).kernel(
-            raw_args=args_str
-        ).console(
-            whitespace=1
+        return (
+            response
+            .fail(
+                code='INVALID_ARGUMENTS',
+                message=message
+            )
+            .kernel(raw_args=args_str)
+            .console(whitespace=1)
         )
 
     parser.error = error_overload
 
-    parsed_args = vars(parser.parse_args(args_list))
+    try:
+        parsed_args = parser.parse_args(args_list)
+    except TypeError:  # pragma: no cover
+        parsed_args = None
 
     if response.failed:
         return ARGS_RESPONSE_NT(None, None, response)
 
     args_result = dict()
     args_result.update(assigned_args)
-    args_result.update(parsed_args)
+    args_result.update(vars(parsed_args))
 
     # Clean the argument values of quote characters and hanging whitespace
 

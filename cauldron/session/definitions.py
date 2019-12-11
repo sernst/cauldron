@@ -40,9 +40,7 @@ class ExecutionResult:
 
 
 class FileDefinition(object):
-    """
-
-    """
+    """..."""
 
     def __init__(
             self,

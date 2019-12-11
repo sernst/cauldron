@@ -8,7 +8,7 @@ from cauldron.cli import sync
 
 
 class TestSyncFiles(scaffolds.ResultsTest):
-    """ Tests for the cauldron.cli.sync.files module """
+    """ Tests for the cauldron.cli.sync.files module."""
 
     @patch('os.path.getmtime')
     @patch('cauldron.cli.sync.files.send_chunk')
@@ -17,7 +17,7 @@ class TestSyncFiles(scaffolds.ResultsTest):
             send_chunk: MagicMock,
             getmtime: MagicMock
     ):
-        """ should not sync file if it does not need to be synced """
+        """Should not sync file if it does not need to be synced."""
 
         file_path = 'fake.path'
         getmtime.return_value = 900
@@ -35,7 +35,7 @@ class TestSyncFiles(scaffolds.ResultsTest):
 
     @patch('cauldron.cli.sync.files.send_chunk')
     def test_send_progress(self, send_chunk: MagicMock):
-        """ should send file in multiple chunks """
+        """Should send file in multiple chunks."""
 
         send_chunk.return_value = Response()
 
@@ -55,7 +55,7 @@ class TestSyncFiles(scaffolds.ResultsTest):
 
     @patch('cauldron.cli.sync.files.send_chunk')
     def test_failed_chunk(self, send_chunk: MagicMock):
-        """ should abort sending when chunk write fails """
+        """Should abort sending when chunk write fails."""
 
         send_chunk.return_value = Response().fail().response
         file_path = os.path.realpath(__file__)
@@ -69,7 +69,7 @@ class TestSyncFiles(scaffolds.ResultsTest):
 
     @patch('cauldron.cli.sync.files.send')
     def test_all_failed_file(self, send: MagicMock):
-        """ should abort sending when file send fails """
+        """Should abort sending when file send fails."""
 
         send.return_value = Response().fail().response
         directory = os.path.dirname(os.path.realpath(__file__))

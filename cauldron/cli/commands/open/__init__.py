@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 import cauldron
 from cauldron import cli
 from cauldron import environ
+from cauldron.cli.commands.listing import discovery
 from cauldron.cli.commands.open import actions
 from cauldron.cli.commands.open import opener
 from cauldron.cli.commands.open import remote as remote_opener
@@ -20,14 +21,7 @@ def populate(
         raw_args: typing.List[str],
         assigned_args: dict
 ):
-    """
-
-    :param parser:
-    :param raw_args:
-    :param assigned_args:
-    :return:
-    """
-
+    """..."""
     parser.add_argument(
         'path',
         nargs='?',
@@ -77,13 +71,13 @@ def populate(
     )
 
     parser.add_argument(
-        '-a', '--available',
+        '-a', '--available', '--all',
         dest='list_available',
         default=False,
         action='store_true',
         help=cli.reformat(
             """
-            List all known projects.
+            List all known projects to choose one to open.
             """
         )
     )
@@ -107,18 +101,14 @@ def execute(
         forget: bool = False,
         results_path: str = None
 ) -> Response:
-    """
-
-    :return:
-    """
-
+    """..."""
     response = context.response
     path = path.strip('"') if path else None
 
     if list_available:
-        actions.echo_known_projects(response)
-        return response
-
+        path = actions.select_from_available(response)
+        if not path:
+            return response
     if last_opened_project:
         path = actions.fetch_last(response)
         if not path:
@@ -128,13 +118,14 @@ def execute(
         if not path:
             return response
     elif not path or not path.strip():
-        actions.echo_known_projects(response)
+        discovery.echo_known_projects(response)
         return response
     else:
-        p = actions.fetch_location(response, path)
+        p = actions.fetch_location(path)
         path = p if p else path
 
     if context.remote_connection.active:
+        environ.remote_connection.reset_sync_time()
         response.consume(remote_opener.sync_open(
             context=context,
             path=path,
@@ -177,7 +168,7 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
             path_segment = value.split(':', 1)[-1]
             return autocompletion.match_path(
                 segment,
-                environ.paths.package('resources', 'examples', path_segment),
+                environ.paths.resources('examples', path_segment),
                 include_files=False
             )
 
@@ -185,9 +176,7 @@ def autocomplete(segment: str, line: str, parts: typing.List[str]):
             path_segment = value.split(':', 1)[-1]
             return autocompletion.match_path(
                 segment,
-                environ.paths.clean(
-                    os.path.join('~', 'cauldron', path_segment)
-                ),
+                environ.paths.home(path_segment),
                 include_files=False
             )
 

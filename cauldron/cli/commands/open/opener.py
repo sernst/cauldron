@@ -5,6 +5,7 @@ from cauldron import environ
 from cauldron import runner
 from cauldron import session
 from cauldron.environ import Response
+from cauldron.session import projects
 
 
 def project_exists(response: 'environ.Response', path: str) -> bool:
@@ -52,13 +53,8 @@ def load_project(response, path):
     return False
 
 
-def update_recent_paths(response, path):
-    """
-    :param response:
-    :param path:
-    :return:
-    """
-
+def update_recent_paths(response: 'environ.Response', path: str):
+    """..."""
     try:
         recent_paths = environ.configs.fetch('recent_paths', [])
 
@@ -66,7 +62,7 @@ def update_recent_paths(response, path):
             recent_paths.remove(path)
 
         recent_paths.insert(0, path)
-        environ.configs.put(recent_paths=recent_paths[:10], persists=True)
+        environ.configs.put(recent_paths=recent_paths[:40], persists=True)
         environ.configs.save()
     except Exception as error:  # pragma: no cover
         response.warn(
@@ -75,10 +71,8 @@ def update_recent_paths(response, path):
             error=str(error)
         ).console(whitespace=1)
 
-    return True
 
-
-def initialize_results(response, project):
+def initialize_results(response: environ.Response, project):
     if not project.results_path:
         return True
 
@@ -95,17 +89,19 @@ def initialize_results(response, project):
     return False
 
 
-def write_results(response, project):
+def write_results(response: environ.Response, project: 'projects.Project'):
     try:
         path = project.output_path
         if not path or not os.path.exists(path):
             project.write()
         return True
-    except Exception as err:
+    except Exception as error:
+        import traceback
+        traceback.print_exc()
         response.fail(
             code='WRITE_FAILED',
             message='Unable to write project output data',
-            error=err
+            error=error
         )
         return False
 
@@ -115,14 +111,7 @@ def open_project(
         forget: bool = False,
         results_path: str = None
 ) -> Response:
-    """
-
-    :param path:
-    :param forget:
-    :param results_path:
-    :return:
-    """
-
+    """..."""
     response = Response()
 
     try:
@@ -145,13 +134,14 @@ def open_project(
             message='Unable to load project data'
         ).console(whitespace=1).response
 
-    if not forget and not update_recent_paths(response, path):
-        return response.fail(
-            code='PROJECT_STATUS_FAILURE',
-            message='Unable to update loaded project status'
-        ).console(whitespace=1).response
+    if not forget:  # pragma: no cover
+        update_recent_paths(response, path)
 
     project = cauldron.project.get_internal_project()
+    if project.steps:
+        # Always select the first step when a project is opened.
+        project.select_step(0)
+
     if results_path:
         project.results_path = results_path
 

@@ -20,7 +20,7 @@ StopCondition = namedtuple('StopCondition', ['aborted', 'halt'])
 
 
 class Project:
-    """ """
+    """..."""
 
     def __init__(
             self,
@@ -38,7 +38,6 @@ class Project:
             [optional] The shared data cache used to store project data when
             run
         """
-
         source_directory = environ.paths.clean(source_directory)
         if os.path.isfile(source_directory):
             source_directory = os.path.dirname(source_directory)
@@ -108,8 +107,7 @@ class Project:
 
     @property
     def asset_directories(self):
-        """ """
-
+        """..."""
         def listify(value):
             return [value] if isinstance(value, str) else list(value)
         folders = listify(self.settings.fetch('asset_folders', ['assets']))
@@ -121,8 +119,7 @@ class Project:
 
     @property
     def has_error(self):
-        """ """
-
+        """..."""
         for s in self.steps:
             if s.error:
                 return True
@@ -193,7 +190,6 @@ class Project:
         Returns the URL that will open this project results file in the browser
         :return:
         """
-
         return 'file://{path}?id={id}'.format(
             path=os.path.join(self.results_path, 'project.html'),
             id=self.uuid
@@ -207,7 +203,6 @@ class Project:
         parameters are needed to view it, which is needed on platforms like
         windows
         """
-
         return 'file://{path}'.format(
             path=os.path.join(self.results_path, 'display.html'),
             id=self.uuid
@@ -218,7 +213,6 @@ class Project:
         """
         Returns the directory where the project results files will be written
         """
-
         return os.path.join(self.results_path, 'reports', self.uuid, 'latest')
 
     @property
@@ -227,29 +221,45 @@ class Project:
         Returns the full path to where the results.js file will be written
         :return:
         """
-
         return os.path.join(self.output_directory, 'results.js')
 
-    def make_remote_url(self, host: str = None):
+    def select_step(
+            self,
+            step_name_or_index: typing.Union[str, int, 'steps.ProjectStep']
+    ) -> typing.Optional['steps.ProjectStep']:
         """
-
-        :param host:
+        Selects the specified step by step object, step name or index if
+        such a step exists and returns that step if it does.
         """
-
-        if host:
-            host = host.rstrip('/')
+        if isinstance(step_name_or_index, steps.ProjectStep):
+            step = (
+                step_name_or_index
+                if step_name_or_index in self.steps
+                else None
+            )
+        elif isinstance(step_name_or_index, int):
+            index = min(len(self.steps) - 1, step_name_or_index)
+            step = self.steps[index]
         else:
-            host = ''
+            step = self.get_step(step_name_or_index or '')
 
-        return '{}/view/project.html?id={}'.format(host, self.uuid)
+        if not step:
+            return None
+
+        for s in self.steps:
+            s.is_selected = (s == step)
+        return step
+
+    def make_remote_url(self, host: str = None):
+        """..."""
+        clean_host = (host or '').rstrip('/')
+        return '{}/view/project.html?id={}'.format(clean_host, self.uuid)
 
     def kernel_serialize(self):
-        """ """
-
+        """..."""
         return dict(
             uuid=self.uuid,
             stop_condition=self.stop_condition._asdict(),
-            serial_time=time.time(),
             last_modified=self.last_modified,
             remote_source_directory=self.remote_source_directory,
             source_directory=self.source_directory,
@@ -316,13 +326,8 @@ class Project:
         self.last_modified = time.time()
         return True
 
-    def get_step(self, name: str) -> typing.Union['steps.ProjectStep', None]:
-        """
-
-        :param name:
-        :return:
-        """
-
+    def get_step(self, name: str) -> typing.Optional['steps.ProjectStep']:
+        """Returns the step by name or None if no such step is found."""
         for s in self.steps:
             if s.definition.name == name:
                 return s
@@ -333,12 +338,7 @@ class Project:
             self,
             reference_id: str
     ) -> typing.Union['steps.ProjectStep', None]:
-        """
-
-        :param reference_id:
-        :return:
-        """
-
+        """Returns the step by its ID or None if no such step is found."""
         for s in self.steps:
             if s.reference_id == reference_id:
                 return s
@@ -446,8 +446,7 @@ class Project:
         self.last_modified = time.time()
 
     def write(self) -> str:
-        """ """
-
+        """..."""
         writing.save(self)
         return self.url
 

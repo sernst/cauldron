@@ -1,8 +1,11 @@
 import os
 
+#: Directory where cauldron was launched from.
+INITIAL_DIRECTORY = os.path.realpath(os.curdir)
+
 
 def join(*args: str) -> str:
-    """ Creates an absolute and cleaned path from the arguments """
+    """ Creates an absolute and cleaned path from the arguments."""
 
     return clean(os.path.join(*args))
 
@@ -16,6 +19,10 @@ def clean(path: str) -> str:
     :param path:
         The source path to be cleaned
     """
+    # Remove any potential quotes around the path, which can be common
+    # when paths are entered externally either programmatically or
+    # through CLI input.
+    path = path.strip('"') if path else path
 
     if not path or path == '.':
         path = os.curdir
@@ -35,7 +42,6 @@ def package(*args: str) -> str:
         Zero or more relative path elements that describe a file or folder
         within the reporting
     """
-
     return clean(os.path.join(os.path.dirname(__file__), '..', *args))
 
 
@@ -49,7 +55,6 @@ def resources(*args: str) -> str:
     :return:
         The absolute path
     """
-
     return package('resources', *args)
 
 
@@ -63,7 +68,6 @@ def user(*args: str) -> str:
     :return:
         The absolute path
     """
-
     return clean(os.path.join('~', '.cauldron', *args))
 
 
@@ -77,5 +81,17 @@ def results(*args: str) -> str:
     :return:
         The absolute path
     """
-
     return user('results', *args)
+
+
+def home(*args: str) -> str:
+    """
+    Creates an absolute path from the specified relative components within the
+    user's Cauldron app data folder.
+
+    :param args:
+        Relative components of the path relative to the root package
+    :return:
+        The absolute path
+    """
+    return clean(os.path.join('~', 'cauldron', *args))

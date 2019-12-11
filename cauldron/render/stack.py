@@ -36,7 +36,7 @@ def get_stack_frames(error_stack: bool = True) -> list:
 
 def format_stack_frame(stack_frame, project: 'projects.Project') -> dict:
     """
-    Formats a raw stack frame into a dictionary formatted for render 
+    Formats a raw stack frame into a dictionary formatted for render
     templating and enriched with information from the currently open project.
 
     :param stack_frame:
@@ -70,8 +70,8 @@ def get_formatted_stack_frame(
 ) -> list:
     """
     Returns a list of the stack frames formatted for user display that has
-    been enriched by the project-specific data. 
-    
+    been enriched by the project-specific data.
+
     :param project:
         The currently open project used to enrich the stack data.
     :param error_stack:
