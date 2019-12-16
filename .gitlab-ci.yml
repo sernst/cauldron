@@ -69,6 +69,11 @@ codecov:
 coveralls:
   image: python:3.7
   stage: broadcast
+  # Coveralls does not currently support coverage.py 5.0+ and
+  # so until that time, this should be allowed to fail so that
+  # it does not fail the pipeline. See issue for details:
+  # https://github.com/coveralls-clients/coveralls-python/issues/203
+  allow_failure: true
   script:
     - pip install coveralls
     - ls -la

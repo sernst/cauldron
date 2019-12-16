@@ -8,7 +8,7 @@ class TestPlotting(scaffolds.ResultsTest):
     def test_grey_color(self):
         """Should return gray colors based on arguments."""
         color = plotting.get_gray_color()
-        self.assertEqual(color, 'rgba(128, 128, 128, 1)')
+        self.assertEqual(color, 'rgba(128, 128, 128, 1.0)')
 
         color = plotting.get_gray_color(234, 0.34)
         self.assertEqual(color, 'rgba(234, 234, 234, 0.34)')

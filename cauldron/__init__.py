@@ -1,10 +1,11 @@
+from cauldron import environ as _environ
+from cauldron import plotting  # noqa
 from cauldron import session as _session
 from cauldron.session import display as _display
-from cauldron.session.reloading import refresh as _refresh
-from cauldron.session.caching import SharedCache as _SharedCache
 from cauldron.session import spark as _spark
+from cauldron.session.caching import SharedCache as _SharedCache
 from cauldron.session.definitions import ExecutionResult
-from cauldron import environ as _environ
+from cauldron.session.reloading import refresh as _refresh
 
 # Version Information in commonly viewed formats
 __version__ = _environ.version  # type: str
