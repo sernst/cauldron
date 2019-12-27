@@ -26,13 +26,7 @@ def populate_extra_files():
     """
     out = ['cauldron/settings.json']
 
-    for entry in glob.iglob('cauldron/resources/examples/**/*', recursive=True):
-        out.append(entry)
-
-    for entry in glob.iglob('cauldron/resources/templates/**/*', recursive=True):
-        out.append(entry)
-
-    for entry in glob.iglob('cauldron/resources/web/**/*', recursive=True):
+    for entry in glob.iglob('cauldron/resources/**/*', recursive=True):
         out.append(entry)
 
     return out

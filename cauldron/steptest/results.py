@@ -5,7 +5,8 @@ from cauldron.session.caching import SharedCache
 
 class StepTestRunResult:
     """
-    This class contains information returned from running a step during testing.
+    This class contains information returned from running a step
+    during testing.
     """
 
     def __init__(
@@ -23,7 +24,6 @@ class StepTestRunResult:
         Container object that holds all of the local variables that were
         defined within the run step
         """
-
         return self._locals
 
     @property
@@ -33,8 +33,14 @@ class StepTestRunResult:
         False if there as an uncaught exception during the execution of the
         step.
         """
-
         return not self._response.failed
+
+    @property
+    def step(self) -> 'projects.ProjectStep':
+        """
+        The internal step object for the step that was executed.
+        """
+        return self._step
 
     def echo_error(self) -> str:
         """
@@ -45,7 +51,6 @@ class StepTestRunResult:
             The string representation of the exception that caused the running
             step to fail or a blank string if no exception occurred
         """
-
         if not self._response.errors:
             return ''
 
