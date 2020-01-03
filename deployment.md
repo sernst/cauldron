@@ -19,7 +19,9 @@ $ python3 conda-recipe/conda-builder.py
 
 WINDOWS:
 ```powershell
-> rmdir dist /s /q
+CMD> rmdir dist /s /q
+PS> rm dist -r -fo
+
 > python setup.py sdist bdist_wheel
 > twine upload dist/cauldron*
 > docker run --rm -it -v ${pwd}:/cauldron continuumio/anaconda3 /bin/bash

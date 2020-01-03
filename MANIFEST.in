@@ -1,6 +1,4 @@
 include LICENSE
 include README.rst
 include cauldron/settings.json
-recursive-include cauldron/resources/web *
-recursive-include cauldron/resources/examples *
-recursive-include cauldron/resources/templates *
+recursive-include cauldron/resources *

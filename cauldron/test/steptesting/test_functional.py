@@ -72,12 +72,18 @@ def test_to_strings(tester: steptest.CauldronTest):
 
 
 def test_modes(tester: steptest.CauldronTest):
-    """Should be testing and not interactive or single run"""
+    """Should be testing and not interactive or single run."""
     step = tester.run_step('S01-first.py')
     assert step.success
     assert step.local.is_testing
     assert not step.local.is_interactive
     assert not step.local.is_single_run
+
+
+def test_partial_match(tester: steptest.CauldronTest):
+    """Should run S01 from a partial step name."""
+    result = tester.run_step('first')
+    assert result.step.definition.name == 'S01-first.py'
 
 
 def test_find_in_current_path():

@@ -1,13 +1,13 @@
 import json
 import os
 import tempfile
-import time
 import typing
 
 import cauldron as cd
 from cauldron import environ
 from cauldron.cli import commander
 from cauldron.session import exposed
+from cauldron.session import projects
 from cauldron.steptest.results import StepTestRunResult
 
 
@@ -70,6 +70,37 @@ def open_project(project_path: str) -> 'exposed.ExposedProject':
     return cd.project
 
 
+def find_matching_step(
+        project: 'projects.Project',
+        step_name: str,
+) -> typing.Optional['projects.ProjectStep']:
+    """
+    Attempts to find a step within the specified project with a name
+    that fully or partially matches the specified step name. The search
+    works from most to least restrictive matching and will return the
+    first available match. If no such match is found a None value will
+    be returned instead.
+
+    :param project:
+        The project in which the step should be found.
+    :param step_name:
+        A fully or partial matching name of a step to find in the
+        specified project.
+    """
+    methods = (
+        lambda n: n == step_name,
+        lambda n: n.startswith(step_name),
+        lambda n: step_name in n
+    )
+    matcher = (
+        step
+        for method in methods
+        for step in project.steps
+        if method(step.name)
+    )
+    return next(matcher, None)
+
+
 def run_step(
         step_name: str,
         allow_failure: bool = False
@@ -96,15 +127,15 @@ def run_step(
             .format(step_name)
         )
 
-    step = project.get_step(step_name)
+    step = find_matching_step(project, step_name)
     if not step:
         raise AssertionError('No step named "{}" was found'.format(step_name))
 
-    response = commander.execute('run', '"{}" --force'.format(step_name))
+    response = commander.execute('run', '"{}" --force'.format(step.name))
     response.thread.join()
 
     if not allow_failure and response.failed:
-        raise AssertionError('Failed to run step "{}"'.format(step_name))
+        raise AssertionError('Failed to run step "{}"'.format(step.name))
 
     return StepTestRunResult(step, response)
 
