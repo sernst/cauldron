@@ -20,7 +20,7 @@ def populate(
         parser: ArgumentParser,
         raw_args: typing.List[str],
         assigned_args: dict
-) -> typing.NoReturn:
+):
     """
     Populates the commend execution argument parser with the arguments
     for the command.
