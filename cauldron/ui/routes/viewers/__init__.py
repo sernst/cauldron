@@ -2,6 +2,7 @@ import mimetypes
 import os
 
 import flask
+
 from cauldron import environ
 from cauldron.ui import configs as ui_configs
 
@@ -25,7 +26,7 @@ def view(route: str):
     return flask.send_file(
         path,
         mimetype=mimetypes.guess_type(path)[0],
-        cache_timeout=-1
+        cache_timeout=0
     )
 
 
@@ -42,5 +43,5 @@ def cache(route: str):
     return flask.send_file(
         path,
         mimetype=mimetypes.guess_type(path)[0],
-        cache_timeout=-1
+        cache_timeout=0
     )

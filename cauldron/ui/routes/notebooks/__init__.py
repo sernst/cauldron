@@ -1,9 +1,10 @@
 import mimetypes
 import os
 
-import cauldron
 import flask
 import requests
+
+import cauldron
 from cauldron import environ
 from cauldron.ui import configs as ui_configs
 
@@ -56,6 +57,18 @@ def notebook(route: str):
         )
     )
 
+    timeouts = {
+        'woff': 300,
+        'woff2': 300,
+        'eot': 300,
+        'otf': 300,
+        'ttf': 300,
+        'png': 10,
+        'jpg': 10,
+        'html': 10,
+        'js': 10,
+    }
+
     if load_from_resources:
         # If a local version of the asset exists, send that from the
         # resources directory instead of the results directory.
@@ -64,7 +77,10 @@ def notebook(route: str):
             return flask.send_file(
                 local_asset_path,
                 mimetype=mimetypes.guess_type(local_asset_path)[0],
-                cache_timeout=-1
+                cache_timeout=timeouts.get(
+                    local_asset_path.rsplit('.', 1)[-1],
+                    0
+                ),
             )
 
     if is_remote:
@@ -75,12 +91,12 @@ def notebook(route: str):
     if not project or not results_path:
         return '', 204
 
-    path = os.path.join(results_path, route)
+    path = os.path.join(results_path, route)  # type: str
     if not os.path.exists(path):
         return '', 204
 
     return flask.send_file(
         path,
         mimetype=mimetypes.guess_type(path)[0],
-        cache_timeout=-1
+        cache_timeout=timeouts.get(path.rsplit('.', 1)[-1], 0),
     )

@@ -1,8 +1,9 @@
 import mimetypes
 import os
 
-import cauldron
 import flask
+
+import cauldron
 from cauldron.ui import configs as ui_configs
 
 blueprint = flask.Blueprint(
@@ -31,8 +32,20 @@ def view(route: str):
     if not os.path.exists(path):
         return '', 204
 
+    timeouts = {
+        'woff': 84600,
+        'woff2': 84600,
+        'eot': 84600,
+        'otf': 84600,
+        'ttf': 84600,
+        'png': 84600,
+        'jpg': 84600,
+        'html': 10,
+        'js': 10,
+    }
+
     return flask.send_file(
         path,
         mimetype=mimetypes.guess_type(path)[0],
-        cache_timeout=-1
+        cache_timeout=timeouts.get(path.rsplit('.', 1)[-1], 0)
     )

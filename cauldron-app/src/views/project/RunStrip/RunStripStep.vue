@@ -7,7 +7,8 @@
       .RunStripStep__box(
         @click.left.exact="focusOnStep"
         @click.left.shift.exact="queueStepToRun"
-        @dblclick="queueStepToRun"
+        @click.left.ctrl.exact="focusAndQueueStep"
+        @click.left.meta.exact="focusAndQueueStep"
       )
         i.material-icons.md-14.RunStripStep__icon(
           :class="{ 'RunStripStep__icon--swirl': isRunning }"
@@ -109,6 +110,11 @@ function focusOnStep() {
     .then(() => {
       this.warmingSelected = false;
     });
+}
+
+function focusAndQueueStep() {
+  return this.focusOnStep()
+    .then(() => this.queueStepToRun());
 }
 
 function abortStep() {
@@ -251,6 +257,7 @@ export default {
     queueStepToRun,
     runStepsFromHere,
     runStepsFromStart,
+    focusAndQueueStep,
   },
 };
 </script>

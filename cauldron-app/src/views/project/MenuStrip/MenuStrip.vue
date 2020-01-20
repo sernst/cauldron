@@ -4,6 +4,7 @@
     )
       menu-strip-item(icon="folder_open" title="Project" @action="onAction")
       menu-strip-item(icon="dns" title="Steps" @action="onAction")
+      menu-strip-item(icon="settings_applications" title="Settings" @action="onAction")
 </template>
 
 <script>
@@ -38,6 +39,8 @@ export default {
 
 <style scoped lang="scss">
   .MenuStrip {
+    display: flex;
+    flex-direction: column;
     font-family: "Source Sans Pro", sans-serif;
     background-color: #EEE;
     width: 2em;
@@ -47,6 +50,10 @@ export default {
     &--locked {
       pointer-events: none;
       opacity: 0.5;
+    }
+
+    &__spacer {
+      flex: 1;
     }
   }
 </style>

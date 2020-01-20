@@ -3,10 +3,10 @@ import time
 import typing
 
 from cauldron.render import texts as render_texts
+from cauldron.session import definitions
 from cauldron.session import projects
 from cauldron.session.buffering import RedirectBuffer
 from cauldron.session.caching import SharedCache
-from cauldron.session import definitions
 
 
 class Report(object):
@@ -30,8 +30,8 @@ class Report(object):
         self.subtitle = self.definition.get('subtitle')
         self.summary = self.definition.get('summary')
         self.library_includes = []
-        self.stdout_interceptor = None  # type: RedirectBuffer
-        self.stderr_interceptor = None  # type: RedirectBuffer
+        self.stdout_interceptor = None  # type: typing.Optional[RedirectBuffer]
+        self.stderr_interceptor = None  # type: typing.Optional[RedirectBuffer]
         self._last_update_time = 0
 
     @property

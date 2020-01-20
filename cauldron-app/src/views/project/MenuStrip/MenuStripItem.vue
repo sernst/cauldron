@@ -22,11 +22,17 @@
             @hide="onHideOverlay"
             @action="onAction"
           )
+          settings-menu-overlay(
+            v-if="shouldShowOverlay('Settings')"
+            @hide="onHideOverlay"
+            @action="onAction"
+          )
 </template>
 
 <script>
 import ProjectMenuOverlay from './ProjectMenuOverlay.vue';
 import StepMenuOverlay from './StepMenuOverlay.vue';
+import SettingsMenuOverlay from './SettingsMenuOverlay.vue';
 
 function data() {
   return {
@@ -40,7 +46,6 @@ function shouldShowOverlay(identifier) {
 }
 
 function onHideOverlay() {
-  console.log('onHideOverlay');
   this.show = false;
 }
 
@@ -76,7 +81,7 @@ function onAction(event) {
 
 export default {
   name: 'MenuStripItem',
-  components: { StepMenuOverlay, ProjectMenuOverlay },
+  components: { SettingsMenuOverlay, StepMenuOverlay, ProjectMenuOverlay },
   props: {
     icon: { type: String, default: 'home' },
     title: { type: String, default: 'Menu' },
@@ -139,7 +144,7 @@ export default {
       left: 2em;
       z-index: $menu-z-index;
       min-width: 200px;
-      background-color: #EEE;
+      background-color: #FAFAFA;
       border: 1px solid #DDD;
     }
   }

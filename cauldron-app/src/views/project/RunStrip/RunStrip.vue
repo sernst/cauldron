@@ -6,7 +6,6 @@
           :class="getScrollerClasses('up')"
         )
           i.RunStrip__scrollerIcon.material-icons.md-24 arrow_drop_up
-
       run-strip-step(
         v-for="(step, index) in steps"
         v-if="index >= visibleIndex"
@@ -16,8 +15,8 @@
         @aborted="onAborted"
         @settings="onEditSettings"
       )
-
       .RunStrip__bottomBox
+        expander-button(@toggle="toggleExpanderOvleray" :state="showExpanderOverlay")
         follow-toggle
         .RunStrip__scroller(
           @click="scroll('down')"
@@ -29,6 +28,7 @@
 <script>
 import RunStripStep from './RunStripStep.vue';
 import FollowToggle from './FollowToggle.vue';
+import ExpanderButton from './ExpanderButton.vue';
 
 function scroll(direction) {
   const stepCount = (this.steps || []).length;
@@ -67,15 +67,20 @@ function onEditSettings(event) {
   this.$emit('settings', event);
 }
 
+function toggleExpanderOvleray() {
+  this.showExpanderOverlay = !this.showExpanderOverlay
+}
+
 function data() {
   return {
     visibleIndex: 0,
+    showExpanderOverlay: false,
   };
 }
 
 export default {
   name: 'RunStrip',
-  components: { FollowToggle, RunStripStep },
+  components: { ExpanderButton, FollowToggle, RunStripStep },
   data,
   computed: { steps },
   methods: {
@@ -84,6 +89,7 @@ export default {
     onEditSettings,
     scroll,
     getScrollerClasses,
+    toggleExpanderOvleray,
   },
 };
 </script>

@@ -13,6 +13,7 @@ from cauldron.ui.parsing import create_parser  # noqa
 from cauldron.ui.routes import apps as apps_routes
 from cauldron.ui.routes import notebooks as notebooks_routes
 from cauldron.ui.routes import viewers as viewers_routes
+from cauldron.ui.routes.apis import settings as settings_routes
 from cauldron.ui.routes.apis import executions as executions_routes
 from cauldron.ui.routes.apis import statuses as statuses_routes
 
@@ -64,6 +65,7 @@ def create_application(
     app.register_blueprint(executions_routes.blueprint)
     app.register_blueprint(notebooks_routes.blueprint)
     app.register_blueprint(viewers_routes.blueprint)
+    app.register_blueprint(settings_routes.blueprint)
 
     # Either used the specified port for the UI if one was given or
     # find the first available port in the given range and use that
