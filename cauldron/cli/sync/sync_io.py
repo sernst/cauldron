@@ -2,6 +2,7 @@ import binascii
 import math
 import os
 import zlib
+import typing
 
 from cauldron import writer
 
@@ -68,7 +69,7 @@ def get_file_chunk_count(
 def read_file_chunks(
         file_path: str,
         chunk_size: int = DEFAULT_CHUNK_SIZE
-) -> bytes:
+) -> typing.Tuple[str, int]:
     """
     Reads the specified file in chunks and returns a generator where
     each returned chunk is a compressed base64 encoded string for sync
@@ -89,7 +90,7 @@ def read_file_chunks(
         for chunk_index in range(chunk_count):
             source = fp.read(chunk_size)
             chunk = pack_chunk(source)
-            yield chunk
+            yield chunk, len(source)
 
 
 def write_file_chunk(

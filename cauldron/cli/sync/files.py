@@ -82,7 +82,7 @@ def send(
             return 0, ''
 
         progress_value = int(100 * complete_count / chunk_count)
-        display = '({}%)'.format('{}'.format(progress_value).zfill(3))
+        display = '({}%)'.format('{}'.format(progress_value).ljust(3))
         return progress_value, display
 
     progress_display = get_progress(0)[-1]
@@ -90,15 +90,13 @@ def send(
         kind='SYNC',
         code='STARTED',
         message='{} "{}"'.format(progress_display, relative_path),
-        data=dict(
-            progress=0,
-            file_path=file_path,
-            relative_path=relative_path
-        )
+        progress=0,
+        file_path=file_path,
+        relative_path=relative_path,
     ))
 
     offset = 0
-    for index, chunk in enumerate(chunks):
+    for index, (chunk, length) in enumerate(chunks):
         response = send_chunk(
             chunk=chunk,
             index=index,
@@ -107,39 +105,29 @@ def send(
             file_kind=file_kind,
             remote_connection=remote_connection,
             sync_time=sync_time,
-            location=location
+            location=location,
         )
-        offset += len(chunk)
+        offset += length
 
         if response.failed:
             return response
 
         progress, progress_display = get_progress(index + 1)
-        if chunk_count > 1 and (index + 1) < chunk_count:
+        if chunk_count > 1:
             callback(response.notify(
                 kind='SYNC',
-                code='PROGRESS',
-                message='{} "{}"'.format(progress_display, relative_path),
-                data=dict(
-                    progress=0.01 * progress,
-                    chunk_count=chunk_count,
-                    file_path=file_path,
-                    relative_path=relative_path
-                )
+                code='PROGRESS' if (index + 1) < chunk_count else 'DONE',
+                message='{} -> {} {} "{}"'.format(
+                    '+{:,.0f}B'.format(length),
+                    '{:,.0f}B'.format(offset),
+                    progress_display,
+                    relative_path
+                ),
+                progress=0.01 * progress,
+                chunk_count=chunk_count,
+                file_path=file_path,
+                relative_path=relative_path
             ))
-
-    progress, progress_display = get_progress(chunk_count)
-    callback(response.notify(
-        kind='SYNC',
-        code='DONE',
-        message='{} "{}"'.format(progress_display, relative_path),
-        data=dict(
-            chunk_count=chunk_count,
-            progress=progress,
-            file_path=file_path,
-            relative_path=relative_path
-        )
-    ))
 
     return response
 

@@ -19,7 +19,7 @@ class TestSyncIo(scaffolds.ResultsTest):
 
         path = os.path.realpath(__file__)
         out = self.get_temp_path('test_reading_chunks', 'test.py')
-        for chunk in sync.io.read_file_chunks(path, 100):
+        for chunk, length in sync.io.read_file_chunks(path, 100):
             sync.io.write_file_chunk(out, chunk)
 
         with open(path) as f:
@@ -33,5 +33,5 @@ class TestSyncIo(scaffolds.ResultsTest):
         """Should abort reading chunks if no such file exists."""
 
         fake_path = '{}.fake-file'.format(__file__)
-        chunks = [c for c in sync.io.read_file_chunks(fake_path)]
+        chunks = [c for c, length in sync.io.read_file_chunks(fake_path)]
         self.assertEqual(0, len(chunks))
