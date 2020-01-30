@@ -15,22 +15,22 @@ BUILDS = [
         'build_args': {'PARENT': 'python:3.6', 'TYPE': 'ui'},
     },
     {
-        'ids': [
-            'standard', 'kernel-standard',
-            'standard37', 'kernel-standard37'
-        ],
+        'ids': ['standard37', 'kernel-standard37'],
         'build_args': {'PARENT': 'python:3.7', 'TYPE': 'kernel'},
     },
     {
-        'ids': ['ui-standard', 'ui-standard37'],
+        'ids': ['ui-standard37'],
         'build_args': {'PARENT': 'python:3.7', 'TYPE': 'ui'},
     },
     {
-        'ids': ['standard38', 'kernel-standard38'],
+        'ids': [
+            'standard', 'kernel-standard',
+            'standard38', 'kernel-standard38'
+        ],
         'build_args': {'PARENT': 'python:3.8', 'TYPE': 'kernel'},
     },
     {
-        'ids': ['ui-standard38'],
+        'ids': ['ui-standard', 'ui-standard38'],
         'build_args': {'PARENT': 'python:3.8', 'TYPE': 'ui'},
     },
     {

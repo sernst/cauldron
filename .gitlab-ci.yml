@@ -2,6 +2,18 @@ stages:
   - check
   - broadcast
 
+pytest-py353:
+  image: python:3.5.3
+  stage: check
+  script:
+    - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+    - pip install -r requirements.txt
+    - >
+      py.test
+      --cov-report term
+      --cov=cauldron
+      .
+
 pytest-py35:
   image: python:3.5
   stage: check
