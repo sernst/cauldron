@@ -7,7 +7,7 @@ library.
 
 ## 1. Release the package
 
-Mac OS/Linux:
+### Mac OS/Linux
 
 ```bash
 $ rm -rf ./dist
@@ -17,7 +17,8 @@ $ docker run --rm -it -v $(pwd):/cauldron continuumio/anaconda3 /bin/bash
 $ python3 conda-recipe/conda-builder.py
 ```
 
-WINDOWS:
+### WINDOWS
+
 ```powershell
 CMD> rmdir dist /s /q
 PS> rm dist -r -fo
@@ -31,7 +32,7 @@ PS> rm dist -r -fo
 ## 2. Push new container images
 
 ```bash
-$ python docker-builder --publish
+$ python docker-builder.py --publish
 ```
 
 ## 3. Update release information

@@ -7,10 +7,11 @@
 import notebook from '../../notebook';
 import emitter from '../../emitter';
 import http from '../../http';
+import utils from '../../utils';
 
 function showIframe() {
   const { project, view } = this.$store.getters;
-  return (this.viewer ? view : project) !== null;
+  return this.isMounted && (this.viewer ? view : project) !== null;
 }
 
 /**
@@ -37,6 +38,7 @@ function watchSelectedStep(newStepName, oldStepName) {
 function data() {
   return {
     isLoading: true,
+    isMounted: false,
   };
 }
 
@@ -87,7 +89,11 @@ function mounted() {
 
   // Don't return this promise because we don't want the resolution process to be
   // blocking.
-  this.onLoaded()
+  utils.thenWait(1000)
+    .then(() => {
+      this.isMounted = true;
+    })
+    .then(() => this.onLoaded())
     .then(() => {
       emitter.$on('refresh-notebook', this.refresh);
     })
