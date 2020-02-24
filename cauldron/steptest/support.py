@@ -87,18 +87,25 @@ def find_matching_step(
         A fully or partial matching name of a step to find in the
         specified project.
     """
-    methods = (
-        lambda n: n == step_name,
-        lambda n: n.startswith(step_name),
-        lambda n: step_name in n
-    )
-    matcher = (
-        step
-        for method in methods
-        for step in project.steps
-        if method(step.name)
-    )
-    return next(matcher, None)
+    comparison = (step_name or '').lower()
+    matches = []
+    for step in project.steps:
+        name = step.name.lower()
+        identical = name == comparison
+        starts = name.startswith(comparison)
+        if identical or starts:
+            matches.append((step, 0))
+            # If there is an identical or starting match, that will be
+            # the best fit and further steps should be ignored.
+            break
+
+        contains = name.find(comparison)
+        if contains != -1:
+            matches.append((step, contains))
+
+    matches.sort(key=lambda m: m[1])
+    matches.append((None, 0))
+    return matches[0][0]
 
 
 def run_step(

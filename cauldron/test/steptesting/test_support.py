@@ -35,6 +35,8 @@ MOCK_STEP_NAMES = [
     'S02-Bar.py',
     'S03-FooBar.py',
     'S04-Spam.py',
+    'S05-Bar.py',
+    'S06-Pam.py',
 ]
 
 FIND_SCENARIOS = (
@@ -43,7 +45,9 @@ FIND_SCENARIOS = (
     ('S04-Spam', MOCK_STEP_NAMES[3]),
     ('Spam', MOCK_STEP_NAMES[3]),
     ('Foo', MOCK_STEP_NAMES[0]),
-    ('S05', None),
+    ('S99', None),
+    ('Bar', MOCK_STEP_NAMES[1]),
+    ('Pam', MOCK_STEP_NAMES[5]),
 )
 
 
