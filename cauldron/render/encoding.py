@@ -2,6 +2,7 @@ import datetime
 import json
 import numpy as np
 import pandas as pd
+import decimal
 import typing
 from collections import namedtuple
 
@@ -14,6 +15,8 @@ NOT_OVERRIDEN = namedtuple('NOT_OVERRIDEN', [])
 def default_override(value: typing.Any):
     """..."""
 
+    if isinstance(value, decimal.Decimal):
+        return float(value)
     if isinstance(value, datetime.date):
         return value.isoformat()
     elif isinstance(value, datetime.datetime):

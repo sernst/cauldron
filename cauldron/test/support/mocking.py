@@ -65,4 +65,4 @@ class ImportPatcher:
         return self.mock_importer
 
     def __exit__(self, *args, **kwargs):
-        return self._patch.__exit__()
+        return self._patch.__exit__(*args)

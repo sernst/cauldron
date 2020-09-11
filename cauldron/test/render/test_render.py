@@ -2,6 +2,7 @@ import builtins
 import os
 from unittest.mock import patch
 from datetime import date
+import decimal
 
 import pandas as pd
 from cauldron import render
@@ -13,12 +14,13 @@ class TestRender(scaffolds.ResultsTest):
 
     def test_table(self):
         """Should render a table"""
-
+        dt = date(2016, 9, 9)
+        d = decimal.Decimal('3.14')
         df = pd.DataFrame([
-            {'a': 1, 'b': 'hello', 'c': True, 'd': date(2016, 9, 9)},
-            {'a': 1, 'b': 'hello', 'c': True, 'd': date(2016, 9, 9)},
-            {'a': 1, 'b': 'hello', 'c': True, 'd': date(2016, 9, 9)},
-            {'a': 1, 'b': 'hello', 'c': True, 'd': date(2016, 9, 9)}
+            {'a': 1, 'b': 'hello', 'c': True, 'd': dt, 'e': d},
+            {'a': 1, 'b': 'hello', 'c': True, 'd': dt, 'e': d},
+            {'a': 1, 'b': 'hello', 'c': True, 'd': dt, 'e': d},
+            {'a': 1, 'b': 'hello', 'c': True, 'd': dt, 'e': d}
         ])
 
         result = render.table(df, 0.5, include_index=True)
