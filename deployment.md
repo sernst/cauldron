@@ -14,6 +14,7 @@ $ rm -rf ./dist
 $ python3 setup.py sdist bdist_wheel
 $ twine upload dist/cauldron*
 $ docker run --rm -it -v $(pwd):/cauldron continuumio/anaconda3 /bin/bash
+$ cd /cauldron
 $ python3 conda-recipe/conda-builder.py
 ```
 
@@ -26,6 +27,7 @@ PS> rm dist -r -fo
 > python setup.py sdist bdist_wheel
 > twine upload dist/cauldron*
 > docker run --rm -it -v ${pwd}:/cauldron continuumio/anaconda3 /bin/bash
+> cd /cauldron
 > python conda-recipe/conda-builder.py
 ```
 

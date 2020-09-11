@@ -13,7 +13,7 @@ requirements:
   build:
     - python
     - pandas
-    - numpy
+    - numpy>=1.16.0
     - jinja2
     - markdown
     - pygments
