@@ -1,6 +1,7 @@
 import logging
 
 import flask
+import waitress
 
 from cauldron import environ
 from cauldron import templating
@@ -113,12 +114,19 @@ def start(
     )
 
     app = ui_app_data['application']
-    app.run(
-        port=ui_app_data['port'],
-        debug=ui_app_data['debug'],
-        host=ui_app_data['host'],
-        threaded=True
-    )
+    if kwargs.get('basic'):
+        app.run(
+            port=ui_app_data['port'],
+            debug=ui_app_data['debug'],
+            host=ui_app_data['host'],
+            threaded=True
+        )
+    else:
+        waitress.serve(
+            app,
+            host=ui_app_data['host'] or 'localhost',
+            port=ui_app_data['port'],
+        )
 
     environ.modes.remove(environ.modes.UI)
     if not ui_app_data['was_interactive']:

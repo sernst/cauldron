@@ -77,19 +77,6 @@ class TestServer(FlaskResultsTest):
         aborted = self.get('/abort')
         self.assert_no_errors(aborted.response)
 
-    def test_start_server(self):
-        """Should start server with specified settings."""
-
-        kwargs = dict(
-            port=9999,
-            debug=True,
-            host='TEST'
-        )
-
-        with mock.patch('cauldron.cli.server.run.APPLICATION.run') as func:
-            server_run.execute(**kwargs)
-            func.assert_called_once_with(**kwargs)
-
     def test_start_server_version(self):
         """Should return server version without starting the server."""
 
@@ -154,3 +141,24 @@ class TestServer(FlaskResultsTest):
 
         aborted = self.get('/abort')
         self.assert_no_errors(aborted.response)
+
+    @mock.patch('cauldron.cli.server.run.APPLICATION.run')
+    def test_start_server_basic(self, application_run: mock.MagicMock):
+        """Should start server with specified settings."""
+        kwargs = dict(
+            port=9999,
+            debug=True,
+            host='TEST',
+        )
+        server_run.execute(basic=True, **kwargs)
+        application_run.assert_called_once_with(**kwargs)
+
+    @mock.patch('cauldron.cli.server.run.waitress.serve')
+    def test_start_server(self, waitress_serve: mock.MagicMock):
+        """Should start server with specified settings."""
+        kwargs = dict(
+            port=9999,
+            host='TEST',
+        )
+        server_run.execute(**kwargs)
+        assert waitress_serve.call_args[1] == kwargs

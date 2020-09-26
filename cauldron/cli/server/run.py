@@ -6,6 +6,7 @@ import typing
 from argparse import ArgumentParser
 
 from flask import Flask
+import waitress
 
 import cauldron as cd
 from cauldron import environ
@@ -124,6 +125,17 @@ def create_parser(arg_parser: ArgumentParser = None) -> ArgumentParser:
         default=None
     )
 
+    parser.add_argument(
+        '--basic',
+        action='store_true',
+        help="""
+            When specified a basic Flask server will be used to
+            serve the kernel instead of a waitress WSGI server.
+            Use only when necessary as the Flask server isn't
+            as robust.
+            """
+    )
+
     return parser
 
 
@@ -182,5 +194,9 @@ def execute(
         **kwargs
     )
     app = populated_server_data['application']
-    app.run(port=port, debug=debug,host=host)
+    if kwargs.get('basic'):
+        app.run(port=port, debug=debug, host=host)
+    else:
+        waitress.serve(app, port=port, host=host or 'localhost')
+
     environ.modes.remove(environ.modes.INTERACTIVE)

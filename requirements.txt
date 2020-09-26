@@ -13,3 +13,4 @@ requests
 pytest
 pytest-runner
 pytest-cov
+waitress

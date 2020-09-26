@@ -80,7 +80,8 @@ setup(
         'pygments',
         'beautifulsoup4',
         'flask',
-        'requests'
+        'requests',
+        'waitress',
     ],
     extras_require={
         'plotly': ['plotly'],
