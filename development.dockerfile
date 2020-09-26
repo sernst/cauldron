@@ -1,4 +1,6 @@
-FROM python:3.8
+ARG PYTHON
+
+FROM python:$PYTHON
 
 COPY requirements.txt /build-data/requirements.txt
 

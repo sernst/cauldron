@@ -10,6 +10,7 @@ pytest-py353:
     - pip install -r requirements.txt
     - >
       py.test
+      --verbose
       --cov-report term
       --cov=cauldron
       .
@@ -22,6 +23,7 @@ pytest-py35:
     - pip install -r requirements.txt
     - >
       py.test
+      --verbose
       --cov-report term
       --cov=cauldron
       .
@@ -34,6 +36,7 @@ pytest-py36:
     - pip install -r requirements.txt
     - >
       py.test
+      --verbose
       --cov-report term
       --cov=cauldron
       .
@@ -41,14 +44,28 @@ pytest-py36:
 pytest-py37:
   image: python:3.7
   stage: check
-  coverage: '/^TOTAL.*\s+\d+\s+\d+\s+(\d+)%/'
   script:
     - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
     - pip install -r requirements.txt
     - pip install codecov coveralls codacy-coverage
     - >
       py.test
+      --verbose
       --cov-report xml:"$(pwd)/coverage.xml"
+      --cov-report term
+      --cov=cauldron
+      .
+
+pytest-py38:
+  image: python:3.8
+  stage: check
+  coverage: '/^TOTAL.*\s+\d+\s+\d+\s+(\d+)%/'
+  script:
+    - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+    - pip install -r requirements.txt
+    - >
+      py.test
+      --verbose
       --cov-report term
       --cov=cauldron
       .
@@ -58,20 +75,25 @@ pytest-py37:
       - coverage.xml
     expire_in: 1 day
 
-pytest-py38:
-  image: python:3.8
+pytest-py39:
+  image: python:3.9.0rc2
   stage: check
+  # It takes too long to build everything from source at this point
+  # so this is disabled until wheels start appearing.
+  when: manual
+  allow_failure: true
   script:
     - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
     - pip install -r requirements.txt
     - >
       py.test
+      --verbose
       --cov-report term
       --cov=cauldron
       .
 
 codecov:
-  image: python:3.7
+  image: python:3.8
   stage: broadcast
   script:
     - pip install codecov
@@ -79,13 +101,8 @@ codecov:
     - codecov
 
 coveralls:
-  image: python:3.7
+  image: python:3.8
   stage: broadcast
-  # Coveralls does not currently support coverage.py 5.0+ and
-  # so until that time, this should be allowed to fail so that
-  # it does not fail the pipeline. See issue for details:
-  # https://github.com/coveralls-clients/coveralls-python/issues/203
-  allow_failure: true
   script:
     - pip install coveralls
     - ls -la

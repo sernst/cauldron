@@ -56,4 +56,15 @@ def create_parser(
             dest='connection_url'
         )
 
+        parser.add_argument(
+            '--basic',
+            action='store_true',
+            help="""
+                When specified a basic Flask server will be used to
+                serve the kernel instead of a waitress WSGI server.
+                Use only when necessary as the Flask server isn't
+                as robust.
+                """
+        )
+
     return parser
