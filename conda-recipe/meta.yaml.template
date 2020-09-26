@@ -22,6 +22,7 @@ requirements:
     - requests
     - pytest
     - pytest-runner
+    - waitress
 
   run:
     - python
