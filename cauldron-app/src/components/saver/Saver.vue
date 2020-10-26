@@ -63,7 +63,7 @@ function onDone() {
 function onSave(force) {
   this.confirmingOverwrite = false;
   const filename = this.outputFilename;
-  const exists = this.location.current_files.filter(f => f.name === filename).length > 0;
+  const exists = this.location.current_files.filter((f) => f.name === filename).length > 0;
 
   console.log(exists, filename, this.location.current_files);
 

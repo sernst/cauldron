@@ -147,14 +147,14 @@ function queueStepToRun() {
 function runStepsFromStart() {
   this.show = false;
   const steps = (this.$store.getters.project || {}).steps || [];
-  stepper.addToQueue(steps.slice(0, this.index + 1).map(s => s.name));
+  stepper.addToQueue(steps.slice(0, this.index + 1).map((s) => s.name));
   http.markStatusDirty();
 }
 
 function runStepsFromHere() {
   this.show = false;
   const steps = (this.$store.getters.project || {}).steps || [];
-  stepper.addToQueue(steps.slice(this.index).map(s => s.name));
+  stepper.addToQueue(steps.slice(this.index).map((s) => s.name));
   http.markStatusDirty();
 }
 
@@ -170,7 +170,7 @@ function state() {
     { id: 'clean', value: step.status.run },
     { id: 'untouched', value: true },
   ];
-  return states.filter(s => s.value)[0];
+  return states.filter((s) => s.value)[0];
 }
 
 function isState(...args) {

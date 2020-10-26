@@ -65,18 +65,15 @@ class AsyncCommandThread(threading.Thread):
     @property
     def is_finished(self) -> bool:
         """..."""
-
         has_response = len(self.responses) > 0
         has_finished_response = has_response and (
-            self.responses[-1].failed or
-            self.responses[-1].data['run_status'] != 'running'
+            self.responses[-1].response.failed or
+            self.responses[-1].response.data['run_status'] != 'running'
         )
-
         return has_finished_response
 
     def check_status(self) -> Response:
         """..."""
-
         run_uid = self.responses[-1].data.get('run_uid', '')
         endpoint = '/abort' if self.abort else '/run-status/{}'.format(run_uid)
 

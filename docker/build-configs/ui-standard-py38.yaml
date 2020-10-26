@@ -1,0 +1,6 @@
+ids:
+- ui-standard
+- ui-standard38
+build_args:
+  PARENT: python:3.8
+  TYPE: ui

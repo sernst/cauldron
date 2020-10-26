@@ -1,0 +1,6 @@
+ids:
+- standard37
+- kernel-standard37
+build_args:
+  PARENT: python:3.7
+  TYPE: kernel

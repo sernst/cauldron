@@ -14,3 +14,4 @@ pytest
 pytest-runner
 pytest-cov
 waitress
+pyyaml

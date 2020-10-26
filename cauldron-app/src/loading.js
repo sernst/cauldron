@@ -7,7 +7,7 @@ function show(id, message) {
 
 function hide(id) {
   const keeps = (store.getters.loadingMessages || [])
-    .filter(item => id !== null && id !== item.id);
+    .filter((item) => id !== null && id !== item.id);
   store.commit('loadingMessages', keeps);
 }
 

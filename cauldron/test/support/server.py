@@ -43,7 +43,6 @@ def deserialize_flask_response(
         flask_response: FlaskResponse
 ) -> 'environ.Response':
     """..."""
-
     try:
         data = json.loads(flask_response.data.decode('utf-8', 'ignore'))
         response = environ.Response.deserialize(data)

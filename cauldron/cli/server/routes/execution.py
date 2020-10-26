@@ -1,14 +1,15 @@
 import typing
 
-import cauldron as cd
 import flask
+from flask import request
+
+import cauldron as cd
 from cauldron.cli import commander
 from cauldron.cli.server import arguments
+from cauldron.cli.server import authorization
 from cauldron.cli.server import run as server_runner
 from cauldron.environ.response import Response
 from cauldron.runner import redirection
-from flask import request
-from cauldron.cli.server import authorization
 
 
 @server_runner.APPLICATION.route('/', methods=['GET', 'POST'])
@@ -25,33 +26,35 @@ def execute_deprecated_route():
     return execute(True)
 
 
+@server_runner.APPLICATION.route(
+    '/command-sync/<path:command>',
+    methods=['GET', 'POST'],
+)
 @server_runner.APPLICATION.route('/command-sync', methods=['GET', 'POST'])
 @authorization.gatekeeper
-def execute_sync():
+def execute_sync(command: str = None):
     """
     Execution method for synchronous commands. Command thread
     blocks until it is complete to prevent returning any
-    intermediately running states
-
-    :return:
+    intermediately running states.
     """
-
     return execute(False)
 
 
+@server_runner.APPLICATION.route(
+    '/command-async/<path:command>',
+    methods=['GET', 'POST'],
+)
 @server_runner.APPLICATION.route('/command-async', methods=['GET', 'POST'])
 @authorization.gatekeeper
-def execute_async():
+def execute_async(command: str = None):
     """
     Execution method for synchronous commands. Command threads
     are added to the background stack with a unique run uid
     so that they can be polled later for status changes. The
     async method returns a response containing that uid if the
     command execution doesn't end quickly.
-
-    :return:
     """
-
     return execute(True)
 
 

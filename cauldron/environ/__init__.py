@@ -1,5 +1,6 @@
 import time
 import typing
+import sys
 from collections import namedtuple
 from datetime import datetime
 from datetime import timedelta
@@ -73,6 +74,11 @@ package_settings = systems.get_package_data()
 
 version = package_settings.get('version', '0.0.0')
 notebook_version = package_settings.get('notebookVersion', 'v0')
+python_version = '{}.{}.{}'.format(
+    sys.version_info.major,
+    sys.version_info.minor,
+    sys.version_info.micro,
+)
 
 version_info = VersionInfo(*[int(x) for x in version.split('.')])
 

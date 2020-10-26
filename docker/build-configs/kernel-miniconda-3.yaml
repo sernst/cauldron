@@ -1,0 +1,6 @@
+ids:
+- miniconda
+- kernel-miniconda
+build_args:
+  PARENT: continuumio/miniconda3:latest
+  TYPE: kernel

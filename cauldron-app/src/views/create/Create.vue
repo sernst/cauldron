@@ -93,7 +93,7 @@ function onCreate() {
     this.addLibraryDirectory ? '--libs=libs' : null,
     this.addAssetsDirectory ? '--assets=assets' : null,
   ];
-  const command = elements.filter(e => e).join(' ');
+  const command = elements.filter((e) => e).join(' ');
 
   console.log('Creating project', command);
   this.loadingMessage = `Creating your "${this.name}" project`;

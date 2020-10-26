@@ -155,3 +155,5 @@ build
 cauldron-web
 cauldron_notebook.egg-info
 dist
+
+docker/build-configs

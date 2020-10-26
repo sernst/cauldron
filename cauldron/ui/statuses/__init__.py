@@ -40,6 +40,10 @@ def get_status(last_timestamp: float, force: bool = False) -> dict:
 
     response = environ.Response().update(
         version=environ.version,
+        python_version=environ.python_version,
+        notebook_version=environ.notebook_version,
+        ui_server_version=environ.version,
+        ui_python_version=environ.python_version,
         remote=environ.remote_connection.serialize(),
         project=project_data,
         step_changes=step_changes,

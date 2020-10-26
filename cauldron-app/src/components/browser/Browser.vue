@@ -75,7 +75,7 @@ function filesToShow() {
   }
 
   // For each file, check to see if it matches at least one of the specified extensions.
-  return files.filter(f => this.extensions.filter(e => f.name.endsWith(e)).length > 0);
+  return files.filter((f) => this.extensions.filter((e) => f.name.endsWith(e)).length > 0);
 }
 
 /**

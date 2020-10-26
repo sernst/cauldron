@@ -72,6 +72,35 @@ def add_ui_containerized_action(sub_parser: ArgumentParser) -> ArgumentParser:
             """
         )
     )
+    sub_parser.add_argument(
+        '--env',
+        dest='environment_variables',
+        action='append',
+        help="""
+            Specify one or more environment variables to be assigned to
+            the container at launch to be available within the notebook
+            environment. Specify them as values `NAME=VALUE`.
+            """,
+    )
+    sub_parser.add_argument(
+        '--volume',
+        dest='volumes',
+        action='append',
+        help="""
+            Optionally specify additional volume bind mounts to be included
+            in the execution process in addition to the default of notebooks
+            directory.
+            """,
+    )
+    sub_parser.add_argument(
+        '--tag',
+        dest='image_tag',
+        default='current-ui-standard',
+        help="""
+            Specifies the cauldron image tag that will be executed in
+            the container, defaulting to the `current-ui-standard` tag.
+            """,
+    )
     return sub_parser
 
 

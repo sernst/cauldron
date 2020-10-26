@@ -1,78 +1,31 @@
 import json
 import os
+import pathlib
 import textwrap
 from argparse import ArgumentParser
 
+import yaml
+
 HUB_PREFIX = 'swernst/cauldron'
-MY_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
+MY_DIRECTORY = pathlib.Path(__file__).parent.absolute()
+
 BUILDS = [
-    {
-        'ids': ['standard36', 'kernel-standard36'],
-        'build_args': {'PARENT': 'python:3.6', 'TYPE': 'kernel'},
-    },
-    {
-        'ids': ['ui-standard36'],
-        'build_args': {'PARENT': 'python:3.6', 'TYPE': 'ui'},
-    },
-    {
-        'ids': ['standard37', 'kernel-standard37'],
-        'build_args': {'PARENT': 'python:3.7', 'TYPE': 'kernel'},
-    },
-    {
-        'ids': ['ui-standard37'],
-        'build_args': {'PARENT': 'python:3.7', 'TYPE': 'ui'},
-    },
-    {
-        'ids': [
-            'standard', 'kernel-standard',
-            'standard38', 'kernel-standard38'
-        ],
-        'build_args': {'PARENT': 'python:3.8', 'TYPE': 'kernel'},
-    },
-    {
-        'ids': ['ui-standard', 'ui-standard38'],
-        'build_args': {'PARENT': 'python:3.8', 'TYPE': 'ui'},
-    },
-    {
-        'ids': ['miniconda', 'kernel-miniconda'],
-        'build_args': {
-            'PARENT': 'continuumio/miniconda3:latest',
-            'TYPE': 'kernel'
-        },
-    },
-    {
-        'ids': ['ui-miniconda'],
-        'build_args': {
-            'PARENT': 'continuumio/miniconda3:latest',
-            'TYPE': 'ui'
-        },
-    },
-    {
-        'ids': ['conda', 'kernel-conda'],
-        'build_args': {
-            'PARENT': 'continuumio/anaconda3:latest',
-            'TYPE': 'kernel'
-        },
-    },
-    {
-        'ids': ['ui-conda'],
-        'build_args': {
-            'PARENT': 'continuumio/anaconda3:latest',
-            'TYPE': 'ui'
-        },
-    },
+    yaml.safe_load(path.read_text())
+    for path in MY_DIRECTORY.joinpath('docker/build-configs').iterdir()
+    if str(path).endswith('.yaml')
 ]
 
-with open(os.path.join(MY_DIRECTORY, 'cauldron', 'settings.json')) as f:
-    settings = json.load(f)
-
+settings = json.loads(
+    MY_DIRECTORY
+    .joinpath('cauldron/settings.json')
+    .read_text()
+)
 VERSION = settings['version']
 
 
 def build(build_id: str, spec: dict, args: dict) -> dict:
     """Builds the container from the specified docker file path"""
-    path = os.path.join(
-        MY_DIRECTORY,
+    path = MY_DIRECTORY.joinpath(
         spec.get('dockerfile', 'docker-common.dockerfile')
     )
 
@@ -105,6 +58,7 @@ def build(build_id: str, spec: dict, args: dict) -> dict:
         print('[DRY-RUN]: Skipped building command')
         print(textwrap.indent(command.replace(' -', '\n   -'), '   '))
     else:
+        os.environ['DOCKER_BUILDKIT'] = '1'
         os.system(command)
 
     return dict(
@@ -118,9 +72,12 @@ def build(build_id: str, spec: dict, args: dict) -> dict:
 
 def publish(build_entry: dict, args: dict):
     """Publishes the specified build entry to docker hub"""
+    skip_publishing = not build_entry.get('publish', True)
     for tag in build_entry['tags']:
         if args['dry_run']:
             print('[DRY-RUN]: Skipped pushing {}'.format(tag))
+        elif skip_publishing:
+            print('[SKIPPED]: Publishing not allowed for {}'.format(tag))
         else:
             print('[PUSHING]:', tag)
             os.system('docker push {}'.format(tag))

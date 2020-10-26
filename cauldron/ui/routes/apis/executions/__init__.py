@@ -1,6 +1,6 @@
 import flask
-
 import requests
+
 from cauldron import environ
 from cauldron.ui import configs as ui_configs
 from cauldron.ui.routes.apis.executions import runner
@@ -13,13 +13,15 @@ blueprint = flask.Blueprint(
 
 
 @blueprint.route('/command/sync', methods=['POST'])
-def command_sync():
+@blueprint.route('/command/sync/<path:command>', methods=['POST'])
+def command_sync(command: str = None):
     """Executes a synchronous command."""
     return runner.execute(asynchronous=False).flask_serialize()
 
 
 @blueprint.route('/command/async', methods=['POST'])
-def command_async():
+@blueprint.route('/command/async/<path:command>', methods=['POST'])
+def command_async(command: str = None):
     """Executes an asynchronous command."""
     r = ui_configs.ACTIVE_EXECUTION_RESPONSE
 
