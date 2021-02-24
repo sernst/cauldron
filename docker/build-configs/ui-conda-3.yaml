@@ -1,0 +1,5 @@
+ids:
+- ui-conda
+build_args:
+  PARENT: continuumio/anaconda3:latest
+  TYPE: ui

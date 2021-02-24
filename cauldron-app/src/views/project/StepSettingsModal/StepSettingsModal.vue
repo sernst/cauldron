@@ -67,7 +67,7 @@ function onDeleteConfirmed(event) {
     event.removeDeletedFile ? '' : ' --keep',
   ];
 
-  return http.execute(command.filter(line => line.length > 0).join(' '))
+  return http.execute(command.filter((line) => line.length > 0).join(' '))
     .then((response) => {
       if (!response.data.success) {
         return Promise.resolve();
@@ -100,7 +100,7 @@ function onApply() {
     { key: 'newTitle', after: this.title, before: this.initialValues.title },
     { key: 'newLocation', after: this.location, before: this.initialValues.location },
   ]
-    .filter(e => e.after !== e.before)
+    .filter((e) => e.after !== e.before)
     .reduce((combined, e) => Object.assign(combined, { [e.key]: e.after }), {});
 
   const hasModifications = Object.keys(changes).length > 0;
@@ -118,7 +118,7 @@ function onApply() {
     changes.newLocation ? `--position="${changes.newLocation}"` : '',
   ];
 
-  return http.execute(command.filter(line => line.length > 0).join(' '))
+  return http.execute(command.filter((line) => line.length > 0).join(' '))
     .then((response) => {
       if (!response.data.success) {
         return Promise.resolve();
@@ -182,8 +182,8 @@ function mounted() {
   this.location = initialValues.location;
 
   const locations = ((this.$store.getters.project || {}).steps || [])
-    .map(s => ({ label: s.name, id: s.name }))
-    .filter(s => s.label !== step.name);
+    .map((s) => ({ label: s.name, id: s.name }))
+    .filter((s) => s.label !== step.name);
   locations.unshift({ label: 'Beginning (First step)', id: '0' });
   this.locations = locations;
 }

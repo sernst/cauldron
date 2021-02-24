@@ -12,8 +12,8 @@ const IGNORED_ERROR_CODES = ['EXECUTION_ERROR'];
  */
 function addErrors(errors) {
   const existing = store.getters.errors.concat();
-  const existingCodes = existing.map(e => e.code).concat(IGNORED_ERROR_CODES);
-  const newErrors = (errors || []).filter(e => existingCodes.indexOf(e.code) === -1);
+  const existingCodes = existing.map((e) => e.code).concat(IGNORED_ERROR_CODES);
+  const newErrors = (errors || []).filter((e) => existingCodes.indexOf(e.code) === -1);
 
   if (newErrors) {
     store.commit('errors', existing.concat(newErrors));
@@ -31,8 +31,8 @@ function addError(error) {
  */
 function addWarnings(warnings) {
   const existingWarnings = store.getters.warnings.concat();
-  const existingCodes = existingWarnings.map(e => e.code);
-  const newWarnings = (warnings || []).filter(e => existingCodes.indexOf(e.code) === -1);
+  const existingCodes = existingWarnings.map((e) => e.code);
+  const newWarnings = (warnings || []).filter((e) => existingCodes.indexOf(e.code) === -1);
 
   if (newWarnings) {
     store.commit('warnings', existingWarnings.concat(newWarnings));

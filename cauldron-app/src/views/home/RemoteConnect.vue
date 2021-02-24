@@ -1,18 +1,25 @@
 <template lang="pug">
     .RemoteConnect.tooltip.is-tooltip-right(
-      data-tooltip="Manage remote connection"
+      :data-tooltip="tooltip"
       :class="{ 'RemoteConnect--connected': connected, 'RemoteConnect--disconnected': !connected }"
     )
       .material-icons {{ icon }}
 </template>
 
 <script>
+function tooltip() {
+  const type = this.connected ? 'remote' : 'local';
+  const url = this.status?.remote?.url || null;
+  const suffix = this.connected ? `at ${url}` : 'alongside the UI.';
+  return `Running a ${type} kernel connection ${suffix}`;
+}
+
 function icon() {
-  return this.status.connected ? 'link' : 'link_off';
+  return this.connected ? 'link' : 'link_off';
 }
 
 function connected() {
-  return this.status.connected || false;
+  return this.status?.remote?.active || false;
 }
 
 export default {
@@ -20,7 +27,7 @@ export default {
   props: {
     status: { type: Object, default: () => {} },
   },
-  computed: { connected, icon },
+  computed: { connected, icon, tooltip },
 };
 </script>
 
@@ -32,12 +39,9 @@ export default {
     cursor: pointer;
 
     &--connected {
-      background-color: blue;
-      border: 1px solid green;
-
-      &:hover {
-
-      }
+      color: #51b76a;
+      background-color: #ccffd9;
+      border: 1px solid #51b76a;
     }
 
     &--disconnected {

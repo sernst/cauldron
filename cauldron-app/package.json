@@ -1,6 +1,6 @@
 {
   "name": "cauldron-app",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
     "build": "vue-cli-service build --dest=../cauldron/resources/app",
@@ -9,32 +9,32 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "axios": "^0.19.0",
-    "bulma": "^0.7.5",
+    "axios": "^0.21.0",
+    "bulma": "^0.9.1",
     "bulma-extensions": "^6.2.7",
-    "core-js": "^2.6.5",
+    "core-js": "^3.6.5",
     "material-icons": "^0.3.1",
     "source-sans-pro": "^3.6.0",
-    "vue": "^2.6.10",
-    "vue-router": "^3.0.3",
-    "vue-tippy": "^4.0.3",
-    "vuex": "^3.0.1"
+    "vue": "^2.6.12",
+    "vue-router": "^3.4.7",
+    "vue-tippy": "^4.7.1",
+    "vuex": "^3.5.1"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "^3.12.0",
-    "@vue/cli-plugin-eslint": "^3.12.0",
-    "@vue/cli-plugin-unit-jest": "^3.12.0",
-    "@vue/cli-service": "^3.12.0",
-    "@vue/eslint-config-airbnb": "^4.0.0",
-    "@vue/test-utils": "1.0.0-beta.29",
+    "@vue/cli-plugin-babel": "^4.5.8",
+    "@vue/cli-plugin-eslint": "^4.5.8",
+    "@vue/cli-plugin-unit-jest": "^4.5.8",
+    "@vue/cli-service": "^4.5.8",
+    "@vue/eslint-config-airbnb": "^5.1.0",
+    "@vue/test-utils": "^1.1.0",
     "babel-core": "7.0.0-bridge.0",
-    "babel-eslint": "^10.0.1",
-    "babel-jest": "^23.6.0",
-    "eslint": "^5.16.0",
-    "eslint-plugin-vue": "^5.0.0",
-    "node-sass": "^4.12.0",
-    "sass-loader": "^8.0.0",
+    "babel-eslint": "^10.1.0",
+    "babel-jest": "^26.6.1",
+    "eslint": "^7.11.0",
+    "eslint-plugin-vue": "^7.1.0",
+    "node-sass": "^4.14.1",
+    "sass-loader": "^10.0.4",
     "vue-cli-plugin-pug": "^1.0.7",
-    "vue-template-compiler": "^2.6.10"
+    "vue-template-compiler": "^2.6.12"
   }
 }

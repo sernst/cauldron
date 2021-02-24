@@ -1,0 +1,6 @@
+ids:
+- conda
+- kernel-conda
+build_args:
+  PARENT: continuumio/anaconda3:latest
+  TYPE: kernel

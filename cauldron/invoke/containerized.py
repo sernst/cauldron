@@ -35,6 +35,12 @@ def run_ui(args: dict) -> int:
         '-v', '{}:/notebooks'.format(notebooks_directory),
     ]
 
+    for variable in (args.get('environment_variables') or []):
+        cmd += ['--env', variable]
+
+    for variable in (args.get('volumes') or []):
+        cmd += ['--volume', variable]
+
     print('\n\n--- LAUNCHING UI CONTAINER ---\n')
     print('[INFO]: Notebooks directory "{}"'.format(notebooks_directory))
     if remote:
@@ -55,7 +61,7 @@ def run_ui(args: dict) -> int:
         if args['ssh_key']:
             cmd.append('--ssh-key={}'.format(args['ssh_key']))
     else:
-        cmd.append('swernst/cauldron:current-ui-standard')
+        cmd.append('swernst/cauldron:{}'.format(args['image_tag']))
 
     display_command = textwrap.indent(
         ' '.join(cmd).replace(' -', '\n  -').replace('swer', '\n  swer'),

@@ -112,7 +112,7 @@ function updateStatusLoop() {
         return response;
       }
 
-      const codes = response.data.errors.map(e => e.code);
+      const codes = response.data.errors.map((e) => e.code);
       if (codes.indexOf('LOST_REMOTE_CONNECTION') !== -1) {
         return this.recordResponse(LOST, response);
       }

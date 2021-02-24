@@ -11,7 +11,14 @@ def test_merge_local_state_no_project():
 
     assert 'hash' in response, 'Expect hash to be set locally.'
 
-    expected_keys = {'view', 'remote', 'project', 'is_active_async'}
+    expected_keys = {
+        'view',
+        'remote',
+        'project',
+        'is_active_async',
+        'ui_server_version',
+        'ui_python_version',
+    }
     assert expected_keys == set(response['data'].keys()), """
         Expect the specified keys to be set.
         """

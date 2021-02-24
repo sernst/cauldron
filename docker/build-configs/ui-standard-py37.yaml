@@ -1,0 +1,5 @@
+ids:
+- ui-standard37
+build_args:
+  PARENT: python:3.7
+  TYPE: ui

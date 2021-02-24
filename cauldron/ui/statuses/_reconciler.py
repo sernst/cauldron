@@ -89,5 +89,11 @@ def merge_local_state(remote_status: dict, force: bool) -> dict:
     # We care about the local UI environment command executions.
     remote_status['data']['is_active_async'] = ui_configs.is_active_async()
 
+    # We want the local UI server version to be included.
+    remote_status['data']['ui_server_version'] = environ.version
+
+    # We want the local UI python version to be included.
+    remote_status['data']['ui_python_version'] = environ.python_version
+
     remote_status['hash'] = _utils.get_digest_hash(remote_status, force)
     return remote_status

@@ -74,7 +74,8 @@ function post(endpoint, data, timeout) {
 }
 
 function execute(command) {
-  return post('/command/sync', { command }, 30000)
+  const prefix = command.split(' ')[0];
+  return post(`/command/sync/${prefix}`, { prefix, command }, 30000)
     .then((response) => {
       addErrors(response);
       addWarnings(response);
@@ -83,7 +84,8 @@ function execute(command) {
 }
 
 function executeAsync(command) {
-  return post('/command/async', { command })
+  const prefix = command.split(' ')[0];
+  return post(`/command/async/${prefix}`, { prefix, command })
     .then((response) => {
       addErrors(response);
       addWarnings(response);
@@ -96,7 +98,7 @@ function handleStepRunningError(response) {
   const hasRunningStepError = (
     !response.data.success
     || (response.data.errors || []).length > 0
-    || stepChanges.filter(c => ((c || {}).step || {}).has_error).length > 0
+    || stepChanges.filter((c) => ((c || {}).step || {}).has_error).length > 0
   );
 
   if (hasRunningStepError) {
@@ -179,7 +181,7 @@ function updateStatus(debounce = 0, force = false) {
       const lastHash = (store.getters.status || {}).hash || '';
       const hash = payload.hash || '';
 
-      const runningSteps = steps.filter(s => s.status.running);
+      const runningSteps = steps.filter((s) => s.status.running);
       const running = !hasRunningStepError && runningSteps.length > 0;
       const syncing = ((remote || {}).sync || {}).active;
 
@@ -256,18 +258,14 @@ function updateStatus(debounce = 0, force = false) {
     });
 }
 
-function abortExecution() {
+async function abortExecution() {
   stepper.clearQueue();
-
-  return post('/command/abort')
-    .then((response) => {
-      addErrors(response);
-      addWarnings(response);
-
-      store.commit('running', false);
-      markStatusDirty();
-      return response;
-    });
+  const response = await post('/command/abort');
+  addErrors(response);
+  addWarnings(response);
+  store.commit('running', false);
+  markStatusDirty();
+  return response;
 }
 
 export default {

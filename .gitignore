@@ -178,3 +178,9 @@ release-settings.json
 
 .pytest_cache
 /cauldron-web/package-lock.json
+
+# Remove for experimental purposes
+docker-apm.dockerfile
+docker/build-configs/*-apm.yaml
+docker/apm
+docker/apm/apm.bat

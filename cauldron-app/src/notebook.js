@@ -142,7 +142,7 @@ function applyStepModifications(renames, changes, stepName) {
       const { previousStepChanges } = store.getters;
       const updatedChanges = newChanges
         .reduce((all, c) => Object.assign(all, { [c.name]: c }), {});
-      const combinedChanges = Object.assign({}, previousStepChanges, updatedChanges);
+      const combinedChanges = { ...previousStepChanges, ...updatedChanges };
       store.commit('previousStepChanges', combinedChanges);
 
       return utils.thenWait(300);
@@ -155,8 +155,8 @@ function applyStepModifications(renames, changes, stepName) {
 
       const steps = (store.getters.project || {}).steps || [];
       const targetSteps = steps
-        .filter(s => s.name === stepName)
-        .concat(changes.filter(c => c.step).reverse());
+        .filter((s) => s.name === stepName)
+        .concat(changes.filter((c) => c.step).reverse());
 
       if (targetSteps.length === 0) {
         return;

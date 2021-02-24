@@ -1,0 +1,5 @@
+ids:
+- ui-miniconda
+build_args:
+  PARENT: continuumio/miniconda3:latest
+  TYPE: ui

@@ -2,32 +2,6 @@ stages:
   - check
   - broadcast
 
-pytest-py353:
-  image: python:3.5.3
-  stage: check
-  script:
-    - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
-    - pip install -r requirements.txt
-    - >
-      py.test
-      --verbose
-      --cov-report term
-      --cov=cauldron
-      .
-
-pytest-py35:
-  image: python:3.5
-  stage: check
-  script:
-    - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
-    - pip install -r requirements.txt
-    - >
-      py.test
-      --verbose
-      --cov-report term
-      --cov=cauldron
-      .
-
 pytest-py36:
   image: python:3.6
   stage: check
@@ -76,12 +50,8 @@ pytest-py38:
     expire_in: 1 day
 
 pytest-py39:
-  image: python:3.9.0rc2
+  image: python:3.9
   stage: check
-  # It takes too long to build everything from source at this point
-  # so this is disabled until wheels start appearing.
-  when: manual
-  allow_failure: true
   script:
     - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
     - pip install -r requirements.txt
@@ -93,7 +63,7 @@ pytest-py39:
       .
 
 codecov:
-  image: python:3.8
+  image: python:3.9
   stage: broadcast
   script:
     - pip install codecov
@@ -101,7 +71,7 @@ codecov:
     - codecov
 
 coveralls:
-  image: python:3.8
+  image: python:3.9
   stage: broadcast
   script:
     - pip install coveralls

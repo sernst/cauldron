@@ -1,4 +1,7 @@
-
+/** Exposes webpack DefinePlugin variables injected during build. */
+function getBuildVar(key) {
+  return process.env[key];
+}
 
 function thenWait(elapsedMilliseconds, args) {
   return new Promise((resolve) => {
@@ -8,4 +11,4 @@ function thenWait(elapsedMilliseconds, args) {
   });
 }
 
-export default { thenWait };
+export default { thenWait, getBuildVar };

@@ -1,0 +1,6 @@
+ids:
+- standard38
+- kernel-standard38
+build_args:
+  PARENT: python:3.8
+  TYPE: kernel
