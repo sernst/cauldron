@@ -50,12 +50,8 @@ pytest-py38:
     expire_in: 1 day
 
 pytest-py39:
-  image: python:3.9.0rc2
+  image: python:3.9
   stage: check
-  # It takes too long to build everything from source at this point
-  # so this is disabled until wheels start appearing.
-  when: manual
-  allow_failure: true
   script:
     - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
     - pip install -r requirements.txt
@@ -67,7 +63,7 @@ pytest-py39:
       .
 
 codecov:
-  image: python:3.8
+  image: python:3.9
   stage: broadcast
   script:
     - pip install codecov
@@ -75,7 +71,7 @@ codecov:
     - codecov
 
 coveralls:
-  image: python:3.8
+  image: python:3.9
   stage: broadcast
   script:
     - pip install coveralls

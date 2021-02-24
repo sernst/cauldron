@@ -1,0 +1,6 @@
+ids:
+- ui-standard
+- ui-standard39
+build_args:
+  PARENT: python:3.9
+  TYPE: ui

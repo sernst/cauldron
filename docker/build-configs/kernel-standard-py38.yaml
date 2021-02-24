@@ -1,6 +1,4 @@
 ids:
-- standard
-- kernel-standard
 - standard38
 - kernel-standard38
 build_args:
