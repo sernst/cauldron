@@ -23,8 +23,7 @@ def add_library_path(path: str) -> bool:
         Whether or not the path was added. Only returns False if the path was
         not added because it doesn't exist
     """
-
-    if not os.path.exists(path):
+    if not path or not os.path.exists(path):
         return False
 
     if path not in sys.path:
@@ -85,10 +84,76 @@ def close():
     return True
 
 
-def reload_libraries(library_directories: list = None):
+def _reload_module(path: str, library_directory: str):
+    """
+    Reloads the module at the specified path within the package rooted at
+    the given library_directory.
+    """
+    path = os.path.dirname(path) if path.endswith('__init__.py') else path
+    start_index = len(library_directory) + 1
+    end_index = -3 if path.endswith('.py') else None
+    package_path = path[start_index:end_index]
+
+    module = sys.modules.get(package_path.replace(os.sep, '.'))
+    return importlib.reload(module) if module is not None else None
+
+
+def _reload_library(directory: str) -> list:
+    """
+    Carries out a reload action on the specified root library directory that is
+    assumed to contain a python local package with potential module changes.
+
+    :param directory:
+        Root directory of the library package to reload.
+    """
+    if not add_library_path(directory):
+        # If the library wasn't added because it doesn't exist, remove it
+        # in case the directory has recently been deleted and then return
+        # an empty result
+        remove_library_path(directory)
+        return []
+
+    glob_path = os.path.join(os.path.realpath(directory), '**', '*.py')
+
+    # Force file paths to be sorted by hierarchy from deepest to shallowest,
+    # which ensures that changes are reloaded by children before any dependencies
+    # are encountered in parents.
+    found_file_paths = sorted(
+        glob.glob(glob_path, recursive=True),
+        key=lambda p: "{}--{}".format(str(p.count(os.sep)).zfill(4), p),
+        reverse=True,
+    )
+
+    # Iterate over imports multiple times in case there's a failed import as the
+    # result of dependency changes between multiple files. However, after 20
+    # iterations give up and fail.
+    outputs = []
+    last_error = None
+    for i in range(20):
+        for path in [*found_file_paths]:
+            try:
+                outputs.append(_reload_module(path, directory))
+                # Remove the path if the reload operation succeeded.
+                found_file_paths.remove(path)
+            except Exception as error:
+                # Ignore failures and hope they can be resolved in another pass.
+                last_error = error
+
+        if not found_file_paths:
+            # If there's nothing left to reload, return the reloaded modules.
+            return outputs
+
+    # If 20 attempts to reload modules fail, it's time to error out.
+    raise RuntimeError(
+        "Failed to reload modified modules. This could be due to a circular import."
+    ) from last_error
+
+
+def reload_libraries(library_directories: list = None) -> list:
     """
     Reload the libraries stored in the project's local and shared library
-    directories
+    directories to ensure that any modifications since the previous load/reload
+    have been refreshed.
     """
     directories = library_directories or []
     project = cauldron.project.get_internal_project()
@@ -96,36 +161,13 @@ def reload_libraries(library_directories: list = None):
         directories += project.library_directories
 
     if not directories:
-        return
-
-    def reload_module(path: str, library_directory: str):
-        path = os.path.dirname(path) if path.endswith('__init__.py') else path
-        start_index = len(library_directory) + 1
-        end_index = -3 if path.endswith('.py') else None
-        package_path = path[start_index:end_index]
-
-        module = sys.modules.get(package_path.replace(os.sep, '.'))
-        return importlib.reload(module) if module is not None else None
-
-    def reload_library(directory: str) -> list:
-        if not add_library_path(directory):
-            # If the library wasn't added because it doesn't exist, remove it
-            # in case the directory has recently been deleted and then return
-            # an empty result
-            remove_library_path(directory)
-            return []
-
-        glob_path = os.path.join(directory, '**', '*.py')
-        return [
-            reload_module(path, directory)
-            for path in glob.glob(glob_path, recursive=True)
-        ]
+        return []
 
     return [
         reloaded_module
         for directory in directories
-        for reloaded_module in reload_library(directory)
-        if reload_module is not None
+        for reloaded_module in _reload_library(directory)
+        if reloaded_module is not None
     ]
 
 

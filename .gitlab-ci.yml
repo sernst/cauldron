@@ -1,79 +1,81 @@
 stages:
-  - check
-  - broadcast
+- check
+- broadcast
 
 pytest-py36:
   image: python:3.6
   stage: check
   script:
-    - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
-    - pip install -r requirements.txt
-    - >
-      py.test
-      --verbose
-      --cov-report term
-      --cov=cauldron
-      .
+  - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+  - pip install -r requirements.txt
+  - >
+    py.test
+    --verbose
+    --cov-report term
+    --cov=cauldron
+    .
 
 pytest-py37:
   image: python:3.7
   stage: check
   script:
-    - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
-    - pip install -r requirements.txt
-    - pip install codecov coveralls codacy-coverage
-    - >
-      py.test
-      --verbose
-      --cov-report xml:"$(pwd)/coverage.xml"
-      --cov-report term
-      --cov=cauldron
-      .
+  - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+  - pip install -r requirements.txt
+  - pip install codecov coveralls codacy-coverage
+  - >
+    py.test
+    --verbose
+    --cov-report xml:"$(pwd)/coverage.xml"
+    --cov-report term
+    --cov=cauldron
+    .
 
 pytest-py38:
   image: python:3.8
   stage: check
-  coverage: '/^TOTAL.*\s+\d+\s+\d+\s+(\d+)%/'
   script:
-    - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
-    - pip install -r requirements.txt
-    - >
-      py.test
-      --verbose
-      --cov-report term
-      --cov=cauldron
-      .
+  - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+  - pip install -r requirements.txt
+  - >
+    py.test
+    --verbose
+    --cov-report term
+    --cov=cauldron
+    .
   artifacts:
     paths:
-      - .coverage
-      - coverage.xml
+    - .coverage
+    - coverage.xml
     expire_in: 1 day
 
 pytest-py39:
   image: python:3.9
   stage: check
+  coverage: '/^TOTAL.*\s+\d+\s+\d+\s+(\d+)%/'
   script:
-    - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
-    - pip install -r requirements.txt
-    - >
-      py.test
-      --verbose
-      --cov-report term
-      --cov=cauldron
-      .
+  - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+  - pip install -r requirements.txt
+  - >
+    py.test
+    --verbose
+    --cov-report term
+    --cov=cauldron
+    .
 
 codecov:
   image: python:3.9
   stage: broadcast
+  allow_failure: true
   script:
-    - pip install codecov
-    - ls -la
-    - codecov
+  - pip install codecov
+  - ls -la
+  - codecov
 
 coveralls:
   image: python:3.9
   stage: broadcast
+  allow_failure: true
   script:
-    - pip install coveralls
-    - ls -la
-    - coveralls --verbose
+  - pip install coveralls
+  - ls -la
+  - coveralls --verbose
