@@ -15,6 +15,7 @@ $ python3 setup.py sdist bdist_wheel
 $ twine upload dist/cauldron*
 $ docker run --rm -it -v $(pwd):/cauldron continuumio/anaconda3 /bin/bash
 $ cd /cauldron
+$ conda config --set anaconda_upload yes
 $ python3 conda-recipe/conda-builder.py
 ```
 
@@ -28,6 +29,7 @@ PS> rm dist -r -fo
 > twine upload dist/cauldron*
 > docker run --rm -it -v ${pwd}:/cauldron continuumio/anaconda3 /bin/bash
 > cd /cauldron
+> conda config --set anaconda_upload yes
 > python conda-recipe/conda-builder.py
 ```
 

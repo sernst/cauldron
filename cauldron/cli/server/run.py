@@ -14,22 +14,6 @@ from cauldron import templating
 from cauldron.render.encoding import ComplexFlaskJsonEncoder
 from cauldron.session import writing
 
-# Optional includes for APM monitoring during development.
-if os.environ.get('ENABLE_APM') is not None:  # pragma: no-cover
-    try:
-        from scout_apm.flask import ScoutApm
-    except ImportError:
-        ScoutApm = None
-
-    try:
-        # Optional include for APM monitoring during development.
-        import newrelic.agent
-        newrelic.agent.initialize()
-    except ImportError:
-        pass
-else:
-    ScoutApm = None
-
 APPLICATION = Flask('Cauldron')
 APPLICATION.json_encoder = ComplexFlaskJsonEncoder
 SERVER_VERSION = [0, 0, 1, 1]
@@ -187,15 +171,6 @@ def create_application(
         templating.render_splash()
 
     environ.modes.add(environ.modes.INTERACTIVE)
-
-    if ScoutApm is not None and os.environ.get('SCOUT_KEY'):
-        ScoutApm(APPLICATION)
-        APPLICATION.config['SCOUT_MONITOR'] = True
-        APPLICATION.config['SCOUT_KEY'] = os.environ['SCOUT_KEY']
-        APPLICATION.config['SCOUT_NAME'] = os.environ.get(
-            'SCOUT_NAME',
-            'cauldron-kernel',
-        )
 
     return {'application': APPLICATION, **server_data}
 

@@ -1,5 +1,4 @@
 import logging
-import os
 
 import flask
 import waitress
@@ -17,22 +16,6 @@ from cauldron.ui.routes import notebooks as notebooks_routes
 from cauldron.ui.routes import viewers as viewers_routes
 from cauldron.ui.routes.apis import executions as executions_routes
 from cauldron.ui.routes.apis import statuses as statuses_routes
-
-# Optional includes for APM monitoring during development.
-if os.environ.get('ENABLE_APM') is not None:  # pragma: no-cover
-    try:
-        from scout_apm.flask import ScoutApm
-    except ImportError:
-        ScoutApm = None
-
-    try:
-        # Optional include for APM monitoring during development.
-        import newrelic.agent
-        newrelic.agent.initialize()
-    except ImportError:
-        pass
-else:
-    ScoutApm = None
 
 
 def create_application(
@@ -82,12 +65,6 @@ def create_application(
     app.register_blueprint(executions_routes.blueprint)
     app.register_blueprint(notebooks_routes.blueprint)
     app.register_blueprint(viewers_routes.blueprint)
-
-    if ScoutApm is not None and os.environ.get('SCOUT_KEY'):
-        ScoutApm(app)
-        app.config['SCOUT_MONITOR'] = True
-        app.config['SCOUT_KEY'] = os.environ['SCOUT_KEY']
-        app.config['SCOUT_NAME'] = os.environ.get('SCOUT_NAME', 'cauldron-ui')
 
     # Either used the specified port for the UI if one was given or
     # find the first available port in the given range and use that
