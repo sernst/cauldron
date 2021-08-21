@@ -8,6 +8,7 @@ from cauldron.cli import commander
 from cauldron.session import exposed  # noqa
 from cauldron.steptest import support
 from cauldron.steptest.results import StepTestRunResult
+from typing import Generator
 
 try:
     import pytest
@@ -35,7 +36,7 @@ def create_test_fixture(test_file_path: str, fixture_name: str = 'tester'):
     )
 
     @pytest.fixture(name=fixture_name)
-    def tester_fixture() -> CauldronTest:
+    def tester_fixture() -> Generator[CauldronTest, None, None]:
         tester = CauldronTest(project_path=path)
         tester.setup()
         yield tester
