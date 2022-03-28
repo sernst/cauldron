@@ -8,7 +8,7 @@ import typing
 from jinja2 import Environment
 from jinja2 import FileSystemLoader
 from jinja2 import Template
-from jinja2 import contextfilter
+from jinja2 import pass_context
 from jinja2.runtime import Context
 
 from cauldron import environ
@@ -18,7 +18,7 @@ BASE_TIME = time.time()
 JINJA_ENVIRONMENT = Environment()
 
 
-@contextfilter
+@pass_context
 def get_id(context: Context, prefix: str) -> str:
     """
     A jinja2 context filter for creating reusable unique identifiers within a
@@ -47,8 +47,8 @@ def get_id(context: Context, prefix: str) -> str:
     )
 
 
-@contextfilter
-def get_latex(content:Context, prefix: str) -> str:
+@pass_context
+def get_latex(content: Context, prefix: str) -> str:
     """..."""
     return '\n\n{}\n\n'.format(render_template(
         'katex.html',
