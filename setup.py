@@ -37,6 +37,7 @@ setup(
     version=settings['version'],
     description='The Unnotebook: Data Analysis Environment',
     long_description=readme(),
+    long_description_content_type="text/x-rst",
     keywords=[
         'Data', 'Analysis', 'Visualization',
         'Interactive', 'Interpreter', 'Shell'

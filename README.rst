@@ -362,6 +362,6 @@ will happen in the kernel's environment, not your local one.
 Windows Development
 -------------------
 
-If you are developing and testing on Windows, you will need to install
-`pyreadline3` for the test suite to run as `readline` is not available
-on non-*ix systems.
+If you are developing and testing on Windows, you will need to install ``pyreadline3``
+for the test suite to run as the ``readline`` standard library package is not available
+on Windows.
