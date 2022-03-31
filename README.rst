@@ -358,3 +358,10 @@ relayed to the kernel. All project files will be synchronized between the
 local environment and the kernel's environment. This means you can interact
 with a local project exactly like you normally would, but all of the execution
 will happen in the kernel's environment, not your local one.
+
+Windows Development
+-------------------
+
+If you are developing and testing on Windows, you will need to install
+`pyreadline3` for the test suite to run as `readline` is not available
+on non-*ix systems.

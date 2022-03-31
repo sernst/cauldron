@@ -1,0 +1,8 @@
+ids:
+- standard
+- kernel-standard
+- standard310
+- kernel-standard310
+build_args:
+  PARENT: python:3.10
+  TYPE: kernel

@@ -13,5 +13,5 @@ def test_hello():
     response = client.get('/')
     assert 302 == response.status_code
 
-    expected = 'http://localhost{}/app'.format(configs.ROOT_PREFIX)
+    expected = '{}/app'.format(configs.ROOT_PREFIX)
     assert expected == response.location

@@ -1,0 +1,6 @@
+ids:
+- ui-standard
+- ui-standard310
+build_args:
+  PARENT: python:3.10
+  TYPE: ui

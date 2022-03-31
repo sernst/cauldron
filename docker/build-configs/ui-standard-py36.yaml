@@ -1,5 +1,0 @@
-ids:
-- ui-standard36
-build_args:
-  PARENT: python:3.6
-  TYPE: ui

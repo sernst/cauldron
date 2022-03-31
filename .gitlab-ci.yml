@@ -2,19 +2,6 @@ stages:
 - check
 - broadcast
 
-pytest-py36:
-  image: python:3.6
-  stage: check
-  script:
-  - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
-  - pip install -r requirements.txt
-  - >
-    py.test
-    --verbose
-    --cov-report term
-    --cov=cauldron
-    .
-
 pytest-py37:
   image: python:3.7
   stage: check
@@ -51,6 +38,18 @@ pytest-py38:
 pytest-py39:
   image: python:3.9
   stage: check
+  script:
+  - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
+  - pip install -r requirements.txt
+  - >
+    py.test
+    --verbose
+    --cov-report term
+    --cov=cauldron
+    .
+pytest-py310:
+  image: python:3.10
+  stage: check
   coverage: '/^TOTAL.*\s+\d+\s+\d+\s+(\d+)%/'
   script:
   - export PYTHONPATH="${PYTHONPATH}:$(pwd)"
@@ -63,7 +62,7 @@ pytest-py39:
     .
 
 codecov:
-  image: python:3.9
+  image: python:3.10
   stage: broadcast
   allow_failure: true
   script:
@@ -72,7 +71,7 @@ codecov:
   - codecov
 
 coveralls:
-  image: python:3.9
+  image: python:3.10
   stage: broadcast
   allow_failure: true
   script:
