@@ -1,6 +1,4 @@
 ids:
-- standard
-- kernel-standard
 - standard39
 - kernel-standard39
 build_args:
